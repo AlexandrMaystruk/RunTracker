@@ -1,0 +1,66 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    def globalConfiguration = rootProject.ext
+
+    compileSdkVersion globalConfiguration.androidCompileSdkVersion
+    defaultConfig {
+        minSdkVersion globalConfiguration.androidMinSdkVersion
+        targetSdkVersion globalConfiguration.androidTargetSdkVersion
+
+        versionCode globalConfiguration.androidVersionCode
+        versionName globalConfiguration.androidVersionName
+
+        testInstrumentationRunner globalConfiguration["testInstrumentationRunner"]
+        vectorDrawables.useSupportLibrary = true
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    def presentationDependencies = rootProject.ext.presentationDependencies
+    def presentationTestDependencies = rootProject.ext.presentationTestDependencies
+
+    implementation presentationDependencies.kotlin
+    implementation presentationDependencies.navigationFragment
+    implementation presentationDependencies.navigationUI
+    implementation presentationDependencies.supportAndroid
+    implementation presentationDependencies.supportAppCompat
+    implementation presentationDependencies.supportDesign
+    implementation presentationDependencies.cardView
+    implementation presentationDependencies.recyclerView
+    implementation presentationDependencies.constraintLayout
+    implementation presentationDependencies.kotlinAnko
+    implementation presentationDependencies.kotlinKtx
+    implementation presentationDependencies.dagger
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    kapt presentationDependencies.daggerCompiler
+
+    debugImplementation presentationDependencies.leakcanary
+
+    testImplementation presentationTestDependencies.junit
+    testImplementation presentationTestDependencies.mockito
+
+    androidTestImplementation presentationTestDependencies.espresso
+    androidTestImplementation presentationTestDependencies.testingSupportLib
+}
