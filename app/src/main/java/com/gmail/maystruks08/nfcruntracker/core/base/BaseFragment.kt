@@ -3,7 +3,6 @@ package com.gmail.maystruks08.nfcruntracker.core.base
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import com.gmail.maystruks08.hikingfood.FragmentToolbar
 
 abstract class BaseFragment : Fragment() {
 

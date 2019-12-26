@@ -4,7 +4,6 @@ import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import com.gmail.maystruks08.hikingfood.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.R
 
 class ToolbarManager constructor(private var builder: FragmentToolbar, private var container: View) {

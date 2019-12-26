@@ -31,7 +31,8 @@ class FragmentArgumentDelegate<T : Any> :
     @Suppress("UNCHECKED_CAST")
     override fun getValue(thisRef: Fragment, property: KProperty<*>): T {
         val key = property.name
-        return thisRef.arguments?.get(key) as? T ?: throw IllegalStateException("Property ${property.name} could not be read")
+        return thisRef.arguments?.get(key) as? T
+            ?: throw IllegalStateException("Property ${property.name} could not be read")
     }
 
     override fun setValue(thisRef: Fragment, property: KProperty<*>, value: T) {
@@ -53,19 +54,19 @@ class FragmentNullableArgumentDelegate<T : Any?> :
     }
 
     override fun setValue(thisRef: Fragment, property: KProperty<*>, value: T?) {
-        val args = thisRef.arguments
-            ?: Bundle().also(thisRef::setArguments)
+        val args = thisRef.arguments ?: Bundle().also(thisRef::setArguments)
         val key = property.name
         value?.let { args.put(key, it) } ?: args.remove(key)
     }
 
     fun <T : Any> argument(): ReadWriteProperty<Fragment, T> =
         FragmentArgumentDelegate()
+
     fun <T : Any> argumentNullable(): ReadWriteProperty<Fragment, T?> =
         FragmentNullableArgumentDelegate()
 
 
-    //THIS IS DEMO HOW IT WORKS
+//THIS IS DEMO HOW IT WORKS
 //    class DemoFragment : Fragment() {
 //        private var param1: Int by argument()
 //        private var param2: String by argument()

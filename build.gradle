@@ -130,7 +130,6 @@ ext {
             kotlin         : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
             room           : "androidx.room:room-runtime:$roomVersion",
             roomCompiler   : "androidx.room:room-compiler:$roomVersion",
-            roomRxJava     : "androidx.room:room-rxjava2:$roomVersion",
             workManager    : "androidx.work:work-runtime-ktx:$workManagerVersion",
             itextpdf       : "com.itextpdf:itextg:$textPDFVersion"
     ]

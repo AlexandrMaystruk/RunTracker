@@ -31,6 +31,7 @@ dependencies {
     implementation project(':domain')
 
     api dataDependencies.room
+    kapt dataDependencies.roomCompiler
 
     implementation dataDependencies.annotations
     implementation dataDependencies.kotlin
@@ -38,8 +39,6 @@ dependencies {
 
     compileOnly dataDependencies.javaxInject
     compileOnly dataDependencies.javaxAnnotation
-
-    kapt dataDependencies.roomCompiler
 
     testImplementation dataTestDependencies.junit
     testImplementation dataTestDependencies.mockito

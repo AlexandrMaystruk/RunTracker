@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.hikingfood
+package com.gmail.maystruks08.nfcruntracker.core.base
 
 import android.view.MenuItem
 import androidx.annotation.DrawableRes
