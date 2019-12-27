@@ -36,6 +36,8 @@ dependencies {
     implementation dataDependencies.annotations
     implementation dataDependencies.kotlin
     implementation dataDependencies.itextpdf
+    implementation dataDependencies.corutinesCore
+    implementation dataDependencies.corutinesAndroid
 
     compileOnly dataDependencies.javaxInject
     compileOnly dataDependencies.javaxAnnotation
