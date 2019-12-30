@@ -34,6 +34,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -45,18 +49,24 @@ dependencies {
     api project(':data')
 
     implementation presentationDependencies.kotlin
+    implementation presentationDependencies.kotlinAnko
+    implementation presentationDependencies.kotlinKtx
+
+    implementation presentationDependencies.lifecycleExtensions
+    implementation presentationDependencies.lifecycleLivedata
+    implementation presentationDependencies.lifecycleViewmodel
     implementation presentationDependencies.navigationFragment
     implementation presentationDependencies.navigationUI
+    implementation presentationDependencies.dagger
+
+    kapt presentationDependencies.daggerCompiler
+
     implementation presentationDependencies.supportAndroid
     implementation presentationDependencies.supportAppCompat
     implementation presentationDependencies.supportDesign
     implementation presentationDependencies.cardView
     implementation presentationDependencies.recyclerView
     implementation presentationDependencies.constraintLayout
-    implementation presentationDependencies.kotlinAnko
-    implementation presentationDependencies.kotlinKtx
-    implementation presentationDependencies.dagger
-    kapt presentationDependencies.daggerCompiler
 
     debugImplementation presentationDependencies.leakcanary
 

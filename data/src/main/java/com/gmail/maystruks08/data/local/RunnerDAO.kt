@@ -3,20 +3,19 @@ package com.gmail.maystruks08.data.local
 import androidx.room.*
 
 @Dao
-interface CompetitorDAO {
+interface RunnerDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(users: CompetitorResultTable)
-
-
-    @Update
-    fun update(menu: CompetitorResultTable)
+    fun insert(users: RunnerTable)
 
     @Update
-    fun update(menus: List<CompetitorResultTable>)
+    fun update(menu: RunnerTable)
+
+    @Update
+    fun update(menus: List<RunnerTable>)
 
     @Delete
-    fun delete(menu: CompetitorResultTable)
+    fun delete(menu: RunnerTable)
 
     @Query("DELETE FROM users")
     fun dropTable()

@@ -5,11 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import javax.annotation.Resource
 
-abstract class BaseFragment(@Resource private val layout : Int) : Fragment() {
+abstract class BaseFragment(private val layout : Int) : Fragment() {
 
     var toolbarManager: ToolbarManager? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        injectDependencies()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(layout, container, false)
@@ -17,11 +21,16 @@ abstract class BaseFragment(@Resource private val layout : Int) : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        toolbarManager =  ToolbarManager(builder(), view).apply { prepareToolbar() }
+        bindViewModel()
+        toolbarManager =  ToolbarManager(initToolbar(), view).apply { prepareToolbar() }
         initViews()
     }
 
-    protected abstract fun builder(): FragmentToolbar
+    protected abstract fun injectDependencies()
+
+    protected abstract fun initToolbar(): FragmentToolbar
+
+    protected abstract fun bindViewModel()
 
     protected abstract fun initViews()
 

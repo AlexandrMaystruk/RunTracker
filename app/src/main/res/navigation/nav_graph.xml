@@ -6,7 +6,7 @@
     app:startDestination="@id/rootFragment">
     <fragment
         android:id="@+id/rootFragment"
-        android:name="com.gmail.maystruks08.nfcruntracker.ui.fragments.RootFragment"
+        android:name="com.gmail.maystruks08.nfcruntracker.ui.RootFragment"
         android:label="fragmentRoot"
         tools:layout="@layout/fragment_root" >
     </fragment>

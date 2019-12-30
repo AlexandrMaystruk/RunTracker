@@ -4,9 +4,12 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "users")
-data class CompetitorResultTable(
+data class RunnerTable(
     @PrimaryKey
-    var id: String
+    val id: String,
+    val name: String,
+    val surname: String,
+    val age: Int
 )
 
 

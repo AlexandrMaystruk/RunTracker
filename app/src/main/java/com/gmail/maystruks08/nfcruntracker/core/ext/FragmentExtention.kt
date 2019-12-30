@@ -1,10 +1,16 @@
-package com.gmail.maystruks08.nfcruntracker
+package com.gmail.maystruks08.nfcruntracker.core.ext
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+
+fun Context.toast (text: String = "Some text") {
+    Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+}
 
 fun <T> Bundle.put(key: String, value: T) {
     when (value) {
