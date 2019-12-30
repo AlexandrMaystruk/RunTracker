@@ -1,6 +1,7 @@
 package com.gmail.maystruks08.nfcruntracker.ui
 
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
@@ -14,6 +15,8 @@ class RootFragment : BaseFragment(R.layout.fragment_root) {
     @Inject
     lateinit var viewModel: RootViewModel
 
+    private lateinit var runnerAdapter: RunnerAdapter
+
     override fun injectDependencies() {
         App.rootComponent?.inject(this)
     }
@@ -24,11 +27,20 @@ class RootFragment : BaseFragment(R.layout.fragment_root) {
         viewModel.toast.observe(viewLifecycleOwner, Observer {
             context?.toast(it)
         })
+
+        viewModel.runners.observe(viewLifecycleOwner, Observer {
+            runnerAdapter.runnerList = it
+        })
     }
 
     override fun initViews() {
-        addNewRunner.setOnClickListener {
-            viewModel.onAddNewRunnerClicked()
+        runnerAdapter = RunnerAdapter {}
+        runnersRecyclerView.apply {
+            layoutManager = LinearLayoutManager(runnersRecyclerView.context)
+            adapter = runnerAdapter
+        }
+        showAllRunners.setOnClickListener {
+            viewModel.showAllRunnerClicked()
         }
     }
 

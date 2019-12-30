@@ -1,9 +1,9 @@
-package com.gmail.maystruks08.domain.repository
+package com.gmail.maystruks08.domain.interactors
 
 import com.gmail.maystruks08.domain.entities.Runner
 
 
-interface RootRepository {
+interface RootInteractor {
 
     suspend fun getAllRunners(): List<Runner>
 }

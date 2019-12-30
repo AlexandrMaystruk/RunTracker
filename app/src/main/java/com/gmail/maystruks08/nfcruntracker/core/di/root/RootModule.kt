@@ -2,6 +2,8 @@ package com.gmail.maystruks08.nfcruntracker.core.di.root
 
 import androidx.lifecycle.ViewModel
 import com.gmail.maystruks08.data.repository.RootRepositoryImpl
+import com.gmail.maystruks08.domain.interactors.RootInteractor
+import com.gmail.maystruks08.domain.interactors.RootInteractorImpl
 import com.gmail.maystruks08.domain.repository.RootRepository
 import com.gmail.maystruks08.nfcruntracker.core.di.ViewModelKey
 import com.gmail.maystruks08.nfcruntracker.core.di.ViewModelModule
@@ -22,5 +24,9 @@ abstract class RootModule {
     @Binds
     @RootScope
     abstract fun bindRootRepository(impl: RootRepositoryImpl): RootRepository
+
+    @Binds
+    @RootScope
+    abstract fun bindRootInteractor(impl: RootInteractorImpl): RootInteractor
 
 }

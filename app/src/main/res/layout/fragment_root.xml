@@ -6,12 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".ui.RootFragment">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/runnersRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/showAllRunners"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/addNewRunner"
+        android:id="@+id/showAllRunners"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add new runner"
+        android:text="Show all runners"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
