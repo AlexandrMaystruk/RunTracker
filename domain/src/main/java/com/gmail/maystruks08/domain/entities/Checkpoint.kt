@@ -2,4 +2,4 @@ package com.gmail.maystruks08.domain.entities
 
 import java.util.*
 
-data class Checkpoint(val id: String, var state: CheckpointState,  var date: Date? = null, val checkpointSettings: CheckpointSettings)
+data class Checkpoint(val id: String = "unknown", var state: CheckpointState = CheckpointState.STEP_UNDO, var date: Date? = null)

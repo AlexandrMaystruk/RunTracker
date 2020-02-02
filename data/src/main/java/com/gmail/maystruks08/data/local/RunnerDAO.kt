@@ -5,20 +5,38 @@ import androidx.room.*
 @Dao
 interface RunnerDAO {
 
+    @Transaction
+    suspend fun insertRunner(runner: RunnerTable, checkpoints: List<CheckpointTable>) {
+        insert(runner)
+        insertCheckpoints(checkpoints)
+    }
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(users: RunnerTable)
+    suspend fun insert(users: RunnerTable)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCheckpoints(checkpoints: List<CheckpointTable>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(users: List<RunnerTable>)
+
+    @Query("SELECT * FROM runners")
+    suspend fun getRunners(): List<RunnerWithCheckpoints>
 
     @Update
-    fun update(menu: RunnerTable)
+    suspend fun update(menu: RunnerTable)
 
     @Update
-    fun update(menus: List<RunnerTable>)
+    suspend fun update(menus: List<RunnerTable>)
 
     @Delete
-    fun delete(menu: RunnerTable)
+    suspend fun delete(menu: RunnerTable)
 
-    @Query("DELETE FROM users")
-    fun dropTable()
+    @Query("DELETE FROM runners WHERE number =:number ")
+    suspend fun delete(number: Int)
+
+    @Query("DELETE FROM runners")
+    suspend fun dropTable()
 }
 
 

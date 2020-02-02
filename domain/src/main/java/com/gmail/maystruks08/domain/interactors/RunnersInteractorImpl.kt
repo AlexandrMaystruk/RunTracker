@@ -1,20 +1,17 @@
 package com.gmail.maystruks08.domain.interactors
 
+import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.entities.Runner
-import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.domain.repository.RunnersRepository
 import javax.inject.Inject
 
 class RunnersInteractorImpl @Inject constructor(private val runnersRepository: RunnersRepository) :
     RunnersInteractor {
 
-    override suspend fun getAllRunners(): List<Runner> = runnersRepository.getAllRunners()
+    override suspend fun getAllRunners(): ResultOfTask<Exception, List<Runner>> = runnersRepository.getAllRunners()
 
-    override suspend fun getFilteredRunners(filter: String): List<Runner> {
-        val pattern = ".*${filter.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
-        return runnersRepository.getAllRunners().filter {
-            pattern.containsMatchIn(it.number.toString().toLowerCase())
-        }
+    override suspend fun updateRunnersCache(onResult: (ResultOfTask<Exception, List<Runner>>) -> Unit){
+        runnersRepository.updateRunnersCache(onResult)
     }
 
     override suspend fun addCurrentCheckpointToRunner(cardId: String): Runner? {

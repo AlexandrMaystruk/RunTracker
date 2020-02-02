@@ -90,8 +90,8 @@ class HostActivity : AppCompatActivity() {
             builder.setMessage("Включить NFC для сканирования карт участников?")
             builder.setPositiveButton(android.R.string.yes) { dialog, _ ->
                 toast("Please activate NFC and press Back to return to the application!")
-                startActivity(Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS))
                 dialog.dismiss()
+                startActivity(Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS))
             }
             builder.setNegativeButton(android.R.string.no) { dialog, _ ->
                 toast("NFC scanner disabled! Some functions will not work!")

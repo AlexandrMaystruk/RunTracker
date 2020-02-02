@@ -143,7 +143,7 @@ ext {
             javaxAnnotation : "javax.annotation:jsr250-api:${javaxAnnotationVersion}",
             javaxInject     : "javax.inject:javax.inject:${javaxInjectVersion}",
             kotlin          : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlin_version}",
-            room            : "androidx.room:room-runtime:${roomVersion}",
+            room            : "androidx.room:room-ktx:${roomVersion}",
             roomCompiler    : "androidx.room:room-compiler:${roomVersion}",
             workManager     : "androidx.work:work-runtime-ktx:${workManagerVersion}",
             itextpdf        : "com.itextpdf:itextg:${textPDFVersion}",

@@ -30,6 +30,8 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
 
     override fun bindViewModel() {
         viewModel.runner.observe(viewLifecycleOwner, Observer { runnerView ->
+            val numberStr = "#" + runnerView.number
+            tvRunnerNumber.text = numberStr
             tvRunnerName.text = runnerView.name
             tvRunnerSurname.text = runnerView.surname
             tvDateOfBirthday.text = runnerView.dateOfBirthday

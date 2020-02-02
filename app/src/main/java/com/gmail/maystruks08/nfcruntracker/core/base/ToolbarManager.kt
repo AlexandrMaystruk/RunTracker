@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import com.gmail.maystruks08.nfcruntracker.R
 
+
 class ToolbarManager constructor(private var builder: FragmentToolbar, private var container: View) {
 
     private var fragmentToolbar: Toolbar? = null
@@ -35,6 +36,7 @@ class ToolbarManager constructor(private var builder: FragmentToolbar, private v
             if(builder.searchViewTextChangeListener != null){
                 val menu = fragmentToolbar?.menu
                 val searchView = menu?.findItem(R.id.action_search)?.actionView as? SearchView
+                searchView?.inputType = builder.searchViewInputType
                 searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String): Boolean {
                         return false

@@ -13,6 +13,8 @@ data class Runner(
     val checkpoints: List<Checkpoint>
 ) {
 
+    constructor() : this("", -1, "", "", "", Date(), RunnerType.NORMAL, listOf())
+
     fun getTotalResult(): Date? {
         return if (isAllDone()) {
             Date(checkpoints.last().date!!.time - checkpoints.first().date!!.time)

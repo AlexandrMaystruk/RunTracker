@@ -27,7 +27,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/tvRunnerName"
+                android:id="@+id/tvRunnerNumber"
                 style="@style/TextM"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -35,6 +35,17 @@
                 android:layout_marginTop="@dimen/margin_m"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+
+            <TextView
+                android:id="@+id/tvRunnerName"
+                style="@style/TextM"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_s"
+                app:layout_constraintBottom_toBottomOf="@+id/tvRunnerNumber"
+                app:layout_constraintStart_toEndOf="@+id/tvRunnerNumber"
+                app:layout_constraintTop_toTopOf="@+id/tvRunnerNumber" />
 
             <TextView
                 android:id="@+id/tvRunnerSurname"

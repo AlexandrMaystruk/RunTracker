@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
+import android.text.InputType
 import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,7 +17,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
     @Inject
     lateinit var viewModel: RunnersViewModel
 
-    private lateinit var runnerAdapter: RunnerAdapter
+    private var runnerAdapter: RunnerAdapter? = null
 
     override fun injectDependencies() {
         App.runnersComponent?.inject(this)
@@ -30,7 +31,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
             viewModel.onOpenSettingsFragmentClicked()
             true
         }))
-        .withMenuSearch {
+        .withMenuSearch(InputType.TYPE_CLASS_NUMBER) {
             viewModel.onSearchQueryChanged(it)
         }
         .build()
@@ -41,11 +42,11 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
         })
 
         viewModel.runners.observe(viewLifecycleOwner, Observer {
-            runnerAdapter.runnerList = it
+            runnerAdapter?.runnerList = it
         })
 
         viewModel.runnerUpdate.observe(viewLifecycleOwner, Observer {
-            runnerAdapter.updateItem(it)
+            runnerAdapter?.updateItem(it)
         })
     }
 
@@ -58,6 +59,8 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
     }
 
     override fun onDestroyView() {
+        runnersRecyclerView.adapter = null
+        runnerAdapter = null
         App.clearRunnersComponent()
         super.onDestroyView()
     }

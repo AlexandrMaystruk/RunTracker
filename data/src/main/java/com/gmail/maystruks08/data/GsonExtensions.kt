@@ -26,4 +26,3 @@ inline fun <reified T> Gson.toJsonOrNull(clazz: T?, parentType: Type? = null): S
         }
     }
 }
-

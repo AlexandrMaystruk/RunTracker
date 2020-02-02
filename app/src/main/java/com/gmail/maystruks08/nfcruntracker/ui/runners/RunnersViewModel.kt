@@ -1,7 +1,10 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
 import androidx.lifecycle.*
+import com.gmail.maystruks08.domain.entities.ResultOfTask
+import com.gmail.maystruks08.domain.entities.Runner
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
+import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
@@ -24,22 +27,30 @@ class RunnersViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             showAllRunners()
+            runnersInteractor.updateRunnersCache(::onRunnersUpdates)
+        }
+    }
+
+    private fun onRunnersUpdates(onResult: ResultOfTask<Exception, List<Runner>>){
+        when (onResult) {
+            is ResultOfTask.Value -> runnersLiveData.postValue(onResult.value.map { it.toRunnerView() }.toMutableList())
+            is ResultOfTask.Error -> handleError(onResult.error)
         }
     }
 
     private suspend fun showAllRunners() {
-        toastLiveData.postValue("Start load runners")
-        val allRunners = runnersInteractor.getAllRunners().toMutableList()
-        runnersLiveData.postValue(allRunners.map { it.toRunnerView() }.toMutableList())
-        toastLiveData.postValue("End load runners")
+        toastLiveData.postValue("Init runners list")
+        when (val result = runnersInteractor.getAllRunners()) {
+            is ResultOfTask.Value -> runnersLiveData.postValue(result.value.map { it.toRunnerView() }.toMutableList())
+            is ResultOfTask.Error -> handleError(result.error)
+        }
     }
 
     fun onNfcCardScanned(cardId: String) {
         viewModelScope.launch {
-            toastLiveData.postValue("Start handle card = $cardId")
             runnersInteractor.addCurrentCheckpointToRunner(cardId)?.let {
                 runnerUpdateLiveData.postValue(it.toRunnerView())
-                toastLiveData.postValue("Сheckpoint counted")
+                toastLiveData.postValue("Сheckpoint counted, card id:$cardId")
             }
         }
     }
@@ -47,8 +58,17 @@ class RunnersViewModel @Inject constructor(
     fun onSearchQueryChanged(query: String) {
         viewModelScope.launch {
             if (query.isNotEmpty()) {
-                val allRunners = runnersInteractor.getFilteredRunners(query).toMutableList()
-                runnersLiveData.postValue(allRunners.map { it.toRunnerView() }.toMutableList())
+                when (val result = runnersInteractor.getAllRunners()) {
+                    is ResultOfTask.Value -> {
+                        val pattern = ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
+                        runnersLiveData.postValue(
+                            result.value.filter {
+                                pattern.containsMatchIn(it.number.toString().toLowerCase())
+                            }.map { it.toRunnerView() }.toMutableList()
+                        )
+                    }
+                    is ResultOfTask.Error -> handleError(result.error)
+                }
             } else {
                 showAllRunners()
             }
@@ -61,5 +81,9 @@ class RunnersViewModel @Inject constructor(
 
     fun onOpenSettingsFragmentClicked() {
         router.navigateTo(Screens.SettingsScreen())
+    }
+
+    private fun handleError(e: Exception) {
+        e.printStackTrace()
     }
 }
