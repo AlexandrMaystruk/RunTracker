@@ -5,13 +5,20 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import java.util.*
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-fun Context.toast (text: String = "Some text") {
+fun Context.toast(text: String = "Some text") {
     Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
 }
 
+inline fun <reified T : Fragment> FragmentActivity.getFragment(tag: String): T? {
+    return supportFragmentManager.findFragmentByTag(tag) as? T
+}
+
+@Suppress("UNCHECKED_CAST")
 fun <T> Bundle.put(key: String, value: T) {
     when (value) {
         is Boolean -> putBoolean(key, value)
@@ -27,12 +34,12 @@ fun <T> Bundle.put(key: String, value: T) {
         is Float -> putFloat(key, value)
         is Bundle -> putBundle(key, value)
         is Parcelable -> putParcelable(key, value)
+        is ArrayList<*> -> putParcelableArrayList(key, value as ArrayList<out Parcelable>)
         else -> throw IllegalStateException("Type of property $key is not supported")
     }
 }
 
-class FragmentArgumentDelegate<T : Any> :
-    ReadWriteProperty<Fragment, T> {
+class FragmentArgumentDelegate<T : Any> : ReadWriteProperty<Fragment, T> {
 
     @Suppress("UNCHECKED_CAST")
     override fun getValue(thisRef: Fragment, property: KProperty<*>): T {
@@ -42,16 +49,18 @@ class FragmentArgumentDelegate<T : Any> :
     }
 
     override fun setValue(thisRef: Fragment, property: KProperty<*>, value: T) {
-        val args = thisRef.arguments
-            ?: Bundle().also(thisRef::setArguments)
+        val args = thisRef.arguments ?: Bundle().also(thisRef::setArguments)
         val key = property.name
         args.put(key, value)
     }
 }
 
+fun <T : Any> argument(): ReadWriteProperty<Fragment, T> = FragmentArgumentDelegate()
 
-class FragmentNullableArgumentDelegate<T : Any?> :
-    ReadWriteProperty<Fragment, T?> {
+fun <T : Any> argumentNullable(): ReadWriteProperty<Fragment, T?> =
+    FragmentNullableArgumentDelegate()
+
+class FragmentNullableArgumentDelegate<T : Any?> : ReadWriteProperty<Fragment, T?> {
 
     @Suppress("UNCHECKED_CAST")
     override fun getValue(thisRef: Fragment, property: KProperty<*>): T? {
@@ -64,24 +73,4 @@ class FragmentNullableArgumentDelegate<T : Any?> :
         val key = property.name
         value?.let { args.put(key, it) } ?: args.remove(key)
     }
-
-    fun <T : Any> argument(): ReadWriteProperty<Fragment, T> =
-        FragmentArgumentDelegate()
-
-    fun <T : Any> argumentNullable(): ReadWriteProperty<Fragment, T?> =
-        FragmentNullableArgumentDelegate()
-
-
-//THIS IS DEMO HOW IT WORKS
-//    class DemoFragment : Fragment() {
-//        private var param1: Int by argument()
-//        private var param2: String by argument()
-//        companion object {
-//            fun newInstance(param1: Int, param2: String): DemoFragment =
-//                DemoFragment().apply {
-//                    this.param1 = param1
-//                    this.param2 = param2
-//                }
-//        }
-//    }
 }

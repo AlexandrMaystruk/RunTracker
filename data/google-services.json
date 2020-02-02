@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "911749988113",
+    "firebase_url": "https://nfcruntracker.firebaseio.com",
+    "project_id": "nfcruntracker",
+    "storage_bucket": "nfcruntracker.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:911749988113:android:c0ce26c2dcafa2184f96b0",
+        "android_client_info": {
+          "package_name": "com.gmail.maystruks08.data"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "911749988113-844v8pt8pi7nc4bioc1r0ql0jurnanbd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gmail.maystruks08.nfcruntracker",
+            "certificate_hash": "f239a946c9d4b43e74f39049094a7636f5f3ba35"
+          }
+        },
+        {
+          "client_id": "911749988113-ecqhtt5djhkkgot3qtb79tqlhf7dmf3o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSJ9EpBw1iPxtNVPnSoo7nE7XvaFt9TcU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "911749988113-ecqhtt5djhkkgot3qtb79tqlhf7dmf3o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

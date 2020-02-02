@@ -12,7 +12,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "android.arch.navigation:navigation-safe-args-gradle-plugin:$navigationSageArgs"
+        classpath 'com.google.gms:google-services:4.3.3'
     }
 }
 
@@ -81,10 +81,16 @@ ext {
     leakCanaryVersion = '2.0-beta-3'
 
     //navigation version
-    navigationVersion = '2.1.0'
+    ciceroneVersion = '4.0.2'
+
+    //fireStore version
+    firestoreVersion = '21.3.1'
+
+    //https://github.com/ShawnLin013/NumberPicker
+    numberPickerVersion = '2.4.8'
 
     //Testing
-    jUnitVersion = '4.12'
+    jUnitVersion = '4.13'
     mockitoKotlinVersion = '2.1.0'
     espressoVersion = '3.2.0'
     testingSupportLibVersion = '1.2.0'
@@ -104,13 +110,14 @@ ext {
             javaxInject        : "javax.inject:javax.inject:${javaxInjectVersion}",
             daggerCompiler     : "com.google.dagger:dagger-compiler:${daggerVersion}",
             dagger             : "com.google.dagger:dagger:${daggerVersion}",
-            navigationFragment : "androidx.navigation:navigation-fragment-ktx:${navigationVersion}",
-            navigationUI       : "androidx.navigation:navigation-ui-ktx:${navigationVersion}",
+            cicerone           : "ru.terrakok.cicerone:cicerone:${ciceroneVersion}",
             leakcanary         : "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}",
             // ViewModel and LiveData
             lifecycleExtensions: "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion",
             lifecycleLivedata  : "androidx.lifecycle:lifecycle-livedata-ktx:$livedataVersion",
             lifecycleViewmodel : "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion",
+            numberPicker    : "com.shawnlin:number-picker:${numberPickerVersion}",
+
     ]
 
     presentationTestDependencies = [
@@ -141,7 +148,8 @@ ext {
             workManager     : "androidx.work:work-runtime-ktx:${workManagerVersion}",
             itextpdf        : "com.itextpdf:itextg:${textPDFVersion}",
             corutinesCore   : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}",
-            corutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutinesVersion}"
+            corutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutinesVersion}",
+            firestore       : "com.google.firebase:firebase-firestore:${firestoreVersion}"
     ]
 
     dataTestDependencies = [

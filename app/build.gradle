@@ -55,9 +55,9 @@ dependencies {
     implementation presentationDependencies.lifecycleExtensions
     implementation presentationDependencies.lifecycleLivedata
     implementation presentationDependencies.lifecycleViewmodel
-    implementation presentationDependencies.navigationFragment
-    implementation presentationDependencies.navigationUI
     implementation presentationDependencies.dagger
+    implementation presentationDependencies.cicerone
+    implementation presentationDependencies.numberPicker
 
     kapt presentationDependencies.daggerCompiler
 
