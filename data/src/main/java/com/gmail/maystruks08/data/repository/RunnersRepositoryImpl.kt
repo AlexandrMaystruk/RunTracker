@@ -51,6 +51,12 @@ class RunnersRepositoryImpl @Inject constructor(
                     if (firestoreException != null) {
                         onResult.invoke(ResultOfTask.build { throw firestoreException })
                     } else {
+                        runBlocking {
+                            launch {
+                                runnerDAO.dropTable()
+                                runnersCache.runnersList.clear()
+                            }
+                        }
                         snapshot?.documentChanges?.forEach { documentChange ->
                             when (documentChange.type) {
                                 DocumentChange.Type.ADDED -> {
