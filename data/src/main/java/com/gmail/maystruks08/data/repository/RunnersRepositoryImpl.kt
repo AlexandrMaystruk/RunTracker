@@ -46,31 +46,13 @@ class RunnersRepositoryImpl @Inject constructor(
     override suspend fun updateRunnersCache(onResult: (ResultOfTask<Exception, List<Runner>>) -> Unit) {
         try {
             withContext(Dispatchers.IO) {
-                //Listen firestore db updates
                 firestoreApi.registerSnapshotListener { snapshot, firestoreException ->
                     if (firestoreException != null) {
                         onResult.invoke(ResultOfTask.build { throw firestoreException })
                     } else {
-                        runBlocking {
-                            launch {
-                                runnerDAO.dropTable()
-                                runnersCache.runnersList.clear()
-                            }
-                        }
                         snapshot?.documentChanges?.forEach { documentChange ->
                             when (documentChange.type) {
-                                DocumentChange.Type.ADDED -> {
-                                    documentChange.document.toObject(Runner::class.java)
-                                        .let { runner ->
-                                            runBlocking {
-                                                launch {
-                                                    runnerDAO.insertRunner(runner.toRunnerTable(), runner.checkpoints.map { it.toCheckpointTable(runner.id) })
-                                                    runnersCache.runnersList.add(runner)
-                                                }
-                                            }
-                                        }
-                                }
-                                DocumentChange.Type.MODIFIED -> {
+                                DocumentChange.Type.ADDED, DocumentChange.Type.MODIFIED -> {
                                     documentChange.document.toObject(Runner::class.java)
                                         .let { runner ->
                                             runBlocking {
