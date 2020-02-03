@@ -13,8 +13,7 @@
         android:testOnly="false">
         <activity
             android:theme="@style/AppTheme"
-            android:name=".HostActivity"
-            android:alwaysRetainTaskState="true"
+            android:name="com.gmail.maystruks08.nfcruntracker.HostActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
