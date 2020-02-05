@@ -11,6 +11,14 @@ interface RunnerDAO {
         insertCheckpoints(checkpoints)
     }
 
+    @Transaction
+    suspend fun updateRunner(runner: RunnerTable, checkpoints: List<CheckpointTable>) {
+        update(runner)
+        checkpoints.forEach {
+            updateCheckpoint(it)
+        }
+    }
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(users: RunnerTable)
 
@@ -24,13 +32,13 @@ interface RunnerDAO {
     suspend fun getRunners(): List<RunnerWithCheckpoints>
 
     @Update
-    suspend fun update(menu: RunnerTable)
+    suspend fun update(runner: RunnerTable)
 
     @Update
-    suspend fun update(menus: List<RunnerTable>)
+    suspend fun updateCheckpoint(checkpointTable: CheckpointTable)
 
-    @Delete
-    suspend fun delete(menu: RunnerTable)
+    @Query("UPDATE runners SET needToSync = :needToSync WHERE id = :runnerId")
+    suspend fun markAsNeedToSync(runnerId: String, needToSync: Boolean)
 
     @Query("DELETE FROM runners WHERE number =:number ")
     suspend fun delete(number: Int)

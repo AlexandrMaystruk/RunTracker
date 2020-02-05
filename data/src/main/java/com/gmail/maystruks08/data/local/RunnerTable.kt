@@ -13,7 +13,8 @@ data class RunnerTable(
     val surname: String,
     val city: String,
     val dateOfBirthday: Date,
-    val type: Int
+    val type: Int,
+    val needToSync: Boolean = false
 )
 
 

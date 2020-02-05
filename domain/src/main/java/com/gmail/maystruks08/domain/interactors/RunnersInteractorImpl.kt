@@ -8,6 +8,10 @@ import javax.inject.Inject
 class RunnersInteractorImpl @Inject constructor(private val runnersRepository: RunnersRepository) :
     RunnersInteractor {
 
+    override suspend fun bindGoogleDriveService(): ResultOfTask<Exception, String>{
+        return runnersRepository.bindGoogleDriveService()
+    }
+
     override suspend fun getAllRunners(): ResultOfTask<Exception, List<Runner>> = runnersRepository.getAllRunners()
 
     override suspend fun updateRunnersCache(onResult: (ResultOfTask<Exception, List<Runner>>) -> Unit){
@@ -20,5 +24,9 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
             runner.markCheckpointAsPassed(currentCheckpoint)
             runnersRepository.updateRunnerData(runner)
         }
+    }
+
+    override suspend fun finishWork() {
+        runnersRepository.finishWork()
     }
 }

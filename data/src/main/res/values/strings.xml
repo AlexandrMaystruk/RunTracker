@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">data</string>
+    <string name="default_web_client_id" translatable="false">3324848074-kb2h5mb6caeqluj6l7ve6ih6pk9i770j.apps.googleusercontent.com</string>
+    <string name="firebase_database_url" translatable="false">https://nfcruntracker-f044b.firebaseio.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">3324848074</string>
+    <string name="google_api_key" translatable="false">AIzaSyB5yEftGonPrNm37OT037PslYJae27U6go</string>
+    <string name="google_app_id" translatable="false">1:3324848074:android:2c639388fb9136d9f35133</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyB5yEftGonPrNm37OT037PslYJae27U6go</string>
+    <string name="google_storage_bucket" translatable="false">nfcruntracker-f044b.appspot.com</string>
+    <string name="project_id" translatable="false">nfcruntracker-f044b</string>
+
 </resources>

@@ -9,17 +9,21 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.terrakok.cicerone.Router
 import javax.inject.Inject
 
 class RunnersViewModel @Inject constructor(
     private val runnersInteractor: RunnersInteractor,
-    private val router: Router
-) : BaseViewModel() {
+    private val router: Router) : BaseViewModel() {
 
     val runners get() = runnersLiveData
     val runnerUpdate get() = runnerUpdateLiveData
+
+    val link get() = linkLiveData
+    private val linkLiveData = MutableLiveData<String>()
 
     private val runnersLiveData = MutableLiveData<MutableList<RunnerView>>()
     private val runnerUpdateLiveData = MutableLiveData<RunnerView>()
@@ -29,9 +33,19 @@ class RunnersViewModel @Inject constructor(
             showAllRunners()
             runnersInteractor.updateRunnersCache(::onRunnersUpdates)
         }
+
+        //TODO get runner list from Google drive
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                when (val onResult = runnersInteractor.bindGoogleDriveService()) {
+                    is ResultOfTask.Value -> link.postValue(onResult.value)
+                    is ResultOfTask.Error -> handleError(onResult.error)
+                }
+            }
+        }
     }
 
-    private fun onRunnersUpdates(onResult: ResultOfTask<Exception, List<Runner>>){
+    private fun onRunnersUpdates(onResult: ResultOfTask<Exception, List<Runner>>) {
         when (onResult) {
             is ResultOfTask.Value -> runnersLiveData.postValue(onResult.value.map { it.toRunnerView() }.toMutableList())
             is ResultOfTask.Error -> handleError(onResult.error)
@@ -60,7 +74,8 @@ class RunnersViewModel @Inject constructor(
             if (query.isNotEmpty()) {
                 when (val result = runnersInteractor.getAllRunners()) {
                     is ResultOfTask.Value -> {
-                        val pattern = ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
+                        val pattern =
+                            ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
                         runnersLiveData.postValue(
                             result.value.filter {
                                 pattern.containsMatchIn(it.number.toString().toLowerCase())

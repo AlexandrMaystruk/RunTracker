@@ -7,6 +7,8 @@ import com.google.firebase.firestore.QuerySnapshot
 
 interface FirestoreApi{
 
+    suspend fun getCheckpointsSettings(clientId: String): Task<QuerySnapshot>
+
     suspend fun updateRunner(runner: Runner): Task<Void>
 
     suspend fun downloadAllRunners(): Task<QuerySnapshot>

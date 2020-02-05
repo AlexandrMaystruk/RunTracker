@@ -8,5 +8,4 @@ import javax.inject.Singleton
 class RunnersCache @Inject constructor() {
 
     var runnersList = mutableListOf<Runner>()
-
 }

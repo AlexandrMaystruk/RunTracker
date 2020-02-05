@@ -1,5 +1,7 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
+import android.content.Intent
+import android.net.Uri
 import android.text.InputType
 import android.view.MenuItem
 import androidx.lifecycle.Observer
@@ -47,6 +49,12 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
 
         viewModel.runnerUpdate.observe(viewLifecycleOwner, Observer {
             runnerAdapter?.updateItem(it)
+        })
+
+        viewModel.link.observe(viewLifecycleOwner, Observer { url->
+//            val i = Intent(Intent.ACTION_VIEW)
+//            i.data = Uri.parse(url)
+//            startActivity(i)
         })
     }
 

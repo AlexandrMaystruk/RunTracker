@@ -9,25 +9,37 @@ import com.gmail.maystruks08.data.mappers.toCheckpointTable
 import com.gmail.maystruks08.data.mappers.toRunner
 import com.gmail.maystruks08.data.mappers.toRunnerTable
 import com.gmail.maystruks08.data.remote.FirestoreApi
+import com.gmail.maystruks08.data.remote.googledrive.GoogleDriveApi
 import com.gmail.maystruks08.domain.entities.Checkpoint
 import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.entities.Runner
 import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.domain.repository.RunnersRepository
 import com.google.firebase.firestore.DocumentChange
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 
 class RunnersRepositoryImpl @Inject constructor(
     private val firestoreApi: FirestoreApi,
+    private val driveApi: GoogleDriveApi,
     private val runnerDAO: RunnerDAO,
     private val runnersCache: RunnersCache,
     private val checkpointsCache: CheckpointsCache
 ) : RunnersRepository {
+
+    override suspend fun bindGoogleDriveService(): ResultOfTask<Exception, String> {
+        return try {
+            withContext(Dispatchers.IO) {
+                driveApi.getFile()
+            }
+            ResultOfTask.build { "" }
+        } catch (e: NoClassDefFoundError) {
+            ResultOfTask.build { throw Exception("https://accounts.google.com/o/oauth2/auth?access_type=online&client_id=7796872061-63b7kuf4ac15na6ur2lmp7brmt4ff8fg.apps.googleusercontent.com&redirect_uri=http://localhost:43240/Callback&response_type=code&scope=https://www.googleapis.com/auth/drive") }
+        } catch (e: Exception) {
+            ResultOfTask.build { throw e }
+        }
+    }
 
     override suspend fun getAllRunners(): ResultOfTask<Exception, List<Runner>> {
         return try {
@@ -60,7 +72,11 @@ class RunnersRepositoryImpl @Inject constructor(
                                                     runnerDAO.delete(runner.number)
                                                     runnersCache.runnersList.removeAll { it.number == runner.number }
 
-                                                    runnerDAO.insertRunner(runner.toRunnerTable(), runner.checkpoints.map { it.toCheckpointTable(runner.id) })
+                                                    runnerDAO.insertRunner(
+                                                        runner.toRunnerTable(),
+                                                        runner.checkpoints.map {
+                                                            it.toCheckpointTable(runner.id)
+                                                        })
                                                     runnersCache.runnersList.add(runner)
                                                 }
                                             }
@@ -90,29 +106,38 @@ class RunnersRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateRunnerData(runner: Runner): Runner? {
-        return try {
+        try {
+            withContext(Dispatchers.IO) {
+                runnerDAO.updateRunner(
+                    runner.toRunnerTable(),
+                    runner.checkpoints.map { it.toCheckpointTable(runnerId = runner.id) })
+            }
             awaitTaskCompletable(firestoreApi.updateRunner(runner))
             val index = runnersCache.runnersList.indexOfFirst { it.id == runner.id }
             if (index != -1) {
                 runnersCache.runnersList.removeAt(index)
             }
             runnersCache.runnersList.add(runner)
-            runner
+            return runner
         } catch (e: Exception) {
-            e.printStackTrace()
             Log.e(TAG, e.localizedMessage)
-            null
+            withContext(Dispatchers.IO) {
+                runnerDAO.markAsNeedToSync(runner.id, true)
+            }
+            return runner
         }
     }
 
-    override suspend fun getRunnerById(cardId: String): Runner? =
-        runnersCache.runnersList.find { it.id == cardId }
+    override suspend fun getRunnerById(cardId: String): Runner? = runnersCache.runnersList.find { it.id == cardId }
 
-    override suspend fun getCurrentCheckpoint(type: RunnerType): Checkpoint {
-        return when (type) {
+    override suspend fun getCurrentCheckpoint(type: RunnerType): Checkpoint =
+        when (type) {
             RunnerType.NORMAL -> checkpointsCache.currentCheckpoint
             RunnerType.IRON -> checkpointsCache.currentIronPeopleCheckpoint
         }
+
+    override suspend fun finishWork() {
+        firestoreApi.unregisterUpdatesListener()
     }
 
     companion object {

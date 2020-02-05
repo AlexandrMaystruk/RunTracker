@@ -17,7 +17,8 @@ import java.util.*
     ]
 )
 data class CheckpointTable(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
     val runnerId: String,
     val checkpointId: String,
     val date: Date? = null,

@@ -11,14 +11,8 @@ interface CheckpointDAO {
     @Update
     fun update(menu: RunnerTable)
 
-    @Update
-    fun update(menus: List<RunnerTable>)
 
-    @Delete
-    fun delete(menu: RunnerTable)
 
-    @Query("DELETE FROM users")
-    fun dropTable()
 }
 
 

@@ -89,6 +89,9 @@ ext {
     //https://github.com/ShawnLin013/NumberPicker
     numberPickerVersion = '2.4.8'
 
+    //Google drive
+    googleDriveVersion = '1.23.0'
+
     //Testing
     jUnitVersion = '4.13'
     mockitoKotlinVersion = '2.1.0'
@@ -116,7 +119,7 @@ ext {
             lifecycleExtensions: "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion",
             lifecycleLivedata  : "androidx.lifecycle:lifecycle-livedata-ktx:$livedataVersion",
             lifecycleViewmodel : "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion",
-            numberPicker    : "com.shawnlin:number-picker:${numberPickerVersion}",
+            numberPicker       : "com.shawnlin:number-picker:${numberPickerVersion}",
 
     ]
 
@@ -149,7 +152,10 @@ ext {
             itextpdf        : "com.itextpdf:itextg:${textPDFVersion}",
             corutinesCore   : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}",
             corutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutinesVersion}",
-            firestore       : "com.google.firebase:firebase-firestore:${firestoreVersion}"
+            firestore       : "com.google.firebase:firebase-firestore:${firestoreVersion}",
+            googleDrive     : "com.google.api-client:google-api-client:${googleDriveVersion}",
+            googleAuth      : "com.google.oauth-client:google-oauth-client-jetty:${googleDriveVersion}",
+            googleApi       : "com.google.apis:google-api-services-drive:v3-rev110-${googleDriveVersion}"
     ]
 
     dataTestDependencies = [

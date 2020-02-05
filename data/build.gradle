@@ -1,7 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'com.google.gms.google-services'
 
 android {
     def globalConfiguration = rootProject.extensions.getByName("ext")
@@ -37,6 +36,22 @@ dependencies {
 
     api dataDependencies.room
     api dataDependencies.firestore
+
+    implementation (dataDependencies.googleDrive){
+        exclude group: 'com.google.common'
+        exclude group: 'com.google.guava'
+    }
+
+    implementation (dataDependencies.googleAuth){
+        exclude group: 'com.google.common'
+        exclude group: 'com.google.guava'
+    }
+
+    implementation (dataDependencies.googleApi){
+        exclude group: 'com.google.common'
+        exclude group: 'com.google.guava'
+    }
+
     kapt dataDependencies.roomCompiler
 
     implementation dataDependencies.annotations

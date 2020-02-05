@@ -7,6 +7,8 @@ import com.gmail.maystruks08.domain.entities.RunnerType
 
 interface RunnersRepository {
 
+    suspend fun bindGoogleDriveService(): ResultOfTask<Exception, String>
+
     suspend fun getAllRunners(): ResultOfTask<Exception, List<Runner>>
 
     suspend fun updateRunnersCache(onResult: (ResultOfTask<Exception, List<Runner>>) -> Unit)
@@ -16,5 +18,7 @@ interface RunnersRepository {
     suspend fun updateRunnerData(runner: Runner): Runner?
 
     suspend fun getCurrentCheckpoint(type: RunnerType): Checkpoint
+
+    suspend fun finishWork()
 
 }

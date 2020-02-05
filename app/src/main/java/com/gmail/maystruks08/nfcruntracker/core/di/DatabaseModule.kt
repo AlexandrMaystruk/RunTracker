@@ -6,6 +6,8 @@ import com.gmail.maystruks08.data.local.AppDatabase
 import com.gmail.maystruks08.data.local.RunnerDAO
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.data.remote.FirestoreApiImpl
+import com.gmail.maystruks08.data.remote.googledrive.DriveCredentialsProvider
+import com.gmail.maystruks08.data.remote.googledrive.GoogleDriveApi
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import dagger.Module
@@ -29,6 +31,16 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun firestoreApi(): FirestoreApi = FirestoreApiImpl(FirebaseFirestore.getInstance())
+
+    @JvmStatic
+    @Provides
+    @Singleton
+    fun credentialsProvider(context: Context): DriveCredentialsProvider = DriveCredentialsProvider(context)
+
+    @JvmStatic
+    @Provides
+    @Singleton
+    fun googleDriveApi(context: Context, provider: DriveCredentialsProvider): GoogleDriveApi = GoogleDriveApi(context, provider)
 
 
     @JvmStatic

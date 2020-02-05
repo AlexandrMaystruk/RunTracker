@@ -12,10 +12,11 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
 
     private var registration: ListenerRegistration?= null
 
-    override suspend fun updateRunner(runner: Runner): Task<Void>  = db.collection("runners").document(runner.id).set(runner)
+    override suspend fun getCheckpointsSettings(clientId: String): Task<QuerySnapshot> { TODO("not implemented") }
+
+    override suspend fun updateRunner(runner: Runner): Task<Void>  =db.collection("runners").document(runner.id).set(runner)
 
     override suspend fun downloadAllRunners(): Task<QuerySnapshot> = db.collection("runners").get()
-
 
     override suspend fun registerSnapshotListener(listener: (QuerySnapshot?, FirebaseFirestoreException?) -> Unit) {
         registration = db.collection("runners").addSnapshotListener { snapshots, e ->
@@ -25,6 +26,5 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
 
     override suspend fun unregisterUpdatesListener() {
         registration?.remove()
-        TODO("not implemented")
     }
 }

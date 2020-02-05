@@ -2,6 +2,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
 
 import com.gmail.maystruks08.domain.entities.Checkpoint
 import com.gmail.maystruks08.domain.entities.Runner
+import com.gmail.maystruks08.nfcruntracker.core.ext.toDateFormat
 import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepBean
 
 fun Checkpoint.toStepBean() = StepBean(
@@ -20,6 +21,6 @@ fun Runner.toRunnerView() = RunnerView(
     this.number.toString(),
     this.name,
     this.surname,
-    this.dateOfBirthday.toString(),
+    this.dateOfBirthday.toDateFormat(),
     this.checkpoints.map { it.toCheckpointView() }
 )
