@@ -17,25 +17,46 @@ class SettingsViewModel @Inject constructor(
 
     private val configLiveData = MutableLiveData<SettingsRepository.Config>()
 
+    private var isFirstStart = true
+
     init {
         viewModelScope.launch {
-            val config = repository.getInitialConfig()
+            val config = repository.getConfig()
             configLiveData.postValue(config)
+        }
+
+        viewModelScope.launch {
+            try {
+                repository.updateConfig()?.let { newConfig ->
+                    configLiveData.postValue(newConfig)
+                }
+            } catch (e: Exception){
+                e.printStackTrace()
+            }
         }
     }
 
+    fun onInitViewsStarted(){
+        isFirstStart = true
+    }
+
     fun onCurrentCheckpointChangedForRunners(checkpointNumber: Int) {
-        viewModelScope.launch {
-            repository.changeCurrentCheckpointForRunners(checkpointNumber)
-            toastLiveData.postValue("Settings changed")
+        if(!isFirstStart){
+            viewModelScope.launch {
+                repository.changeCurrentCheckpointForRunners(checkpointNumber)
+                toastLiveData.postValue("Settings changed")
+            }
         }
     }
 
     fun onCurrentCheckpointChangedForIronPeoples(checkpointNumber: Int) {
-        viewModelScope.launch {
-            repository.changeCurrentCheckpointForIronPeoples(checkpointNumber)
-            toastLiveData.postValue("Settings changed")
+        if(!isFirstStart) {
+            viewModelScope.launch {
+                repository.changeCurrentCheckpointForIronPeoples(checkpointNumber)
+                toastLiveData.postValue("Settings changed")
+            }
         }
+        isFirstStart = false
     }
 
     fun onBackClicked() {

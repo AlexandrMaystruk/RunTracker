@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.core.navigation
 
+import com.gmail.maystruks08.nfcruntracker.ui.login.LoginFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
 import com.gmail.maystruks08.nfcruntracker.ui.settings.SettingsFragment
@@ -31,5 +32,12 @@ object Screens {
         }
     }
 
+    class LoginScreen : AppScreen() {
+        override fun getFragment() = LoginFragment()
+
+        companion object {
+            fun tag() = LoginScreen::class.java.canonicalName ?: ""
+        }
+    }
 }
 

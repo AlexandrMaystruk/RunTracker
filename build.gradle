@@ -85,6 +85,8 @@ ext {
 
     //fireStore version
     firestoreVersion = '21.3.1'
+    firebaseUiVersion = '4.3.1'
+    firebaseAuthVersion = '17.0.0'
 
     //https://github.com/ShawnLin013/NumberPicker
     numberPickerVersion = '2.4.8'
@@ -152,6 +154,8 @@ ext {
             itextpdf        : "com.itextpdf:itextg:${textPDFVersion}",
             corutinesCore   : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}",
             corutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutinesVersion}",
+            firebaseUi      : "com.firebaseui:firebase-ui-auth:${firebaseUiVersion}",
+            firebaseAuth    : "com.google.firebase:firebase-auth:${firebaseAuthVersion}",
             firestore       : "com.google.firebase:firebase-firestore:${firestoreVersion}",
             googleDrive     : "com.google.api-client:google-api-client:${googleDriveVersion}",
             googleAuth      : "com.google.oauth-client:google-oauth-client-jetty:${googleDriveVersion}",

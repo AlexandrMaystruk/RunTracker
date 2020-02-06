@@ -1,6 +1,8 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
+import android.content.Context
 import androidx.lifecycle.*
+import com.firebase.ui.auth.AuthUI
 import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.entities.Runner
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
@@ -17,7 +19,8 @@ import javax.inject.Inject
 
 class RunnersViewModel @Inject constructor(
     private val runnersInteractor: RunnersInteractor,
-    private val router: Router) : BaseViewModel() {
+    private val router: Router,
+    private val context: Context) : BaseViewModel(){
 
     val runners get() = runnersLiveData
     val runnerUpdate get() = runnerUpdateLiveData
@@ -96,6 +99,14 @@ class RunnersViewModel @Inject constructor(
 
     fun onOpenSettingsFragmentClicked() {
         router.navigateTo(Screens.SettingsScreen())
+    }
+
+    fun onSignOutClicked() {
+        AuthUI.getInstance()
+            .signOut(context)
+            .addOnCompleteListener {
+                router.newRootScreen(Screens.LoginScreen())
+            }
     }
 
     private fun handleError(e: Exception) {

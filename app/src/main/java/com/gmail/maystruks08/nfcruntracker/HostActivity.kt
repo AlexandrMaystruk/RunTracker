@@ -40,7 +40,7 @@ class HostActivity : AppCompatActivity() {
         setContentView(R.layout.activity_host)
         App.baseComponent.inject(this)
 
-        router.newRootScreen(Screens.RunnersScreen())
+        router.newRootScreen(Screens.LoginScreen())
     }
 
     private val navigator: Navigator =

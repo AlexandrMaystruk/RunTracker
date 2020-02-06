@@ -6,7 +6,7 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.toDateFormat
 import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepBean
 
 fun Checkpoint.toStepBean() = StepBean(
-    this.id,
+    this.name,
     this.state.id
 )
 

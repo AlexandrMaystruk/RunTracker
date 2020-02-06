@@ -31,7 +31,7 @@ class RunnerViewModel @Inject constructor(private val router: Router) : BaseView
                     stringBuilder.append(it.date.toTimeFormat())
                 }
                 val mapped = CheckpointView(
-                    runnerView.id,
+                    it.id,
                     StepBean(stringBuilder.toString(), it.stepBean.state),
                     it.date
                 )

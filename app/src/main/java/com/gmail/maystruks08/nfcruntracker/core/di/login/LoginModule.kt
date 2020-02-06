@@ -1,20 +1,19 @@
-package com.gmail.maystruks08.nfcruntracker.core.di.settings
+package com.gmail.maystruks08.nfcruntracker.core.di.login
 
 import androidx.lifecycle.ViewModel
 import com.gmail.maystruks08.nfcruntracker.core.di.ViewModelKey
 import com.gmail.maystruks08.nfcruntracker.core.di.ViewModelModule
-import com.gmail.maystruks08.nfcruntracker.ui.settings.SettingsViewModel
+import com.gmail.maystruks08.nfcruntracker.ui.login.LoginViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 
 @Module(includes = [ViewModelModule::class])
-abstract class SettingsModule {
+abstract class LoginModule {
 
     @IntoMap
     @Binds
-    @SettingsScope
-    @ViewModelKey(SettingsViewModel::class)
-    abstract fun bindSettingsViewModel(viewModel: SettingsViewModel): ViewModel
-
+    @LoginScope
+    @ViewModelKey(LoginViewModel::class)
+    abstract fun bindLoginViewModel(viewModel: LoginViewModel): ViewModel
 }

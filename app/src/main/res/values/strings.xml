@@ -5,6 +5,8 @@
 
 
     <string name="search">Search</string>
+    <string name="signOut">Sign out</string>
+
 
     <string name="toast_exit_app_warning_text">Tap again to exit</string>
 

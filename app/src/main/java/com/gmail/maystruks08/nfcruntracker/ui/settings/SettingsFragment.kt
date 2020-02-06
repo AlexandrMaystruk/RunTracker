@@ -28,8 +28,8 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
 
     override fun bindViewModel() {
         viewModel.config.observe(viewLifecycleOwner, Observer {
-            spinnerForRunners.setSelection(it.checkpointNumber)
-            spinnerForIronPeople.setSelection(it.checkpointIronPeopleNumber)
+            spinnerForRunners.setSelection(it.checkpointId?:0)
+            spinnerForIronPeople.setSelection(it.checkpointIronPeopleId?:0)
         })
 
         viewModel.toast.observe(viewLifecycleOwner, Observer {
@@ -38,6 +38,7 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
     }
 
     override fun initViews() {
+        viewModel.onInitViewsStarted()
         spinnerForRunners.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

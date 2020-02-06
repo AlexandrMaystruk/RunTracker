@@ -1,7 +1,5 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
-import android.content.Intent
-import android.net.Uri
 import android.text.InputType
 import android.view.MenuItem
 import androidx.lifecycle.Observer
@@ -29,8 +27,11 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
         .withId(R.id.toolbar)
         .withTitle(R.string.app_name)
         .withMenu(R.menu.menu_search_with_settings)
-        .withMenuItems(listOf(R.id.action_settings), listOf(MenuItem.OnMenuItemClickListener {
+        .withMenuItems(listOf(R.id.action_settings, R.id.action_logout), listOf(MenuItem.OnMenuItemClickListener {
             viewModel.onOpenSettingsFragmentClicked()
+            true
+        }, MenuItem.OnMenuItemClickListener {
+            viewModel.onSignOutClicked()
             true
         }))
         .withMenuSearch(InputType.TYPE_CLASS_NUMBER) {
@@ -51,7 +52,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
             runnerAdapter?.updateItem(it)
         })
 
-        viewModel.link.observe(viewLifecycleOwner, Observer { url->
+        viewModel.link.observe(viewLifecycleOwner, Observer { url ->
 //            val i = Intent(Intent.ACTION_VIEW)
 //            i.data = Uri.parse(url)
 //            startActivity(i)

@@ -7,6 +7,7 @@ import com.gmail.maystruks08.domain.entities.CheckpointState
 fun CheckpointTable.toCheckpoint(): Checkpoint {
     return Checkpoint(
         id = this.checkpointId,
+        name = this.name,
         state = CheckpointState.fromId(this.state),
         date = this.date
     )

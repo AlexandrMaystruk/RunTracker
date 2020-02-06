@@ -19,8 +19,9 @@ import java.util.*
 data class CheckpointTable(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    val name: String = "",
     val runnerId: String,
-    val checkpointId: String,
+    val checkpointId: Int,
     val date: Date? = null,
     val state: Int
 )

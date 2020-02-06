@@ -18,25 +18,25 @@ class ConfigPreferences @Inject constructor(context: Context) {
 
     private val sp = context.getSharedPreferences(NAME, Context.MODE_PRIVATE)
 
-    fun saveCurrentCheckpoint(checkpoint: String?) {
+    fun saveCurrentCheckpointId(checkpoint: Int?) {
         sp.edit().apply {
-            putString(CHECKPOINT, checkpoint)
+            putInt(CHECKPOINT, checkpoint?:0)
             apply()
         }
     }
 
-    fun getCurrentCheckpoint(): String? {
-        return sp.getString(CHECKPOINT, null)
+    fun getCurrentCheckpoint(): Int{
+        return sp.getInt(CHECKPOINT, 0)
     }
 
-    fun saveCurrentIronPeopleCheckpoint(checkpoint: String?) {
+    fun saveCurrentIronPeopleCheckpointId(checkpoint: Int?) {
         sp.edit().apply {
-            putString(IRON_PEOPLE_CHECKPOINT, checkpoint)
+            putInt(IRON_PEOPLE_CHECKPOINT, checkpoint?:0)
             apply()
         }
     }
 
-    fun getCurrentIronPeopleCheckpoint(): String? {
-        return sp.getString(IRON_PEOPLE_CHECKPOINT, null)
+    fun getCurrentIronPeopleCheckpoint(): Int {
+        return sp.getInt(IRON_PEOPLE_CHECKPOINT, 0)
     }
 }

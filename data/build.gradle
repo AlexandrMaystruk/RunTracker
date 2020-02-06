@@ -36,6 +36,8 @@ dependencies {
 
     api dataDependencies.room
     api dataDependencies.firestore
+    api dataDependencies.firebaseUi
+    api dataDependencies.firebaseAuth
 
     implementation (dataDependencies.googleDrive){
         exclude group: 'com.google.common'

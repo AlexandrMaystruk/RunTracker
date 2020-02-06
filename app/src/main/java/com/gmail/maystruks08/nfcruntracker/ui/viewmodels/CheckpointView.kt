@@ -6,19 +6,19 @@ import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepBean
 import java.util.*
 
 class CheckpointView(
-    val id: String,
+    val id: Int,
     val stepBean: StepBean,
     val date: Date? = null
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readString() ?: "",
+        parcel.readInt() ,
         parcel.readParcelable(StepBean::class.java.classLoader)!!,
         Date(parcel.readLong())
 
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(id)
+        parcel.writeInt(id)
         parcel.writeParcelable(stepBean, flags)
         date?.time?.let { parcel.writeLong(it) }
     }

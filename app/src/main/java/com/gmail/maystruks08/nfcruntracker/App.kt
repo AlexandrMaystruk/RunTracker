@@ -4,6 +4,7 @@ import android.app.Application
 import com.gmail.maystruks08.nfcruntracker.core.di.AppModule
 import com.gmail.maystruks08.nfcruntracker.core.di.BaseComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.DaggerBaseComponent
+import com.gmail.maystruks08.nfcruntracker.core.di.login.LoginComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runner.RunnerComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.RunnersComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.settings.SettingsComponent
@@ -13,6 +14,13 @@ class App : Application() {
     companion object {
 
         lateinit var baseComponent: BaseComponent
+
+        var loginComponent: LoginComponent? = null
+            get() {
+                if (field == null)
+                    field = baseComponent.provideLoginComponent()
+                return field
+            }
 
         var runnersComponent: RunnersComponent? = null
             get() {
@@ -44,7 +52,11 @@ class App : Application() {
         }
 
         fun clearSettingsComponent(){
-            runnersComponent = null
+            settingsComponent = null
+        }
+
+        fun clearLoginComponent(){
+            loginComponent = null
         }
     }
 
