@@ -5,6 +5,7 @@ import android.content.res.Resources
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.HostActivity
 import com.gmail.maystruks08.nfcruntracker.core.di.login.LoginComponent
+import com.gmail.maystruks08.nfcruntracker.core.di.register.RegisterNewRunnerComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runner.RunnerComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.RunnersComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.settings.SettingsComponent
@@ -26,6 +27,8 @@ interface BaseComponent {
     fun provideSettingsComponent(): SettingsComponent
 
     fun provideLoginComponent(): LoginComponent
+
+    fun provideRegisterComponent(): RegisterNewRunnerComponent
 
     fun inject(app: App)
 

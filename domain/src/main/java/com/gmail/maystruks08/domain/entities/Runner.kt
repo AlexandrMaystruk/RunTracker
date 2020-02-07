@@ -3,17 +3,15 @@ package com.gmail.maystruks08.domain.entities
 import java.util.*
 
 data class Runner(
-    val id: String,
-    val number: Int,
-    val name: String,
-    val surname: String,
-    val city: String,
-    val dateOfBirthday: Date,
-    val type: RunnerType,
-    val checkpoints: List<Checkpoint>
+    val id: String = "",
+    val number: Int = -1,
+    val name: String = "",
+    val surname: String = " ",
+    val city: String = "",
+    val dateOfBirthday: Date = Date(),
+    val type: RunnerType = RunnerType.NORMAL,
+    val checkpoints: List<Checkpoint> = listOf()
 ) {
-
-    constructor() : this("", -1, "", "", "", Date(), RunnerType.NORMAL, listOf())
 
     fun getTotalResult(): Date? {
         return if (isAllDone()) {
@@ -21,7 +19,8 @@ data class Runner(
         } else null
     }
 
-    fun getCurrentPosition(): Checkpoint? = checkpoints.find { it.state == CheckpointState.STEP_CURRENT }
+    fun getCurrentPosition(): Checkpoint? =
+        checkpoints.find { it.state == CheckpointState.STEP_CURRENT }
 
     fun markCheckpointAsPassed(checkpoint: Checkpoint): Boolean {
         val index = checkpoints.indexOfFirst { it.id == checkpoint.id }

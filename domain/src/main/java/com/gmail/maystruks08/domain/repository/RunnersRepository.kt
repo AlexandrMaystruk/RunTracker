@@ -7,7 +7,7 @@ import com.gmail.maystruks08.domain.entities.RunnerType
 
 interface RunnersRepository {
 
-    suspend fun bindGoogleDriveService(): ResultOfTask<Exception, String>
+    suspend fun bindGoogleDriveService():  ResultOfTask<Exception, String>
 
     suspend fun getAllRunners(): ResultOfTask<Exception, List<Runner>>
 

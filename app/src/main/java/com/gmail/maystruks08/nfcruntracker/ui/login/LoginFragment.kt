@@ -18,7 +18,6 @@ class LoginFragment : BaseFragment(R.layout.fui_auth_method_picker_layout) {
 
     override fun initToolbar() = FragmentToolbar.Builder().build()
 
-
     override fun bindViewModel() {
         viewModel.startAuthFlow.observe(viewLifecycleOwner, Observer {
             startActivityForResult(
@@ -32,7 +31,8 @@ class LoginFragment : BaseFragment(R.layout.fui_auth_method_picker_layout) {
                     )
                     .setTheme(R.style.LoginTheme)
                     .build(),
-                RC_SIGN_IN)
+                RC_SIGN_IN
+            )
         })
     }
 
