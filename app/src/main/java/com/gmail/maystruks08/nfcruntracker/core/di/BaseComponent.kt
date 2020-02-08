@@ -6,8 +6,7 @@ import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.HostActivity
 import com.gmail.maystruks08.nfcruntracker.core.di.login.LoginComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.register.RegisterNewRunnerComponent
-import com.gmail.maystruks08.nfcruntracker.core.di.runner.RunnerComponent
-import com.gmail.maystruks08.nfcruntracker.core.di.runners.RunnersComponent
+import com.gmail.maystruks08.nfcruntracker.core.di.runners.root.RootRunnersComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.settings.SettingsComponent
 import dagger.Component
 import javax.inject.Singleton
@@ -20,9 +19,7 @@ interface BaseComponent {
 
     fun provideResources(): Resources
 
-    fun provideRunnersComponent(): RunnersComponent
-
-    fun provideRunnerComponent(): RunnerComponent
+    fun provideRootRunnersComponent(): RootRunnersComponent
 
     fun provideSettingsComponent(): SettingsComponent
 

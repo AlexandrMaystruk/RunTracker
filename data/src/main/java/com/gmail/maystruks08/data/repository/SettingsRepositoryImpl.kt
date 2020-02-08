@@ -17,6 +17,8 @@ class SettingsRepositoryImpl @Inject constructor(
 ) : SettingsRepository {
 
     override suspend fun updateConfig(): SettingsRepository.Config? {
+        preferences.saveCurrentCheckpointId(0)
+        preferences.saveCurrentIronPeopleCheckpointId(0)
         firebaseAuth.currentUser?.uid?.let { currentUserId ->
             val result = awaitTaskResult(firestoreApi.getCheckpointsSettings(currentUserId))
             val checkpointId = result["checkpointId"] as HashMap<*, *>
@@ -49,7 +51,7 @@ class SettingsRepositoryImpl @Inject constructor(
         preferences.saveCurrentCheckpointId(checkpointNumber)
         firebaseAuth.currentUser?.uid?.let { currentUserId ->
             try {
-                firestoreApi.saveCheckpointsSettings(currentUserId, SettingsRepository.Config( checkpointNumber, null))
+                firestoreApi.saveCheckpointsSettings(currentUserId, SettingsRepository.Config(checkpointNumber, null))
             } catch (e: Exception){
                 Log.e("SettingsRepository", e.toString())
             }}

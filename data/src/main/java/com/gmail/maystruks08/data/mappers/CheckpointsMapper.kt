@@ -16,6 +16,7 @@ fun CheckpointTable.toCheckpoint(): Checkpoint {
 fun Checkpoint.toCheckpointTable(runnerId: String): CheckpointTable {
     return CheckpointTable(
         runnerId = runnerId,
+        name = this.name,
         checkpointId = this.id,
         state = this.state.id,
         date = this.date

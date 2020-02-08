@@ -18,6 +18,10 @@ inline fun <reified T : Fragment> FragmentActivity.getFragment(tag: String): T? 
     return supportFragmentManager.findFragmentByTag(tag) as? T
 }
 
+inline fun <reified T : Fragment> Fragment.getFragment(tag: String): T? {
+    return fragmentManager?.findFragmentByTag(tag) as? T
+}
+
 @Suppress("UNCHECKED_CAST")
 fun <T> Bundle.put(key: String, value: T) {
     when (value) {

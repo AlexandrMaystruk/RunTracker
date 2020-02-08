@@ -1,6 +1,5 @@
 package com.gmail.maystruks08.data.repository
 
-import android.util.Log
 import com.gmail.maystruks08.data.awaitTaskCompletable
 import com.gmail.maystruks08.data.cache.CheckpointsCache
 import com.gmail.maystruks08.data.cache.RunnersCache
@@ -10,13 +9,14 @@ import com.gmail.maystruks08.data.mappers.toRunner
 import com.gmail.maystruks08.data.mappers.toRunnerTable
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.data.remote.googledrive.GoogleDriveApi
-import com.gmail.maystruks08.domain.entities.Checkpoint
-import com.gmail.maystruks08.domain.entities.ResultOfTask
-import com.gmail.maystruks08.domain.entities.Runner
-import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.entities.*
+import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
 import com.google.firebase.firestore.DocumentChange
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -41,21 +41,23 @@ class RunnersRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllRunners(): ResultOfTask<Exception, List<Runner>> {
+    override suspend fun getAllRunners(type: RunnerType): ResultOfTask<Exception, List<Runner>> {
         return try {
             if (runnersCache.runnersList.isNotEmpty()) {
-                ResultOfTask.build { runnersCache.runnersList }
+                val result = runnersCache.runnersList.filter { it.type == type }
+                ResultOfTask.build { result }
             } else {
                 val runners = runnerDAO.getRunners().map { it.toRunner() }
                 runnersCache.runnersList = runners.toMutableList()
-                ResultOfTask.build { runners }
+                val result = runnersCache.runnersList.filter { it.type == type }
+                ResultOfTask.build { result }
             }
         } catch (e: Exception) {
             ResultOfTask.build { throw e }
         }
     }
 
-    override suspend fun updateRunnersCache(onResult: (ResultOfTask<Exception, List<Runner>>) -> Unit) {
+    override suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit) {
         try {
             withContext(Dispatchers.IO) {
                 firestoreApi.registerSnapshotListener { snapshot, firestoreException ->
@@ -63,45 +65,39 @@ class RunnersRepositoryImpl @Inject constructor(
                         onResult.invoke(ResultOfTask.build { throw firestoreException })
                     } else {
                         snapshot?.documentChanges?.forEach { documentChange ->
-                            when (documentChange.type) {
-                                DocumentChange.Type.ADDED, DocumentChange.Type.MODIFIED -> {
-                                    documentChange.document.toObject(Runner::class.java)
-                                        .let { runner ->
-                                            runBlocking {
-                                                launch {
-                                                    runnerDAO.delete(runner.number)
-                                                    runnersCache.runnersList.removeAll { it.number == runner.number }
-
-                                                    runnerDAO.insertRunner(
-                                                        runner.toRunnerTable(),
-                                                        runner.checkpoints.map {
-                                                            it.toCheckpointTable(runner.id)
-                                                        })
-                                                    runnersCache.runnersList.add(runner)
-                                                }
-                                            }
+                            runBlocking {
+                                launch {
+                                    val runner = documentChange.document.toObject(Runner::class.java)
+                                    val changeType = when (documentChange.type) {
+                                        DocumentChange.Type.ADDED -> {
+                                            insertRunner(runner)
+                                            Change.ADD
                                         }
-                                }
-                                DocumentChange.Type.REMOVED -> {
-                                    documentChange.document.toObject(Runner::class.java)
-                                        .let { runner ->
-                                            runBlocking {
-                                                launch {
-                                                    runnerDAO.delete(runner.number)
-                                                    runnersCache.runnersList.removeAll { it.number == runner.number }
-                                                }
-                                            }
+                                        DocumentChange.Type.MODIFIED -> {
+                                            updateRunner(runner)
+                                            Change.UPDATE
                                         }
+                                        DocumentChange.Type.REMOVED -> {
+                                            deleteRunner(runner)
+                                            Change.REMOVE
+                                        }
+                                    }
+                                    if (type == runner.type) {
+                                        onResult.invoke(ResultOfTask.build {
+                                            RunnerChange(
+                                                runner,
+                                                changeType
+                                            )
+                                        })
+                                    }
                                 }
                             }
                         }
-                        onResult.invoke(ResultOfTask.build { runnersCache.runnersList })
                     }
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
-            onResult.invoke(ResultOfTask.build { throw Throwable("Get and cache runners from firestore failure") })
+            onResult.invoke(ResultOfTask.build { throw SyncWithServerException() })
         }
     }
 
@@ -120,7 +116,6 @@ class RunnersRepositoryImpl @Inject constructor(
             runnersCache.runnersList.add(runner)
             return runner
         } catch (e: Exception) {
-            Log.e(TAG, e.localizedMessage)
             withContext(Dispatchers.IO) {
                 runnerDAO.markAsNeedToSync(runner.id, true)
             }
@@ -128,7 +123,8 @@ class RunnersRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRunnerById(cardId: String): Runner? = runnersCache.runnersList.find { it.id == cardId }
+    override suspend fun getRunnerById(cardId: String): Runner? =
+        runnersCache.runnersList.find { it.id == cardId }
 
     override suspend fun getCurrentCheckpoint(type: RunnerType): Checkpoint =
         when (type) {
@@ -140,8 +136,33 @@ class RunnersRepositoryImpl @Inject constructor(
         firestoreApi.unregisterUpdatesListener()
     }
 
-    companion object {
+    private suspend fun insertRunner(runner: Runner) {
+        val runnerTable = runner.toRunnerTable()
+        val checkpointsTables = runner.checkpoints.map { it.toCheckpointTable(runner.id) }
+        val index = runnersCache.runnersList.indexOfFirst { it.number == runner.number }
+        if (index != -1) {
+            runnerDAO.updateRunner(runnerTable, checkpointsTables)
+            runnersCache.runnersList.removeAt(index)
+            runnersCache.runnersList.add(index, runner)
+        } else {
+            runnerDAO.insertRunner(runnerTable, checkpointsTables)
+            runnersCache.runnersList.add(runner)
+        }
+    }
 
-        const val TAG = "RunnersRepository"
+    private suspend fun updateRunner(runner: Runner) {
+        val index = runnersCache.runnersList.indexOfFirst { it.number == runner.number }
+        if (index != -1) {
+            runnerDAO.updateRunner(
+                runner.toRunnerTable(),
+                runner.checkpoints.map { it.toCheckpointTable(runner.id) })
+            runnersCache.runnersList.removeAt(index)
+            runnersCache.runnersList.add(index, runner)
+        }
+    }
+
+    private suspend fun deleteRunner(runner: Runner) {
+        runnerDAO.delete(runner.number)
+        runnersCache.runnersList.removeAll { it.number == runner.number }
     }
 }

@@ -1,13 +1,12 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runner
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.toTimeFormat
 import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepBean
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import ru.terrakok.cicerone.Router
-import java.lang.StringBuilder
 import javax.inject.Inject
 
 class RunnerViewModel @Inject constructor(private val router: Router) : BaseViewModel() {

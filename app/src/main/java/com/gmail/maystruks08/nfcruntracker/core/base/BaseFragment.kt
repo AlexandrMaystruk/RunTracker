@@ -37,7 +37,7 @@ abstract class BaseFragment(private val layout: Int? = null) : Fragment() {
 
     protected abstract fun bindViewModel()
 
-    protected abstract fun initViews()
+    protected open fun initViews() {}
 
     override fun onDestroyView() {
         toolbarManager = null

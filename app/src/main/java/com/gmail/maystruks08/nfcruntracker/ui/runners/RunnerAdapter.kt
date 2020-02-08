@@ -17,13 +17,15 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
         notifyDataSetChanged()
     }
 
-    fun insertItem(item: RunnerView, position: Int? = null) {
-        if (position != null) {
-            runnerList.add(position, item)
-            notifyItemInserted(position)
-        } else {
+    fun insertItemOrUpdateIfExist(item: RunnerView) {
+        val index = runnerList.indexOfFirst { item.id == it.id }
+        if (index == -1) {
             runnerList.add(item)
-            notifyItemInserted(runnerList.indexOf(item))
+            notifyItemInserted(runnerList.lastIndex)
+        } else {
+            runnerList.removeAt(index)
+            runnerList.add(index, item)
+            notifyItemChanged(index)
         }
     }
 
@@ -35,9 +37,10 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
         notifyItemChanged(index)
     }
 
-    fun removeItem(position: Int) {
-        runnerList.removeAt(position)
-        notifyItemRemoved(position)
+    fun removeItem(item: RunnerView) {
+        val index = runnerList.indexOfFirst { item.id == it.id }
+        if (index == -1) return
+        notifyItemRemoved(index)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -48,15 +51,19 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindHolder(runnerList[position], clickListener)
+        holder.bindHolder(runnerList[position])
     }
 
     override fun getItemCount(): Int = runnerList.size
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+   inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+       init {
+           itemView.setOnClickListener { if (isAdapterPositionCorrect()) clickListener(runnerList[adapterPosition]) }
+       }
 
         @SuppressLint("SetTextI18n")
-        fun bindHolder(runner: RunnerView, clickListener: (RunnerView) -> Unit) {
+        fun bindHolder(runner: RunnerView) {
             itemView.tvRunnerNumber.text = "#${runner.number}"
             itemView.tvRunnerName.text = runner.name
             itemView.tvRunnerSurname.text = runner.surname
@@ -64,7 +71,9 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
             if(runner.checkpoints.isNotEmpty()){
                 itemView.tvCurrentCheckpoint.text = runner.getCurrentPosition()?.stepBean?.name
             }
-            itemView.setOnClickListener { clickListener(runner) }
+
         }
+
+        private fun isAdapterPositionCorrect(): Boolean = adapterPosition in 0..runnerList.lastIndex
     }
 }

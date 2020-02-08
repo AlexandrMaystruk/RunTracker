@@ -3,14 +3,14 @@ package com.gmail.maystruks08.nfcruntracker.core.navigation
 import com.gmail.maystruks08.nfcruntracker.ui.login.LoginFragment
 import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
-import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
+import com.gmail.maystruks08.nfcruntracker.ui.runners.RootRunnersFragment
 import com.gmail.maystruks08.nfcruntracker.ui.settings.SettingsFragment
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 
 object Screens {
 
     class RunnersScreen : AppScreen() {
-        override fun getFragment() = RunnersFragment()
+        override fun getFragment() = RootRunnersFragment()
 
         companion object {
             fun tag() = RunnersScreen::class.java.canonicalName ?: ""

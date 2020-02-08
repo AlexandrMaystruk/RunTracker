@@ -1,85 +1,85 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
-import android.content.Context
-import androidx.lifecycle.*
-import com.firebase.ui.auth.AuthUI
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import com.gmail.maystruks08.domain.entities.Change
 import com.gmail.maystruks08.domain.entities.ResultOfTask
-import com.gmail.maystruks08.domain.entities.Runner
+import com.gmail.maystruks08.domain.entities.RunnerChange
+import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
+import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
+import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
-import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import ru.terrakok.cicerone.Router
 import javax.inject.Inject
 
-class RunnersViewModel @Inject constructor(
-    private val runnersInteractor: RunnersInteractor,
-    private val router: Router,
-    private val context: Context) : BaseViewModel(){
+class RunnersViewModel @Inject constructor(private val runnersInteractor: RunnersInteractor) : BaseViewModel() {
 
-    val runners get() = runnersLiveData
-    val runnerUpdate get() = runnerUpdateLiveData
+    val runners get() = _runnersLiveData
+    val runnerAdd get() = _runnerAddLiveData
+    val runnerUpdate get() = _runnerUpdateLiveData
+    val runnerRemove get() = _runnerRemoveLiveData
 
-    val link get() = linkLiveData
-    private val linkLiveData = MutableLiveData<String>()
+    private val _runnersLiveData = MutableLiveData<MutableList<RunnerView>>()
+    private val _runnerAddLiveData = MutableLiveData<RunnerView>()
+    private val _runnerUpdateLiveData = MutableLiveData<RunnerView>()
+    private val _runnerRemoveLiveData = MutableLiveData<RunnerView>()
 
-    private val runnersLiveData = MutableLiveData<MutableList<RunnerView>>()
-    private val runnerUpdateLiveData = MutableLiveData<RunnerView>()
+    private lateinit var runnerType: RunnerType
 
-    init {
+    fun initFragment(runnerTypeId: Int){
+        runnerType = RunnerType.fromOrdinal(runnerTypeId)
         viewModelScope.launch {
             showAllRunners()
-            runnersInteractor.updateRunnersCache(::onRunnersUpdates)
-        }
-
-        //TODO get runner list from Google drive
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                when (val onResult = runnersInteractor.bindGoogleDriveService()) {
-                    is ResultOfTask.Value -> link.postValue(onResult.value)
-                    is ResultOfTask.Error -> handleError(onResult.error)
-                }
-            }
-        }
-    }
-
-    private fun onRunnersUpdates(onResult: ResultOfTask<Exception, List<Runner>>) {
-        when (onResult) {
-            is ResultOfTask.Value -> runnersLiveData.postValue(onResult.value.map { it.toRunnerView() }.toMutableList())
-            is ResultOfTask.Error -> handleError(onResult.error)
-        }
-    }
-
-    private suspend fun showAllRunners() {
-        toastLiveData.postValue("Init runners list")
-        when (val result = runnersInteractor.getAllRunners()) {
-            is ResultOfTask.Value -> runnersLiveData.postValue(result.value.map { it.toRunnerView() }.toMutableList())
-            is ResultOfTask.Error -> handleError(result.error)
+            runnersInteractor.updateRunnersCache(runnerType, ::onRunnersUpdates)
         }
     }
 
     fun onNfcCardScanned(cardId: String) {
         viewModelScope.launch {
-            runnersInteractor.addCurrentCheckpointToRunner(cardId)?.let {
-                runnerUpdateLiveData.postValue(it.toRunnerView())
-                toastLiveData.postValue("Сheckpoint counted, card id:$cardId")
+            when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(cardId)) {
+                is ResultOfTask.Value -> handleRunnerChanges(onResult.value)
+                is ResultOfTask.Error -> handleError(onResult.error)
             }
+        }
+    }
+
+    private suspend fun showAllRunners() {
+        toastLiveData.postValue("Init runners list")
+        when (val result = runnersInteractor.getAllRunners(runnerType)) {
+            is ResultOfTask.Value -> _runnersLiveData.postValue(result.value.map { it.toRunnerView() }.toMutableList())
+            is ResultOfTask.Error -> handleError(result.error)
+        }
+    }
+
+    private fun onRunnersUpdates(onResult: ResultOfTask<Exception, RunnerChange>) {
+        when (onResult) {
+            is ResultOfTask.Value -> handleRunnerChanges(onResult.value)
+            is ResultOfTask.Error -> handleError(onResult.error)
+        }
+    }
+
+    private fun handleRunnerChanges(runnerChange: RunnerChange) {
+        val runnerView = runnerChange.runner.toRunnerView()
+        when (runnerChange.changeType) {
+            Change.ADD -> _runnerAddLiveData.postValue(runnerView)
+            Change.UPDATE -> _runnerUpdateLiveData.postValue(runnerView)
+            Change.REMOVE -> _runnerRemoveLiveData.postValue(runnerView)
         }
     }
 
     fun onSearchQueryChanged(query: String) {
         viewModelScope.launch {
             if (query.isNotEmpty()) {
-                when (val result = runnersInteractor.getAllRunners()) {
+                when (val result = runnersInteractor.getAllRunners(runnerType)) {
                     is ResultOfTask.Value -> {
                         val pattern =
                             ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
-                        runnersLiveData.postValue(
+                        _runnersLiveData.postValue(
                             result.value.filter {
                                 pattern.containsMatchIn(it.number.toString().toLowerCase())
                             }.map { it.toRunnerView() }.toMutableList()
@@ -93,23 +93,12 @@ class RunnersViewModel @Inject constructor(
         }
     }
 
-    fun onRunnerClicked(runnerView: RunnerView) {
-        router.navigateTo(Screens.RunnerScreen(runnerView))
-    }
-
-    fun onOpenSettingsFragmentClicked() {
-        router.navigateTo(Screens.SettingsScreen())
-    }
-
-    fun onSignOutClicked() {
-        AuthUI.getInstance()
-            .signOut(context)
-            .addOnCompleteListener {
-                router.newRootScreen(Screens.LoginScreen())
-            }
-    }
-
     private fun handleError(e: Exception) {
-        e.printStackTrace()
+        when(e){
+            is SaveRunnerDataException -> {}
+            is RunnerNotFoundException -> {}
+            is SyncWithServerException -> {}
+            else ->  e.printStackTrace()
+        }
     }
 }

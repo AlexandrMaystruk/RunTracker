@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.nfcruntracker.core.di.runner
+package com.gmail.maystruks08.nfcruntracker.core.di.runners.runner
 
 import androidx.lifecycle.ViewModel
 import com.gmail.maystruks08.nfcruntracker.core.di.ViewModelKey

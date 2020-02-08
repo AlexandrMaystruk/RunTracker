@@ -13,7 +13,7 @@ fun RunnerWithCheckpoints.toRunner(): Runner {
         surname = this.runnerTable.surname,
         city = this.runnerTable.city,
         dateOfBirthday = this.runnerTable.dateOfBirthday,
-        type = RunnerType.fromId(this.runnerTable.type),
+        type = RunnerType.fromOrdinal(this.runnerTable.type),
         checkpoints = this.checkpointsTable.map { it.toCheckpoint() }
     )
 }
@@ -26,6 +26,6 @@ fun Runner.toRunnerTable(): RunnerTable {
         surname = this.surname,
         city = this.city,
         dateOfBirthday = this.dateOfBirthday,
-        type = this.type.id
+        type = this.type.ordinal
     )
 }

@@ -1,17 +1,14 @@
 package com.gmail.maystruks08.domain.repository
 
-import com.gmail.maystruks08.domain.entities.Checkpoint
-import com.gmail.maystruks08.domain.entities.ResultOfTask
-import com.gmail.maystruks08.domain.entities.Runner
-import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.entities.*
 
 interface RunnersRepository {
 
     suspend fun bindGoogleDriveService():  ResultOfTask<Exception, String>
 
-    suspend fun getAllRunners(): ResultOfTask<Exception, List<Runner>>
+    suspend fun getAllRunners(type: RunnerType): ResultOfTask<Exception, List<Runner>>
 
-    suspend fun updateRunnersCache(onResult: (ResultOfTask<Exception, List<Runner>>) -> Unit)
+    suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit)
 
     suspend fun getRunnerById(cardId: String): Runner?
 
