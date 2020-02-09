@@ -8,6 +8,7 @@ import javax.inject.Inject
 
 class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_runner) {
 
+
     @Inject
     lateinit var viewModel: RegisterNewRunnerViewModel
 
