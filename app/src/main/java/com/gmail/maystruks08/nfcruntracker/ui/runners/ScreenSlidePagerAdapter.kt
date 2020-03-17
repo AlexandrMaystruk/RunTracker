@@ -20,8 +20,7 @@ class ScreenSlidePagerAdapter(
 
     override fun getCount(): Int = RunnerType.values().size
 
-    override fun getItem(position: Int): Fragment =
-        RunnersFragment.getInstance(position, onClickedAtRunner)
+    override fun getItem(position: Int): Fragment = RunnersFragment.getInstance(position, onClickedAtRunner)
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val fragment = super.instantiateItem(container, position) as RunnersFragment
@@ -34,7 +33,7 @@ class ScreenSlidePagerAdapter(
         super.destroyItem(container, position, `object`)
     }
 
-    fun getRegisteredFragment(position: Int): RunnersFragment = registeredFragments[position]
+    fun getRegisteredFragment(position: Int): RunnersFragment? = registeredFragments[position]
 
     override fun getPageTitle(position: Int): CharSequence? = when (position) {
         0 -> "Бегуны"
@@ -47,7 +46,7 @@ class ScreenSlidePagerAdapter(
         try {
             super.restoreState(state, loader)
         } catch (e: Exception) {
-            Log.e("ScreenSlidePagerAdapter", "Error Restore State of Fragment : " + e.message, e)
+            Log.d("ScreenSlidePagerAdapter", "Error Restore State of Fragment : " + e.message, e)
         }
     }
 }

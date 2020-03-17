@@ -9,11 +9,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import com.gmail.maystruks08.nfcruntracker.core.ext.getFragment
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.core.navigation.AppNavigator
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
-import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
+import com.gmail.maystruks08.nfcruntracker.eventbas.CardScannerLiveData
 import com.gmail.maystruks08.nfcruntracker.utils.NfcAdapter
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
@@ -30,6 +29,9 @@ class HostActivity : AppCompatActivity() {
 
     @Inject
     lateinit var router: Router
+
+    @Inject
+    lateinit var cardScannerLiveData: CardScannerLiveData
 
     private var lastBackPressTime = 0L
 
@@ -105,7 +107,7 @@ class HostActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         nfcAdapter.processReadCard(intent)?.let { cardId ->
             toast("Nfc card scanned. Id = $cardId")
-            getFragment<RunnersFragment>(Screens.RunnersScreen.tag())?.viewModel?.onNfcCardScanned(cardId)
+            cardScannerLiveData.onCardScanned(cardId)
         }
     }
 

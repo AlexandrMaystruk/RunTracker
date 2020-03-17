@@ -9,11 +9,11 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 
 object Screens {
 
-    class RunnersScreen : AppScreen() {
+    class RootRunnersScreen : AppScreen() {
         override fun getFragment() = RootRunnersFragment()
 
         companion object {
-            fun tag() = RunnersScreen::class.java.canonicalName ?: ""
+            fun tag() = RootRunnersScreen::class.java.canonicalName ?: ""
         }
     }
 
@@ -45,7 +45,7 @@ object Screens {
         override fun getFragment() = RegisterNewRunnerFragment()
 
         companion object {
-            fun tag() = LoginScreen::class.java.canonicalName ?: ""
+            fun tag() = RegisterRunnerScreen::class.java.canonicalName ?: ""
         }
     }
 }

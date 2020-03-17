@@ -8,6 +8,7 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
+import com.gmail.maystruks08.nfcruntracker.eventbas.CardScannerLiveData
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import kotlinx.android.synthetic.main.fragment_runners.*
 import javax.inject.Inject
@@ -16,6 +17,9 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
 
     @Inject
     lateinit var viewModel: RunnersViewModel
+
+    @Inject
+    lateinit var cardScannerLiveData: CardScannerLiveData
 
     private var runnerAdapter: RunnerAdapter? = null
 
@@ -50,6 +54,10 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
 
         viewModel.runnerRemove.observe(viewLifecycleOwner, Observer {
             runnerAdapter?.removeItem(it)
+        })
+
+        cardScannerLiveData.onNfcReaderScannedCard.observe(viewLifecycleOwner, Observer {
+          viewModel.onNfcCardScanned(it)
         })
     }
 
