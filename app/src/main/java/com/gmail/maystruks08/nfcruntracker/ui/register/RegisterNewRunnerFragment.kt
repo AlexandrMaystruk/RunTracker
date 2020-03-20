@@ -9,6 +9,7 @@ import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.toDateFormat
+import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.eventbas.CardScannerLiveData
 import kotlinx.android.synthetic.main.fragment_register_new_runner.*
 import java.util.*
@@ -27,6 +28,7 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
     private var runnerSex: RunnerSex? = null
     private var runnerType: RunnerType? = null
     private var runnerDateOfBirthday: Date? = null
+    private var runnerCardId: String? = null
 
     override fun injectDependencies() = App.registerNewRunnerComponent?.inject(this)
 
@@ -57,6 +59,7 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
 
         cardScannerLiveData.onNfcReaderScannedCard.observe(viewLifecycleOwner, Observer {
             tvScanCard.text = "Карта: $it"
+            runnerCardId = it
             viewModel.onNfcCardScanned(it)
         })
     }
@@ -88,7 +91,7 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
                 runnerDateOfBirthday != null &&
                 !etRunnerNumber.text.isNullOrEmpty() &&
                 runnerType != null &&
-                !tvScanCard.text.isNullOrEmpty()
+                runnerCardId != null
             ) {
                 viewModel.onRegisterNewRunner(
                     etRunnerFullName.text.toString(),
@@ -97,8 +100,10 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
                     etRunnerCity.text.toString(),
                     etRunnerNumber.text.toString().toInt(),
                     runnerType!!,
-                    tvScanCard.text.toString()
+                    runnerCardId!!
                 )
+            } else {
+                context?.toast("Заполните обязательные поля!")
             }
         }
     }
@@ -106,11 +111,6 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
     override fun onDestroyView() {
         App.clearRegisterNewRunnerComponent()
         super.onDestroyView()
-    }
-
-    companion object {
-        const val MALE = 0
-        const val FEMALE = 1
     }
 
 }
