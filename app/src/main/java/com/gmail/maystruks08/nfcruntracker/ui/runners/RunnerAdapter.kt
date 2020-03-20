@@ -65,8 +65,7 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
         @SuppressLint("SetTextI18n")
         fun bindHolder(runner: RunnerView) {
             itemView.tvRunnerNumber.text = "#${runner.number}"
-            itemView.tvRunnerName.text = runner.name
-            itemView.tvRunnerSurname.text = runner.surname
+            itemView.tvRunnerFullName.text = runner.fullName
             itemView.runnerProgress.setStepViewTexts(runner.checkpoints.map { it.stepBean })
             if(runner.checkpoints.isNotEmpty()){
                 itemView.tvCurrentCheckpoint.text = runner.getCurrentPosition()?.stepBean?.name

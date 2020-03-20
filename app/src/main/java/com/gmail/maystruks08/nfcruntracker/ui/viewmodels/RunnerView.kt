@@ -7,8 +7,8 @@ import com.gmail.maystruks08.nfcruntracker.ui.stepview.STEP_CURRENT
 class RunnerView(
     val id: String,
     val number: String,
-    val name: String,
-    val surname: String,
+    val fullName: String,
+    val city: String,
     val dateOfBirthday: String,
     var checkpoints: List<CheckpointView>
 ) : Parcelable {
@@ -26,8 +26,8 @@ class RunnerView(
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id)
         parcel.writeString(number)
-        parcel.writeString(name)
-        parcel.writeString(surname)
+        parcel.writeString(fullName)
+        parcel.writeString(city)
         parcel.writeString(dateOfBirthday)
         parcel.writeTypedList(checkpoints)
     }

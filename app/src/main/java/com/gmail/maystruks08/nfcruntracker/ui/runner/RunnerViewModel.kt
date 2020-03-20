@@ -18,12 +18,12 @@ class RunnerViewModel @Inject constructor(private val router: Router) : BaseView
     fun onShowRunnerClicked(runnerView: RunnerView) {
         val stringBuilder = StringBuilder()
         val runner = RunnerView(
-            runnerView.id,
-            runnerView.number,
-            runnerView.name,
-            runnerView.surname,
-            runnerView.dateOfBirthday,
-            runnerView.checkpoints.map {
+            id = runnerView.id,
+            number = runnerView.number,
+            fullName = runnerView.fullName,
+            city = runnerView.city,
+            dateOfBirthday = runnerView.dateOfBirthday,
+            checkpoints = runnerView.checkpoints.map {
                 stringBuilder.append(it.stepBean.name)
                 if (it.date != null) {
                     stringBuilder.append(" ")
@@ -42,11 +42,11 @@ class RunnerViewModel @Inject constructor(private val router: Router) : BaseView
         runnerLiveData.postValue(runner)
     }
 
-    fun markCheckpointAsPassed(runnerView: RunnerView){
+    fun markCheckpointAsPassed(runnerView: RunnerView) {
         //TODO mark checkpoint as passed in manual
     }
 
-    fun onBackClicked(){
+    fun onBackClicked() {
         router.exit()
     }
 }

@@ -25,8 +25,6 @@ interface BaseComponent {
 
     fun provideLoginComponent(): LoginComponent
 
-    fun provideRegisterComponent(): RegisterNewRunnerComponent
-
     fun inject(app: App)
 
     fun inject(activity: HostActivity)

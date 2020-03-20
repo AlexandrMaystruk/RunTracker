@@ -2,6 +2,8 @@ package com.gmail.maystruks08.nfcruntracker.ui.register
 
 import android.app.DatePickerDialog
 import androidx.lifecycle.Observer
+import com.gmail.maystruks08.domain.entities.RunnerSex
+import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
@@ -22,6 +24,9 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
     lateinit var cardScannerLiveData: CardScannerLiveData
 
     private val calendar = Calendar.getInstance()
+    private var runnerSex: RunnerSex? = null
+    private var runnerType: RunnerType? = null
+    private var runnerDateOfBirthday: Date? = null
 
     override fun injectDependencies() = App.registerNewRunnerComponent?.inject(this)
 
@@ -46,25 +51,66 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
         })
 
         viewModel.onDateOfBirthdaySelected.observe(viewLifecycleOwner, Observer {
+            runnerDateOfBirthday = it
             tvDateOfBirthday.text = it.toDateFormat()
         })
 
         cardScannerLiveData.onNfcReaderScannedCard.observe(viewLifecycleOwner, Observer {
-            tvScanCard.text = "Id карта: $it"
+            tvScanCard.text = "Карта: $it"
             viewModel.onNfcCardScanned(it)
         })
     }
 
-
     override fun initViews() {
         tvDateOfBirthday.setOnClickListener {
             viewModel.onSelectDateOfBirthdayClicked()
+        }
+
+        radioGroupSex.setOnCheckedChangeListener { _, checkedId ->
+            runnerSex = when (checkedId) {
+                R.id.rbMale -> RunnerSex.MALE
+                R.id.rbFemale -> RunnerSex.FEMALE
+                else -> null
+            }
+        }
+
+        radioGroupRunnerType.setOnCheckedChangeListener { _, checkedId ->
+            runnerType = when (checkedId) {
+                R.id.rbRunner -> RunnerType.NORMAL
+                R.id.rbIronRunner -> RunnerType.IRON
+                else -> null
+            }
+        }
+
+        btnAddNewRunner.setOnClickListener {
+            if (etRunnerFullName.text.isNotEmpty() &&
+                runnerSex != null &&
+                runnerDateOfBirthday != null &&
+                !etRunnerNumber.text.isNullOrEmpty() &&
+                runnerType != null &&
+                !tvScanCard.text.isNullOrEmpty()
+            ) {
+                viewModel.onRegisterNewRunner(
+                    etRunnerFullName.text.toString(),
+                    runnerSex!!,
+                    runnerDateOfBirthday!!,
+                    etRunnerCity.text.toString(),
+                    etRunnerNumber.text.toString().toInt(),
+                    runnerType!!,
+                    tvScanCard.text.toString()
+                )
+            }
         }
     }
 
     override fun onDestroyView() {
         App.clearRegisterNewRunnerComponent()
         super.onDestroyView()
+    }
+
+    companion object {
+        const val MALE = 0
+        const val FEMALE = 1
     }
 
 }

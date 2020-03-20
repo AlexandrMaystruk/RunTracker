@@ -38,7 +38,7 @@ class App : Application() {
         var registerNewRunnerComponent: RegisterNewRunnerComponent? = null
             get() {
                 if (field == null)
-                    field = baseComponent.provideRegisterComponent()
+                    field = rootRunnersComponent?.provideRegisterRunnerComponent()
                 return field
             }
 
