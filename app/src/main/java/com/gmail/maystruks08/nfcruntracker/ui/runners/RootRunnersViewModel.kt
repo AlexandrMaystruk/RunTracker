@@ -18,7 +18,7 @@ class RootRunnersViewModel @Inject constructor(
     }
 
     fun onRegisterNewRunnerClicked(){
-        router.navigateTo(Screens.RegisterRunnerScreen())
+        router.navigateTo(Screens.RegisterNewRunnerScreen())
     }
 
     fun onClickedAtRunner(runnerView: RunnerView) {

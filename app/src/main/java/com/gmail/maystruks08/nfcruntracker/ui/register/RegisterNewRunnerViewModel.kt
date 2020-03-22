@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.ui.register
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.ResultOfTask
@@ -16,11 +17,13 @@ import javax.inject.Inject
 
 class RegisterNewRunnerViewModel @Inject constructor(private val interactor: RegisterNewRunnerInteractor, private val router: Router) : BaseViewModel(){
 
-    val selectDateOfBirthdayClicked get() = _selectDateOdBirthdayClickedLiveData
-    val onDateOfBirthdaySelected get() = _selectDateOdBirthdaySelectedLiveData
+    val selectDateOfBirthdayClicked get(): LiveData<Unit> = _selectDateOdBirthdayClickedLiveData
+    val selectedDateOfBirthday get(): LiveData<Date> = _selectDateOdBirthdaySelectedLiveData
+    val scannedCard get() : LiveData<String> = _cardIdLiveData
 
     private val _selectDateOdBirthdayClickedLiveData = MutableLiveData<Unit>()
     private val _selectDateOdBirthdaySelectedLiveData = MutableLiveData<Date>()
+    private val _cardIdLiveData = MutableLiveData<String>()
 
 
     fun onSelectDateOfBirthdayClicked(){
@@ -32,7 +35,7 @@ class RegisterNewRunnerViewModel @Inject constructor(private val interactor: Reg
     }
 
     fun onNfcCardScanned(cardId: String) {
-        //TODO save card id
+        _cardIdLiveData.postValue(cardId)
     }
 
     fun onBackClicked(){

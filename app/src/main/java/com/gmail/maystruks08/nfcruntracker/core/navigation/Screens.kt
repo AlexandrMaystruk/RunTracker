@@ -41,11 +41,11 @@ object Screens {
         }
     }
 
-    class RegisterRunnerScreen : AppScreen() {
+    class RegisterNewRunnerScreen : AppScreen() {
         override fun getFragment() = RegisterNewRunnerFragment()
 
         companion object {
-            fun tag() = RegisterRunnerScreen::class.java.canonicalName ?: ""
+            fun tag() = RegisterNewRunnerScreen::class.java.canonicalName ?: ""
         }
     }
 }

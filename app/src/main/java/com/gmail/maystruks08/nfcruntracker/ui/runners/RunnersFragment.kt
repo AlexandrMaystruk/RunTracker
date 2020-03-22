@@ -7,8 +7,6 @@ import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
-import com.gmail.maystruks08.nfcruntracker.core.ext.toast
-import com.gmail.maystruks08.nfcruntracker.eventbas.CardScannerLiveData
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import kotlinx.android.synthetic.main.fragment_runners.*
 import javax.inject.Inject
@@ -17,9 +15,6 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
 
     @Inject
     lateinit var viewModel: RunnersViewModel
-
-    @Inject
-    lateinit var cardScannerLiveData: CardScannerLiveData
 
     private var runnerAdapter: RunnerAdapter? = null
 
@@ -35,10 +30,6 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
 
     override fun bindViewModel() {
         viewModel.initFragment(runnerTypeId)
-
-        viewModel.toast.observe(viewLifecycleOwner, Observer {
-            context?.toast(it)
-        })
 
         viewModel.runners.observe(viewLifecycleOwner, Observer {
             runnerAdapter?.runnerList = it
@@ -56,13 +47,10 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
             runnerAdapter?.removeItem(it)
         })
 
-        cardScannerLiveData.onNfcReaderScannedCard.observe(viewLifecycleOwner, Observer {
-          viewModel.onNfcCardScanned(it)
-        })
     }
 
     override fun initViews() {
-        runnerAdapter = RunnerAdapter{ onClickedAtRunner.invoke(it) }
+        runnerAdapter = RunnerAdapter { onClickedAtRunner.invoke(it) }
         runnersRecyclerView.apply {
             layoutManager = LinearLayoutManager(runnersRecyclerView.context)
             adapter = runnerAdapter
@@ -76,10 +64,12 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
         super.onDestroyView()
     }
 
-    companion object{
+    companion object {
 
-        fun getInstance(runnerTypeId: Int, onClickedAtRunner: (RunnerView) -> Unit) = RunnersFragment().apply {
-            this.onClickedAtRunner = onClickedAtRunner
-            this.runnerTypeId = runnerTypeId }
+        fun getInstance(runnerTypeId: Int, onClickedAtRunner: (RunnerView) -> Unit) =
+            RunnersFragment().apply {
+                this.onClickedAtRunner = onClickedAtRunner
+                this.runnerTypeId = runnerTypeId
+            }
     }
 }

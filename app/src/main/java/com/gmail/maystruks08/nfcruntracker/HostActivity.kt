@@ -9,10 +9,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.gmail.maystruks08.nfcruntracker.core.ext.getFragment
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.core.navigation.AppNavigator
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
-import com.gmail.maystruks08.nfcruntracker.eventbas.CardScannerLiveData
+import com.gmail.maystruks08.nfcruntracker.ui.runners.RootRunnersFragment
 import com.gmail.maystruks08.nfcruntracker.utils.NfcAdapter
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
@@ -30,14 +31,14 @@ class HostActivity : AppCompatActivity() {
     @Inject
     lateinit var router: Router
 
-    @Inject
-    lateinit var cardScannerLiveData: CardScannerLiveData
-
     private var lastBackPressTime = 0L
 
     private val nfcAdapter = NfcAdapter()
 
+    private var alertDialog: AlertDialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_host)
         App.baseComponent.inject(this)
@@ -88,26 +89,26 @@ class HostActivity : AppCompatActivity() {
         nfcAdapter.startListening(this)
         if (!nfcAdapter.isEnabled()) {
             val builder = AlertDialog.Builder(this)
-            builder.setTitle("NFC отключен!")
-            builder.setMessage("Включить NFC для сканирования карт участников?")
-            builder.setPositiveButton(android.R.string.yes) { dialog, _ ->
-                toast("Please activate NFC and press Back to return to the application!")
-                dialog.dismiss()
-                startActivity(Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS))
-            }
-            builder.setNegativeButton(android.R.string.no) { dialog, _ ->
-                toast("NFC scanner disabled! Some functions will not work!")
-                dialog.dismiss()
-            }
-            builder.show()
-        }
+                .setTitle("NFC отключен!")
+                .setMessage("Включить NFC для сканирования карт участников?")
+                .setPositiveButton(android.R.string.yes) { _, _ ->
+                    toast("Пожалуйста, активируйте NFC и нажмите Назад, чтобы вернуться в приложение!")
+                    alertDialog?.dismiss()
+                    startActivity(Intent(android.provider.Settings.ACTION_NFC_SETTINGS))
+                }
+                .setNegativeButton(android.R.string.no) { _, _ ->
+                    toast("NFC сканер отключен! Некоторые функции не будут работать!")
+                    alertDialog?.dismiss()
+                }
+            alertDialog = builder.show()
+        } else alertDialog?.dismiss()
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         nfcAdapter.processReadCard(intent)?.let { cardId ->
-            toast("Nfc card scanned. Id = $cardId")
-            cardScannerLiveData.onCardScanned(cardId)
+            toast("Карта: $cardId")
+            getFragment<RootRunnersFragment>(Screens.RootRunnersScreen.tag())?.onNfcCardScanned(cardId)
         }
     }
 
@@ -115,5 +116,6 @@ class HostActivity : AppCompatActivity() {
         super.onPause()
         navigatorHolder.removeNavigator()
         nfcAdapter.stopListening(this)
+        alertDialog?.dismiss()
     }
 }

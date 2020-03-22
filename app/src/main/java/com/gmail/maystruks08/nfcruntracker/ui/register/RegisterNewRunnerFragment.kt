@@ -10,7 +10,6 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.toDateFormat
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
-import com.gmail.maystruks08.nfcruntracker.eventbas.CardScannerLiveData
 import kotlinx.android.synthetic.main.fragment_register_new_runner.*
 import java.util.*
 import javax.inject.Inject
@@ -20,9 +19,6 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
 
     @Inject
     lateinit var viewModel: RegisterNewRunnerViewModel
-
-    @Inject
-    lateinit var cardScannerLiveData: CardScannerLiveData
 
     private val calendar = Calendar.getInstance()
     private var runnerSex: RunnerSex? = null
@@ -52,15 +48,14 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
             ).show()
         })
 
-        viewModel.onDateOfBirthdaySelected.observe(viewLifecycleOwner, Observer {
+        viewModel.selectedDateOfBirthday.observe(viewLifecycleOwner, Observer {
             runnerDateOfBirthday = it
             tvDateOfBirthday.text = it.toDateFormat()
         })
 
-        cardScannerLiveData.onNfcReaderScannedCard.observe(viewLifecycleOwner, Observer {
+        viewModel.scannedCard.observe(viewLifecycleOwner, Observer {
             tvScanCard.text = "Карта: $it"
             runnerCardId = it
-            viewModel.onNfcCardScanned(it)
         })
     }
 
@@ -102,9 +97,7 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
                     runnerType!!,
                     runnerCardId!!
                 )
-            } else {
-                context?.toast("Заполните обязательные поля!")
-            }
+            } else context?.toast("Заполните обязательные поля!")
         }
     }
 
