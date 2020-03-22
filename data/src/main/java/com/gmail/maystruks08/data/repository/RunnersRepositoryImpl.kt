@@ -8,7 +8,6 @@ import com.gmail.maystruks08.data.mappers.toCheckpointTable
 import com.gmail.maystruks08.data.mappers.toRunner
 import com.gmail.maystruks08.data.mappers.toRunnerTable
 import com.gmail.maystruks08.data.remote.FirestoreApi
-import com.gmail.maystruks08.data.remote.googledrive.GoogleDriveApi
 import com.gmail.maystruks08.domain.entities.*
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
@@ -22,24 +21,10 @@ import javax.inject.Inject
 
 class RunnersRepositoryImpl @Inject constructor(
     private val firestoreApi: FirestoreApi,
-    private val driveApi: GoogleDriveApi,
     private val runnerDao: RunnerDao,
     private val runnersCache: RunnersCache,
     private val checkpointsCache: CheckpointsCache
 ) : RunnersRepository {
-
-    override suspend fun bindGoogleDriveService(): ResultOfTask<Exception, String> {
-        return try {
-            withContext(Dispatchers.IO) {
-                driveApi.getFile()
-            }
-            ResultOfTask.build { "" }
-        } catch (e: NoClassDefFoundError) {
-            ResultOfTask.build { throw Exception("https://accounts.google.com/o/oauth2/auth?access_type=online&client_id=7796872061-63b7kuf4ac15na6ur2lmp7brmt4ff8fg.apps.googleusercontent.com&redirect_uri=http://localhost:43240/Callback&response_type=code&scope=https://www.googleapis.com/auth/drive") }
-        } catch (e: Exception) {
-            ResultOfTask.build { throw e }
-        }
-    }
 
     override suspend fun getAllRunners(type: RunnerType): ResultOfTask<Exception, List<Runner>> {
         return try {

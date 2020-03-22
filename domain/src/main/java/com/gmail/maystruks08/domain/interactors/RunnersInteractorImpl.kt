@@ -9,9 +9,6 @@ import javax.inject.Inject
 class RunnersInteractorImpl @Inject constructor(private val runnersRepository: RunnersRepository) :
     RunnersInteractor {
 
-    override suspend fun bindGoogleDriveService(): ResultOfTask<Exception, String> =
-         runnersRepository.bindGoogleDriveService()
-
     override suspend fun getAllRunners(type: RunnerType): ResultOfTask<Exception, List<Runner>> =
         runnersRepository.getAllRunners(type)
 
