@@ -59,7 +59,7 @@ class App : Application() {
         var runnerComponent: RunnerComponent? = null
             get() {
                 if (field == null)
-                    field = rootRunnersComponent?.provideRunnerComponent()
+                    field = runnersComponent?.provideRunnerComponent()
                 return field
             }
 

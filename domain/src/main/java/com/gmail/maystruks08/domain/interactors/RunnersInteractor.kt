@@ -7,6 +7,8 @@ import com.gmail.maystruks08.domain.entities.RunnerType
 
 interface RunnersInteractor {
 
+    suspend fun getRunner(id: String): ResultOfTask<Exception, Runner>
+
     suspend fun getAllRunners(type: RunnerType): ResultOfTask<Exception, List<Runner>>
 
     suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit)

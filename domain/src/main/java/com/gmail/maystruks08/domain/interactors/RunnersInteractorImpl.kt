@@ -9,6 +9,11 @@ import javax.inject.Inject
 class RunnersInteractorImpl @Inject constructor(private val runnersRepository: RunnersRepository) :
     RunnersInteractor {
 
+    override suspend fun getRunner(id: String): ResultOfTask<Exception, Runner> {
+        val runner = runnersRepository.getRunnerById(id) ?: return ResultOfTask.build { throw RunnerNotFoundException() }
+        return ResultOfTask.build { runner }
+    }
+
     override suspend fun getAllRunners(type: RunnerType): ResultOfTask<Exception, List<Runner>> =
         runnersRepository.getAllRunners(type)
 

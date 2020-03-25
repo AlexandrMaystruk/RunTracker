@@ -15,8 +15,6 @@ interface RootRunnersComponent {
 
     fun provideRunnersComponent(): RunnersComponent
 
-    fun provideRunnerComponent(): RunnerComponent
-
     fun provideRegisterRunnerComponent(): RegisterNewRunnerComponent
 
 }

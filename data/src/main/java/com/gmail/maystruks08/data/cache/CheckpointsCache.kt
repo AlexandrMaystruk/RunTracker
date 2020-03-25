@@ -9,26 +9,26 @@ import javax.inject.Singleton
 class CheckpointsCache @Inject constructor() {
 
     var checkpoints = listOf(
-        Checkpoint(0,"С", CheckpointState.STEP_UNDO),
-        Checkpoint(1,"15", CheckpointState.STEP_UNDO),
-        Checkpoint(2,"46", CheckpointState.STEP_UNDO),
-        Checkpoint(3,"52", CheckpointState.STEP_UNDO),
-        Checkpoint(4,"70", CheckpointState.STEP_UNDO),
-        Checkpoint(5,"81", CheckpointState.STEP_UNDO),
-        Checkpoint(6,"90", CheckpointState.STEP_UNDO),
-        Checkpoint(7,"Ф", CheckpointState.STEP_UNDO)
+        Checkpoint(0,"С", CheckpointState.UNDONE),
+        Checkpoint(1,"15", CheckpointState.UNDONE),
+        Checkpoint(2,"46", CheckpointState.UNDONE),
+        Checkpoint(3,"52", CheckpointState.UNDONE),
+        Checkpoint(4,"70", CheckpointState.UNDONE),
+        Checkpoint(5,"81", CheckpointState.UNDONE),
+        Checkpoint(6,"90", CheckpointState.UNDONE),
+        Checkpoint(7,"Ф", CheckpointState.UNDONE)
     )
 
     var checkpointsIronPeople = listOf(
-        Checkpoint(0,"С", CheckpointState.STEP_UNDO),
-        Checkpoint(1,"7.5", CheckpointState.STEP_UNDO),
-        Checkpoint(2,"15", CheckpointState.STEP_UNDO),
-        Checkpoint(3,"42", CheckpointState.STEP_UNDO),
-        Checkpoint(4,"52", CheckpointState.STEP_UNDO),
-        Checkpoint(5,"70", CheckpointState.STEP_UNDO),
-        Checkpoint(6,"81", CheckpointState.STEP_UNDO),
-        Checkpoint(7,"91", CheckpointState.STEP_UNDO),
-        Checkpoint(8,"Ф", CheckpointState.STEP_UNDO)
+        Checkpoint(0,"С", CheckpointState.UNDONE),
+        Checkpoint(1,"7.5", CheckpointState.UNDONE),
+        Checkpoint(2,"15", CheckpointState.UNDONE),
+        Checkpoint(3,"42", CheckpointState.UNDONE),
+        Checkpoint(4,"52", CheckpointState.UNDONE),
+        Checkpoint(5,"70", CheckpointState.UNDONE),
+        Checkpoint(6,"81", CheckpointState.UNDONE),
+        Checkpoint(7,"91", CheckpointState.UNDONE),
+        Checkpoint(8,"Ф", CheckpointState.UNDONE)
     )
 
     var currentCheckpoint: Checkpoint = checkpoints[0]
