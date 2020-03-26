@@ -31,13 +31,18 @@ class RunnerViewModel @Inject constructor(private val router: Router, private va
 
     private fun handleError(e: Exception) {
         when(e){
-            is RunnerNotFoundException -> {}
+            is RunnerNotFoundException -> toastLiveData.postValue("Участник не найден =(")
             else -> e.printStackTrace()
         }
     }
 
     fun markCheckpointAsPassed(runnerId: String) {
-        //TODO mark checkpoint as passed in manual
+        viewModelScope.launch {
+            when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(runnerId)) {
+                is ResultOfTask.Value -> runnerLiveData.postValue(onResult.value.runner)
+                is ResultOfTask.Error -> handleError(onResult.error)
+            }
+        }
     }
 
     fun onBackClicked() {

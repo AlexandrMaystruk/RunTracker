@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runner
 
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.maystruks08.nfcruntracker.App
@@ -9,14 +10,14 @@ import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.toDateFormat
 import kotlinx.android.synthetic.main.fragment_runner.*
-import kotlinx.android.synthetic.main.fragment_runner.tvRunnerFullName
-
 import javax.inject.Inject
 
 class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
 
     @Inject
     lateinit var viewModel: RunnerViewModel
+
+    private var alertDialog: AlertDialog? = null
 
     private var runnerId: String by argument()
 
@@ -46,7 +47,17 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
 
     override fun initViews() {
         btnMarkCheckpointAsPassedInManual.setOnClickListener {
-            viewModel.markCheckpointAsPassed(runnerId)
+            val builder = AlertDialog.Builder(it.context)
+                .setTitle("Внимание!")
+                .setMessage("Отметить участника на КП без карты?")
+                .setPositiveButton(android.R.string.yes) { _, _ ->
+                    viewModel.markCheckpointAsPassed(runnerId)
+                    alertDialog?.dismiss()
+                }
+                .setNegativeButton(android.R.string.no) { _, _ ->
+                    alertDialog?.dismiss()
+                }
+            alertDialog = builder.show()
         }
 
         checkpointsAdapter = CheckpointsAdapter()
