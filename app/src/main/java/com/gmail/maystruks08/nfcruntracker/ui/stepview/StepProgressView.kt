@@ -12,51 +12,38 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.*
 import com.gmail.maystruks08.nfcruntracker.R
 
-class StepProgressView : ViewGroup,
-    IStepProgress {
+
+class StepProgressView : ViewGroup, IStepProgress {
 
     private val stepProgress = StepProgress()
     private val drawableHelper = DrawableHelper()
 
-    private lateinit var ovalStrokeDrawable: Drawable
-    private lateinit var ovalStrokeInactiveDrawable: Drawable
-    private lateinit var checkedDrawable: Drawable
     private lateinit var arcActiveDrawable: ColorDrawable
     private lateinit var arcInactiveDrawable: ColorDrawable
+    private lateinit var doneDrawable: Drawable
+    private lateinit var undoneDrawable: Drawable
+    private lateinit var currentDrawable: Drawable
+
+    @DrawableRes
+    private  var doneDrawableId: Int = R.drawable.ic_check_circle
+    @DrawableRes
+    private  var undoneDrawableId: Int =  R.drawable.ic_unchecked
+    @DrawableRes
+    private  var currentDrawableId: Int = R.drawable.ic_checked
 
     @ColorInt
-    private var textNodeTitleColor = ContextCompat.getColor(
-        context,
-        R.color.colorPrimary
-    )
+    private var textNodeTitleColor = ContextCompat.getColor(context, R.color.colorPrimary)
 
     @ColorInt
-    private var textNodeColor = ContextCompat.getColor(
-        context,
-        R.color.colorBlack
-    )
+    private var connectionLineColor = ContextCompat.getColor(context, R.color.colorGreen)
 
     @ColorInt
-    private var nodeColor = ContextCompat.getColor(
-        context,
-        R.color.colorPrimary
-    )
-
-    @ColorInt
-    private var arcColor = ContextCompat.getColor(
-        context,
-        R.color.colorRed
-    )
-
-    @ColorInt
-    private var colorInactive = ContextCompat.getColor(
-        context,
-        R.color.colorGreen
-    )
+    private var colorInactive = ContextCompat.getColor(context, R.color.colorAccent)
 
     private var titles: List<String> = listOf()
     private var stepsCount = 2
@@ -77,11 +64,7 @@ class StepProgressView : ViewGroup,
     }
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        context.theme.obtainStyledAttributes(
-            attrs,
-            R.styleable.StepProgressView,
-            0, 0
-        ).apply {
+        context.theme.obtainStyledAttributes(attrs, R.styleable.StepProgressView, 0, 0).apply {
             try {
                 //common setup
                 stepsCount = getInteger(R.styleable.StepProgressView_stepsCount, stepsCount)
@@ -90,18 +73,21 @@ class StepProgressView : ViewGroup,
                 }
                 colorInactive = getColor(R.styleable.StepProgressView_colorInactive, colorInactive)
                 //node setup
+
+                doneDrawableId = getResourceId(R.styleable.StepProgressView_nodeDoneDrawable, doneDrawableId)
+                undoneDrawableId = getResourceId(R.styleable.StepProgressView_nodeUndoneDrawable, undoneDrawableId)
+                currentDrawableId =getResourceId( R.styleable.StepProgressView_nodeCurrentDrawable, currentDrawableId)
+
                 nodeHeight = getDimension(R.styleable.StepProgressView_nodeHeight, nodeHeight)
-                nodeColor = getColor(R.styleable.StepProgressView_nodeColor, nodeColor)
                 //arc setup
                 arcHeight = getDimension(R.styleable.StepProgressView_arcWidth, arcHeight)
                 arcPadding = getDimension(R.styleable.StepProgressView_arcPadding, arcPadding)
-                arcColor = getColor(R.styleable.StepProgressView_arcColor, arcColor)
+                connectionLineColor = getColor(R.styleable.StepProgressView_arcColor, connectionLineColor)
 
                 titlesEnabled = getBoolean(R.styleable.StepProgressView_titlesEnabled, titlesEnabled)
                 textTitlePadding = getDimension(R.styleable.StepProgressView_textTitlePadding, textTitlePadding)
                 textNodeTitleSize = getDimensionPixelSize(R.styleable.StepProgressView_textNodeTitleSize, textNodeTitleSize)
                 textNodeSize = getDimensionPixelSize(R.styleable.StepProgressView_textNodeSize, textNodeSize)
-                textNodeColor = getColor(R.styleable.StepProgressView_textNodeColor, textNodeColor)
                 textNodeTitleColor = getColor(R.styleable.StepProgressView_textNodeTitleColor, textNodeTitleColor)
             } finally {
                 recycle()
@@ -111,10 +97,10 @@ class StepProgressView : ViewGroup,
     }
 
     private fun init() {
-        ovalStrokeDrawable = drawableHelper.createStrokeOvalDrawable(context, nodeColor)
-        ovalStrokeInactiveDrawable = drawableHelper.createStrokeOvalDrawable(context, colorInactive)
-        checkedDrawable = drawableHelper.createCheckDrawable(context, nodeColor)
-        arcActiveDrawable = ColorDrawable(arcColor)
+        doneDrawable = ContextCompat.getDrawable(context, doneDrawableId) ?: drawableHelper.createStrokeOvalDrawable(context, textNodeTitleColor)
+        undoneDrawable = ContextCompat.getDrawable(context, undoneDrawableId) ?: drawableHelper.createStrokeOvalDrawable(context, textNodeTitleColor)
+        currentDrawable = ContextCompat.getDrawable(context, currentDrawableId) ?: drawableHelper.createStrokeOvalDrawable(context, textNodeTitleColor)
+        arcActiveDrawable = ColorDrawable(connectionLineColor)
         arcInactiveDrawable = ColorDrawable(colorInactive)
 
         if (titlesEnabled) {
@@ -279,11 +265,7 @@ class StepProgressView : ViewGroup,
     //to respect optimal proportions for nodes and arcs
     private fun getArcWidth(widthMeasureSpec: Int, width: Int, nodeSize: Int): Int {
         //include padding for titles
-        val sCount = if (titlesEnabled) {
-            stepsCount + 1
-        } else {
-            stepsCount
-        }
+        val sCount = if (titlesEnabled) stepsCount + 1 else stepsCount
         val wMode = MeasureSpec.getMode(widthMeasureSpec)
         val arcsCount = stepsCount - 1
         val allArcsWidth = (width - sCount * nodeSize)
@@ -323,9 +305,7 @@ class StepProgressView : ViewGroup,
         val step: View
         try {
             //Take a node view to calculate it margins
-            step = children.first {
-                it is TextView && it.tag as String != STEP_TITLE_TAG
-            }
+            step = children.first { it is TextView && it.tag as String != STEP_TITLE_TAG }
         } catch (e: NoSuchElementException) {
             e.printStackTrace()
             return
@@ -382,13 +362,7 @@ class StepProgressView : ViewGroup,
 
     private fun textViewForStep(stepPosition: Int, isActive: Boolean): TextView {
         return TextView(context).apply {
-            background = if (isActive) {
-                setTextColor(textNodeColor)
-                ovalStrokeDrawable
-            } else {
-                setTextColor(colorInactive)
-                ovalStrokeInactiveDrawable
-            }
+            background = if (isActive) currentDrawable else undoneDrawable
             gravity = Gravity.CENTER
             layoutParams = getDefaultElementLayoutParams()
             setTextSize(TypedValue.COMPLEX_UNIT_PX, textNodeSize.toFloat())
@@ -402,56 +376,33 @@ class StepProgressView : ViewGroup,
         height: Int = LayoutParams.WRAP_CONTENT
     ) = LinearLayout.LayoutParams(width, height)
 
-    private fun arcView(position: Int): ArcView {
-        return ArcView(context)
-            .apply {
+    private fun arcView(position: Int): View {
+        return View(context).apply {
             background = TransitionDrawable(arrayOf(arcInactiveDrawable, arcActiveDrawable))
-            layoutParams = LinearLayout.LayoutParams(
-                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT
-            )
+            layoutParams = LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
             tag = ARC_TAG_PREFIX + position
         }
     }
 
     private fun changeStepStateView(stepNumber: Int, newState: StepState) {
-        val view = findViewWithTag<TextView>(NODE_TAG_PREFIX + stepNumber)
-        view?.let {
+        findViewWithTag<TextView>(NODE_TAG_PREFIX + stepNumber)?.let {
             when (newState) {
-                StepState.DONE -> {
-                    it.background = checkedDrawable
-                    it.textSize = 0f
-                    it.setTextColor(textNodeColor)
-                }
-                StepState.CURRENT -> {
-                    it.background = ovalStrokeDrawable
-                    it.setTextSize(TypedValue.COMPLEX_UNIT_PX, textNodeTitleSize.toFloat())
-                    it.setTextColor(textNodeColor)
-                }
-                else -> {
-                    it.background = ovalStrokeInactiveDrawable
-                    it.setTextSize(TypedValue.COMPLEX_UNIT_PX, textNodeTitleSize.toFloat())
-                    it.setTextColor(colorInactive)
-                }
+                StepState.DONE -> it.background = doneDrawable
+                StepState.CURRENT -> it.background = currentDrawable
+                else -> it.background = undoneDrawable
             }
         }
     }
 
     private fun animateProgressArc(arcNumber: Int, activated: Boolean) {
-        val view = findViewWithTag<ArcView>(
-            ARC_TAG_PREFIX + arcNumber)
-        if (activated) {
-            if (!view.isHighlighted) {
-                view.isHighlighted = true
-                (view.background as TransitionDrawable).startTransition(arcTransitionDuration)
-            }
-        } else {
-            if (view.isHighlighted) {
-                view.isHighlighted = false
-                (view.background as TransitionDrawable).resetTransition()
+        findViewWithTag<View>(ARC_TAG_PREFIX + arcNumber)?.let {
+            if (activated) {
+                (it.background as TransitionDrawable).startTransition(arcTransitionDuration)
+            } else {
+                (it.background as TransitionDrawable).resetTransition()
             }
         }
     }
-
 
     fun setCurrentStep(currentStep: Int) {
         stepProgress.setCurrentStep(currentStep)
@@ -488,13 +439,6 @@ class StepProgressView : ViewGroup,
      */
     override fun markCurrentAsDone() {
         stepProgress.markCurrentStepDone()
-    }
-
-    /**
-     * Mark current selected step as undone
-     */
-    override fun markCurrentAsUndone() {
-        stepProgress.markCurrentStepUndone()
     }
 
     /**
@@ -579,6 +523,14 @@ class StepProgressView : ViewGroup,
                 }
                 changeStepState(i, stepState)
             }
+
+            for (i in 0..stepsStates.size - 2) {
+                if ( i < currentStep) {
+                    animateProgressArc(i, true)
+                } else {
+                    animateProgressArc(i, false)
+                }
+            }
         }
 
         fun nextStep(isCurrentDone: Boolean): Int {
@@ -603,25 +555,6 @@ class StepProgressView : ViewGroup,
             changeStepState(currentStep, StepState.DONE)
         }
 
-        fun markCurrentStepUndone() {
-            if (isStepUndone()) {
-                return
-            }
-            changeStepState(currentStep, StepState.CURRENT)
-        }
-
-        private fun updateArcsState() {
-            var allDone = true
-            for (i in 0..stepsStates.size - 2) {
-                if (isStepDone(i) && allDone) {
-                    animateProgressArc(i, true)
-                } else {
-                    allDone = false
-                    animateProgressArc(i, false)
-                }
-            }
-        }
-
         fun isStepDone(stepNumber: Int = -1): Boolean {
             val stepState = if (stepNumber == -1) {
                 stepsStates[currentStep]
@@ -631,19 +564,9 @@ class StepProgressView : ViewGroup,
             return stepState == StepState.DONE
         }
 
-        private fun isStepUndone(stepNumber: Int = -1): Boolean {
-            val stepState = if (stepNumber == -1) {
-                stepsStates[currentStep]
-            } else {
-                stepsStates[stepNumber]
-            }
-            return stepState == StepState.UNDONE || stepState == StepState.CURRENT
-        }
-
         private fun changeStepState(stepNumber: Int, newState: StepState) {
             stepsStates[stepNumber] = newState
             changeStepStateView(stepNumber, newState)
-            updateArcsState()
         }
 
         fun isAllDone(): Boolean {

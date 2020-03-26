@@ -9,7 +9,7 @@ import javax.inject.Singleton
 class CheckpointsCache @Inject constructor() {
 
     var checkpoints = listOf(
-        Checkpoint(0,"С", CheckpointState.UNDONE),
+        Checkpoint(0,"С", CheckpointState.CURRENT),
         Checkpoint(1,"15", CheckpointState.UNDONE),
         Checkpoint(2,"46", CheckpointState.UNDONE),
         Checkpoint(3,"52", CheckpointState.UNDONE),
@@ -20,7 +20,7 @@ class CheckpointsCache @Inject constructor() {
     )
 
     var checkpointsIronPeople = listOf(
-        Checkpoint(0,"С", CheckpointState.UNDONE),
+        Checkpoint(0,"С", CheckpointState.CURRENT),
         Checkpoint(1,"7.5", CheckpointState.UNDONE),
         Checkpoint(2,"15", CheckpointState.UNDONE),
         Checkpoint(3,"42", CheckpointState.UNDONE),
@@ -34,6 +34,5 @@ class CheckpointsCache @Inject constructor() {
     var currentCheckpoint: Checkpoint = checkpoints[0]
 
     var currentIronPeopleCheckpoint: Checkpoint = checkpoints[0]
-
 
 }

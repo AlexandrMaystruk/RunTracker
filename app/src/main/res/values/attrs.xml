@@ -10,7 +10,6 @@
         <attr name="nodeCurrentDrawable" format="reference" />
 
         <attr name="nodeHeight" format="dimension" />
-        <attr name="nodeColor" format="color" />
         <!-- Arc customization -->
         <attr name="arcWidth" format="dimension" />
         <attr name="arcHeight" format="dimension" />

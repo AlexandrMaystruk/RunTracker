@@ -21,11 +21,6 @@ interface IStepProgress {
     fun markCurrentAsDone()
 
     /**
-     * Mark current selected step as undone
-     */
-    fun markCurrentAsUndone()
-
-    /**
      * Set title for each step
      * @param titles list of titles to apply to step views. Size should be the same as steps count
      */
