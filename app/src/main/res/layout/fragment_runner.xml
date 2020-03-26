@@ -32,7 +32,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
-                android:layout_marginTop="@dimen/margin_m"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/runnerCheckpointsRecyclerView"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -47,6 +46,7 @@
                 android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginEnd="@dimen/margin_xs"
                 android:textStyle="bold"
+                android:gravity="start"
                 app:layout_constraintBottom_toBottomOf="@+id/tvRunnerNumber"
                 app:layout_constraintEnd_toStartOf="@+id/tvDateOfBirthday"
                 app:layout_constraintStart_toEndOf="@+id/tvRunnerNumber"
@@ -63,16 +63,26 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tvRunnerFullName" />
 
+            <TextView
+                android:id="@+id/tvRunnerCity"
+                style="@style/TextM"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:layout_marginTop="@dimen/margin_xs"
+                app:layout_constraintStart_toStartOf="@+id/tvRunnerFullName"
+                app:layout_constraintTop_toBottomOf="@+id/tvRunnerFullName" />
+
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/runnerCheckpointsRecyclerView"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginTop="@dimen/margin_m"
+                android:layout_marginTop="@dimen/margin_xs"
                 app:layout_constraintBottom_toTopOf="@+id/btnMarkCheckpointAsPassedInManual"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvRunnerNumber" />
-
+                app:layout_constraintTop_toBottomOf="@+id/tvRunnerCity" />
 
             <Button
                 android:id="@+id/btnMarkCheckpointAsPassedInManual"

@@ -9,6 +9,7 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.toDateFormat
+import com.gmail.maystruks08.nfcruntracker.core.ext.toTimeFormat
 import kotlinx.android.synthetic.main.fragment_runner.*
 import javax.inject.Inject
 
@@ -41,6 +42,15 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
             tvRunnerNumber.text = numberStr
             tvRunnerFullName.text = runner.fullName
             tvDateOfBirthday.text = runner.dateOfBirthday.toDateFormat()
+            tvRunnerCity.text = runner.city
+            if(runner.totalResult != null){
+                val totalResultStr = "Общее время: ${runner.totalResult?.toTimeFormat()}"
+                btnMarkCheckpointAsPassedInManual.text = totalResultStr
+                btnMarkCheckpointAsPassedInManual.isEnabled = false
+            } else {
+                btnMarkCheckpointAsPassedInManual.text = "Отметить на текущем КП"
+                btnMarkCheckpointAsPassedInManual.isEnabled = true
+            }
             checkpointsAdapter?.checkpoints = runner.checkpoints.toMutableList()
         })
     }

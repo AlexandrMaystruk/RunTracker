@@ -26,11 +26,22 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/tvRunnerResult"
+            style="@style/TextM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_xs"
+            android:layout_marginEnd="@dimen/margin_s"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
             android:id="@+id/tvRunnerFullName"
             style="@style/TextM"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_s"
+            android:layout_marginStart="@dimen/margin_xs"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/tvRunnerNumber"
             app:layout_constraintStart_toEndOf="@+id/tvRunnerNumber"
