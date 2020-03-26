@@ -8,6 +8,7 @@ class RunnerView(
     val number: String,
     val fullName: String,
     val city: String,
+    val result: String?,
     val dateOfBirthday: String,
     val isIron: Boolean,
     val currentPosition: Int
@@ -18,6 +19,7 @@ class RunnerView(
         parcel.readString()?:"",
         parcel.readString()?:"",
         parcel.readString()?:"",
+        parcel.readString(),
         parcel.readString()?:"",
         parcel.readByte() != 0.toByte(),
         parcel.readInt()
@@ -28,6 +30,7 @@ class RunnerView(
         parcel.writeString(number)
         parcel.writeString(fullName)
         parcel.writeString(city)
+        parcel.writeString(result)
         parcel.writeString(dateOfBirthday)
         parcel.writeByte(if (isIron) 1 else 0)
         parcel.writeInt(currentPosition)

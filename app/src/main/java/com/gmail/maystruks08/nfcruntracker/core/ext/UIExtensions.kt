@@ -10,7 +10,7 @@ const val TIME_FORMAT = "HH:mm:ss"
 
 const val DATA_TIME_FORMAT = "dd.MM.yyyy HH:mm:ss"
 
-const val DATA_TIME_SHORT_FORMAT = "dd.MM HH:mm:ss"
+const val DATA_TIME_SHORT_FORMAT = "E, HH:mm:ss"
 
 fun View.show() {
     this.visibility = View.VISIBLE

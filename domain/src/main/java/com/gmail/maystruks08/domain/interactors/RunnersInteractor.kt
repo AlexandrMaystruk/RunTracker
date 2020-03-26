@@ -15,6 +15,8 @@ interface RunnersInteractor {
 
     suspend fun addCurrentCheckpointToRunner(cardId: String): ResultOfTask<Exception, RunnerChange>
 
+    suspend fun removeCheckpointForRunner(cardId: String, checkpointId: Int): ResultOfTask<Exception, RunnerChange>
+
     suspend fun finishWork()
 
 }
