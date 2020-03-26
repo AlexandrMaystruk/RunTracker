@@ -24,6 +24,10 @@ data class Runner(
 
     fun markCheckpointAsPassed(checkpoint: Checkpoint): Boolean {
         val index = checkpoints.indexOfFirst { it.id == checkpoint.id }
+        val currentCheckpointState = checkpoints[index].state
+        if(currentCheckpointState == CheckpointState.DONE || currentCheckpointState == CheckpointState.CURRENT ){
+            return false
+        }
         if (index <= checkpoints.size && index != -1) {
             val previousIsDone = if (index == 0) {
                 true
@@ -40,6 +44,13 @@ data class Runner(
             }
         }
         return false
+    }
+
+    fun removeCheckpoint(checkpointId: Int){
+        checkpoints.find { it.id == checkpointId }?.also {
+            it.state = CheckpointState.UNDONE
+            it.date = null
+        }
     }
 
     private fun isAllDone(): Boolean {

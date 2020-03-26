@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.entities.Runner
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
+import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import kotlinx.coroutines.launch
@@ -27,15 +28,25 @@ class RunnerViewModel @Inject constructor(private val router: Router, private va
     }
 
     private fun handleError(e: Exception) {
+        e.printStackTrace()
         when(e){
             is RunnerNotFoundException -> toastLiveData.postValue("Участник не найден =(")
-            else -> e.printStackTrace()
+            is SaveRunnerDataException -> toastLiveData.postValue("Ошибка сохранения данных участника =(")
         }
     }
 
     fun markCheckpointAsPassed(runnerId: String) {
         viewModelScope.launch {
             when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(runnerId)) {
+                is ResultOfTask.Value -> runnerLiveData.postValue(onResult.value.runner)
+                is ResultOfTask.Error -> handleError(onResult.error)
+            }
+        }
+    }
+
+    fun deleteCheckpointFromRunner(runnerId: String, checkpointId: Int) {
+        viewModelScope.launch {
+            when (val onResult = runnersInteractor.removeCheckpointForRunner(runnerId, checkpointId)) {
                 is ResultOfTask.Value -> runnerLiveData.postValue(onResult.value.runner)
                 is ResultOfTask.Error -> handleError(onResult.error)
             }

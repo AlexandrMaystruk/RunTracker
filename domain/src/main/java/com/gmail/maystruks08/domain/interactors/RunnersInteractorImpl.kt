@@ -28,6 +28,13 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
         return ResultOfTask.build { RunnerChange(updatedRunner, Change.UPDATE) }
     }
 
+    override suspend fun removeCheckpointForRunner(cardId: String, checkpointId: Int): ResultOfTask<Exception, RunnerChange> {
+        val runner = runnersRepository.getRunnerById(cardId) ?: return ResultOfTask.build { throw RunnerNotFoundException() }
+        runner.removeCheckpoint(checkpointId)
+        val updatedRunner = runnersRepository.updateRunnerData(runner) ?: return ResultOfTask.build { throw SaveRunnerDataException() }
+        return ResultOfTask.build { RunnerChange(updatedRunner, Change.UPDATE) }
+    }
+
     override suspend fun finishWork() {
         runnersRepository.finishWork()
     }

@@ -15,7 +15,7 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.toDateTimeShortFormat
 import kotlinx.android.synthetic.main.item_checkpoint.view.*
 import kotlin.properties.Delegates
 
-class CheckpointsAdapter : RecyclerView.Adapter<CheckpointsAdapter.ViewHolder>() {
+class CheckpointsAdapter(private val longClickListener: (Int) -> Unit) : RecyclerView.Adapter<CheckpointsAdapter.ViewHolder>() {
 
     var checkpoints: MutableList<Checkpoint> by Delegates.observable(mutableListOf()) { _, _, _ ->
         notifyDataSetChanged()
@@ -27,14 +27,14 @@ class CheckpointsAdapter : RecyclerView.Adapter<CheckpointsAdapter.ViewHolder>()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindHolder(checkpoints[position], position)
+        holder.bindHolder(checkpoints[position], position, longClickListener)
     }
 
     override fun getItemCount(): Int = checkpoints.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bindHolder(item: Checkpoint, position: Int) {
+        fun bindHolder(item: Checkpoint, position: Int, longClickListener: (Int) -> Unit) {
             val stateDrawable = when (item.state) {
                 CheckpointState.UNDONE -> R.drawable.ic_unchecked
                 CheckpointState.DONE -> R.drawable.ic_check_circle
@@ -64,6 +64,10 @@ class CheckpointsAdapter : RecyclerView.Adapter<CheckpointsAdapter.ViewHolder>()
 
             itemView.ivCheckpointState.background = ContextCompat.getDrawable(itemView.context, stateDrawable)
             if(item.date != null){
+                itemView.tvCheckpointDate.setOnLongClickListener {
+                    longClickListener.invoke(item.id)
+                    true
+                }
                 itemView.tvCheckpointDate.show()
                 itemView.tvCheckpointDate.text = item.date?.toDateTimeShortFormat()
             } else itemView.tvCheckpointDate.gone()

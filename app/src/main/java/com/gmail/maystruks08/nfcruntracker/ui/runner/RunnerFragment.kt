@@ -60,11 +60,25 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
             alertDialog = builder.show()
         }
 
-        checkpointsAdapter = CheckpointsAdapter()
+        checkpointsAdapter = CheckpointsAdapter(::onCheckpointDateLongClicked)
         runnerCheckpointsRecyclerView.apply {
             layoutManager = LinearLayoutManager(runnerCheckpointsRecyclerView.context)
             adapter = checkpointsAdapter
         }
+    }
+
+    private fun onCheckpointDateLongClicked(checkpointId: Int){
+        val builder = AlertDialog.Builder(requireContext())
+            .setTitle("Внимание!")
+            .setMessage("Удалить участнику прохождение текущего КП?")
+            .setPositiveButton(android.R.string.yes) { _, _ ->
+                viewModel.deleteCheckpointFromRunner(runnerId, checkpointId)
+                alertDialog?.dismiss()
+            }
+            .setNegativeButton(android.R.string.no) { _, _ ->
+                alertDialog?.dismiss()
+            }
+        alertDialog = builder.show()
     }
 
     override fun onDestroyView() {
