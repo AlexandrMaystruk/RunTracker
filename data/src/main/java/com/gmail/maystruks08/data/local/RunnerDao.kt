@@ -3,7 +3,7 @@ package com.gmail.maystruks08.data.local
 import androidx.room.*
 
 @Dao
-interface RunnerDAO {
+interface RunnerDao {
 
     @Transaction
     suspend fun insertRunner(runner: RunnerTable, checkpoints: List<CheckpointTable>) {

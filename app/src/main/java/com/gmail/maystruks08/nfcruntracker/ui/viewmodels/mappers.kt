@@ -19,8 +19,8 @@ fun Checkpoint.toCheckpointView() = CheckpointView(
 fun Runner.toRunnerView() = RunnerView(
     this.id,
     this.number.toString(),
-    this.name,
-    this.surname,
+    this.fullName,
+    this.city,
     this.dateOfBirthday.toDateFormat(),
     this.checkpoints.map { it.toCheckpointView() }
 )

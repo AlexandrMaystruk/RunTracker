@@ -5,8 +5,8 @@ import java.util.*
 data class Runner(
     val id: String = "",
     val number: Int = -1,
-    val name: String = "",
-    val surname: String = " ",
+    val fullName: String = "",
+    val sex: RunnerSex = RunnerSex.MALE,
     val city: String = "",
     val dateOfBirthday: Date = Date(),
     val type: RunnerType = RunnerType.NORMAL,

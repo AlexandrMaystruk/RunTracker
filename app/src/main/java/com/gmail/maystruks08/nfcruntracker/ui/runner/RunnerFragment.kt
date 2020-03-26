@@ -8,6 +8,8 @@ import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import kotlinx.android.synthetic.main.fragment_runner.*
+import kotlinx.android.synthetic.main.fragment_runner.tvRunnerFullName
+import kotlinx.android.synthetic.main.fragment_runner.tvRunnerNumber
 
 import javax.inject.Inject
 
@@ -32,8 +34,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
         viewModel.runner.observe(viewLifecycleOwner, Observer { runnerView ->
             val numberStr = "#" + runnerView.number
             tvRunnerNumber.text = numberStr
-            tvRunnerName.text = runnerView.name
-            tvRunnerSurname.text = runnerView.surname
+            tvRunnerFullName.text = runnerView.fullName
             tvDateOfBirthday.text = runnerView.dateOfBirthday
             checkpointStepProgress.setStepViewTexts(runnerView.checkpoints.map { it.stepBean })
         })

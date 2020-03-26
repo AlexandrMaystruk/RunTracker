@@ -38,7 +38,7 @@
 
 
             <TextView
-                android:id="@+id/tvRunnerName"
+                android:id="@+id/tvRunnerFullName"
                 style="@style/TextM"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -48,24 +48,14 @@
                 app:layout_constraintTop_toTopOf="@+id/tvRunnerNumber" />
 
             <TextView
-                android:id="@+id/tvRunnerSurname"
-                style="@style/TextM"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_min"
-                app:layout_constraintBottom_toBottomOf="@+id/tvRunnerName"
-                app:layout_constraintStart_toEndOf="@+id/tvRunnerName"
-                app:layout_constraintTop_toTopOf="@+id/tvRunnerName" />
-
-            <TextView
                 android:id="@+id/tvDateOfBirthday"
                 style="@style/TextM"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
-                app:layout_constraintBottom_toBottomOf="@+id/tvRunnerName"
-                app:layout_constraintStart_toEndOf="@+id/tvRunnerSurname"
-                app:layout_constraintTop_toTopOf="@+id/tvRunnerName" />
+                app:layout_constraintBottom_toBottomOf="@+id/tvRunnerFullName"
+                app:layout_constraintStart_toEndOf="@+id/tvRunnerFullName"
+                app:layout_constraintTop_toTopOf="@+id/tvRunnerFullName" />
 
             <com.gmail.maystruks08.nfcruntracker.ui.stepview.VerticalStepView
                 android:id="@+id/checkpointStepProgress"
