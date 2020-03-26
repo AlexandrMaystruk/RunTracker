@@ -20,7 +20,7 @@ data class Runner(
     }
 
     fun getCurrentPosition(): Checkpoint? =
-        checkpoints.find { it.state == CheckpointState.STEP_CURRENT }
+        checkpoints.find { it.state == CheckpointState.CURRENT }
 
     fun markCheckpointAsPassed(checkpoint: Checkpoint): Boolean {
         val index = checkpoints.indexOfFirst { it.id == checkpoint.id }
@@ -28,14 +28,14 @@ data class Runner(
             val previousIsDone = if (index == 0) {
                 true
             } else {
-                checkpoints[index - 1].state == CheckpointState.STEP_CURRENT
+                checkpoints[index - 1].state == CheckpointState.CURRENT
             }
             if (previousIsDone) {
                 for (i in 0 until index) {
-                    checkpoints[i].state = CheckpointState.STEP_COMPLETED
+                    checkpoints[i].state = CheckpointState.DONE
                 }
                 checkpoints[index].date = Date()
-                checkpoints[index].state = CheckpointState.STEP_CURRENT
+                checkpoints[index].state = CheckpointState.CURRENT
                 return true
             }
         }
@@ -44,7 +44,7 @@ data class Runner(
 
     private fun isAllDone(): Boolean {
         checkpoints.forEachIndexed { index, checkpoint ->
-            if (checkpoint.state == CheckpointState.STEP_UNDO && index != checkpoints.lastIndex || index == checkpoints.lastIndex && checkpoint.state == CheckpointState.STEP_CURRENT) {
+            if (checkpoint.state == CheckpointState.UNDONE && index != checkpoints.lastIndex || index == checkpoints.lastIndex && checkpoint.state == CheckpointState.CURRENT) {
                 return false
             }
         }

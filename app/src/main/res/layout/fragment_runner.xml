@@ -31,19 +31,24 @@
                 style="@style/TextM"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_l"
+                android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_m"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/runnerCheckpointsRecyclerView"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
 
             <TextView
                 android:id="@+id/tvRunnerFullName"
                 style="@style/TextM"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginEnd="@dimen/margin_xs"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/tvRunnerNumber"
+                app:layout_constraintEnd_toStartOf="@+id/tvDateOfBirthday"
                 app:layout_constraintStart_toEndOf="@+id/tvRunnerNumber"
                 app:layout_constraintTop_toTopOf="@+id/tvRunnerNumber" />
 
@@ -52,18 +57,22 @@
                 style="@style/TextM"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginEnd="@dimen/margin_s"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/tvRunnerFullName"
-                app:layout_constraintStart_toEndOf="@+id/tvRunnerFullName"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tvRunnerFullName" />
 
-            <com.gmail.maystruks08.nfcruntracker.ui.stepview.VerticalStepView
-                android:id="@+id/checkpointStepProgress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/runnerCheckpointsRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_marginTop="@dimen/margin_m"
+                app:layout_constraintBottom_toTopOf="@+id/btnMarkCheckpointAsPassedInManual"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvDateOfBirthday" />
+                app:layout_constraintTop_toBottomOf="@+id/tvRunnerNumber" />
+
 
             <Button
                 android:id="@+id/btnMarkCheckpointAsPassedInManual"
@@ -73,7 +82,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/checkpointStepProgress"
+                app:layout_constraintTop_toBottomOf="@+id/tvRunnerNumber"
                 app:layout_constraintVertical_bias="1" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

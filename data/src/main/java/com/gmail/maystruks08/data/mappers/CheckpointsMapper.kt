@@ -8,7 +8,7 @@ fun CheckpointTable.toCheckpoint(): Checkpoint {
     return Checkpoint(
         id = this.checkpointId,
         name = this.name,
-        state = CheckpointState.fromId(this.state),
+        state = CheckpointState.fromOrdinal(this.state),
         date = this.date
     )
 }
@@ -18,7 +18,7 @@ fun Checkpoint.toCheckpointTable(runnerId: String): CheckpointTable {
         runnerId = runnerId,
         name = this.name,
         checkpointId = this.id,
-        state = this.state.id,
+        state = this.state.ordinal,
         date = this.date
     )
 }

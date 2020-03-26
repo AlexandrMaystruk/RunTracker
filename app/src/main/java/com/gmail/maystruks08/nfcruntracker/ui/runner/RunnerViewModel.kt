@@ -1,48 +1,42 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runner
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import com.gmail.maystruks08.domain.entities.ResultOfTask
+import com.gmail.maystruks08.domain.entities.Runner
+import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
+import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
+import com.gmail.maystruks08.domain.exception.SyncWithServerException
+import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
-import com.gmail.maystruks08.nfcruntracker.core.ext.toTimeFormat
-import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepBean
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
+import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import javax.inject.Inject
 
-class RunnerViewModel @Inject constructor(private val router: Router) : BaseViewModel() {
+class RunnerViewModel @Inject constructor(private val router: Router, private val runnersInteractor: RunnersInteractor) : BaseViewModel() {
 
     val runner get() = runnerLiveData
 
-    private val runnerLiveData = MutableLiveData<RunnerView>()
+    private val runnerLiveData = MutableLiveData<Runner>()
 
-    fun onShowRunnerClicked(runnerView: RunnerView) {
-        val stringBuilder = StringBuilder()
-        val runner = RunnerView(
-            id = runnerView.id,
-            number = runnerView.number,
-            fullName = runnerView.fullName,
-            city = runnerView.city,
-            dateOfBirthday = runnerView.dateOfBirthday,
-            checkpoints = runnerView.checkpoints.map {
-                stringBuilder.append(it.stepBean.name)
-                if (it.date != null) {
-                    stringBuilder.append(" ")
-                    stringBuilder.append(it.date.toTimeFormat())
-                }
-                val mapped = CheckpointView(
-                    it.id,
-                    StepBean(stringBuilder.toString(), it.stepBean.state),
-                    it.date
-                )
-                stringBuilder.clear()
-                stringBuilder.setLength(0)
-                mapped
+    fun onShowRunnerClicked(runnerId: String) {
+        viewModelScope.launch {
+            when (val onResult = runnersInteractor.getRunner(runnerId)) {
+                is ResultOfTask.Value -> runnerLiveData.postValue(onResult.value)
+                is ResultOfTask.Error -> handleError(onResult.error)
             }
-        )
-        runnerLiveData.postValue(runner)
+        }
     }
 
-    fun markCheckpointAsPassed(runnerView: RunnerView) {
+    private fun handleError(e: Exception) {
+        when(e){
+            is RunnerNotFoundException -> {}
+            else -> e.printStackTrace()
+        }
+    }
+
+    fun markCheckpointAsPassed(runnerId: String) {
         //TODO mark checkpoint as passed in manual
     }
 

@@ -1,6 +1,6 @@
-package com.gmail.maystruks08.domain.entities
+package com.gmail.maystruks08.nfcruntracker.ui.stepview
 
-enum class CheckpointState {
+ enum class StepState {
 
     UNDONE, DONE, CURRENT;
 
