@@ -9,11 +9,11 @@ data class RunnerTable(
     @PrimaryKey
     val id: String,
     val number: Int,
-    val name: String,
-    val surname: String,
+    val fullName: String,
     val city: String,
     val dateOfBirthday: Date,
     val type: Int,
+    val totalResult: Date?,
     val needToSync: Boolean = false
 )
 

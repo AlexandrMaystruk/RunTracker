@@ -9,8 +9,10 @@ import javax.inject.Inject
 class RunnersInteractorImpl @Inject constructor(private val runnersRepository: RunnersRepository) :
     RunnersInteractor {
 
-    override suspend fun bindGoogleDriveService(): ResultOfTask<Exception, String> =
-         runnersRepository.bindGoogleDriveService()
+    override suspend fun getRunner(id: String): ResultOfTask<Exception, Runner> {
+        val runner = runnersRepository.getRunnerById(id) ?: return ResultOfTask.build { throw RunnerNotFoundException() }
+        return ResultOfTask.build { runner }
+    }
 
     override suspend fun getAllRunners(type: RunnerType): ResultOfTask<Exception, List<Runner>> =
         runnersRepository.getAllRunners(type)
@@ -22,6 +24,13 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
         val runner = runnersRepository.getRunnerById(cardId) ?: return ResultOfTask.build { throw RunnerNotFoundException() }
         val currentCheckpoint = runnersRepository.getCurrentCheckpoint(runner.type)
         runner.markCheckpointAsPassed(currentCheckpoint)
+        val updatedRunner = runnersRepository.updateRunnerData(runner) ?: return ResultOfTask.build { throw SaveRunnerDataException() }
+        return ResultOfTask.build { RunnerChange(updatedRunner, Change.UPDATE) }
+    }
+
+    override suspend fun removeCheckpointForRunner(cardId: String, checkpointId: Int): ResultOfTask<Exception, RunnerChange> {
+        val runner = runnersRepository.getRunnerById(cardId) ?: return ResultOfTask.build { throw RunnerNotFoundException() }
+        runner.removeCheckpoint(checkpointId)
         val updatedRunner = runnersRepository.updateRunnerData(runner) ?: return ResultOfTask.build { throw SaveRunnerDataException() }
         return ResultOfTask.build { RunnerChange(updatedRunner, Change.UPDATE) }
     }

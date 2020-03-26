@@ -9,11 +9,11 @@ fun RunnerWithCheckpoints.toRunner(): Runner {
     return Runner(
         id = this.runnerTable.id,
         number = this.runnerTable.number,
-        name = this.runnerTable.name,
-        surname = this.runnerTable.surname,
+        fullName = this.runnerTable.fullName,
         city = this.runnerTable.city,
         dateOfBirthday = this.runnerTable.dateOfBirthday,
         type = RunnerType.fromOrdinal(this.runnerTable.type),
+        totalResult = this.runnerTable.totalResult,
         checkpoints = this.checkpointsTable.map { it.toCheckpoint() }
     )
 }
@@ -22,10 +22,10 @@ fun Runner.toRunnerTable(): RunnerTable {
     return RunnerTable(
         id = this.id,
         number = this.number,
-        name = this.name,
-        surname = this.surname,
+        fullName = this.fullName,
         city = this.city,
         dateOfBirthday = this.dateOfBirthday,
+        totalResult = this.totalResult,
         type = this.type.ordinal
     )
 }

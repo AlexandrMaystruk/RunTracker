@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:testOnly="false">
         <activity
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppThemeLauncher"
             android:name="com.gmail.maystruks08.nfcruntracker.HostActivity"
             android:screenOrientation="portrait">
             <intent-filter>

@@ -8,6 +8,6 @@ import androidx.room.TypeConverters
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun runnerDao(): RunnerDAO
+    abstract fun runnerDao(): RunnerDao
 
 }

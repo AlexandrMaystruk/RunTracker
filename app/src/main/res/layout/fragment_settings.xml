@@ -10,6 +10,19 @@
     <include layout="@layout/layout_toolbar" />
 
     <TextView
+        android:id="@+id/tvInfo"
+        style="@style/TextM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_m"
+        android:text="Укажите на каком из КП вы находитесь"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+    <TextView
         android:id="@+id/tvCheckpointForRunners"
         style="@style/TextM"
         android:layout_width="wrap_content"
@@ -17,7 +30,7 @@
         android:layout_margin="@dimen/margin_m"
         android:text="КП для бегунов"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/tvInfo" />
 
     <Spinner
         android:id="@+id/spinnerForRunners"
@@ -28,7 +41,7 @@
         android:layout_marginEnd="@dimen/margin_m"
         android:background="@drawable/spinner_bg"
         android:dropDownWidth="wrap_content"
-        android:entries="@array/checkpoints"
+        android:entries="@array/checkpoints_full_name"
         android:popupBackground="@color/colorWhite"
         android:popupElevation="3dp"
         android:stateListAnimator="@drawable/spinner_sla"
@@ -57,7 +70,7 @@
         android:layout_marginEnd="@dimen/margin_m"
         android:background="@drawable/spinner_bg"
         android:dropDownWidth="wrap_content"
-        android:entries="@array/iron_people_checkpoints"
+        android:entries="@array/iron_people_checkpoints_full_name"
         android:popupBackground="@color/colorWhite"
         android:popupElevation="3dp"
         android:stateListAnimator="@drawable/spinner_sla"
@@ -65,6 +78,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tvCheckpointForIronPeople"
         app:layout_constraintTop_toTopOf="@+id/tvCheckpointForIronPeople" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,6 +6,9 @@ import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
+import com.gmail.maystruks08.nfcruntracker.core.ext.getChildVisibleFragment
+import com.gmail.maystruks08.nfcruntracker.core.ext.getVisibleFragment
+import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import kotlinx.android.synthetic.main.fragment_view_pager_runners.*
 import javax.inject.Inject
@@ -17,9 +20,7 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
 
     private var adapter: ScreenSlidePagerAdapter? = null
 
-    override fun injectDependencies() {
-        App.rootRunnersComponent?.inject(this)
-    }
+    override fun injectDependencies() = App.rootRunnersComponent?.inject(this)
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
@@ -42,7 +43,9 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
         .build()
 
     override fun bindViewModel() {
-
+        btnRegisterNewRunner.setOnClickListener {
+            viewModel.onRegisterNewRunnerClicked()
+        }
     }
 
     override fun initViews() {
@@ -51,8 +54,13 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
         tabs.setupWithViewPager(pager)
     }
 
+    fun onNfcCardScanned(cardId: String) {
+        getVisibleFragment<RegisterNewRunnerFragment>()?.viewModel?.onNfcCardScanned(cardId)
+        getChildVisibleFragment<RunnersFragment>()?.viewModel?.onNfcCardScanned(cardId)
+    }
+
     private fun onClickedAtRunner(runnerView: RunnerView) {
-        viewModel.onClickedAtRunner(runnerView)
+        viewModel.onClickedAtRunner(runnerView.id)
     }
 
     override fun onDestroyView() {

@@ -1,26 +1,18 @@
 package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
 
-import com.gmail.maystruks08.domain.entities.Checkpoint
+import com.gmail.maystruks08.domain.entities.CheckpointState
 import com.gmail.maystruks08.domain.entities.Runner
+import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.nfcruntracker.core.ext.toDateFormat
-import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepBean
-
-fun Checkpoint.toStepBean() = StepBean(
-    this.name,
-    this.state.id
-)
-
-fun Checkpoint.toCheckpointView() = CheckpointView(
-    this.id,
-    this.toStepBean(),
-    this.date
-)
+import com.gmail.maystruks08.nfcruntracker.core.ext.toTimeFormat
 
 fun Runner.toRunnerView() = RunnerView(
     this.id,
     this.number.toString(),
-    this.name,
-    this.surname,
+    this.fullName,
+    this.city,
+    this.totalResult?.toTimeFormat(),
     this.dateOfBirthday.toDateFormat(),
-    this.checkpoints.map { it.toCheckpointView() }
+    this.type == RunnerType.IRON,
+    this.checkpoints.indexOfFirst { it.state  == CheckpointState.CURRENT }
 )

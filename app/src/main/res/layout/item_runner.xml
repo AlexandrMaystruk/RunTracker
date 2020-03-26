@@ -7,6 +7,7 @@
     android:layout_marginTop="@dimen/margin_min"
     android:layout_marginEnd="@dimen/margin_min"
     app:cardCornerRadius="5dp"
+    app:cardElevation="5dp"
     app:contentPadding="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,46 +21,44 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_s"
             android:layout_marginTop="@dimen/margin_xs"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tvRunnerName"
+            android:id="@+id/tvRunnerResult"
             style="@style/TextM"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_s"
+            android:layout_marginTop="@dimen/margin_xs"
+            android:layout_marginEnd="@dimen/margin_s"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvRunnerFullName"
+            style="@style/TextM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_xs"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/tvRunnerNumber"
             app:layout_constraintStart_toEndOf="@+id/tvRunnerNumber"
             app:layout_constraintTop_toTopOf="@+id/tvRunnerNumber" />
 
-        <TextView
-            android:id="@+id/tvRunnerSurname"
-            style="@style/TextM"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_min"
-            app:layout_constraintBottom_toBottomOf="@+id/tvRunnerName"
-            app:layout_constraintStart_toEndOf="@+id/tvRunnerName"
-            app:layout_constraintTop_toTopOf="@+id/tvRunnerName" />
-
-        <TextView
-            android:id="@+id/tvCurrentCheckpoint"
-            style="@style/TextM"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_l"
-            app:layout_constraintBottom_toBottomOf="@+id/tvRunnerSurname"
-            app:layout_constraintStart_toEndOf="@+id/tvRunnerSurname"
-            app:layout_constraintTop_toTopOf="@+id/tvRunnerSurname" />
-
-        <com.gmail.maystruks08.nfcruntracker.ui.stepview.HorizontalStepView
+        <com.gmail.maystruks08.nfcruntracker.ui.stepview.StepProgressView
             android:id="@+id/runnerProgress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvRunnerSurname" />
+            app:layout_constraintTop_toBottomOf="@+id/tvRunnerNumber"
+            app:nodeHeight="30dp"
+            app:stepsCount="9"
+            app:textNodeTitleSize="14sp"
+            app:textTitlePadding="5dp"
+            app:titlesEnabled="true" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

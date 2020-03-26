@@ -5,46 +5,63 @@ import java.util.*
 data class Runner(
     val id: String = "",
     val number: Int = -1,
-    val name: String = "",
-    val surname: String = " ",
+    val fullName: String = "",
+    val sex: RunnerSex = RunnerSex.MALE,
     val city: String = "",
     val dateOfBirthday: Date = Date(),
     val type: RunnerType = RunnerType.NORMAL,
+    var totalResult: Date? = null,
     val checkpoints: List<Checkpoint> = listOf()
 ) {
 
-    fun getTotalResult(): Date? {
-        return if (isAllDone()) {
-            Date(checkpoints.last().date!!.time - checkpoints.first().date!!.time)
-        } else null
-    }
-
-    fun getCurrentPosition(): Checkpoint? =
-        checkpoints.find { it.state == CheckpointState.STEP_CURRENT }
+    fun getCurrentPosition(): Checkpoint? = checkpoints.find { it.state == CheckpointState.CURRENT }
 
     fun markCheckpointAsPassed(checkpoint: Checkpoint): Boolean {
         val index = checkpoints.indexOfFirst { it.id == checkpoint.id }
-        if (index <= checkpoints.size && index != -1) {
-            val previousIsDone = if (index == 0) {
-                true
-            } else {
-                checkpoints[index - 1].state == CheckpointState.STEP_CURRENT
+        if (index <= checkpoints.lastIndex && index != -1) {
+            val currentCheckpointState = checkpoints[index].state
+            if (currentCheckpointState == CheckpointState.DONE || currentCheckpointState == CheckpointState.CURRENT) {
+                return false
             }
+            val previousIsDone = if (index == 0) true else checkpoints[index - 1].state == CheckpointState.CURRENT
             if (previousIsDone) {
-                for (i in 0 until index) {
-                    checkpoints[i].state = CheckpointState.STEP_COMPLETED
-                }
                 checkpoints[index].date = Date()
-                checkpoints[index].state = CheckpointState.STEP_CURRENT
+                checkpoints[index].state = CheckpointState.CURRENT
+                for (i in 0 until index) {
+                    checkpoints[i].state = CheckpointState.DONE
+                }
+                if (index == checkpoints.lastIndex) {
+                    totalResult = calculateTotalResult()
+                }
                 return true
             }
         }
         return false
     }
 
+    fun removeCheckpoint(checkpointId: Int) {
+        val index = checkpoints.indexOfFirst { it.id == checkpointId }
+        if (index <= checkpoints.lastIndex && index != -1) {
+            totalResult = null
+            checkpoints[index].date = null
+            checkpoints[index].state = CheckpointState.UNDONE
+            if (index > 0) {
+                checkpoints[index - 1].state = CheckpointState.CURRENT
+                for (i in index until checkpoints.size) {
+                    checkpoints[i].state = CheckpointState.UNDONE
+                    checkpoints[i].date = null
+                }
+            }
+        }
+    }
+
+    private fun calculateTotalResult(): Date? {
+        return if (isAllDone()) Date(checkpoints.last().date!!.time - checkpoints.first().date!!.time) else null
+    }
+
     private fun isAllDone(): Boolean {
         checkpoints.forEachIndexed { index, checkpoint ->
-            if (checkpoint.state == CheckpointState.STEP_UNDO && index != checkpoints.lastIndex || index == checkpoints.lastIndex && checkpoint.state == CheckpointState.STEP_CURRENT) {
+            if (checkpoint.state == CheckpointState.UNDONE || (index == checkpoints.lastIndex && checkpoint.state != CheckpointState.CURRENT)) {
                 return false
             }
         }

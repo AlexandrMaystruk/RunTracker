@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="checkpoints">
+    <string-array name="checkpoints_full_name">
         <item>Старт</item>
         <item>КП 15</item>
         <item>КП 46</item>
@@ -11,7 +11,7 @@
         <item>Финиш</item>
     </string-array>
 
-    <string-array name="iron_people_checkpoints">
+    <string-array name="iron_people_checkpoints_full_name">
         <item>Старт</item>
         <item>КП 7.5</item>
         <item>КП 15</item>
@@ -21,6 +21,30 @@
         <item>КП 81</item>
         <item>КП 91</item>
         <item>Финиш</item>
+    </string-array>
+
+
+    <string-array name="checkpoints">
+        <item>С</item>
+        <item>15</item>
+        <item>46</item>
+        <item>52</item>
+        <item>70</item>
+        <item>81</item>
+        <item>90</item>
+        <item>Ф</item>
+    </string-array>
+
+    <string-array name="iron_people_checkpoints">
+        <item>С</item>
+        <item>7.5</item>
+        <item>15</item>
+        <item>42</item>
+        <item>52</item>
+        <item>70</item>
+        <item>81</item>
+        <item>91</item>
+        <item>Ф</item>
     </string-array>
 
 </resources>

@@ -17,7 +17,8 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class RunnersViewModel @Inject constructor(private val runnersInteractor: RunnersInteractor) : BaseViewModel() {
+class RunnersViewModel @Inject constructor(private val runnersInteractor: RunnersInteractor) :
+    BaseViewModel() {
 
     val runners get() = _runnersLiveData
     val runnerAdd get() = _runnerAddLiveData
@@ -31,7 +32,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
 
     private lateinit var runnerType: RunnerType
 
-    fun initFragment(runnerTypeId: Int){
+    fun initFragment(runnerTypeId: Int) {
         runnerType = RunnerType.fromOrdinal(runnerTypeId)
         viewModelScope.launch {
             showAllRunners()
@@ -49,7 +50,6 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     }
 
     private suspend fun showAllRunners() {
-        toastLiveData.postValue("Init runners list")
         when (val result = runnersInteractor.getAllRunners(runnerType)) {
             is ResultOfTask.Value -> _runnersLiveData.postValue(result.value.map { it.toRunnerView() }.toMutableList())
             is ResultOfTask.Error -> handleError(result.error)
@@ -77,8 +77,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
             if (query.isNotEmpty()) {
                 when (val result = runnersInteractor.getAllRunners(runnerType)) {
                     is ResultOfTask.Value -> {
-                        val pattern =
-                            ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
+                        val pattern = ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
                         _runnersLiveData.postValue(
                             result.value.filter {
                                 pattern.containsMatchIn(it.number.toString().toLowerCase())
@@ -98,7 +97,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
             is SaveRunnerDataException -> {}
             is RunnerNotFoundException -> {}
             is SyncWithServerException -> {}
-            else ->  e.printStackTrace()
+            else -> e.printStackTrace()
         }
     }
 }

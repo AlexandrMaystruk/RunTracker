@@ -7,13 +7,15 @@ import com.gmail.maystruks08.domain.entities.RunnerType
 
 interface RunnersInteractor {
 
-    suspend fun bindGoogleDriveService(): ResultOfTask<Exception, String>
+    suspend fun getRunner(id: String): ResultOfTask<Exception, Runner>
 
     suspend fun getAllRunners(type: RunnerType): ResultOfTask<Exception, List<Runner>>
 
     suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit)
 
     suspend fun addCurrentCheckpointToRunner(cardId: String): ResultOfTask<Exception, RunnerChange>
+
+    suspend fun removeCheckpointForRunner(cardId: String, checkpointId: Int): ResultOfTask<Exception, RunnerChange>
 
     suspend fun finishWork()
 

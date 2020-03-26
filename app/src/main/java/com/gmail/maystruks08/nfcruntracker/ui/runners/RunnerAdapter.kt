@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.gmail.maystruks08.nfcruntracker.R
+import com.gmail.maystruks08.nfcruntracker.core.ext.gone
+import com.gmail.maystruks08.nfcruntracker.core.ext.show
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import kotlinx.android.synthetic.main.item_runner.view.*
 import kotlin.properties.Delegates
@@ -45,9 +47,7 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_runner, parent, false)
-        return ViewHolder(
-            view
-        )
+        return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -65,13 +65,18 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
         @SuppressLint("SetTextI18n")
         fun bindHolder(runner: RunnerView) {
             itemView.tvRunnerNumber.text = "#${runner.number}"
-            itemView.tvRunnerName.text = runner.name
-            itemView.tvRunnerSurname.text = runner.surname
-            itemView.runnerProgress.setStepViewTexts(runner.checkpoints.map { it.stepBean })
-            if(runner.checkpoints.isNotEmpty()){
-                itemView.tvCurrentCheckpoint.text = runner.getCurrentPosition()?.stepBean?.name
+            itemView.tvRunnerFullName.text = runner.fullName
+            if(runner.result != null){
+                val resultStr = "Время: ${runner.result}"
+                itemView.tvRunnerResult.text = resultStr
+                itemView.tvRunnerResult.show()
+            } else {
+                itemView.tvRunnerResult.text = null
+                itemView.tvRunnerResult.gone()
             }
-
+            val titlesId = if (runner.isIron) R.array.iron_people_checkpoints else R.array.checkpoints
+            itemView.runnerProgress.setStepTitles(itemView.resources.getStringArray(titlesId).toList())
+            itemView.runnerProgress.setCurrentStep(runner.currentPosition)
         }
 
         private fun isAdapterPositionCorrect(): Boolean = adapterPosition in 0..runnerList.lastIndex

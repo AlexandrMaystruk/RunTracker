@@ -38,7 +38,7 @@ class LoginViewModel @Inject constructor(
                         Log.e("LoginViewModel", e.toString())
                     }
                 }
-                router.newRootScreen(Screens.RunnersScreen())
+                router.newRootScreen(Screens.RootRunnersScreen())
             }
         }
     }
@@ -46,7 +46,7 @@ class LoginViewModel @Inject constructor(
     fun handleLoginResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == RC_SIGN_IN) {
             when (resultCode) {
-                Activity.RESULT_OK -> router.newRootScreen(Screens.RunnersScreen())
+                Activity.RESULT_OK -> router.newRootScreen(Screens.RootRunnersScreen())
                 Activity.RESULT_CANCELED -> router.exit()
                 else -> toastLiveData.postValue(IdpResponse.fromResultIntent(data)?.error?.localizedMessage)
             }
