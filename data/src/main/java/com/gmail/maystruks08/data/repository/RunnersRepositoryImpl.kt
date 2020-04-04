@@ -130,7 +130,7 @@ class RunnersRepositoryImpl @Inject constructor(
             runnersCache.runnersList.removeAt(index)
             runnersCache.runnersList.add(index, runner)
         } else {
-            runnerDao.insertRunner(runnerTable, checkpointsTables)
+            runnerDao.insertOrReplaceRunner(runnerTable, checkpointsTables)
             runnersCache.runnersList.add(runner)
         }
     }

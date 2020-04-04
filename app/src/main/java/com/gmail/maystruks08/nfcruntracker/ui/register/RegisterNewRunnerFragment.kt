@@ -57,6 +57,10 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
             tvScanCard.text = "Карта: $it"
             runnerCardId = it
         })
+
+        viewModel.toast.observe(viewLifecycleOwner, Observer {
+           context?.toast(it)
+        })
     }
 
     override fun initViews() {

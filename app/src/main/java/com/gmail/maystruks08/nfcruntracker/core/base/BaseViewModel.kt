@@ -4,7 +4,7 @@ import androidx.lifecycle.*
 
 abstract class BaseViewModel : ViewModel() {
 
-    val toast get() = toastLiveData
+    val toast get(): LiveData<String>  = toastLiveData
 
     protected val toastLiveData = MutableLiveData<String>()
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.entities.RunnerSex
 import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.interactors.RegisterNewRunnerInteractor
@@ -51,9 +52,7 @@ class RegisterNewRunnerViewModel @Inject constructor(private val interactor: Reg
                             runnerCardId: String) {
 
         viewModelScope.launch {
-            when (val onResult = interactor.registerNewRunner(fullName, runnerSex, dateOfBirthday,
-                city, runnerNumber, runnerType, runnerCardId)) {
-
+            when (val onResult = interactor.registerNewRunner(fullName, runnerSex, dateOfBirthday, city, runnerNumber, runnerType, runnerCardId)) {
                 is ResultOfTask.Value -> onBackClicked()
                 is ResultOfTask.Error -> handleError(onResult.error)
             }
@@ -64,6 +63,7 @@ class RegisterNewRunnerViewModel @Inject constructor(private val interactor: Reg
         when(e){
             is SaveRunnerDataException -> {}
             is SyncWithServerException -> {}
+            is RunnerWithIdAlreadyExistException-> toastLiveData.postValue("Участник с такой картой уже существует")
             else ->  e.printStackTrace()
         }
     }

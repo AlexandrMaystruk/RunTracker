@@ -3,39 +3,30 @@ package com.gmail.maystruks08.data.local
 import androidx.room.*
 
 @Dao
-interface RunnerDao {
+interface RunnerDao : BaseDao<RunnerTable> {
+
+    @Transaction
+    suspend fun insertOrReplaceRunner(runner: RunnerTable, checkpoints: List<CheckpointTable>) {
+        insertOrReplace(runner)
+        insertAllOrReplaceCheckpoint(checkpoints)
+    }
 
     @Transaction
     suspend fun insertRunner(runner: RunnerTable, checkpoints: List<CheckpointTable>) {
         insert(runner)
-        insertCheckpoints(checkpoints)
+        insertAllCheckpoints(checkpoints)
     }
 
     @Transaction
     suspend fun updateRunner(runner: RunnerTable, checkpoints: List<CheckpointTable>) {
         update(runner)
         checkpoints.forEach {
-            updateCheckpoint(it)
+            update(it)
         }
     }
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(users: RunnerTable)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCheckpoints(checkpoints: List<CheckpointTable>)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(users: List<RunnerTable>)
-
     @Query("SELECT * FROM runners")
     suspend fun getRunners(): List<RunnerWithCheckpoints>
-
-    @Update
-    suspend fun update(runner: RunnerTable)
-
-    @Update
-    suspend fun updateCheckpoint(checkpointTable: CheckpointTable)
 
     @Query("UPDATE runners SET needToSync = :needToSync WHERE id = :runnerId")
     suspend fun markAsNeedToSync(runnerId: String, needToSync: Boolean)
@@ -45,6 +36,20 @@ interface RunnerDao {
 
     @Query("DELETE FROM runners")
     suspend fun dropTable()
+
+
+    /**
+     * CHECKPOINTS
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllOrReplaceCheckpoint(obj: List<CheckpointTable>)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insertAllCheckpoints(obj: List<CheckpointTable>)
+
+    @Update
+    suspend fun update(obj: CheckpointTable)
+
 }
 
 

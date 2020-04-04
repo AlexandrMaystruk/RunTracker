@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.data.repository
 
+import android.database.sqlite.SQLiteConstraintException
 import com.gmail.maystruks08.data.cache.CheckpointsCache
 import com.gmail.maystruks08.data.local.RunnerDao
 import com.gmail.maystruks08.data.mappers.toCheckpointTable
@@ -9,6 +10,7 @@ import com.gmail.maystruks08.domain.entities.Checkpoint
 import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.entities.Runner
 import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
 import com.gmail.maystruks08.domain.repository.RegisterNewRunnersRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,6 +32,8 @@ class RegisterNewRunnersRepositoryImpl @Inject constructor(
                 firestoreApi.updateRunner(runner)
             }
             ResultOfTask.build { }
+        } catch (e: SQLiteConstraintException) {
+            ResultOfTask.build { throw RunnerWithIdAlreadyExistException() }
         } catch (e: Exception) {
             withContext(Dispatchers.IO) {
                 runnerDao.markAsNeedToSync(runnerId = runner.id, needToSync = true)
