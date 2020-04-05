@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.core.di.runners
 
+import com.gmail.maystruks08.nfcruntracker.core.di.runners.result.RunnersResultComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.runner.RunnerComponent
 import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
 import dagger.Subcomponent
@@ -11,5 +12,8 @@ interface RunnersComponent {
     fun inject(fragment: RunnersFragment)
 
     fun provideRunnerComponent(): RunnerComponent
+
+    fun provideRunnerResultComponent(): RunnersResultComponent
+
 
 }

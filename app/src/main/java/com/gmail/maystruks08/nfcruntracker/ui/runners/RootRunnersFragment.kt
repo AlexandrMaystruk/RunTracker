@@ -27,12 +27,12 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
         .withTitle(R.string.app_name)
         .withMenu(R.menu.menu_search_with_settings)
         .withMenuItems(
-            listOf(R.id.action_settings, R.id.action_logout),
+            listOf(R.id.action_settings, R.id.action_result),
             listOf(MenuItem.OnMenuItemClickListener {
                 viewModel.onOpenSettingsFragmentClicked()
                 true
             }, MenuItem.OnMenuItemClickListener {
-                viewModel.onSignOutClicked()
+                viewModel.onShowResultsClicked()
                 true
             })
         )

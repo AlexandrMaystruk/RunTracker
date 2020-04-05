@@ -52,6 +52,10 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
                 viewModel.onCurrentCheckpointChangedForIronPeoples(position)
             }
         }
+
+        tvSignOut.setOnClickListener {
+            viewModel.onSignOutClicked()
+        }
     }
 
     override fun onDestroyView() {

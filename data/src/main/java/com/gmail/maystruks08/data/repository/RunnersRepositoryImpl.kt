@@ -42,6 +42,20 @@ class RunnersRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getRunnerFinishers(): ResultOfTask<Exception, List<Runner>> {
+        return try {
+            if (runnersCache.runnersList.isNotEmpty()) {
+                val result = runnersCache.runnersList.filter { it.totalResult != null}
+                ResultOfTask.build { result }
+            } else {
+                val finishers = runnerDao.getRunnersFinishers().map { it.toRunner() }
+                ResultOfTask.build { finishers }
+            }
+        } catch (e: Exception) {
+            ResultOfTask.build { throw e }
+        }
+    }
+
     override suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit) {
         try {
             withContext(Dispatchers.IO) {

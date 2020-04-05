@@ -9,7 +9,7 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.toDateFormat
-import com.gmail.maystruks08.nfcruntracker.core.ext.toTimeFormat
+import com.gmail.maystruks08.nfcruntracker.core.ext.toTimeUTCFormat
 import kotlinx.android.synthetic.main.fragment_runner.*
 import javax.inject.Inject
 
@@ -31,7 +31,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
         .withNavigationIcon(R.drawable.ic_arrow_back) { viewModel.onBackClicked() }
-        .withTitle(R.string.app_name)
+        .withTitle(R.string.screen_runner)
         .build()
 
     override fun bindViewModel() {
@@ -44,7 +44,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
             tvDateOfBirthday.text = runner.dateOfBirthday.toDateFormat()
             tvRunnerCity.text = runner.city
             if(runner.totalResult != null){
-                val totalResultStr = "Общее время: ${runner.totalResult?.toTimeFormat()}"
+                val totalResultStr = "Общее время: ${runner.totalResult?.toTimeUTCFormat()}"
                 btnMarkCheckpointAsPassedInManual.text = totalResultStr
                 btnMarkCheckpointAsPassedInManual.isEnabled = false
             } else {

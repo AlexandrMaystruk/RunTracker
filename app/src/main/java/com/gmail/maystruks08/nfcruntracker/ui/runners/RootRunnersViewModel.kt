@@ -1,23 +1,19 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
-import android.content.Context
-import com.firebase.ui.auth.AuthUI
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import ru.terrakok.cicerone.Router
 import javax.inject.Inject
 
 class RootRunnersViewModel @Inject constructor(
-    private val router: Router,
-    private val context: Context
+    private val router: Router
 ) : BaseViewModel() {
 
     fun onOpenSettingsFragmentClicked() {
         router.navigateTo(Screens.SettingsScreen())
     }
 
-    fun onRegisterNewRunnerClicked(){
+    fun onRegisterNewRunnerClicked() {
         router.navigateTo(Screens.RegisterNewRunnerScreen())
     }
 
@@ -25,11 +21,8 @@ class RootRunnersViewModel @Inject constructor(
         router.navigateTo(Screens.RunnerScreen(runnerId))
     }
 
-    fun onSignOutClicked() {
-        AuthUI.getInstance()
-            .signOut(context)
-            .addOnCompleteListener {
-                router.newRootScreen(Screens.LoginScreen())
-            }
+    fun onShowResultsClicked() {
+        router.navigateTo(Screens.RunnersResultsScreen())
     }
+
 }

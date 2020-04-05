@@ -31,7 +31,7 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
         .withNavigationIcon(R.drawable.ic_arrow_back) { viewModel.onBackClicked() }
-        .withTitle(R.string.app_name)
+        .withTitle(R.string.screen_register_new_runner)
         .build()
 
     override fun bindViewModel() {

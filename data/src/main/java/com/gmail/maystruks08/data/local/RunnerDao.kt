@@ -28,6 +28,9 @@ interface RunnerDao : BaseDao<RunnerTable> {
     @Query("SELECT * FROM runners")
     suspend fun getRunners(): List<RunnerWithCheckpoints>
 
+    @Query("SELECT * FROM runners WHERE totalResult IS NOT NULL")
+    suspend fun getRunnersFinishers(): List<RunnerWithCheckpoints>
+
     @Query("UPDATE runners SET needToSync = :needToSync WHERE id = :runnerId")
     suspend fun markAsNeedToSync(runnerId: String, needToSync: Boolean)
 

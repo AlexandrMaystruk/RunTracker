@@ -6,16 +6,16 @@ import com.gmail.maystruks08.nfcruntracker.core.di.BaseComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.DaggerBaseComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.login.LoginComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.register.RegisterNewRunnerComponent
-import com.gmail.maystruks08.nfcruntracker.core.di.runners.runner.RunnerComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.RunnersComponent
+import com.gmail.maystruks08.nfcruntracker.core.di.runners.result.RunnersResultComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.root.RootRunnersComponent
+import com.gmail.maystruks08.nfcruntracker.core.di.runners.runner.RunnerComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.settings.SettingsComponent
 
 class App : Application() {
 
     companion object {
 
-        
 
         lateinit var baseComponent: BaseComponent
 
@@ -63,6 +63,13 @@ class App : Application() {
                 return field
             }
 
+        var runnersResultComponent: RunnersResultComponent? = null
+            get() {
+                if (field == null)
+                    field = runnersComponent?.provideRunnerResultComponent()
+                return field
+            }
+
         fun clearRootRunnersComponent() {
             rootRunnersComponent = null
         }
@@ -73,6 +80,10 @@ class App : Application() {
 
         fun clearRunnerComponent() {
             runnerComponent = null
+        }
+
+        fun clearRunnersResultComponent() {
+            runnersResultComponent = null
         }
 
         fun clearSettingsComponent() {

@@ -79,4 +79,13 @@
         app:layout_constraintStart_toEndOf="@+id/tvCheckpointForIronPeople"
         app:layout_constraintTop_toTopOf="@+id/tvCheckpointForIronPeople" />
 
+
+    <Button
+        android:id="@+id/tvSignOut"
+        style="@style/MainButton"
+        android:text="Log out"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

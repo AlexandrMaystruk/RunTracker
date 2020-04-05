@@ -1,15 +1,19 @@
 package com.gmail.maystruks08.nfcruntracker.ui.settings
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.firebase.ui.auth.AuthUI
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
+import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(
     private val router: Router,
+    private val context: Context,
     private val repository: SettingsRepository
 ) : BaseViewModel() {
 
@@ -57,6 +61,14 @@ class SettingsViewModel @Inject constructor(
             }
         }
         isFirstStart = false
+    }
+
+    fun onSignOutClicked() {
+        AuthUI.getInstance()
+            .signOut(context)
+            .addOnCompleteListener {
+                router.newRootScreen(Screens.LoginScreen())
+            }
     }
 
     fun onBackClicked() {

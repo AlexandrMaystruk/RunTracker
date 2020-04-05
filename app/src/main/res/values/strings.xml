@@ -2,6 +2,10 @@
     <string name="app_name">NFCRunTracker</string>
 
     <string name="screen_settings">Настройки</string>
+    <string name="screen_register_new_runner">Регистрация учасника</string>
+    <string name="screen_runners_results">Результаты</string>
+    <string name="screen_runner">Информация об участнике</string>
+
 
 
     <string name="search">Search</string>
