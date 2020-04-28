@@ -15,6 +15,13 @@ android {
 
         testInstrumentationRunner globalConfiguration["testInstrumentationRunner"]
         vectorDrawables.useSupportLibrary = true
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments << ["dagger.gradle.incremental": "true"]
+                arguments = ["room.incremental":"true"]
+            }
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

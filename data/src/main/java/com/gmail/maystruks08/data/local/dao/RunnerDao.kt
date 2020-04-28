@@ -27,9 +27,11 @@ interface RunnerDao :
         results.forEach { update(it) }
     }
 
+    @Transaction
     @Query("SELECT * FROM runners WHERE type =:type")
     suspend fun getRunners(type: Int): List<RunnerTableView>
 
+    @Transaction
     @Query("SELECT * FROM runners WHERE totalResult IS NOT NULL")
     suspend fun getRunnersFinishers(): List<RunnerTableView>
 

@@ -45,7 +45,7 @@ class ScreenSlidePagerAdapter(
         try {
             super.restoreState(state, loader)
         } catch (e: Exception) {
-            Log.d("ScreenSlidePagerAdapter", "Error Restore State of Fragment : " + e.message, e)
+            Log.d("ScreenSlidePagerAdapter", "Error Restore State of Fragment")
         }
     }
 }

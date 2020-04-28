@@ -9,7 +9,7 @@ import com.gmail.maystruks08.data.local.entity.CheckpointTable
 import com.gmail.maystruks08.data.local.entity.ResultTable
 import com.gmail.maystruks08.data.local.entity.RunnerTable
 
-@Database(entities = [RunnerTable::class, CheckpointTable::class, ResultTable::class], version = 1)
+@Database(entities = [RunnerTable::class, CheckpointTable::class, ResultTable::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
