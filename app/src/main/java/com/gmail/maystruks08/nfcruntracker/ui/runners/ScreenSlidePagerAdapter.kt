@@ -11,8 +11,7 @@ import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 
 class ScreenSlidePagerAdapter(
-    private val onClickedAtRunner: (RunnerView) -> Unit,
-    fm: FragmentManager
+    private val onClickedAtRunner: (RunnerView) -> Unit, fm: FragmentManager
 ) :
     FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 

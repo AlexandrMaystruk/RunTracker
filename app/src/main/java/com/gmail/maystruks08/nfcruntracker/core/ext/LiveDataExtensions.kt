@@ -7,5 +7,4 @@ fun <T, K> LiveData<T>.switchMap(function: (T) -> LiveData<K>): LiveData<K> {
     return Transformations.switchMap(this) { value ->
         function(value)
     }
-
 }

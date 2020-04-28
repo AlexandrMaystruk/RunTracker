@@ -7,8 +7,10 @@ import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
+import com.gmail.maystruks08.nfcruntracker.core.ext.toDateTimeFormat
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import kotlinx.android.synthetic.main.fragment_settings.*
+import java.util.*
 import javax.inject.Inject
 
 class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
@@ -30,6 +32,11 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
         viewModel.config.observe(viewLifecycleOwner, Observer {
             spinnerForRunners.setSelection(it.checkpointId?:0)
             spinnerForIronPeople.setSelection(it.checkpointIronPeopleId?:0)
+            tvDateOfStart.text = "Дата старта: ${it.startDate?.toDateTimeFormat()}"
+        })
+
+        viewModel.start.observe(viewLifecycleOwner, Observer {
+            tvDateOfStart.text = "Дата старта: ${it?.toDateTimeFormat()}"
         })
 
         viewModel.toast.observe(viewLifecycleOwner, Observer {
@@ -51,6 +58,10 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 viewModel.onCurrentCheckpointChangedForIronPeoples(position)
             }
+        }
+
+        tvStartRunning.setOnClickListener {
+            viewModel.onCompetitionStart(Date())
         }
 
         tvSignOut.setOnClickListener {

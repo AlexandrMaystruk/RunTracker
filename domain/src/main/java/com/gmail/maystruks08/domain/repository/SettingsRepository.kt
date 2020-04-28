@@ -1,5 +1,7 @@
 package com.gmail.maystruks08.domain.repository
 
+import java.util.*
+
 interface SettingsRepository {
 
     suspend fun updateConfig(): Config?
@@ -10,6 +12,8 @@ interface SettingsRepository {
 
     suspend fun changeCurrentCheckpointForIronPeoples(checkpointNumber: Int)
 
-    data class Config(val checkpointId: Int?, val checkpointIronPeopleId: Int?)
+    suspend fun changeStartDate(date: Date)
+
+    data class Config(val checkpointId: Int?, val checkpointIronPeopleId: Int?, val startDate: Date?)
 
 }

@@ -8,8 +8,6 @@ import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
-import com.gmail.maystruks08.nfcruntracker.core.ext.toDateFormat
-import com.gmail.maystruks08.nfcruntracker.core.ext.toTimeUTCFormat
 import kotlinx.android.synthetic.main.fragment_runner.*
 import javax.inject.Inject
 
@@ -37,21 +35,21 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
     override fun bindViewModel() {
         viewModel.onShowRunnerClicked(runnerId)
 
-        viewModel.runner.observe(viewLifecycleOwner, Observer { runner ->
-            val numberStr = "#" + runner.number
+        viewModel.runnerWithCheckpoints.observe(viewLifecycleOwner, Observer { runner ->
+            val numberStr = "#" + runner.first.number
             tvRunnerNumber.text = numberStr
-            tvRunnerFullName.text = runner.fullName
-            tvDateOfBirthday.text = runner.dateOfBirthday.toDateFormat()
-            tvRunnerCity.text = runner.city
-            if(runner.totalResult != null){
-                val totalResultStr = "Общее время: ${runner.totalResult?.toTimeUTCFormat()}"
+            tvRunnerFullName.text = runner.first.fullName
+            tvDateOfBirthday.text = runner.first.dateOfBirthday
+            tvRunnerCity.text = runner.first.city
+            if(runner.first.result != null){
+                val totalResultStr = "Общее время: ${runner.first.result}"
                 btnMarkCheckpointAsPassedInManual.text = totalResultStr
                 btnMarkCheckpointAsPassedInManual.isEnabled = false
             } else {
                 btnMarkCheckpointAsPassedInManual.text = "Отметить на текущем КП"
                 btnMarkCheckpointAsPassedInManual.isEnabled = true
             }
-            checkpointsAdapter?.checkpoints = runner.checkpoints.toMutableList()
+            checkpointsAdapter?.checkpoints = runner.second.toMutableList()
         })
     }
 

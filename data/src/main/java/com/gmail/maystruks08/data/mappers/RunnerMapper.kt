@@ -1,11 +1,10 @@
 package com.gmail.maystruks08.data.mappers
 
-import com.gmail.maystruks08.data.local.RunnerTable
-import com.gmail.maystruks08.data.local.RunnerWithCheckpoints
-import com.gmail.maystruks08.domain.entities.Runner
-import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.data.local.entity.RunnerTable
+import com.gmail.maystruks08.data.local.pojo.RunnerTableView
+import com.gmail.maystruks08.domain.entities.*
 
-fun RunnerWithCheckpoints.toRunner(): Runner {
+fun RunnerTableView.toRunner(): Runner {
     return Runner(
         id = this.runnerTable.id,
         number = this.runnerTable.number,
@@ -14,7 +13,10 @@ fun RunnerWithCheckpoints.toRunner(): Runner {
         dateOfBirthday = this.runnerTable.dateOfBirthday,
         type = RunnerType.fromOrdinal(this.runnerTable.type),
         totalResult = this.runnerTable.totalResult,
-        checkpoints = this.checkpointsTable.map { it.toCheckpoint() }
+        checkpoints = this.checkpointsResultTable.mapNotNull {
+            it.resultTable.time ?: return@mapNotNull null
+            CheckpointResult(it.checkpointTable.id, it.checkpointTable.name, it.resultTable.time)
+        }.toMutableList()
     )
 }
 

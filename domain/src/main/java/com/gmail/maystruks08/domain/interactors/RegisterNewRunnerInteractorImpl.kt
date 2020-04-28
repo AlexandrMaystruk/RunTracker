@@ -21,7 +21,6 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(private val runnersRep
         runnerCardId: String
     ): ResultOfTask<Exception, Unit> {
 
-        val checkpoints = runnersRepository.getCheckpoints(runnerType)
         val newRunner = Runner(
             id = runnerCardId,
             fullName = fullName,
@@ -30,9 +29,8 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(private val runnersRep
             city = city,
             dateOfBirthday = dateOfBirthday,
             type = runnerType,
-            checkpoints = checkpoints
+            checkpoints = mutableListOf()
         )
-
         return runnersRepository.saveNewRunner(newRunner)
     }
 }

@@ -7,5 +7,12 @@ import javax.inject.Singleton
 @Singleton
 class RunnersCache @Inject constructor() {
 
-    var runnersList = mutableListOf<Runner>()
+    var normalRunnersList = mutableListOf<Runner>()
+
+    var ironRunnersList = mutableListOf<Runner>()
+
+    fun getRunnerList(type: RunnerType): MutableList<Runner> = when (type) {
+        RunnerType.NORMAL -> normalRunnersList
+        RunnerType.IRON -> ironRunnersList
+    }
 }

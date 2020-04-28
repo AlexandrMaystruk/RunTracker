@@ -3,7 +3,7 @@ package com.gmail.maystruks08.nfcruntracker.core.di
 import android.content.Context
 import androidx.room.Room
 import com.gmail.maystruks08.data.local.AppDatabase
-import com.gmail.maystruks08.data.local.RunnerDao
+import com.gmail.maystruks08.data.local.dao.RunnerDao
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.data.remote.FirestoreApiImpl
 import com.google.firebase.auth.FirebaseAuth

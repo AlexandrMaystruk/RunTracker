@@ -17,8 +17,7 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class RunnersViewModel @Inject constructor(private val runnersInteractor: RunnersInteractor) :
-    BaseViewModel() {
+class RunnersViewModel @Inject constructor(private val runnersInteractor: RunnersInteractor) : BaseViewModel() {
 
     val runners get() = _runnersLiveData
     val runnerAdd get() = _runnerAddLiveData
@@ -51,7 +50,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
 
     private suspend fun showAllRunners() {
         when (val result = runnersInteractor.getAllRunners(runnerType)) {
-            is ResultOfTask.Value -> _runnersLiveData.postValue(result.value.map { it.toRunnerView() }.toMutableList())
+            is ResultOfTask.Value -> _runnersLiveData.value = result.value.map { it.toRunnerView() }.toMutableList()
             is ResultOfTask.Error -> handleError(result.error)
         }
     }
@@ -66,9 +65,9 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     private fun handleRunnerChanges(runnerChange: RunnerChange) {
         val runnerView = runnerChange.runner.toRunnerView()
         when (runnerChange.changeType) {
-            Change.ADD -> _runnerAddLiveData.postValue(runnerView)
-            Change.UPDATE -> _runnerUpdateLiveData.postValue(runnerView)
-            Change.REMOVE -> _runnerRemoveLiveData.postValue(runnerView)
+            Change.ADD -> _runnerAddLiveData.value = runnerView
+            Change.UPDATE -> _runnerUpdateLiveData.value = runnerView
+            Change.REMOVE -> _runnerRemoveLiveData.value = runnerView
         }
     }
 

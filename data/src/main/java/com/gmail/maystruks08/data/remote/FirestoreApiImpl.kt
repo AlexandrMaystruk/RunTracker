@@ -5,11 +5,15 @@ import com.gmail.maystruks08.domain.entities.Runner
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
+import java.util.*
 import javax.inject.Inject
 
 class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : FirestoreApi {
 
     private var registration: ListenerRegistration? = null
+
+    private val startDateDocumentName = "start_date"
+
 
     override suspend fun getCheckpointsSettings(clientId: String): Task<DocumentSnapshot> = db.collection("settings").document(clientId).get()
 
@@ -32,6 +36,17 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
         }
         throw Exception("Checkpoint ids is empty")
     }
+
+    override suspend fun saveDateOfStart(date: Date) {
+        val document = db.collection("settings").document(startDateDocumentName)
+        try {
+            awaitTaskCompletable(document.update("Start at", date))
+        } catch (e: FirebaseFirestoreException) {
+            awaitTaskCompletable(document.set(mutableMapOf("Start at" to date)))
+        }
+    }
+
+    override suspend fun getDateOfStart(): Task<DocumentSnapshot> = db.collection("settings").document(startDateDocumentName).get()
 
     override suspend fun updateRunner(runner: Runner): Task<Void> = db.collection("runners").document(runner.id).set(runner)
 

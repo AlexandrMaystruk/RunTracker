@@ -1,10 +1,11 @@
 package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
 
-import com.gmail.maystruks08.domain.entities.CheckpointState
+import com.gmail.maystruks08.domain.entities.CheckpointResult
 import com.gmail.maystruks08.domain.entities.Runner
 import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.nfcruntracker.core.ext.toDateFormat
 import com.gmail.maystruks08.nfcruntracker.core.ext.toTimeUTCFormat
+import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepState
 
 fun Runner.toRunnerView() = RunnerView(
     this.id,
@@ -14,7 +15,7 @@ fun Runner.toRunnerView() = RunnerView(
     this.totalResult?.toTimeUTCFormat(),
     this.dateOfBirthday.toDateFormat(),
     this.type == RunnerType.IRON,
-    this.checkpoints.indexOfFirst { it.state  == CheckpointState.CURRENT }
+    this.checkpoints.lastIndex
 )
 
 fun Runner.toRunnerResultView(position: Int) = RunnerResultView(
@@ -22,4 +23,13 @@ fun Runner.toRunnerResultView(position: Int) = RunnerResultView(
     this.fullName,
     this.number.toString(),
     this.totalResult!!.toTimeUTCFormat(),
-    position)
+    position
+)
+
+
+fun CheckpointResult.toCheckpointView(state: StepState = StepState.DONE) = CheckpointView(
+    this.id,
+    this.name,
+    state,
+    this.date
+)

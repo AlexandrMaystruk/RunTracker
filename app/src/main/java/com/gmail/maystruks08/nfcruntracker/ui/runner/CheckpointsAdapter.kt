@@ -5,19 +5,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.gmail.maystruks08.domain.entities.Checkpoint
-import com.gmail.maystruks08.domain.entities.CheckpointState
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.ext.gone
 import com.gmail.maystruks08.nfcruntracker.core.ext.hide
 import com.gmail.maystruks08.nfcruntracker.core.ext.show
 import com.gmail.maystruks08.nfcruntracker.core.ext.toDateTimeShortFormat
+import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepState
+import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
 import kotlinx.android.synthetic.main.item_checkpoint.view.*
 import kotlin.properties.Delegates
 
 class CheckpointsAdapter(private val longClickListener: (Int) -> Unit) : RecyclerView.Adapter<CheckpointsAdapter.ViewHolder>() {
 
-    var checkpoints: MutableList<Checkpoint> by Delegates.observable(mutableListOf()) { _, _, _ ->
+    var checkpoints: MutableList<CheckpointView> by Delegates.observable(mutableListOf()) { _, _, _ ->
         notifyDataSetChanged()
     }
 
@@ -34,13 +34,13 @@ class CheckpointsAdapter(private val longClickListener: (Int) -> Unit) : Recycle
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bindHolder(item: Checkpoint, position: Int, longClickListener: (Int) -> Unit) {
+        fun bindHolder(item: CheckpointView, position: Int, longClickListener: (Int) -> Unit) {
             val stateDrawable = when (item.state) {
-                CheckpointState.UNDONE -> R.drawable.ic_unchecked
-                CheckpointState.DONE -> R.drawable.ic_check_circle
-                CheckpointState.CURRENT -> R.drawable.ic_checked
+                StepState.UNDONE -> R.drawable.ic_unchecked
+                StepState.DONE -> R.drawable.ic_check_circle
+                StepState.CURRENT -> R.drawable.ic_checked
             }
-            if (item.state == CheckpointState.CURRENT) itemView.ivRunner.show() else itemView.ivRunner.hide()
+            if (item.state ==  StepState.CURRENT) itemView.ivRunner.show() else itemView.ivRunner.hide()
             when (position) {
                 0 -> {
                     itemView.topView.gone()

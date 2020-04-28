@@ -14,6 +14,8 @@ class ConfigPreferences @Inject constructor(context: Context) {
         private const val CHECKPOINT = "CHECKPOINT"
         private const val IRON_PEOPLE_CHECKPOINT = "IRON_PEOPLE_CHECKPOINT"
 
+        private const val DATE_OF_START = "DATE_OF_START"
+
     }
 
     private val sp = context.getSharedPreferences(NAME, Context.MODE_PRIVATE)
@@ -38,5 +40,16 @@ class ConfigPreferences @Inject constructor(context: Context) {
 
     fun getCurrentIronPeopleCheckpoint(): Int {
         return sp.getInt(IRON_PEOPLE_CHECKPOINT, 0)
+    }
+
+    fun saveDateOfStart(date: Long) {
+        sp.edit().apply {
+            putLong(DATE_OF_START, date)
+            apply()
+        }
+    }
+
+    fun getDateOfStart(): Long {
+        return sp.getLong(DATE_OF_START, 0)
     }
 }

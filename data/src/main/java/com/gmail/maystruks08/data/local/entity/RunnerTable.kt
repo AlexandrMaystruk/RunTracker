@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.data.local
+package com.gmail.maystruks08.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

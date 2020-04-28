@@ -1,24 +1,22 @@
 package com.gmail.maystruks08.data.mappers
 
-import com.gmail.maystruks08.data.local.CheckpointTable
+import com.gmail.maystruks08.data.local.entity.CheckpointTable
+import com.gmail.maystruks08.data.local.entity.ResultTable
 import com.gmail.maystruks08.domain.entities.Checkpoint
-import com.gmail.maystruks08.domain.entities.CheckpointState
+import com.gmail.maystruks08.domain.entities.CheckpointResult
 
-fun CheckpointTable.toCheckpoint(): Checkpoint {
-    return Checkpoint(
-        id = this.checkpointId,
+fun Checkpoint.toCheckpointTable(): CheckpointTable {
+    return CheckpointTable(
+        id = this.id,
         name = this.name,
-        state = CheckpointState.fromOrdinal(this.state),
-        date = this.date
+        type = 0 //TODO
     )
 }
 
-fun Checkpoint.toCheckpointTable(runnerId: String): CheckpointTable {
-    return CheckpointTable(
+fun CheckpointResult.toResultTable(runnerId: String): ResultTable {
+    return ResultTable(
         runnerId = runnerId,
-        name = this.name,
-        checkpointId = this.id,
-        state = this.state.ordinal,
-        date = this.date
+        checkpointId = id,
+        time = this.date
     )
 }

@@ -26,6 +26,8 @@ inline fun <reified T : Fragment> Fragment.getChildVisibleFragment(): T? {
     return childFragmentManager.fragments.lastOrNull() as? T
 }
 
+fun Any.name(): String = this::class.java.simpleName
+
 @Suppress("UNCHECKED_CAST")
 fun <T> Bundle.put(key: String, value: T) {
     when (value) {

@@ -1,27 +1,22 @@
-package com.gmail.maystruks08.data.local
+package com.gmail.maystruks08.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
 import java.util.*
 
 @Entity(
-    tableName = "checkpoints",
+    tableName = "result",
+    primaryKeys = ["runnerId", "checkpointId"],
     foreignKeys = [
         ForeignKey(
             entity = RunnerTable::class,
             parentColumns = ["id"],
             childColumns = ["runnerId"],
             onDelete = ForeignKey.CASCADE
-        )
-    ]
+        )]
 )
-data class CheckpointTable(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
-    val name: String = "",
+data class ResultTable(
     val runnerId: String,
     val checkpointId: Int,
-    val date: Date? = null,
-    val state: Int
+    val time: Date? = null
 )
