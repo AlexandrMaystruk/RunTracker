@@ -67,9 +67,8 @@
     <style name="MainButton">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">@dimen/button_height</item>
-        <item name="android:layout_marginStart">@dimen/size_xxl</item>
-        <item name="android:layout_marginEnd">@dimen/size_xxl</item>
-        <item name="android:layout_marginBottom">@dimen/margin_m</item>
+        <item name="android:paddingStart">@dimen/margin_s</item>
+        <item name="android:paddingEnd">@dimen/margin_s</item>
         <item name="android:background">@drawable/bg_main_btn</item>
         <item name="android:textSize">@dimen/text_s</item>
         <item name="android:textColor">@color/colorWhite</item>

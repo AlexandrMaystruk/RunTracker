@@ -317,8 +317,7 @@
     <Button
         android:id="@+id/btnAddNewRunner"
         style="@style/MainButton"
-        android:layout_marginStart="@dimen/margin_xs"
-        android:layout_marginEnd="@dimen/margin_xs"
+        android:layout_margin="@dimen/margin_m"
         android:text="Добавить"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

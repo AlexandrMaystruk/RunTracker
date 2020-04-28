@@ -96,6 +96,7 @@
         android:id="@+id/tvSignOut"
         style="@style/MainButton"
         android:layout_width="0dp"
+        android:layout_margin="@dimen/margin_m"
         android:text="Log out"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/tvStartRunning"
@@ -105,7 +106,8 @@
         android:id="@+id/tvStartRunning"
         style="@style/MainButton"
         android:layout_width="0dp"
-        android:text="Start for all!"
+        android:layout_margin="@dimen/margin_m"
+        android:text="Start run tracking"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tvSignOut" />
