@@ -1,13 +1,11 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
-import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.DaggerViewModelFactory
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import kotlinx.android.synthetic.main.fragment_runners.*
@@ -15,9 +13,13 @@ import javax.inject.Inject
 
 class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
 
+    /**
+     * Created RunnersViewModel without ViewModel providers
+     * because I don't know how I can create different instances.
+     * If used ViewModel providers for a different instance of the fragment
+     * will injected the same instance of RunnersViewModel
+     */
     @Inject
-    lateinit var viewModeFactory: DaggerViewModelFactory
-
     lateinit var viewModel: RunnersViewModel
 
     private var runnerAdapter: RunnerAdapter? = null
@@ -28,7 +30,6 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
 
     override fun injectDependencies() {
         App.runnersComponent?.inject(this)
-        viewModel = ViewModelProviders.of(this, this.viewModeFactory).get(RunnersViewModel::class.java)
         viewModel.initFragment(runnerTypeId)
     }
 

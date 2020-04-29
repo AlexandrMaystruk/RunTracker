@@ -26,8 +26,7 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
 
     override fun injectDependencies() {
         App.rootRunnersComponent?.inject(this)
-        viewModel =
-            ViewModelProviders.of(this, this.viewModeFactory).get(RootRunnersViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, this.viewModeFactory).get(RootRunnersViewModel::class.java)
     }
 
     override fun initToolbar() = FragmentToolbar.Builder()

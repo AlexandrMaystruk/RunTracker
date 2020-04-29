@@ -2,13 +2,12 @@ package com.gmail.maystruks08.nfcruntracker.core.di.runners
 
 import androidx.lifecycle.ViewModel
 import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.ViewModelKey
-import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.ViewModelModule
 import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 
-@Module(includes = [ViewModelModule::class])
+@Module
 abstract class RunnersModule {
 
     @IntoMap
