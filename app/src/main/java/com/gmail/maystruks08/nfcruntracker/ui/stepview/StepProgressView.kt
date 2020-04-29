@@ -51,14 +51,14 @@ class StepProgressView : ViewGroup {
 
     private var beansList = listOf(Bean("C", StepState.CURRENT), Bean("Ф", StepState.UNDONE))
     private var currentStep = 0
+    private var stepsCount = 0
 
     private var nodeHeight = -1f
     private var textNodeTitleSize = resources.getDimension(R.dimen.text_m).toInt()
-    private var textNodeSize = resources.getDimension(R.dimen.size_l).toInt()
+    private var textNodeSize = resources.getDimension(R.dimen.size_s).toInt()
     private var textTitlePadding = SViewUtils.toPx(5f, context)
     private var arcHeight = SViewUtils.toPx(2f, context)
-    private var arcPadding = SViewUtils.toPx(10f, context)
-    private val minSpacingLength = SViewUtils.toPx(10, context)
+    private val minSpacingLength = SViewUtils.toPx(5, context)
     private val nodeDefaultRatio = 0.1
     private val arcsMaxRatio = 0.60
     private val arcTransitionDuration = 200
@@ -80,7 +80,6 @@ class StepProgressView : ViewGroup {
                 nodeHeight = getDimension(R.styleable.StepProgressView_nodeHeight, nodeHeight)
                 //arc setup
                 arcHeight = getDimension(R.styleable.StepProgressView_arcWidth, arcHeight)
-                arcPadding = getDimension(R.styleable.StepProgressView_arcPadding, arcPadding)
                 connectionLineColor = getColor(R.styleable.StepProgressView_arcColor, connectionLineColor)
 
                 textTitlePadding = getDimension(R.styleable.StepProgressView_textTitlePadding, textTitlePadding)
@@ -105,14 +104,15 @@ class StepProgressView : ViewGroup {
     }
 
     private fun createViews() {
-        if (beansList.isEmpty()) {
+        stepsCount = beansList.size
+        if (stepsCount == 0) {
             return
         }
         removeAllViews()
-        for (i in beansList.indices) {
+        for (i in 0 until stepsCount) {
             addView(textViewForStepTitle(i))
             addView(textViewForStep(i, i == 0))
-            if (i != beansList.lastIndex) {
+            if (i != stepsCount - 1) {
                 addView(arcView(i))
             }
         }
@@ -140,9 +140,9 @@ class StepProgressView : ViewGroup {
             wSize - paddingStart - paddingEnd
         }
         val nodeSize = getNodeSize(w, heightMeasureSpec)
-        val arcWidth = if (beansList.size > 1) getArcWidth(widthMeasureSpec, w, nodeSize) else 0
+        val arcWidth = if (stepsCount > 1) getArcWidth(widthMeasureSpec, w, nodeSize) else 0
 
-        textOverflow = nodeSize
+        resolveTextOverflow(nodeSize)
         children.forEach {
             when {
                 //Measure titles for step (node) views
@@ -171,9 +171,7 @@ class StepProgressView : ViewGroup {
                     val arcHSpec =
                         MeasureSpec.makeMeasureSpec(arcHeight.toInt(), MeasureSpec.EXACTLY)
                     if (!hasNodeOverflow) {
-                        (it.layoutParams as LinearLayout.LayoutParams).setMargins(
-                            arcPadding.toInt(), 0, arcPadding.toInt(), 0
-                        )
+                        (it.layoutParams as LinearLayout.LayoutParams).setMargins(0, 0,0, 0)
                     } else {
                         //remove margin if view is in overflow mode to escape case when arc is smaller than its margins
                         (it.layoutParams as LinearLayout.LayoutParams).setMargins(0)
@@ -213,11 +211,17 @@ class StepProgressView : ViewGroup {
             hSize
         }
         val desiredW = if (wMode != MeasureSpec.EXACTLY) {
-            nodeSize * beansList.size + arcWidth * beansList.lastIndex + paddingStart + paddingEnd + textOverflow
+            nodeSize * stepsCount + arcWidth * (stepsCount - 1) + paddingStart + paddingEnd + textOverflow
         } else {
             wSize
         }
         setMeasuredDimension(desiredW, desiredH)
+    }
+
+    //Text could be bigger than node view
+    //Text overflow margin is calculated to fit text in a node view
+    private fun resolveTextOverflow(nodeSize: Int) {
+        textOverflow = nodeSize
     }
 
     //Calculate optimal node size to fit view width.
@@ -251,9 +255,10 @@ class StepProgressView : ViewGroup {
     //to respect optimal proportions for nodes and arcs
     private fun getArcWidth(widthMeasureSpec: Int, width: Int, nodeSize: Int): Int {
         //include padding for titles
+        val sCount =  stepsCount + 1
         val wMode = MeasureSpec.getMode(widthMeasureSpec)
-        val arcsCount = beansList.lastIndex
-        val allArcsWidth = (width - beansList.size + 1 * nodeSize)
+        val arcsCount = stepsCount - 1
+        val allArcsWidth = (width - sCount * nodeSize)
         val isArcsWidthAppropriate = allArcsWidth <= width * arcsMaxRatio
         return if (isArcsWidthAppropriate || (!isArcsWidthAppropriate && wMode == MeasureSpec.EXACTLY)) {
             allArcsWidth / arcsCount
@@ -264,14 +269,14 @@ class StepProgressView : ViewGroup {
 
     private fun nodeSizeFits(width: Int, desiredSize: Int): Boolean {
         //include padding for titles
-        val sCount = beansList.size + 1
-        return (width - desiredSize * sCount) >= minSpacingLength * beansList.lastIndex
+        val sCount =  stepsCount + 1
+        return (width - desiredSize * sCount) >= minSpacingLength * (stepsCount - 1)
     }
 
     private fun maximalNodeSize(width: Int): Int {
         //include padding for titles
-        val sCount = beansList.size + 1
-        return (width - minSpacingLength * beansList.lastIndex) / sCount
+        val sCount =  stepsCount + 1
+        return (width - minSpacingLength * (stepsCount - 1)) / sCount
     }
 
     //Arranges all created views in a proper order from left to right
@@ -282,7 +287,9 @@ class StepProgressView : ViewGroup {
         val step: View
         try {
             //Take a node view to calculate it margins
-            step = children.first { it is TextView && it.tag as String != STEP_TITLE_TAG }
+            step = children.first {
+                it is TextView && it.tag as String != STEP_TITLE_TAG
+            }
         } catch (e: NoSuchElementException) {
             e.printStackTrace()
             return
@@ -386,10 +393,10 @@ class StepProgressView : ViewGroup {
         this.beansList = beans
         createViews()
         beans.forEachIndexed { index, bean ->
-            changeStepStateView(index, bean.state)
             if (bean.state == StepState.CURRENT) {
                 currentStep = index
             }
+            changeStepStateView(index, bean.state)
             if(index < beansList.lastIndex - 1){
                 animateProgressArc(index, isAllPreviousDone(index))
             }

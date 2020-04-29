@@ -12,7 +12,6 @@
         <!-- Arc customization -->
         <attr name="arcWidth" format="dimension" />
         <attr name="arcHeight" format="dimension" />
-        <attr name="arcPadding" format="dimension" />
         <attr name="arcColor" format="color" />
 
         <attr name="textTitlePadding" format="dimension" />
