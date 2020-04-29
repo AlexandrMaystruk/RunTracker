@@ -1,8 +1,8 @@
 package com.gmail.maystruks08.nfcruntracker.core.di.runners.result
 
 import androidx.lifecycle.ViewModel
-import com.gmail.maystruks08.nfcruntracker.core.di.ViewModelKey
-import com.gmail.maystruks08.nfcruntracker.core.di.ViewModelModule
+import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.ViewModelKey
+import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.ViewModelModule
 import com.gmail.maystruks08.nfcruntracker.ui.result.RunnerResultViewModel
 import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerViewModel
 import dagger.Binds

@@ -5,8 +5,8 @@ import com.gmail.maystruks08.data.repository.RunnersRepositoryImpl
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.domain.interactors.RunnersInteractorImpl
 import com.gmail.maystruks08.domain.repository.RunnersRepository
-import com.gmail.maystruks08.nfcruntracker.core.di.ViewModelKey
-import com.gmail.maystruks08.nfcruntracker.core.di.ViewModelModule
+import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.ViewModelKey
+import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.ViewModelModule
 import com.gmail.maystruks08.nfcruntracker.ui.runners.RootRunnersViewModel
 import dagger.Binds
 import dagger.Module

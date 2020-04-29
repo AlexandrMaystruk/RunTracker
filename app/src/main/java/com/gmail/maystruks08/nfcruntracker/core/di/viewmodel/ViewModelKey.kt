@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.nfcruntracker.core.di
+package com.gmail.maystruks08.nfcruntracker.core.di.viewmodel
 
 import androidx.lifecycle.ViewModel
 import dagger.MapKey

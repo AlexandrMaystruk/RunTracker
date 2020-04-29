@@ -1,9 +1,8 @@
-package com.gmail.maystruks08.nfcruntracker.core.di
+package com.gmail.maystruks08.nfcruntracker.core.di.viewmodel
 
 import androidx.lifecycle.ViewModelProvider
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 
 @Module
 interface ViewModelModule {

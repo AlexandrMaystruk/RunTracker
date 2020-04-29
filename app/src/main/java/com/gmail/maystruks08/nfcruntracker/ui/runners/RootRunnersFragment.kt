@@ -2,10 +2,12 @@ package com.gmail.maystruks08.nfcruntracker.ui.runners
 
 import android.text.InputType
 import android.view.MenuItem
+import androidx.lifecycle.ViewModelProviders
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
+import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.DaggerViewModelFactory
 import com.gmail.maystruks08.nfcruntracker.core.ext.getChildVisibleFragment
 import com.gmail.maystruks08.nfcruntracker.core.ext.getVisibleFragment
 import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
@@ -16,11 +18,17 @@ import javax.inject.Inject
 class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
 
     @Inject
+    lateinit var viewModeFactory: DaggerViewModelFactory
+
     lateinit var viewModel: RootRunnersViewModel
 
     private var adapter: ScreenSlidePagerAdapter? = null
 
-    override fun injectDependencies() = App.rootRunnersComponent?.inject(this)
+    override fun injectDependencies() {
+        App.rootRunnersComponent?.inject(this)
+        viewModel =
+            ViewModelProviders.of(this, this.viewModeFactory).get(RootRunnersViewModel::class.java)
+    }
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
