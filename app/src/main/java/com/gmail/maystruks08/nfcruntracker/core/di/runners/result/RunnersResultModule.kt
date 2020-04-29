@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.ViewModelKey
 import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.ViewModelModule
 import com.gmail.maystruks08.nfcruntracker.ui.result.RunnerResultViewModel
-import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -15,6 +14,6 @@ abstract class RunnersResultModule {
     @IntoMap
     @Binds
     @RunnersResultsScope
-    @ViewModelKey(RunnerViewModel::class)
+    @ViewModelKey(RunnerResultViewModel::class)
     abstract fun bindRunnerResultViewModel(viewModel: RunnerResultViewModel): ViewModel
 }
