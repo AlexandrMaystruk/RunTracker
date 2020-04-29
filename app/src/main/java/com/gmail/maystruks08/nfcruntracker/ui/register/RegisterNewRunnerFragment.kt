@@ -2,25 +2,20 @@ package com.gmail.maystruks08.nfcruntracker.ui.register
 
 import android.app.DatePickerDialog
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.gmail.maystruks08.domain.entities.RunnerSex
 import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
-import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.DaggerViewModelFactory
+import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.toDateFormat
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import kotlinx.android.synthetic.main.fragment_register_new_runner.*
 import java.util.*
-import javax.inject.Inject
 
 
 class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_runner) {
-
-    @Inject
-    lateinit var viewModeFactory: DaggerViewModelFactory
 
     lateinit var viewModel: RegisterNewRunnerViewModel
 
@@ -32,7 +27,7 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
 
     override fun injectDependencies() {
         App.registerNewRunnerComponent?.inject(this)
-        viewModel = ViewModelProviders.of(this, this.viewModeFactory).get(RegisterNewRunnerViewModel::class.java)
+        viewModel = injectViewModel(viewModeFactory)
     }
 
     override fun initToolbar() = FragmentToolbar.Builder()

@@ -6,6 +6,9 @@ import android.os.Parcelable
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import java.util.*
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -24,6 +27,10 @@ inline fun <reified T : Fragment> Fragment.getVisibleFragment(): T? {
 
 inline fun <reified T : Fragment> Fragment.getChildVisibleFragment(): T? {
     return childFragmentManager.fragments.lastOrNull() as? T
+}
+
+inline fun <reified T : ViewModel> Fragment.injectViewModel(factory: ViewModelProvider.Factory): T {
+    return ViewModelProviders.of(this, factory)[T::class.java]
 }
 
 fun Any.name(): String = this::class.java.simpleName

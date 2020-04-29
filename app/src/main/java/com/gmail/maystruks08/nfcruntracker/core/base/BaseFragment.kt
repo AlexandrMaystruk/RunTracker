@@ -6,10 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.DaggerViewModelFactory
+import javax.inject.Inject
 
 abstract class BaseFragment(private val layout: Int? = null) : Fragment() {
 
     var toolbarManager: ToolbarManager? = null
+
+    @Inject
+    lateinit var viewModeFactory: DaggerViewModelFactory
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

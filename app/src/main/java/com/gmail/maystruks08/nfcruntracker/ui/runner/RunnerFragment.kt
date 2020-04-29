@@ -2,21 +2,16 @@ package com.gmail.maystruks08.nfcruntracker.ui.runner
 
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
-import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.DaggerViewModelFactory
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
+import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import kotlinx.android.synthetic.main.fragment_runner.*
-import javax.inject.Inject
 
 class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
-
-    @Inject
-    lateinit var viewModeFactory: DaggerViewModelFactory
 
     lateinit var viewModel: RunnerViewModel
 
@@ -28,7 +23,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
 
     override fun injectDependencies() {
         App.runnerComponent?.inject(this)
-        viewModel = ViewModelProviders.of(this, this.viewModeFactory).get(RunnerViewModel::class.java)
+        viewModel = injectViewModel(viewModeFactory)
     }
 
     override fun initToolbar() = FragmentToolbar.Builder()
