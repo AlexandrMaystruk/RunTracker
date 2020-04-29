@@ -1,10 +1,10 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
 import android.annotation.SuppressLint
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.ext.gone
 import com.gmail.maystruks08.nfcruntracker.core.ext.show
@@ -74,9 +74,7 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
                 itemView.tvRunnerResult.text = null
                 itemView.tvRunnerResult.gone()
             }
-            val titlesId = if (runner.isIron) R.array.iron_people_checkpoints else R.array.checkpoints
-            itemView.runnerProgress.setStepTitles(itemView.resources.getStringArray(titlesId).toList())
-            itemView.runnerProgress.setCurrentStep(runner.currentPosition)
+            itemView.runnerProgress.setStepBean(runner.progress.map { it.bean })
         }
 
         private fun isAdapterPositionCorrect(): Boolean = adapterPosition in 0..runnerList.lastIndex

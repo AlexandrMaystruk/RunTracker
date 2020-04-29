@@ -62,7 +62,7 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
     }
 
     private fun onClickedAtRunner(runnerView: RunnerView) {
-        viewModel.onClickedAtRunner(runnerView.id)
+        viewModel.onClickedAtRunner(runnerView.id, runnerView.type)
     }
 
     override fun onDestroyView() {

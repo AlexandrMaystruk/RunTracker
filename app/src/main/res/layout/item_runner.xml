@@ -55,10 +55,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvRunnerNumber"
             app:nodeHeight="30dp"
-            app:stepsCount="9"
             app:textNodeTitleSize="14sp"
-            app:textTitlePadding="5dp"
-            app:titlesEnabled="true" />
+            app:textTitlePadding="5dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

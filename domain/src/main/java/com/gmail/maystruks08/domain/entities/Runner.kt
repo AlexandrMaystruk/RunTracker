@@ -16,28 +16,24 @@ data class Runner(
 
     fun getCurrentPosition(): CheckpointResult? = checkpoints.lastOrNull()
 
-    fun addPassedCheckpoint(
-        checkpoint: CheckpointResult,
-        maxCount: Int,
-        isRestart: Boolean = false
-    ): Boolean {
+    /**
+     * Add checkpoint to runner entity
+     * If previous checkpoint is absent -> mark current checkpoint as hasPrevious = false
+     */
+    fun addPassedCheckpoint(checkpoint: CheckpointResult, finishCheckpointId: Int, isRestart: Boolean = false) {
         val lastCheckpoint = checkpoints.lastOrNull()
-
-        if (isRestart) {
-            checkpoints.clear()
-            totalResult = null
-            checkpoints.add(checkpoint)
-            return true
-        }
-
-        if (checkpoints.isEmpty() && checkpoint.id == 0 || lastCheckpoint?.id == checkpoint.id - 1) {
-            checkpoints.add(checkpoint)
-            if (checkpoints.size == maxCount) {
+        if (!isRestart) {
+            if (lastCheckpoint?.id != checkpoint.id - 1 || !lastCheckpoint.hasPrevious) {
+                checkpoint.hasPrevious = false
+            }
+            if (checkpoint.id == finishCheckpointId) {
                 totalResult = calculateTotalResult()
             }
-            return true
+        } else {
+            checkpoints.clear()
+            totalResult = null
         }
-        return false
+        checkpoints.add(checkpoint)
     }
 
     fun removeCheckpoint(checkpointId: Int) {

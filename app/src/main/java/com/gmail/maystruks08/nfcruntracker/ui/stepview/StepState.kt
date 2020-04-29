@@ -2,7 +2,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.stepview
 
  enum class StepState {
 
-    UNDONE, DONE, CURRENT;
+    UNDONE, DONE, CURRENT, DONE_WARNING;
 
     companion object {
 

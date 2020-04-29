@@ -3,6 +3,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.runner
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
@@ -19,6 +20,8 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
 
     private var runnerId: String by argument()
 
+    private var runnerType: Int by argument()
+
     private var checkpointsAdapter: CheckpointsAdapter? = null
 
     override fun injectDependencies() {
@@ -33,23 +36,24 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
         .build()
 
     override fun bindViewModel() {
-        viewModel.onShowRunnerClicked(runnerId)
+        val titles = if (runnerType == RunnerType.NORMAL.ordinal) R.array.checkpoints else R.array.iron_people_checkpoints
+        viewModel.onShowRunnerClicked(runnerId, runnerType, resources.getStringArray(titles))
 
-        viewModel.runnerWithCheckpoints.observe(viewLifecycleOwner, Observer { runner ->
-            val numberStr = "#" + runner.first.number
+        viewModel.runner.observe(viewLifecycleOwner, Observer { runner ->
+            val numberStr = "#" + runner.number
             tvRunnerNumber.text = numberStr
-            tvRunnerFullName.text = runner.first.fullName
-            tvDateOfBirthday.text = runner.first.dateOfBirthday
-            tvRunnerCity.text = runner.first.city
-            if(runner.first.result != null){
-                val totalResultStr = "Общее время: ${runner.first.result}"
+            tvRunnerFullName.text = runner.fullName
+            tvDateOfBirthday.text = runner.dateOfBirthday
+            tvRunnerCity.text = runner.city
+            if (runner.result != null) {
+                val totalResultStr = "Общее время: ${runner.result}"
                 btnMarkCheckpointAsPassedInManual.text = totalResultStr
                 btnMarkCheckpointAsPassedInManual.isEnabled = false
             } else {
                 btnMarkCheckpointAsPassedInManual.text = "Отметить на текущем КП"
                 btnMarkCheckpointAsPassedInManual.isEnabled = true
             }
-            checkpointsAdapter?.checkpoints = runner.second.toMutableList()
+            checkpointsAdapter?.checkpoints = runner.progress.toMutableList()
         })
     }
 
@@ -59,7 +63,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
                 .setTitle("Внимание!")
                 .setMessage("Отметить участника на КП без карты?")
                 .setPositiveButton(android.R.string.yes) { _, _ ->
-                    viewModel.markCheckpointAsPassed(runnerId)
+                    viewModel.markCheckpointAsPassed(runnerId, runnerType)
                     alertDialog?.dismiss()
                 }
                 .setNegativeButton(android.R.string.no) { _, _ ->
@@ -75,12 +79,12 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
         }
     }
 
-    private fun onCheckpointDateLongClicked(checkpointId: Int){
+    private fun onCheckpointDateLongClicked(checkpointId: Int) {
         val builder = AlertDialog.Builder(requireContext())
             .setTitle("Внимание!")
             .setMessage("Удалить участнику прохождение текущего КП?")
             .setPositiveButton(android.R.string.yes) { _, _ ->
-                viewModel.deleteCheckpointFromRunner(runnerId, checkpointId)
+                viewModel.deleteCheckpointFromRunner(runnerId, runnerType, checkpointId)
                 alertDialog?.dismiss()
             }
             .setNegativeButton(android.R.string.no) { _, _ ->
@@ -96,6 +100,9 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
 
     companion object {
 
-        fun getInstance(runnerId: String) = RunnerFragment().apply { this.runnerId = runnerId }
+        fun getInstance(runnerId: String, runnerType: Int) = RunnerFragment().apply {
+            this.runnerId = runnerId
+            this.runnerType = runnerType
+        }
     }
 }

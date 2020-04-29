@@ -35,12 +35,14 @@ class CheckpointsAdapter(private val longClickListener: (Int) -> Unit) : Recycle
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bindHolder(item: CheckpointView, position: Int, longClickListener: (Int) -> Unit) {
-            val stateDrawable = when (item.state) {
+            val stateDrawable = when (item.bean.state) {
                 StepState.UNDONE -> R.drawable.ic_unchecked
                 StepState.DONE -> R.drawable.ic_check_circle
                 StepState.CURRENT -> R.drawable.ic_checked
+                StepState.DONE_WARNING -> R.drawable.ic_check_warning
+
             }
-            if (item.state ==  StepState.CURRENT) itemView.ivRunner.show() else itemView.ivRunner.hide()
+            if (item.bean.state ==  StepState.CURRENT) itemView.ivRunner.show() else itemView.ivRunner.hide()
             when (position) {
                 0 -> {
                     itemView.topView.gone()
@@ -55,7 +57,7 @@ class CheckpointsAdapter(private val longClickListener: (Int) -> Unit) : Recycle
                     itemView.bottomView.gone()
                 }
                 else -> {
-                    itemView.tvCheckpointName.text = item.name
+                    itemView.tvCheckpointName.text = item.bean.title
                     itemView.tvCheckpointName.background = null
                     itemView.topView.show()
                     itemView.bottomView.show()

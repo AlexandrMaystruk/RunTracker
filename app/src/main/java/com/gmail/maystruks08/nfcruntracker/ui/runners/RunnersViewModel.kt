@@ -30,8 +30,10 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     private val _runnerRemoveLiveData = MutableLiveData<RunnerView>()
 
     private lateinit var runnerType: RunnerType
+    private lateinit var checkpointsTitles: Array<String>
 
-    fun initFragment(runnerTypeId: Int) {
+    fun initFragment(runnerTypeId: Int, titles: Array<String>) {
+        checkpointsTitles = titles
         runnerType = RunnerType.fromOrdinal(runnerTypeId)
         viewModelScope.launch {
             showAllRunners()
@@ -41,7 +43,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
 
     fun onNfcCardScanned(cardId: String) {
         viewModelScope.launch {
-            when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(cardId)) {
+            when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(cardId, runnerType)) {
                 is ResultOfTask.Value -> handleRunnerChanges(onResult.value)
                 is ResultOfTask.Error -> handleError(onResult.error)
             }
@@ -50,7 +52,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
 
     private suspend fun showAllRunners() {
         when (val result = runnersInteractor.getAllRunners(runnerType)) {
-            is ResultOfTask.Value -> _runnersLiveData.value = result.value.map { it.toRunnerView() }.toMutableList()
+            is ResultOfTask.Value -> _runnersLiveData.value = result.value.map { it.toRunnerView(checkpointsTitles) }.toMutableList()
             is ResultOfTask.Error -> handleError(result.error)
         }
     }
@@ -63,7 +65,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     }
 
     private fun handleRunnerChanges(runnerChange: RunnerChange) {
-        val runnerView = runnerChange.runner.toRunnerView()
+        val runnerView = runnerChange.runner.toRunnerView(checkpointsTitles)
         when (runnerChange.changeType) {
             Change.ADD -> _runnerAddLiveData.value = runnerView
             Change.UPDATE -> _runnerUpdateLiveData.value = runnerView
@@ -80,7 +82,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
                         _runnersLiveData.postValue(
                             result.value.filter {
                                 pattern.containsMatchIn(it.number.toString().toLowerCase())
-                            }.map { it.toRunnerView() }.toMutableList()
+                            }.map { it.toRunnerView(checkpointsTitles) }.toMutableList()
                         )
                     }
                     is ResultOfTask.Error -> handleError(result.error)

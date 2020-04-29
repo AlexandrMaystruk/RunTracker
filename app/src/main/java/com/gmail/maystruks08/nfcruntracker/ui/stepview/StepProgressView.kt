@@ -17,24 +17,28 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.*
 import com.gmail.maystruks08.nfcruntracker.R
 
+class StepProgressView : ViewGroup {
 
-class StepProgressView : ViewGroup, IStepProgress {
-
-    private val stepProgress = StepProgress()
     private val drawableHelper = DrawableHelper()
 
     private lateinit var arcActiveDrawable: ColorDrawable
     private lateinit var arcInactiveDrawable: ColorDrawable
     private lateinit var doneDrawable: Drawable
+    private lateinit var doneWarningDrawable: Drawable
     private lateinit var undoneDrawable: Drawable
     private lateinit var currentDrawable: Drawable
 
     @DrawableRes
-    private  var doneDrawableId: Int = R.drawable.ic_check_circle
+    private var doneDrawableId: Int = R.drawable.ic_check_circle
+
     @DrawableRes
-    private  var undoneDrawableId: Int =  R.drawable.ic_unchecked
+    private var doneWarningDrawableId: Int = R.drawable.ic_check_warning
+
     @DrawableRes
-    private  var currentDrawableId: Int = R.drawable.ic_checked
+    private var undoneDrawableId: Int = R.drawable.ic_unchecked
+
+    @DrawableRes
+    private var currentDrawableId: Int = R.drawable.ic_checked
 
     @ColorInt
     private var textNodeTitleColor = ContextCompat.getColor(context, R.color.colorPrimary)
@@ -45,9 +49,9 @@ class StepProgressView : ViewGroup, IStepProgress {
     @ColorInt
     private var colorInactive = ContextCompat.getColor(context, R.color.colorAccent)
 
-    private var titles: List<String> = listOf()
-    private var stepsCount = 2
-    private var titlesEnabled = false
+    private var beansList = listOf(Bean("C", StepState.CURRENT), Bean("Ф", StepState.UNDONE))
+    private var currentStep = 0
+
     private var nodeHeight = -1f
     private var textNodeTitleSize = resources.getDimension(R.dimen.text_m).toInt()
     private var textNodeSize = resources.getDimension(R.dimen.size_l).toInt()
@@ -66,11 +70,6 @@ class StepProgressView : ViewGroup, IStepProgress {
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         context.theme.obtainStyledAttributes(attrs, R.styleable.StepProgressView, 0, 0).apply {
             try {
-                //common setup
-                stepsCount = getInteger(R.styleable.StepProgressView_stepsCount, stepsCount)
-                if (stepsCount < 0) {
-                    throw IllegalStateException("Steps count can't be a negative number")
-                }
                 colorInactive = getColor(R.styleable.StepProgressView_colorInactive, colorInactive)
                 //node setup
 
@@ -84,7 +83,6 @@ class StepProgressView : ViewGroup, IStepProgress {
                 arcPadding = getDimension(R.styleable.StepProgressView_arcPadding, arcPadding)
                 connectionLineColor = getColor(R.styleable.StepProgressView_arcColor, connectionLineColor)
 
-                titlesEnabled = getBoolean(R.styleable.StepProgressView_titlesEnabled, titlesEnabled)
                 textTitlePadding = getDimension(R.styleable.StepProgressView_textTitlePadding, textTitlePadding)
                 textNodeTitleSize = getDimensionPixelSize(R.styleable.StepProgressView_textNodeTitleSize, textNodeTitleSize)
                 textNodeSize = getDimensionPixelSize(R.styleable.StepProgressView_textNodeSize, textNodeSize)
@@ -98,29 +96,23 @@ class StepProgressView : ViewGroup, IStepProgress {
 
     private fun init() {
         doneDrawable = ContextCompat.getDrawable(context, doneDrawableId) ?: drawableHelper.createStrokeOvalDrawable(context, textNodeTitleColor)
+        doneWarningDrawable = ContextCompat.getDrawable(context, doneWarningDrawableId) ?: drawableHelper.createStrokeOvalDrawable(context, textNodeTitleColor)
         undoneDrawable = ContextCompat.getDrawable(context, undoneDrawableId) ?: drawableHelper.createStrokeOvalDrawable(context, textNodeTitleColor)
         currentDrawable = ContextCompat.getDrawable(context, currentDrawableId) ?: drawableHelper.createStrokeOvalDrawable(context, textNodeTitleColor)
         arcActiveDrawable = ColorDrawable(connectionLineColor)
         arcInactiveDrawable = ColorDrawable(colorInactive)
-
-        if (titlesEnabled) {
-            titles = getDefaultTitles()
-        }
-        stepProgress.reset()
         createViews()
     }
 
     private fun createViews() {
-        if (stepsCount == 0) {
+        if (beansList.isEmpty()) {
             return
         }
         removeAllViews()
-        for (i in 0 until stepsCount) {
-            if (titlesEnabled) {
-                addView(textViewForStepTitle(i))
-            }
+        for (i in beansList.indices) {
+            addView(textViewForStepTitle(i))
             addView(textViewForStep(i, i == 0))
-            if (i != stepsCount - 1) {
+            if (i != beansList.lastIndex) {
                 addView(arcView(i))
             }
         }
@@ -148,9 +140,9 @@ class StepProgressView : ViewGroup, IStepProgress {
             wSize - paddingStart - paddingEnd
         }
         val nodeSize = getNodeSize(w, heightMeasureSpec)
-        val arcWidth = if (stepsCount > 1) getArcWidth(widthMeasureSpec, w, nodeSize) else 0
+        val arcWidth = if (beansList.size > 1) getArcWidth(widthMeasureSpec, w, nodeSize) else 0
 
-        resolveTextOverflow(nodeSize)
+        textOverflow = nodeSize
         children.forEach {
             when {
                 //Measure titles for step (node) views
@@ -221,17 +213,11 @@ class StepProgressView : ViewGroup, IStepProgress {
             hSize
         }
         val desiredW = if (wMode != MeasureSpec.EXACTLY) {
-            nodeSize * stepsCount + arcWidth * (stepsCount - 1) + paddingStart + paddingEnd + textOverflow
+            nodeSize * beansList.size + arcWidth * beansList.lastIndex + paddingStart + paddingEnd + textOverflow
         } else {
             wSize
         }
         setMeasuredDimension(desiredW, desiredH)
-    }
-
-    //Text could be bigger than node view
-    //Text overflow margin is calculated to fit text in a node view
-    private fun resolveTextOverflow(nodeSize: Int) {
-        textOverflow = if (titlesEnabled) nodeSize else 0
     }
 
     //Calculate optimal node size to fit view width.
@@ -265,10 +251,9 @@ class StepProgressView : ViewGroup, IStepProgress {
     //to respect optimal proportions for nodes and arcs
     private fun getArcWidth(widthMeasureSpec: Int, width: Int, nodeSize: Int): Int {
         //include padding for titles
-        val sCount = if (titlesEnabled) stepsCount + 1 else stepsCount
         val wMode = MeasureSpec.getMode(widthMeasureSpec)
-        val arcsCount = stepsCount - 1
-        val allArcsWidth = (width - sCount * nodeSize)
+        val arcsCount = beansList.lastIndex
+        val allArcsWidth = (width - beansList.size + 1 * nodeSize)
         val isArcsWidthAppropriate = allArcsWidth <= width * arcsMaxRatio
         return if (isArcsWidthAppropriate || (!isArcsWidthAppropriate && wMode == MeasureSpec.EXACTLY)) {
             allArcsWidth / arcsCount
@@ -279,22 +264,14 @@ class StepProgressView : ViewGroup, IStepProgress {
 
     private fun nodeSizeFits(width: Int, desiredSize: Int): Boolean {
         //include padding for titles
-        val sCount = if (titlesEnabled) {
-            stepsCount + 1
-        } else {
-            stepsCount
-        }
-        return (width - desiredSize * sCount) >= minSpacingLength * (stepsCount - 1)
+        val sCount = beansList.size + 1
+        return (width - desiredSize * sCount) >= minSpacingLength * beansList.lastIndex
     }
 
     private fun maximalNodeSize(width: Int): Int {
         //include padding for titles
-        val sCount = if (titlesEnabled) {
-            stepsCount + 1
-        } else {
-            stepsCount
-        }
-        return (width - minSpacingLength * (stepsCount - 1)) / sCount
+        val sCount = beansList.size + 1
+        return (width - minSpacingLength * beansList.lastIndex) / sCount
     }
 
     //Arranges all created views in a proper order from left to right
@@ -351,7 +328,7 @@ class StepProgressView : ViewGroup, IStepProgress {
 
     private fun textViewForStepTitle(stepPosition: Int): TextView {
         return TextView(context).apply {
-            text = titles[stepPosition]
+            text = beansList[stepPosition].title
             gravity = Gravity.TOP or Gravity.CENTER
             layoutParams = getDefaultElementLayoutParams()
             setTextSize(TypedValue.COMPLEX_UNIT_PX, textNodeTitleSize.toFloat())
@@ -386,10 +363,11 @@ class StepProgressView : ViewGroup, IStepProgress {
 
     private fun changeStepStateView(stepNumber: Int, newState: StepState) {
         findViewWithTag<TextView>(NODE_TAG_PREFIX + stepNumber)?.let {
-            when (newState) {
-                StepState.DONE -> it.background = doneDrawable
-                StepState.CURRENT -> it.background = currentDrawable
-                else -> it.background = undoneDrawable
+            it.background = when (newState) {
+                StepState.DONE -> doneDrawable
+                StepState.DONE_WARNING -> doneWarningDrawable
+                StepState.CURRENT -> currentDrawable
+                else -> undoneDrawable
             }
         }
     }
@@ -404,180 +382,26 @@ class StepProgressView : ViewGroup, IStepProgress {
         }
     }
 
-    fun setCurrentStep(currentStep: Int) {
-        stepProgress.setCurrentStep(currentStep)
-    }
-
-    /**
-     * Set number of steps for progress
-     * @param stepsCount steps number
-     */
-    @Throws(IllegalStateException::class)
-    override fun setStepsCount(stepsCount: Int) {
-        if (stepsCount < 0) {
-            throw IllegalStateException("Steps count can't be a negative number")
-        }
-        this.stepsCount = stepsCount
-        if (titles.size != stepsCount) {
-            titles = getDefaultTitles()
-        }
-        resetView()
-        invalidate()
-    }
-
-    /**
-     * Go to next step
-     * @param isCurrentDone if true marks current selected step as done
-     * @return true if all steps are finished
-     */
-    override fun nextStep(isCurrentDone: Boolean): Boolean {
-        return stepProgress.nextStep(isCurrentDone) == 1
-    }
-
-    /**
-     * Mark current selected step as done
-     */
-    override fun markCurrentAsDone() {
-        stepProgress.markCurrentStepDone()
-    }
-
-    /**
-     * Set title for each step
-     * @param titles list of titles to apply to step views. Size should be the same as steps count
-     */
-    override fun setStepTitles(titles: List<String>) {
-        this.titles = titles
-        this.stepsCount = titles.size
-        resetView()
-        invalidate()
-    }
-
-    /**
-     * Checks if step is finished
-     * @param stepPosition step position to check
-     */
-    override fun isStepDone(stepPosition: Int): Boolean {
-        return stepProgress.isStepDone(stepPosition)
-    }
-
-    /**
-     * Checks if all steps of a progress are finished
-     * @return true if all steps marked as finished
-     */
-    override fun isProgressFinished(): Boolean {
-        return stepProgress.isAllDone()
-    }
-
-    private fun getDefaultTitles(): List<String> {
-        return mutableListOf<String>().apply {
-            for (i in 0 until stepsCount) {
-                when (i) {
-                    0 -> add("C")
-                    in 1 until stepsCount - 1 -> {
-                        add("${i + 1}")
-                    }
-                    stepsCount - 1 -> {
-                        add("Ф")
-                    }
-                }
-            }
-        }
-    }
-
-    private fun resetView() {
-        stepProgress.reset()
+    fun setStepBean(beans: List<Bean>) {
+        this.beansList = beans
         createViews()
+        beans.forEachIndexed { index, bean ->
+            changeStepStateView(index, bean.state)
+            if (bean.state == StepState.CURRENT) {
+                currentStep = index
+            }
+            if(index < beansList.lastIndex - 1){
+                animateProgressArc(index, isAllPreviousDone(index))
+            }
+        }
     }
 
-    private inner class StepProgress {
-
-        private var currentStep = 0
-
-        private var stepsStates: Array<StepState> = getInitialStepProgress()
-
-        fun reset() {
-            currentStep = 0
-            stepsStates = getInitialStepProgress()
+    private fun isAllPreviousDone(index: Int): Boolean{
+        for (i in 0..index + 1) {
+            val state = beansList[i].state
+            if(!(state == StepState.CURRENT || state == StepState.DONE)) return false
         }
-
-        private fun getInitialStepProgress(): Array<StepState> {
-            return Array(stepsCount) {
-                if (it == 0) {
-                    StepState.CURRENT
-                } else {
-                    StepState.UNDONE
-                }
-            }
-        }
-
-        fun setCurrentStep(stepNumber: Int) {
-            if (stepNumber == currentStep) {
-                return
-            }
-            currentStep = stepNumber
-            for (i in 0 until stepsCount) {
-                val stepState = when {
-                    i == currentStep -> StepState.CURRENT
-                    i < currentStep -> StepState.DONE
-                    else -> StepState.UNDONE
-                }
-                changeStepState(i, stepState)
-            }
-
-            for (i in 0..stepsStates.size - 2) {
-                if ( i < currentStep) {
-                    animateProgressArc(i, true)
-                } else {
-                    animateProgressArc(i, false)
-                }
-            }
-        }
-
-        fun nextStep(isCurrentDone: Boolean): Int {
-            if (isAllDone()) {
-                return 1
-            }
-            val nextStep = currentStep + 1
-            if (isCurrentDone) {
-                changeStepState(currentStep, StepState.DONE)
-            }
-            if (nextStep < stepsCount) {
-                changeStepState(nextStep, StepState.CURRENT)
-                currentStep = nextStep
-            }
-            return if (isAllDone()) 1 else 0
-        }
-
-        fun markCurrentStepDone() {
-            if (isStepDone()) {
-                return
-            }
-            changeStepState(currentStep, StepState.DONE)
-        }
-
-        fun isStepDone(stepNumber: Int = -1): Boolean {
-            val stepState = if (stepNumber == -1) {
-                stepsStates[currentStep]
-            } else {
-                stepsStates[stepNumber]
-            }
-            return stepState == StepState.DONE
-        }
-
-        private fun changeStepState(stepNumber: Int, newState: StepState) {
-            stepsStates[stepNumber] = newState
-            changeStepStateView(stepNumber, newState)
-        }
-
-        fun isAllDone(): Boolean {
-            stepsStates.forEach {
-                if (it == StepState.UNDONE || it == StepState.CURRENT) {
-                    return false
-                }
-            }
-            return true
-        }
-
+        return true
     }
 
     companion object {

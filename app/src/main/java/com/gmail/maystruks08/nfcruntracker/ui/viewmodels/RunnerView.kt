@@ -1,6 +1,7 @@
 package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
 
 import android.os.Parcelable
+import com.gmail.maystruks08.nfcruntracker.ui.stepview.Bean
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -11,6 +12,6 @@ data class RunnerView(
     val city: String,
     val result: String?,
     val dateOfBirthday: String,
-    val isIron: Boolean,
-    val currentPosition: Int
+    val type: Int,
+    val progress: List<CheckpointView>
 ) : Parcelable

@@ -11,8 +11,8 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
 
     private var onRunnerChanged: ((ResultOfTask<Exception, RunnerChange>) -> Unit)? = null
 
-    override suspend fun getRunner(id: String): ResultOfTask<Exception, Runner> {
-        val runner = runnersRepository.getRunnerById(id) ?: return ResultOfTask.build { throw RunnerNotFoundException() }
+    override suspend fun getRunner(id: String, type: RunnerType): ResultOfTask<Exception, Runner> {
+        val runner = runnersRepository.getRunnerById(id, type) ?: return ResultOfTask.build { throw RunnerNotFoundException() }
         return ResultOfTask.build { runner }
     }
 
@@ -40,8 +40,8 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
         }
     }
 
-    override suspend fun addCurrentCheckpointToRunner(cardId: String): ResultOfTask<Exception, RunnerChange> {
-        val runner = runnersRepository.getRunnerById(cardId) ?: return ResultOfTask.build { throw RunnerNotFoundException() }
+    override suspend fun addCurrentCheckpointToRunner(cardId: String, type: RunnerType ): ResultOfTask<Exception, RunnerChange> {
+        val runner = runnersRepository.getRunnerById(cardId, type) ?: return ResultOfTask.build { throw RunnerNotFoundException() }
         val currentCheckpoint = runnersRepository.getCurrentCheckpoint(runner.type)
         val checkpointsCount = runnersRepository.getCheckpointsCount(runner.type)
         runner.addPassedCheckpoint(CheckpointResult(currentCheckpoint.id, currentCheckpoint.name, Date()), checkpointsCount)
@@ -49,8 +49,8 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
         return ResultOfTask.build { RunnerChange(updatedRunner, Change.UPDATE) }
     }
 
-    override suspend fun removeCheckpointForRunner(cardId: String, checkpointId: Int): ResultOfTask<Exception, RunnerChange> {
-        val runner = runnersRepository.getRunnerById(cardId) ?: return ResultOfTask.build { throw RunnerNotFoundException() }
+    override suspend fun removeCheckpointForRunner(cardId: String, checkpointId: Int, type: RunnerType): ResultOfTask<Exception, RunnerChange> {
+        val runner = runnersRepository.getRunnerById(cardId, type) ?: return ResultOfTask.build { throw RunnerNotFoundException() }
         runner.removeCheckpoint(checkpointId)
         val updatedRunner = runnersRepository.updateRunnerData(runner) ?: return ResultOfTask.build { throw SaveRunnerDataException() }
         return ResultOfTask.build { RunnerChange(updatedRunner, Change.UPDATE) }

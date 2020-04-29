@@ -18,5 +18,6 @@ import java.util.*
 data class ResultTable(
     val runnerId: String,
     val checkpointId: Int,
-    val time: Date? = null
+    val time: Date?,
+    var hasPrevious: Boolean
 )
