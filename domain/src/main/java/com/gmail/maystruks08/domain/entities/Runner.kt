@@ -21,6 +21,10 @@ data class Runner(
      * If previous checkpoint is absent -> mark current checkpoint as hasPrevious = false
      */
     fun addPassedCheckpoint(checkpoint: CheckpointResult, finishCheckpointId: Int, isRestart: Boolean = false) {
+        val indexOfExistingElement = checkpoints.indexOfFirst { it.id == checkpoint.id && it.type == checkpoint.type }
+        if(indexOfExistingElement != -1){
+            checkpoints.removeAt(indexOfExistingElement)
+        }
         val lastCheckpoint = checkpoints.lastOrNull()
         if (!isRestart) {
             if (lastCheckpoint?.id != checkpoint.id - 1 || !lastCheckpoint.hasPrevious) {
