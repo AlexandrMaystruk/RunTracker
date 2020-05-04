@@ -3,12 +3,12 @@ package com.gmail.maystruks08.nfcruntracker.ui.settings
 import android.view.View
 import android.widget.AdapterView
 import androidx.lifecycle.Observer
+import com.gmail.maystruks08.domain.toDateTimeFormat
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
-import com.gmail.maystruks08.nfcruntracker.core.ext.toDateTimeFormat
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import kotlinx.android.synthetic.main.fragment_settings.*
 import java.util.*

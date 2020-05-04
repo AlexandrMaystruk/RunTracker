@@ -3,12 +3,14 @@ package com.gmail.maystruks08.nfcruntracker
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.gmail.maystruks08.domain.toDateTimeFormat
 import com.gmail.maystruks08.nfcruntracker.core.ext.getFragment
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.core.navigation.AppNavigator
@@ -19,6 +21,8 @@ import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.commands.Command
+import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 const val PRESS_TWICE_INTERVAL = 2000
@@ -107,6 +111,7 @@ class HostActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         nfcAdapter.processReadCard(intent)?.let { cardId ->
+            Timber.log(Log.INFO, "Card scanned: $cardId at ${Date().toDateTimeFormat()}")
             toast("Карта: $cardId")
             getFragment<RootRunnersFragment>(Screens.RootRunnersScreen.tag())?.onNfcCardScanned(cardId)
         }

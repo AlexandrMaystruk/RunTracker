@@ -1,24 +1,31 @@
 package com.gmail.maystruks08.data.mappers
 
 import com.gmail.maystruks08.data.local.entity.RunnerTable
-import com.gmail.maystruks08.data.local.pojo.ResultTableView
 import com.gmail.maystruks08.data.local.pojo.RunnerTableView
 import com.gmail.maystruks08.domain.entities.*
 
-fun RunnerTableView.toRunner(): Runner {
-    return Runner(
-        id = this.runnerTable.id,
-        number = this.runnerTable.number,
-        fullName = this.runnerTable.fullName,
-        city = this.runnerTable.city,
-        dateOfBirthday = this.runnerTable.dateOfBirthday,
-        type = RunnerType.fromOrdinal(this.runnerTable.type),
-        totalResult = this.runnerTable.totalResult,
-        checkpoints = this.checkpointsResultTable.mapNotNull {
-            it.resultTable.time ?: return@mapNotNull null
-            CheckpointResult(it.checkpointTable.id, it.checkpointTable.name, it.resultTable.time, hasPrevious = it.resultTable.hasPrevious)
-        }.toMutableList()
-    )
+fun List<RunnerTableView>.toRunners(): List<Runner> {
+    return this.groupBy { it.id }.map { entry ->
+        val runner = entry.value.first()
+         Runner(
+            id = runner.id,
+            number = runner.number,
+            fullName = runner.fullName,
+            city = runner.city,
+            dateOfBirthday = runner.dateOfBirthday,
+            type = RunnerType.fromOrdinal(runner.type),
+            totalResult = runner.totalResult,
+            checkpoints = entry.value.mapNotNull {
+                val date = it.time ?: return@mapNotNull null
+                CheckpointResult(
+                id = it.checkpointId,
+                name = it.name,
+                type = CheckpointType.fromOrdinal(it.type),
+                date = date,
+                hasPrevious = it.hasPrevious
+            ) }.toMutableList()
+        )
+    }
 }
 
 fun Runner.toRunnerTable(): RunnerTable {

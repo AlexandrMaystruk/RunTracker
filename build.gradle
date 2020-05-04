@@ -91,6 +91,9 @@ ext {
     //https://github.com/ShawnLin013/NumberPicker
     numberPickerVersion = '2.4.8'
 
+    //Timber for logs
+    timberVersion = '4.7.1'
+
     //Testing
     jUnitVersion = '4.13'
     mockitoKotlinVersion = '2.1.0'
@@ -119,7 +122,7 @@ ext {
             lifecycleLivedata  : "androidx.lifecycle:lifecycle-livedata-ktx:$livedataVersion",
             lifecycleViewmodel : "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion",
             numberPicker       : "com.shawnlin:number-picker:${numberPickerVersion}",
-
+            timber             : "com.jakewharton.timber:timber:${timberVersion}"
     ]
 
     presentationTestDependencies = [
@@ -153,7 +156,8 @@ ext {
             corutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutinesVersion}",
             firebaseUi      : "com.firebaseui:firebase-ui-auth:${firebaseUiVersion}",
             firebaseAuth    : "com.google.firebase:firebase-auth:${firebaseAuthVersion}",
-            firestore       : "com.google.firebase:firebase-firestore:${firestoreVersion}"
+            firestore       : "com.google.firebase:firebase-firestore:${firestoreVersion}",
+            timber          : "com.jakewharton.timber:timber:${timberVersion}"
     ]
 
     dataTestDependencies = [

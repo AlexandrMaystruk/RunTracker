@@ -2,7 +2,6 @@ package com.gmail.maystruks08.nfcruntracker.ui.login
 
 import android.app.Activity
 import android.content.Intent
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.firebase.ui.auth.IdpResponse
@@ -30,15 +29,11 @@ class LoginViewModel @Inject constructor(
         if (FirebaseAuth.getInstance().currentUser == null) {
             startAuthFlowLiveData.postValue(0)
         } else {
-            viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-                    try {
-                        settingsRepository.updateConfig()
-                    } catch (e: Exception) {
-                        Log.e("LoginViewModel", e.toString())
-                    }
+            viewModelScope.launch(Dispatchers.IO) {
+                settingsRepository.updateConfig()
+                withContext(Dispatchers.Main){
+                    router.newRootScreen(Screens.RootRunnersScreen())
                 }
-                router.newRootScreen(Screens.RootRunnersScreen())
             }
         }
     }

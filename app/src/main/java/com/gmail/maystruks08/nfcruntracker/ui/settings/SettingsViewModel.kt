@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.firebase.ui.auth.AuthUI
+import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.bus.StartRunTrackerBus
@@ -37,12 +38,9 @@ class SettingsViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            try {
-                repository.updateConfig()?.let { newConfig ->
-                    configLiveData.value = newConfig
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            when (val resultOfTask = repository.updateConfig()) {
+                is ResultOfTask.Value -> configLiveData.value = resultOfTask.value
+                is ResultOfTask.Error -> resultOfTask.error.printStackTrace()
             }
         }
     }
@@ -54,7 +52,7 @@ class SettingsViewModel @Inject constructor(
     fun onCurrentCheckpointChangedForRunners(checkpointNumber: Int) {
         if (!isFirstStart) {
             viewModelScope.launch {
-                repository.changeCurrentCheckpointForRunners(checkpointNumber)
+                repository.changeCurrentCheckpoint(checkpointNumber)
                 toastLiveData.postValue("Settings changed")
             }
         }

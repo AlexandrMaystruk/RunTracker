@@ -11,6 +11,8 @@ import com.gmail.maystruks08.nfcruntracker.core.di.runners.result.RunnersResultC
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.root.RootRunnersComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.runner.RunnerComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.settings.SettingsComponent
+import com.gmail.maystruks08.nfcruntracker.utils.TimberFileTree
+import timber.log.Timber
 
 class App : Application() {
 
@@ -101,6 +103,13 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        Timber.plant(TimberFileTree(this))
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
+
         baseComponent = DaggerBaseComponent
             .builder()
             .appModule(AppModule(this))

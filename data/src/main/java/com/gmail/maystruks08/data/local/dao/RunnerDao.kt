@@ -28,11 +28,11 @@ interface RunnerDao :
     }
 
     @Transaction
-    @Query("SELECT * FROM runners WHERE type =:type")
+    @Query("SELECT runners.id, runners.number, runners.fullName, runners.city, runners.dateOfBirthday, runners.type,  runners.totalResult, runners.needToSync, checkpoints.checkpointId, checkpoints.name, result.hasPrevious, result.time FROM runners LEFT JOIN result ON runners.id = result.runnerId LEFT JOIN checkpoints ON checkpoints.checkpointId = result.checkpointId WHERE runners.type =:type")
     suspend fun getRunners(type: Int): List<RunnerTableView>
 
     @Transaction
-    @Query("SELECT * FROM runners WHERE totalResult IS NOT NULL")
+    @Query("SELECT runners.id, runners.number, runners.fullName, runners.city, runners.dateOfBirthday, runners.type,  runners.totalResult, runners.needToSync, checkpoints.checkpointId, checkpoints.name, result.hasPrevious, result.time FROM runners LEFT JOIN result ON runners.id = result.runnerId LEFT JOIN checkpoints ON checkpoints.checkpointId = result.checkpointId WHERE totalResult IS NOT NULL")
     suspend fun getRunnersFinishers(): List<RunnerTableView>
 
     @Query("UPDATE runners SET needToSync = :needToSync WHERE id = :runnerId")

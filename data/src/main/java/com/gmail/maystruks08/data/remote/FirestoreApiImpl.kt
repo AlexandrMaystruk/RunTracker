@@ -1,6 +1,8 @@
 package com.gmail.maystruks08.data.remote
 
 import com.gmail.maystruks08.data.awaitTaskCompletable
+import com.gmail.maystruks08.data.serializeToMap
+import com.gmail.maystruks08.domain.entities.Checkpoint
 import com.gmail.maystruks08.domain.entities.Runner
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.android.gms.tasks.Task
@@ -12,7 +14,30 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
 
     private var registration: ListenerRegistration? = null
 
-    private val startDateDocumentName = "start_date"
+    companion object{
+
+        private const val START_DATE_DOCUMENT_NAME = "start_date"
+
+        private const val CHECKPOINTS_DOCUMENT_NAME = "checkpoints"
+
+    }
+
+    override suspend fun getCheckpoints(): Task<DocumentSnapshot> = db.collection("settings").document(CHECKPOINTS_DOCUMENT_NAME).get()
+
+    override suspend fun saveCheckpoints(checkpoints: List<Checkpoint>){
+        val document = db.collection("settings").document(CHECKPOINTS_DOCUMENT_NAME)
+        val map = hashMapOf<String, Any>()
+            .apply {
+                checkpoints.forEachIndexed { index, checkpoint ->
+                    this[index.toString()] = checkpoint.serializeToMap()
+                }
+            }
+        try {
+            awaitTaskCompletable(document.update(map))
+        } catch (e: FirebaseFirestoreException) {
+            awaitTaskCompletable(document.set(map))
+        }
+    }
 
 
     override suspend fun getCheckpointsSettings(clientId: String): Task<DocumentSnapshot> = db.collection("settings").document(clientId).get()
@@ -38,7 +63,7 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
     }
 
     override suspend fun saveDateOfStart(date: Date) {
-        val document = db.collection("settings").document(startDateDocumentName)
+        val document = db.collection("settings").document(START_DATE_DOCUMENT_NAME)
         try {
             awaitTaskCompletable(document.update("Start at", date))
         } catch (e: FirebaseFirestoreException) {
@@ -46,7 +71,7 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
         }
     }
 
-    override suspend fun getDateOfStart(): Task<DocumentSnapshot> = db.collection("settings").document(startDateDocumentName).get()
+    override suspend fun getDateOfStart(): Task<DocumentSnapshot> = db.collection("settings").document(START_DATE_DOCUMENT_NAME).get()
 
     override suspend fun updateRunner(runner: Runner): Task<Void> = db.collection("runners").document(runner.id).set(runner)
 

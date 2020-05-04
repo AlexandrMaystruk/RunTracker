@@ -53,6 +53,8 @@ dependencies {
     implementation dataDependencies.itextpdf
     implementation dataDependencies.corutinesCore
     implementation dataDependencies.corutinesAndroid
+    implementation dataDependencies.timber
+
 
     compileOnly dataDependencies.javaxInject
     compileOnly dataDependencies.javaxAnnotation

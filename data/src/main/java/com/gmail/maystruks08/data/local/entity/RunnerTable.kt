@@ -1,10 +1,14 @@
 package com.gmail.maystruks08.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.util.*
 
-@Entity(tableName = "runners")
+@Entity(
+    tableName = "runners",
+    indices = [Index(value = arrayOf("id"), unique = true)]
+)
 data class RunnerTable(
     @PrimaryKey
     val id: String,

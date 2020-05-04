@@ -4,12 +4,12 @@ import android.app.DatePickerDialog
 import androidx.lifecycle.Observer
 import com.gmail.maystruks08.domain.entities.RunnerSex
 import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.toDateFormat
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
-import com.gmail.maystruks08.nfcruntracker.core.ext.toDateFormat
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import kotlinx.android.synthetic.main.fragment_register_new_runner.*
 import java.util.*

@@ -1,15 +1,18 @@
 package com.gmail.maystruks08.data.local.entity
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.Index
 import java.util.*
 
-@Entity(tableName = "checkpoints")
+@Entity(
+    tableName = "checkpoints",
+    primaryKeys = ["checkpointId", "checkpointType"],
+    indices = [Index(value = arrayOf("checkpointId"))]
+)
 data class CheckpointTable(
-    @PrimaryKey
-    val id: Int,
+    val checkpointId: Int,
+    val checkpointType: Int,
     val name: String,
-    val type: Int,
     val startWorkingTime: Date? = null,
     val finishWorkingTime: Date? = null
 )

@@ -95,9 +95,9 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
 
     private fun handleError(e: Exception) {
         when(e){
-            is SaveRunnerDataException -> {}
-            is RunnerNotFoundException -> {}
-            is SyncWithServerException -> {}
+            is SaveRunnerDataException -> toastLiveData.postValue("Не удалось сохранить данные участника:" + e.message)
+            is RunnerNotFoundException -> toastLiveData.postValue("Участник не найден")
+            is SyncWithServerException -> toastLiveData.postValue("Данные не сохранились на сервер")
             else -> e.printStackTrace()
         }
     }

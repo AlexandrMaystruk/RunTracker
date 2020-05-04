@@ -3,6 +3,7 @@ package com.gmail.maystruks08.nfcruntracker.core.di
 import android.content.Context
 import androidx.room.Room
 import com.gmail.maystruks08.data.local.AppDatabase
+import com.gmail.maystruks08.data.local.dao.CheckpointDAO
 import com.gmail.maystruks08.data.local.dao.RunnerDao
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.data.remote.FirestoreApiImpl
@@ -25,6 +26,11 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun userDao(appDatabase: AppDatabase): RunnerDao = appDatabase.runnerDao()
+
+    @JvmStatic
+    @Provides
+    @Singleton
+    fun provideCheckpointDao (appDatabase: AppDatabase): CheckpointDAO = appDatabase.checkpointDao()
 
     @JvmStatic
     @Provides

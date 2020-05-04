@@ -7,8 +7,11 @@ import com.gmail.maystruks08.data.local.entity.CheckpointTable
 @Dao
 interface CheckpointDAO : BaseDao<CheckpointTable> {
 
-    @Query("SELECT * FROM checkpoints WHERE type =:type")
-    suspend fun getCheckpointsByType(type: Int): List<CheckpointTable>
+    @Query("SELECT * FROM checkpoints WHERE checkpointType =:type")
+    fun getCheckpointsByType(type: Int): List<CheckpointTable>
+
+    @Query("DELETE FROM checkpoints")
+    fun deleteCheckpoints()
 
 }
 

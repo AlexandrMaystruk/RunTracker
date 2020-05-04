@@ -1,6 +1,8 @@
 package com.gmail.maystruks08.domain.repository
 
 import com.gmail.maystruks08.domain.entities.*
+import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
+import com.gmail.maystruks08.domain.exception.SyncWithServerException
 
 interface RunnersRepository {
 
@@ -18,7 +20,8 @@ interface RunnersRepository {
 
     suspend fun getRunnerById(cardId: String, type: RunnerType): Runner?
 
-    suspend fun updateRunnerData(runner: Runner): Runner?
+    @Throws(SaveRunnerDataException::class, SyncWithServerException::class)
+    suspend fun updateRunnerData(runner: Runner): Runner
 
     /** return pair with runner checkpoint and iron people checkpoint*/
     suspend fun getStartCheckpoints(): Pair<List<Checkpoint>, List<Checkpoint>>

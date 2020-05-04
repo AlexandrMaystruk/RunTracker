@@ -1,19 +1,25 @@
 package com.gmail.maystruks08.data.repository
 
+import android.database.sqlite.SQLiteException
+import android.util.Log
 import com.gmail.maystruks08.data.awaitTaskCompletable
 import com.gmail.maystruks08.data.cache.RunnersCache
 import com.gmail.maystruks08.data.cache.SettingsCache
 import com.gmail.maystruks08.data.local.dao.RunnerDao
 import com.gmail.maystruks08.data.mappers.toResultTable
-import com.gmail.maystruks08.data.mappers.toRunner
 import com.gmail.maystruks08.data.mappers.toRunnerTable
+import com.gmail.maystruks08.data.mappers.toRunners
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.domain.entities.*
+import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
+import com.gmail.maystruks08.domain.toDateTimeShortFormat
 import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -25,63 +31,47 @@ class RunnersRepositoryImpl @Inject constructor(
 ) : RunnersRepository {
 
     override suspend fun getRunners(type: RunnerType): ResultOfTask<Exception, List<Runner>> {
-        return try {
-            ResultOfTask.build {
-                when (type) {
-                    RunnerType.NORMAL -> getNormalRunners()
-                    RunnerType.IRON -> getIronRunners()
-                }
+        return ResultOfTask.build {
+            when (type) {
+                RunnerType.NORMAL -> getNormalRunners()
+                RunnerType.IRON -> getIronRunners()
             }
-        } catch (e: Exception) {
-            ResultOfTask.build { throw e }
         }
     }
 
     override suspend fun getNormalRunners(): List<Runner> {
-        return if (runnersCache.normalRunnersList.isNotEmpty()) {
-            runnersCache.normalRunnersList
-        } else {
-            val runners = runnerDao.getRunners(RunnerType.NORMAL.ordinal).map { it.toRunner() }
-            runnersCache.normalRunnersList = runners.toMutableList()
-            runnersCache.normalRunnersList
+        if (runnersCache.normalRunnersList.isEmpty()) {
+            val runners = runnerDao.getRunners(RunnerType.NORMAL.ordinal)
+            runnersCache.normalRunnersList = runners.toRunners().toMutableList()
         }
+        return runnersCache.normalRunnersList
     }
 
     override suspend fun getIronRunners(): List<Runner> {
-        return if (runnersCache.ironRunnersList.isNotEmpty()) {
-            runnersCache.ironRunnersList
-        } else {
-            val runners = runnerDao.getRunners(RunnerType.IRON.ordinal).map { it.toRunner() }
-            runnersCache.ironRunnersList = runners.toMutableList()
-            runnersCache.ironRunnersList
+        if (runnersCache.ironRunnersList.isEmpty()) {
+            val runners = runnerDao.getRunners(RunnerType.IRON.ordinal)
+            runnersCache.ironRunnersList = runners.toRunners().toMutableList()
         }
+        return runnersCache.ironRunnersList
     }
 
     override suspend fun getRunnerFinishers(): ResultOfTask<Exception, List<Runner>> {
-        return try {
+        return ResultOfTask.build {
             if (runnersCache.normalRunnersList.isNotEmpty()) {
-                val result = runnersCache.normalRunnersList.filter { it.totalResult != null }
-                ResultOfTask.build { result }
+                runnersCache.normalRunnersList.filter { it.totalResult != null }
             } else {
-                val finishers = runnerDao.getRunnersFinishers().map { it.toRunner() }
-                ResultOfTask.build { finishers }
+                runnerDao.getRunnersFinishers().toRunners().toMutableList()
             }
-        } catch (e: Exception) {
-            ResultOfTask.build { throw e }
         }
     }
 
     override suspend fun getIronRunnerFinishers(): ResultOfTask<Exception, List<Runner>> {
-        return try {
+        return ResultOfTask.build {
             if (runnersCache.ironRunnersList.isNotEmpty()) {
-                val result = runnersCache.ironRunnersList.filter { it.totalResult != null }
-                ResultOfTask.build { result }
+                runnersCache.ironRunnersList.filter { it.totalResult != null }
             } else {
-                val finishers = runnerDao.getRunnersFinishers().map { it.toRunner() }
-                ResultOfTask.build { finishers }
+                runnerDao.getRunnersFinishers().toRunners().toMutableList()
             }
-        } catch (e: Exception) {
-            ResultOfTask.build { throw e }
         }
     }
 
@@ -121,20 +111,27 @@ class RunnersRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateRunnerData(runner: Runner): Runner? {
-        return try {
+    override suspend fun updateRunnerData(runner: Runner): Runner {
+        try {
+            Timber.log(Log.INFO, "Saving runner data: ${runner.id} checkpoints:${runner.checkpoints.map { "${it.name} ${it.date.toDateTimeShortFormat()}" }}")
             runnerDao.updateRunner(runner.toRunnerTable(), runner.checkpoints.map { it.toResultTable(runnerId = runner.id) })
-            awaitTaskCompletable(firestoreApi.updateRunner(runner))
-
             val index = runnersCache.getRunnerList(runner.type).indexOfFirst { it.id == runner.id }
             if (index != -1) runnersCache.getRunnerList(runner.type).removeAt(index)
             runnersCache.getRunnerList(runner.type).add(runner)
-            runner
-        } catch (e: Exception) {
+        } catch (e: SQLiteException) {
+            Timber.e(e,  "Saving runner ${runner.id} data to room error")
+            e.printStackTrace()
+            throw SaveRunnerDataException(runner.fullName)
+        }
+        try {
+            awaitTaskCompletable(firestoreApi.updateRunner(runner))
+        } catch (e: FirebaseFirestoreException) {
+            Timber.e(e, "Saving runner ${runner.id} data to firestore error")
             e.printStackTrace()
             runnerDao.markAsNeedToSync(runner.id, true)
-            runner
+            throw SyncWithServerException()
         }
+        return runner
     }
 
     override suspend fun getStartCheckpoints(): Pair<List<Checkpoint>, List<Checkpoint>> =
