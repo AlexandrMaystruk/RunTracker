@@ -10,7 +10,9 @@ import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.bus.StartRunTrackerBus
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.terrakok.cicerone.Router
 import java.util.*
 import javax.inject.Inject
@@ -37,9 +39,9 @@ class SettingsViewModel @Inject constructor(
             configLiveData.value = config
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             when (val resultOfTask = repository.updateConfig()) {
-                is ResultOfTask.Value -> configLiveData.value = resultOfTask.value
+                is ResultOfTask.Value -> configLiveData.postValue(resultOfTask.value)
                 is ResultOfTask.Error -> resultOfTask.error.printStackTrace()
             }
         }

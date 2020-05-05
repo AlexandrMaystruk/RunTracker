@@ -14,15 +14,14 @@ data class Runner(
     val checkpoints: MutableList<CheckpointResult> = mutableListOf()
 ) {
 
-    fun getCurrentPosition(): CheckpointResult? = checkpoints.lastOrNull()
-
     /**
      * Add checkpoint to runner entity
      * If previous checkpoint is absent -> mark current checkpoint as hasPrevious = false
+     * If checkpoint with current checkpoint id already exist -> remove old checkpoint and add new
      */
-    fun addPassedCheckpoint(checkpoint: CheckpointResult, finishCheckpointId: Int, isRestart: Boolean = false) {
+    fun addPassedCheckpoint(checkpoint: CheckpointResult, checkpointsCount: Int, isRestart: Boolean = false) {
         val indexOfExistingElement = checkpoints.indexOfFirst { it.id == checkpoint.id && it.type == checkpoint.type }
-        if(indexOfExistingElement != -1){
+        if (indexOfExistingElement != -1) {
             checkpoints.removeAt(indexOfExistingElement)
         }
         val lastCheckpoint = checkpoints.lastOrNull()
@@ -30,15 +29,25 @@ data class Runner(
             if (lastCheckpoint?.id != checkpoint.id - 1 || !lastCheckpoint.hasPrevious) {
                 checkpoint.hasPrevious = false
             }
-            if (checkpoint.id == finishCheckpointId) {
+            checkpoints.add(checkpoint)
+            if (checkpoints.size == checkpointsCount) {
                 totalResult = calculateTotalResult()
             }
         } else {
             checkpoints.clear()
             totalResult = null
+            checkpoints.add(checkpoint)
         }
-        checkpoints.add(checkpoint)
+        checkpoints.sortBy { it.id }
+        for (index in 0 until checkpoints.lastIndex) {
+            val current = checkpoints[index]
+            val next = checkpoints[index + 1]
+            if (current.id == next.id - 1) {
+                checkpoints[index].hasPrevious = true
+            } else return
+        }
     }
+
 
     fun removeCheckpoint(checkpointId: Int) {
         val index = checkpoints.indexOfFirst { it.id == checkpointId }

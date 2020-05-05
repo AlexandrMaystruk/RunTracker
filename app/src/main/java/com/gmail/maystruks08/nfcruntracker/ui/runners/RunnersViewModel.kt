@@ -43,7 +43,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
 
     fun onNfcCardScanned(cardId: String) {
         viewModelScope.launch {
-            when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(cardId, runnerType)) {
+            when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(cardId)) {
                 is ResultOfTask.Value -> handleRunnerChanges(onResult.value)
                 is ResultOfTask.Error -> handleError(onResult.error)
             }

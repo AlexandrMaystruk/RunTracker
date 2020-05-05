@@ -58,8 +58,7 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
                     awaitTaskCompletable(document.set(mutableMapOf("checkpointIronPeopleId" to FirestoreApi.Integer(config.checkpointIronPeopleId))))
                 }
             }
-        }
-        throw Exception("Checkpoint ids is empty")
+        } else  throw Exception("Checkpoint ids is empty")
     }
 
     override suspend fun saveDateOfStart(date: Date) {

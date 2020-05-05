@@ -37,7 +37,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
 
     override fun bindViewModel() {
         val titles = if (runnerType == RunnerType.NORMAL.ordinal) R.array.checkpoints else R.array.iron_people_checkpoints
-        viewModel.onShowRunnerClicked(runnerId, runnerType, resources.getStringArray(titles))
+        viewModel.onShowRunnerClicked(runnerId, resources.getStringArray(titles))
 
         viewModel.runner.observe(viewLifecycleOwner, Observer { runner ->
             val numberStr = "#" + runner.number
@@ -63,7 +63,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
                 .setTitle("Внимание!")
                 .setMessage("Отметить участника на КП без карты?")
                 .setPositiveButton(android.R.string.yes) { _, _ ->
-                    viewModel.markCheckpointAsPassed(runnerId, runnerType)
+                    viewModel.markCheckpointAsPassed(runnerId)
                     alertDialog?.dismiss()
                 }
                 .setNegativeButton(android.R.string.no) { _, _ ->
@@ -84,7 +84,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
             .setTitle("Внимание!")
             .setMessage("Удалить участнику прохождение текущего КП?")
             .setPositiveButton(android.R.string.yes) { _, _ ->
-                viewModel.deleteCheckpointFromRunner(runnerId, runnerType, checkpointId)
+                viewModel.deleteCheckpointFromRunner(runnerId, checkpointId)
                 alertDialog?.dismiss()
             }
             .setNegativeButton(android.R.string.no) { _, _ ->

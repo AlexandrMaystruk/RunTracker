@@ -31,8 +31,8 @@ class SettingsRepositoryImpl @Inject constructor(
                 val checkpoints = hashMap.values
                 checkpointDAO.deleteCheckpoints()
                 checkpointDAO.insertAllOrReplace(checkpoints.map { it.toCheckpointTable() })
-                settingsCache.checkpoints = checkpoints.filter { it.type == CheckpointType.NORMAL }
-                settingsCache.checkpointsIronPeople = checkpoints.filter { it.type == CheckpointType.IRON }
+                settingsCache.checkpoints = checkpoints.filter { it.type == CheckpointType.NORMAL }.sortedBy { it.id }
+                settingsCache.checkpointsIronPeople = checkpoints.filter { it.type == CheckpointType.IRON }.sortedBy { it.id }
             }
             firebaseAuth.currentUser?.uid?.let { currentUserId ->
                 val result = awaitTaskResult(firestoreApi.getCheckpointsSettings(currentUserId))

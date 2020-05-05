@@ -137,7 +137,7 @@ class RunnersRepositoryImpl @Inject constructor(
     override suspend fun getStartCheckpoints(): Pair<List<Checkpoint>, List<Checkpoint>> =
         settingsCache.checkpoints to settingsCache.checkpointsIronPeople
 
-    override suspend fun getRunnerById(cardId: String, type: RunnerType): Runner? =runnersCache.getRunnerList(type).find { it.id == cardId }
+    override suspend fun getRunnerById(cardId: String): Runner? = runnersCache.findRunner(cardId)
 
     override suspend fun getCurrentCheckpoint(type: RunnerType): Checkpoint = settingsCache.getCurrentCheckpoint(type)
 

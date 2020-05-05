@@ -2,8 +2,8 @@ package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
 
 import com.gmail.maystruks08.domain.entities.CheckpointResult
 import com.gmail.maystruks08.domain.entities.Runner
-import com.gmail.maystruks08.nfcruntracker.core.ext.toDateFormat
-import com.gmail.maystruks08.nfcruntracker.core.ext.toTimeUTCFormat
+import com.gmail.maystruks08.domain.toDateFormat
+import com.gmail.maystruks08.domain.toTimeUTCFormat
 import com.gmail.maystruks08.nfcruntracker.ui.stepview.Bean
 import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepState
 

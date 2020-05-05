@@ -26,10 +26,10 @@ class RunnerViewModel @Inject constructor(
 
     private lateinit var checkpointsTitles: Array<String>
 
-    fun onShowRunnerClicked(runnerId: String, runnerType: Int, titles: Array<String>) {
+    fun onShowRunnerClicked(runnerId: String, titles: Array<String>) {
         this.checkpointsTitles = titles
         viewModelScope.launch {
-            when (val onResult = runnersInteractor.getRunner(runnerId, RunnerType.fromOrdinal(runnerType))) {
+            when (val onResult = runnersInteractor.getRunner(runnerId)) {
                 is ResultOfTask.Value -> handleRunnerData(onResult.value)
                 is ResultOfTask.Error -> handleError(onResult.error)
             }
@@ -44,19 +44,19 @@ class RunnerViewModel @Inject constructor(
         }
     }
 
-    fun markCheckpointAsPassed(runnerId: String, runnerType: Int) {
+    fun markCheckpointAsPassed(runnerId: String) {
         viewModelScope.launch {
-            when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(runnerId, RunnerType.fromOrdinal(runnerType))) {
+            when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(runnerId)) {
                 is ResultOfTask.Value -> handleRunnerData(onResult.value.runner)
                 is ResultOfTask.Error -> handleError(onResult.error)
             }
         }
     }
 
-    fun deleteCheckpointFromRunner(runnerId: String, runnerType: Int,  checkpointId: Int) {
+    fun deleteCheckpointFromRunner(runnerId: String, checkpointId: Int) {
         viewModelScope.launch {
             when (val onResult =
-                runnersInteractor.removeCheckpointForRunner(runnerId, checkpointId, RunnerType.fromOrdinal(runnerType))) {
+                runnersInteractor.removeCheckpointForRunner(runnerId, checkpointId)) {
                 is ResultOfTask.Value -> handleRunnerData(onResult.value.runner)
                 is ResultOfTask.Error -> handleError(onResult.error)
             }
