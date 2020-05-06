@@ -4,6 +4,7 @@ import com.gmail.maystruks08.data.local.entity.CheckpointTable
 import com.gmail.maystruks08.data.local.entity.ResultTable
 import com.gmail.maystruks08.domain.entities.Checkpoint
 import com.gmail.maystruks08.domain.entities.CheckpointResult
+import com.gmail.maystruks08.domain.entities.CheckpointType
 
 fun CheckpointResult.toResultTable(runnerId: String): ResultTable {
     return ResultTable(
@@ -21,5 +22,13 @@ fun Checkpoint.toCheckpointTable(): CheckpointTable {
         this.name,
         null, //TODO implement
         null //TODO implement
+    )
+}
+
+fun CheckpointTable.toCheckpoint(): Checkpoint{
+    return Checkpoint(
+        this.checkpointId,
+        this.name,
+        CheckpointType.fromOrdinal(this.checkpointType)
     )
 }

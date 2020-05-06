@@ -87,23 +87,25 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
         }
 
         btnAddNewRunner.setOnClickListener {
-            if (etRunnerFullName.text.isNotEmpty() &&
-                runnerSex != null &&
-                runnerDateOfBirthday != null &&
-                !etRunnerNumber.text.isNullOrEmpty() &&
-                runnerType != null &&
-                runnerCardId != null
-            ) {
-                viewModel.onRegisterNewRunner(
-                    etRunnerFullName.text.toString(),
-                    runnerSex!!,
-                    runnerDateOfBirthday!!,
-                    etRunnerCity.text.toString(),
-                    etRunnerNumber.text.toString().toInt(),
-                    runnerType!!,
-                    runnerCardId!!
-                )
-            } else context?.toast("Заполните обязательные поля!")
+
+            viewModel.onRegisterNewRunner("asfas", RunnerSex.FEMALE, Date(), "",123, RunnerType.NORMAL, UUID.randomUUID().toString())
+//            if (etRunnerFullName.text.isNotEmpty() &&
+//                runnerSex != null &&
+//                runnerDateOfBirthday != null &&
+//                !etRunnerNumber.text.isNullOrEmpty() &&
+//                runnerType != null &&
+//                runnerCardId != null
+//            ) {
+//                viewModel.onRegisterNewRunner(
+//                    etRunnerFullName.text.toString(),
+//                    runnerSex!!,
+//                    runnerDateOfBirthday!!,
+//                    etRunnerCity.text.toString(),
+//                    etRunnerNumber.text.toString().toInt(),
+//                    runnerType!!,
+//                    runnerCardId!!
+//                )
+//            } else context?.toast("Заполните обязательные поля!")
         }
     }
 

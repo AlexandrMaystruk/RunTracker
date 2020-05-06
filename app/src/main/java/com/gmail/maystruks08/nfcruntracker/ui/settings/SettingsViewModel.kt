@@ -12,8 +12,8 @@ import com.gmail.maystruks08.nfcruntracker.core.bus.StartRunTrackerBus
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.terrakok.cicerone.Router
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -35,8 +35,12 @@ class SettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val config = repository.getConfig()
-            configLiveData.value = config
+            try {
+                val config = repository.getConfig()
+                configLiveData.value = config
+            } catch (e: Exception){
+                Timber.i("Get cached config error")
+            }
         }
 
         viewModelScope.launch(Dispatchers.IO) {

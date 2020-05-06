@@ -4,6 +4,8 @@ import com.gmail.maystruks08.domain.entities.*
 
 interface RegisterNewRunnersRepository {
 
-    suspend fun saveNewRunner(runner: Runner): ResultOfTask<Exception, Unit>
+    suspend fun saveNewRunner(runner: Runner)
+
+    suspend fun getCheckpoints(type: RunnerType): List<Checkpoint>
 
 }

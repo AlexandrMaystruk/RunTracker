@@ -1,22 +1,12 @@
 package com.gmail.maystruks08.data.local.pojo
 
-import java.util.*
+import com.gmail.maystruks08.data.local.entity.ResultTable
+import com.gmail.maystruks08.data.local.entity.RunnerTable
 
 data class RunnerTableView(
 
-    val id: String,
-    val number: Int,
-    val fullName: String,
-    val city: String,
-    val dateOfBirthday: Date,
-    val type: Int,
-    val totalResult: Date,
-    val needToSync: Boolean,
-
-    val name: String,
-    val checkpointId: Int,
-    val time: Date?,
-    var hasPrevious: Boolean
+    val runnerTable: RunnerTable,
+    val results: List<ResultTable>
 
 )
 

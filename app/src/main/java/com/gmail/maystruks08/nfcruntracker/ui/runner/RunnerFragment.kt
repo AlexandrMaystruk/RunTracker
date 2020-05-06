@@ -36,8 +36,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
         .build()
 
     override fun bindViewModel() {
-        val titles = if (runnerType == RunnerType.NORMAL.ordinal) R.array.checkpoints else R.array.iron_people_checkpoints
-        viewModel.onShowRunnerClicked(runnerId, resources.getStringArray(titles))
+        viewModel.onShowRunnerClicked(runnerId)
 
         viewModel.runner.observe(viewLifecycleOwner, Observer { runner ->
             val numberStr = "#" + runner.number

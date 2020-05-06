@@ -14,6 +14,7 @@ data class RunnerTable(
     val id: String,
     val number: Int,
     val fullName: String,
+    val sex: Int,
     val city: String,
     val dateOfBirthday: Date,
     val type: Int,

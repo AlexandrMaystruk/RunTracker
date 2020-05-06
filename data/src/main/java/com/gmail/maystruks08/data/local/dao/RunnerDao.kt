@@ -1,6 +1,7 @@
 package com.gmail.maystruks08.data.local.dao
 
 import androidx.room.*
+import com.gmail.maystruks08.data.local.entity.CheckpointTable
 import com.gmail.maystruks08.data.local.entity.ResultTable
 import com.gmail.maystruks08.data.local.entity.RunnerTable
 import com.gmail.maystruks08.data.local.pojo.RunnerTableView
@@ -10,52 +11,69 @@ interface RunnerDao :
     BaseDao<RunnerTable> {
 
     @Transaction
-    suspend fun insertOrReplaceRunner(runner: RunnerTable, results: List<ResultTable>) {
+    fun insertOrReplaceRunner(runner: RunnerTable, results: List<ResultTable>) {
         insertOrReplace(runner)
         insertAllOrReplaceCheckpoint(results)
     }
 
     @Transaction
-    suspend fun insertRunner(runner: RunnerTable, results: List<ResultTable>) {
+    fun insertRunner(runner: RunnerTable, results: List<ResultTable>) {
         insert(runner)
         insertAllCheckpoints(results)
     }
 
     @Transaction
-    suspend fun updateRunner(runner: RunnerTable, results: List<ResultTable>) {
+    fun updateRunner(runner: RunnerTable, results: List<ResultTable>) {
         update(runner)
         results.forEach { update(it) }
     }
 
     @Transaction
-    @Query("SELECT runners.id, runners.number, runners.fullName, runners.city, runners.dateOfBirthday, runners.type,  runners.totalResult, runners.needToSync, checkpoints.checkpointId, checkpoints.name, result.hasPrevious, result.time FROM runners LEFT JOIN result ON runners.id = result.runnerId LEFT JOIN checkpoints ON checkpoints.checkpointId = result.checkpointId WHERE runners.type =:type")
-    suspend fun getRunners(type: Int): List<RunnerTableView>
+    fun getRunnerWithResults(id: String): RunnerTableView {
+       return RunnerTableView(getRunner(id), getRunnerResults(id))
+    }
 
     @Transaction
-    @Query("SELECT runners.id, runners.number, runners.fullName, runners.city, runners.dateOfBirthday, runners.type,  runners.totalResult, runners.needToSync, checkpoints.checkpointId, checkpoints.name, result.hasPrevious, result.time FROM runners LEFT JOIN result ON runners.id = result.runnerId LEFT JOIN checkpoints ON checkpoints.checkpointId = result.checkpointId WHERE totalResult IS NOT NULL")
-    suspend fun getRunnersFinishers(): List<RunnerTableView>
+    fun getRunnersWithResults(type: Int): List<RunnerTableView> {
+        val runners = getRunners(type)
+        return runners.map { RunnerTableView(it, getRunnerResults(it.id)) }
+    }
+
+    @Query("SELECT * FROM checkpoints WHERE checkpointType =:type")
+    fun getCheckpoints(type: Int): List<CheckpointTable>
+
+
+    @Query("SELECT * FROM runners WHERE runners.id =:id")
+    fun getRunner(id: String): RunnerTable
+
+    @Transaction
+    @Query("SELECT * FROM result LEFT JOIN runners ON result.runnerId = runners.id WHERE runners.id =:id")
+    fun getRunnerResults(id: String): List<ResultTable>
+
+    @Transaction
+    @Query("SELECT * FROM runners WHERE type =:type ")
+    fun getRunners(type: Int): List<RunnerTable>
+
 
     @Query("UPDATE runners SET needToSync = :needToSync WHERE id = :runnerId")
-    suspend fun markAsNeedToSync(runnerId: String, needToSync: Boolean)
+    fun markAsNeedToSync(runnerId: String, needToSync: Boolean)
 
-    @Query("DELETE FROM runners WHERE number =:number ")
-    suspend fun delete(number: Int)
+    @Query("DELETE FROM runners WHERE id =:runnerId ")
+    suspend fun delete(runnerId: String): Int
 
-    @Query("DELETE FROM runners")
-    suspend fun dropTable()
 
 
     /**
      * CHECKPOINTS
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllOrReplaceCheckpoint(obj: List<ResultTable>)
+    fun insertAllOrReplaceCheckpoint(obj: List<ResultTable>)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertAllCheckpoints(obj: List<ResultTable>)
+    fun insertAllCheckpoints(obj: List<ResultTable>)
 
     @Update
-    suspend fun update(obj: ResultTable)
+    fun update(obj: ResultTable)
 
 }
 

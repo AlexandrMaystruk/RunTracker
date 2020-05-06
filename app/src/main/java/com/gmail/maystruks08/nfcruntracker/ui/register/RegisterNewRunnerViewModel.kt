@@ -11,7 +11,9 @@ import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.interactors.RegisterNewRunnerInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.terrakok.cicerone.Router
 import java.util.*
 import javax.inject.Inject
@@ -51,9 +53,9 @@ class RegisterNewRunnerViewModel @Inject constructor(private val interactor: Reg
                             runnerType: RunnerType,
                             runnerCardId: String) {
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             when (val onResult = interactor.registerNewRunner(fullName, runnerSex, dateOfBirthday, city, runnerNumber, runnerType, runnerCardId)) {
-                is ResultOfTask.Value -> onBackClicked()
+                is ResultOfTask.Value -> withContext(Dispatchers.Main){ onBackClicked() }
                 is ResultOfTask.Error -> handleError(onResult.error)
             }
         }

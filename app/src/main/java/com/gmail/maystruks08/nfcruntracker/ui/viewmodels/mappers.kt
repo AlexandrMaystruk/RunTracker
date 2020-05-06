@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
 
+import com.gmail.maystruks08.domain.entities.Checkpoint
 import com.gmail.maystruks08.domain.entities.CheckpointResult
 import com.gmail.maystruks08.domain.entities.Runner
 import com.gmail.maystruks08.domain.toDateFormat
@@ -7,7 +8,7 @@ import com.gmail.maystruks08.domain.toTimeUTCFormat
 import com.gmail.maystruks08.nfcruntracker.ui.stepview.Bean
 import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepState
 
-fun Runner.toRunnerView(checkpointNames: Array<String>) = RunnerView(
+fun Runner.toRunnerView() = RunnerView(
     this.id,
     this.number.toString(),
     this.fullName,
@@ -15,7 +16,7 @@ fun Runner.toRunnerView(checkpointNames: Array<String>) = RunnerView(
     this.totalResult?.toTimeUTCFormat(),
     this.dateOfBirthday.toDateFormat(),
     this.type.ordinal,
-    this.checkpoints.toCheckpointViews(checkpointNames)
+    this.checkpoints.toCheckpointViews()
 )
 
 fun Runner.toRunnerResultView(position: Int) = RunnerResultView(
@@ -26,20 +27,18 @@ fun Runner.toRunnerResultView(position: Int) = RunnerResultView(
     position
 )
 
-fun List<CheckpointResult>.toCheckpointViews(checkpointNames: Array<String>): List<CheckpointView> {
-    val checkpoints = this
-    return mutableListOf<CheckpointView>().apply {
-        val current = checkpoints.lastOrNull()
-        for (i in 0..checkpointNames.lastIndex) {
-            val checkpoint = checkpoints.find { it.id == i }
-            val state = if (checkpoint != null) {
-                if (current == checkpoint) {
-                    StepState.CURRENT
-                } else {
-                    if (checkpoint.hasPrevious) StepState.DONE else StepState.DONE_WARNING
-                }
-            } else StepState.UNDONE
-            this.add(CheckpointView(i, Bean(checkpointNames[i], state), checkpoint?.date))
+fun List<Checkpoint>.toCheckpointViews(): List<CheckpointView> {
+    val current = this.findLast { it is CheckpointResult }
+    return this.map {
+        if (it is CheckpointResult) {
+            val state = if (current?.id == it.id) {
+                StepState.CURRENT
+            } else {
+                if (it.hasPrevious) StepState.DONE else StepState.DONE_WARNING
+            }
+            CheckpointView(it.id, Bean(it.name, state), it.date)
+        } else {
+            CheckpointView(it.id, Bean(it.name, StepState.UNDONE))
         }
     }
 }

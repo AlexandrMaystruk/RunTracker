@@ -42,6 +42,7 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
     fun removeItem(item: RunnerView) {
         val index = runnerList.indexOfFirst { item.id == it.id }
         if (index == -1) return
+        runnerList.removeAt(index)
         notifyItemRemoved(index)
     }
 

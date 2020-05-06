@@ -1,40 +1,39 @@
 package com.gmail.maystruks08.data.repository
 
 import android.database.sqlite.SQLiteConstraintException
+import com.gmail.maystruks08.data.cache.RunnersCache
+import com.gmail.maystruks08.data.cache.SettingsCache
 import com.gmail.maystruks08.data.local.dao.RunnerDao
-import com.gmail.maystruks08.data.mappers.toResultTable
+import com.gmail.maystruks08.data.mappers.toCheckpointsResult
 import com.gmail.maystruks08.data.mappers.toRunnerTable
 import com.gmail.maystruks08.data.remote.FirestoreApi
-import com.gmail.maystruks08.domain.entities.ResultOfTask
+import com.gmail.maystruks08.domain.entities.Checkpoint
 import com.gmail.maystruks08.domain.entities.Runner
+import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
 import com.gmail.maystruks08.domain.repository.RegisterNewRunnersRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RegisterNewRunnersRepositoryImpl @Inject constructor(
     private val firestoreApi: FirestoreApi,
-    private val runnerDao: RunnerDao
+    private val runnerDao: RunnerDao,
+    private val settingsCache: SettingsCache,
+    private val runnersCache: RunnersCache
 ) : RegisterNewRunnersRepository {
 
-    override suspend fun saveNewRunner(runner: Runner): ResultOfTask<Exception, Unit> {
-        return try {
-            withContext(Dispatchers.IO) {
-                runnerDao.insertRunner(
-                    runner.toRunnerTable(),
-                    runner.checkpoints.map { it.toResultTable(runner.id) }
-                )
-                firestoreApi.updateRunner(runner)
-            }
-            ResultOfTask.build { }
+    override suspend  fun saveNewRunner(runner: Runner) {
+        try {
+            runnerDao.insertRunner(runner.toRunnerTable(), runner.checkpoints.toCheckpointsResult(runnerId = runner.id))
+            runnersCache.getRunnerList(runner.type).add(runner)
+            firestoreApi.updateRunner(runner)
         } catch (e: SQLiteConstraintException) {
-            ResultOfTask.build { throw RunnerWithIdAlreadyExistException() }
+            throw RunnerWithIdAlreadyExistException()
         } catch (e: Exception) {
-            withContext(Dispatchers.IO) {
-                runnerDao.markAsNeedToSync(runnerId = runner.id, needToSync = true)
-            }
-            ResultOfTask.build { throw e }
+            runnerDao.markAsNeedToSync(runnerId = runner.id, needToSync = true)
+            throw e
         }
     }
+
+    override suspend fun getCheckpoints(type: RunnerType): List<Checkpoint> = settingsCache.getCheckpointList(type)
+
 }

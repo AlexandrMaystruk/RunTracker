@@ -11,26 +11,22 @@ import javax.inject.Inject
 class RegisterNewRunnerInteractorImpl @Inject constructor(private val runnersRepository: RegisterNewRunnersRepository) :
     RegisterNewRunnerInteractor {
 
-    override suspend fun registerNewRunner(
-        fullName: String,
-        runnerSex: RunnerSex,
-        dateOfBirthday: Date,
-        city: String,
-        runnerNumber: Int,
-        runnerType: RunnerType,
-        runnerCardId: String
-    ): ResultOfTask<Exception, Unit> {
-
-        val newRunner = Runner(
-            id = runnerCardId,
-            fullName = fullName,
-            number = runnerNumber,
-            sex = runnerSex,
-            city = city,
-            dateOfBirthday = dateOfBirthday,
-            type = runnerType,
-            checkpoints = mutableListOf()
-        )
-        return runnersRepository.saveNewRunner(newRunner)
+    override suspend fun registerNewRunner(fullName: String, runnerSex: RunnerSex, dateOfBirthday: Date,
+        city: String, runnerNumber: Int, runnerType: RunnerType, runnerCardId: String): ResultOfTask<Exception, Unit> {
+        return ResultOfTask.build {
+            val checkpoints = runnersRepository.getCheckpoints(runnerType).toMutableList()
+            val newRunner = Runner(
+                id = runnerCardId,
+                fullName = fullName,
+                number = runnerNumber,
+                sex = runnerSex,
+                city = city,
+                dateOfBirthday = dateOfBirthday,
+                type = runnerType,
+                totalResult = null,
+                checkpoints = checkpoints
+            )
+            runnersRepository.saveNewRunner(newRunner)
+        }
     }
 }

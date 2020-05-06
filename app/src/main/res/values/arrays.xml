@@ -23,28 +23,4 @@
         <item>Финиш</item>
     </string-array>
 
-
-    <string-array name="checkpoints">
-        <item>С</item>
-        <item>15</item>
-        <item>46</item>
-        <item>52</item>
-        <item>70</item>
-        <item>81</item>
-        <item>90</item>
-        <item>Ф</item>
-    </string-array>
-
-    <string-array name="iron_people_checkpoints">
-        <item>С</item>
-        <item>7.5</item>
-        <item>15</item>
-        <item>42</item>
-        <item>52</item>
-        <item>70</item>
-        <item>81</item>
-        <item>91</item>
-        <item>Ф</item>
-    </string-array>
-
 </resources>

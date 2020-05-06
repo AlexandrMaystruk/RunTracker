@@ -14,6 +14,7 @@ import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,14 +31,12 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     private val _runnerRemoveLiveData = MutableLiveData<RunnerView>()
 
     private lateinit var runnerType: RunnerType
-    private lateinit var checkpointsTitles: Array<String>
 
-    fun initFragment(runnerTypeId: Int, titles: Array<String>) {
-        checkpointsTitles = titles
+    fun initFragment(runnerTypeId: Int) {
         runnerType = RunnerType.fromOrdinal(runnerTypeId)
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             showAllRunners()
-            runnersInteractor.updateRunnersCache(runnerType, ::onRunnersUpdates)
+            updateRunnerCache()
         }
     }
 
@@ -51,10 +50,17 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     }
 
     private suspend fun showAllRunners() {
-        when (val result = runnersInteractor.getAllRunners(runnerType)) {
-            is ResultOfTask.Value -> _runnersLiveData.value = result.value.map { it.toRunnerView(checkpointsTitles) }.toMutableList()
+        when (val result = runnersInteractor.getRunners(runnerType)) {
+            is ResultOfTask.Value -> {
+                val runners = result.value.map { it.toRunnerView() }.toMutableList()
+                _runnersLiveData.postValue(runners)
+            }
             is ResultOfTask.Error -> handleError(result.error)
         }
+    }
+
+    private suspend fun updateRunnerCache(){
+        runnersInteractor.updateRunnersCache(runnerType, ::onRunnersUpdates)
     }
 
     private fun onRunnersUpdates(onResult: ResultOfTask<Exception, RunnerChange>) {
@@ -65,31 +71,27 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     }
 
     private fun handleRunnerChanges(runnerChange: RunnerChange) {
-        val runnerView = runnerChange.runner.toRunnerView(checkpointsTitles)
-        when (runnerChange.changeType) {
-            Change.ADD -> _runnerAddLiveData.value = runnerView
-            Change.UPDATE -> _runnerUpdateLiveData.value = runnerView
-            Change.REMOVE -> _runnerRemoveLiveData.value = runnerView
-        }
+        val runnerView = runnerChange.runner.toRunnerView()
+            when (runnerChange.changeType) {
+                Change.ADD -> _runnerAddLiveData.postValue(runnerView)
+                Change.UPDATE -> _runnerUpdateLiveData.postValue(runnerView)
+                Change.REMOVE -> _runnerRemoveLiveData.postValue(runnerView)
+            }
     }
 
     fun onSearchQueryChanged(query: String) {
         viewModelScope.launch {
             if (query.isNotEmpty()) {
-                when (val result = runnersInteractor.getAllRunners(runnerType)) {
+                when (val result = runnersInteractor.getRunners(runnerType)) {
                     is ResultOfTask.Value -> {
                         val pattern = ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
-                        _runnersLiveData.postValue(
-                            result.value.filter {
-                                pattern.containsMatchIn(it.number.toString().toLowerCase())
-                            }.map { it.toRunnerView(checkpointsTitles) }.toMutableList()
-                        )
+                        val runners = result.value.filter { pattern.containsMatchIn(it.number.toString().toLowerCase()) }
+                        val runnerViews = runners.map { it.toRunnerView() }.toMutableList()
+                        _runnersLiveData.postValue(runnerViews)
                     }
                     is ResultOfTask.Error -> handleError(result.error)
                 }
-            } else {
-                showAllRunners()
-            }
+            } else showAllRunners()
         }
     }
 

@@ -6,6 +6,7 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.bus.StartRunTrackerBus
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import java.util.*
@@ -22,7 +23,7 @@ class RootRunnersViewModel @Inject constructor(
     }
 
     private fun onRunningStart(date: Date) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             runnersInteractor.addStartCheckpointToRunners(date)
         }
     }

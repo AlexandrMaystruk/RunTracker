@@ -3,15 +3,15 @@ package com.gmail.maystruks08.domain.entities
 import java.util.*
 
 data class Runner(
-    val id: String = "",
-    val number: Int = -1,
-    val fullName: String = "",
-    val sex: RunnerSex = RunnerSex.MALE,
-    val city: String = "",
-    val dateOfBirthday: Date = Date(),
-    val type: RunnerType = RunnerType.NORMAL,
-    var totalResult: Date? = null,
-    val checkpoints: MutableList<CheckpointResult> = mutableListOf()
+    val id: String,
+    val number: Int,
+    val fullName: String,
+    val sex: RunnerSex,
+    val city: String,
+    val dateOfBirthday: Date,
+    val type: RunnerType,
+    var totalResult: Date?,
+    val checkpoints: MutableList<Checkpoint> = mutableListOf()
 ) {
 
     /**
@@ -23,45 +23,62 @@ data class Runner(
         val indexOfExistingElement = checkpoints.indexOfFirst { it.id == checkpoint.id && it.type == checkpoint.type }
         if (indexOfExistingElement != -1) {
             checkpoints.removeAt(indexOfExistingElement)
-        }
-        val lastCheckpoint = checkpoints.lastOrNull()
-        if (!isRestart) {
-            if (lastCheckpoint?.id != checkpoint.id - 1 || !lastCheckpoint.hasPrevious) {
-                checkpoint.hasPrevious = false
+            if (!isRestart) addCheckpoint(checkpoint, checkpointsCount) else addStartCheckpoint(checkpoint)
+            checkpoints.sortBy { it.id }
+            for (index in 1 until checkpoints.lastIndex) {
+                val current = checkpoints[index]
+                if(current is CheckpointResult && !hasNotPassedPreviously(current)){
+                    (checkpoints[index] as CheckpointResult).hasPrevious = true
+                }
             }
-            checkpoints.add(checkpoint)
-            if (checkpoints.size == checkpointsCount) {
-                totalResult = calculateTotalResult()
-            }
-        } else {
-            checkpoints.clear()
-            totalResult = null
-            checkpoints.add(checkpoint)
-        }
-        checkpoints.sortBy { it.id }
-        for (index in 0 until checkpoints.lastIndex) {
-            val current = checkpoints[index]
-            val next = checkpoints[index + 1]
-            if (current.id == next.id - 1) {
-                checkpoints[index].hasPrevious = true
-            } else return
         }
     }
-
 
     fun removeCheckpoint(checkpointId: Int) {
         val index = checkpoints.indexOfFirst { it.id == checkpointId }
         if (index != -1) {
             totalResult = null
-            val filtered = checkpoints.filterIndexed { i, _ -> i < index }
-            checkpoints.clear()
-            checkpoints.addAll(filtered)
+            val oldCheckpoint =  checkpoints[index]
+            checkpoints[index] = Checkpoint(oldCheckpoint.id, oldCheckpoint.name, oldCheckpoint.type)
         }
     }
 
+    private fun addStartCheckpoint(checkpoint: CheckpointResult){
+        val mappedCheckpoints = checkpoints.map { Checkpoint(it.id, it.name, it.type ) }
+        totalResult = null
+        checkpoints.clear()
+        checkpoints.add(checkpoint)
+        checkpoints.addAll(mappedCheckpoints)
+    }
+
+    /**
+     * Need to add logic. Is it possible to change the order of passage of checkpoints?
+     */
+    private fun addCheckpoint(checkpoint: CheckpointResult, checkpointsCount: Int){
+        if (hasNotPassedPreviously(checkpoint)) {
+            checkpoint.hasPrevious = false
+        }
+        checkpoints.add(checkpoint.id, checkpoint)
+        if (checkpoints.size == checkpointsCount) {
+            totalResult = calculateTotalResult()
+        }
+    }
+
+    private fun hasNotPassedPreviously(checkpoint: CheckpointResult): Boolean {
+        for (x in 0 until checkpoint.id){
+            if(checkpoints[x] !is CheckpointResult) return true
+            if((checkpoints[x] as? CheckpointResult)?.hasPrevious == false ) return true
+        }
+        return false
+    }
+
+    /**
+     * Need to add logic. Is it possible to change the order of passage of checkpoints?
+     */
     private fun calculateTotalResult(): Date? {
-        val first = checkpoints.firstOrNull()?.date?.time
-        val last = checkpoints.lastOrNull()?.date?.time
-        return if (first != null && last != null) Date(last - first) else null
+        val first = checkpoints.firstOrNull() as? CheckpointResult
+        val last = checkpoints.lastOrNull()as? CheckpointResult
+        return if (first != null && last != null) Date(last.date.time - first.date.time) else null
     }
 }
+

@@ -2,6 +2,7 @@ package com.gmail.maystruks08.data.remote
 
 import com.gmail.maystruks08.domain.entities.Checkpoint
 import com.gmail.maystruks08.domain.entities.Runner
+import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
@@ -27,9 +28,7 @@ interface FirestoreApi{
 
     suspend fun updateRunner(runner: Runner): Task<Void>
 
-    suspend fun downloadAllRunners(): Task<QuerySnapshot>
-
-    suspend fun registerSnapshotListener(listener: (QuerySnapshot?, FirebaseFirestoreException?) -> Unit)
+    fun subscribeToRunnerDataRealtimeUpdates(listener: (List<RunnerChange>) -> Unit)
 
     suspend fun unregisterUpdatesListener()
 

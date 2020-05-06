@@ -38,12 +38,13 @@ class SettingsRepositoryImpl @Inject constructor(
                 val result = awaitTaskResult(firestoreApi.getCheckpointsSettings(currentUserId))
                 val startDateResult = awaitTaskResult(firestoreApi.getDateOfStart())
 
-                val checkpointId = result["checkpointId"] as HashMap<*, *>
-                val checkpointIronPeopleId = result["checkpointIronPeopleId"] as HashMap<*, *>
-                val startDate = (startDateResult["Start at"] as com.google.firebase.Timestamp).toDate()
-                preferences.saveCurrentCheckpointId((checkpointId.values.first() as Long).toInt())
-                preferences.saveCurrentIronPeopleCheckpointId((checkpointIronPeopleId.values.first() as Long).toInt())
-                preferences.saveDateOfStart(startDate.time)
+                val checkpointId = result["checkpointId"] as? HashMap<*, *>
+                val checkpointIronPeopleId = result["checkpointIronPeopleId"] as? HashMap<*, *>
+                val startDate = (startDateResult["Start at"] as? com.google.firebase.Timestamp)?.toDate()
+
+                if(checkpointId != null) preferences.saveCurrentCheckpointId((checkpointId.values.first() as Long).toInt())
+                if(checkpointIronPeopleId != null)  preferences.saveCurrentIronPeopleCheckpointId((checkpointIronPeopleId.values.first() as Long).toInt())
+                if(startDate != null) preferences.saveDateOfStart(startDate.time)
             }
             getConfig()
         }

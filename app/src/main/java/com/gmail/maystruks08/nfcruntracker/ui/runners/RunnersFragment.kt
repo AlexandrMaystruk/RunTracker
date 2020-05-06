@@ -2,7 +2,6 @@ package com.gmail.maystruks08.nfcruntracker.ui.runners
 
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
@@ -31,7 +30,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
 
     override fun injectDependencies() {
         App.runnersComponent?.inject(this)
-        viewModel.initFragment(runnerTypeId, if(runnerTypeId == RunnerType.NORMAL.ordinal) resources.getStringArray(R.array.checkpoints) else resources.getStringArray(R.array.iron_people_checkpoints))
+        viewModel.initFragment(runnerTypeId)
     }
 
     override fun initToolbar() = FragmentToolbar.Builder().build()
