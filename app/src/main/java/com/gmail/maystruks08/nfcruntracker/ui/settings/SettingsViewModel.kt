@@ -36,7 +36,7 @@ class SettingsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             try {
-                val config = repository.getConfig()
+                val config = repository.getCachedConfig()
                 configLiveData.value = config
             } catch (e: Exception){
                 Timber.i("Get cached config error")

@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.toDateTimeFormat
 import com.gmail.maystruks08.nfcruntracker.core.ext.getFragment
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
@@ -17,6 +19,8 @@ import com.gmail.maystruks08.nfcruntracker.core.navigation.AppNavigator
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.runners.RootRunnersFragment
 import com.gmail.maystruks08.nfcruntracker.utils.NfcAdapter
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_host.*
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
@@ -27,7 +31,7 @@ import javax.inject.Inject
 
 const val PRESS_TWICE_INTERVAL = 2000
 
-class HostActivity : AppCompatActivity() {
+class HostActivity : AppCompatActivity(){
 
     @Inject
     lateinit var navigatorHolder: NavigatorHolder
@@ -35,11 +39,16 @@ class HostActivity : AppCompatActivity() {
     @Inject
     lateinit var router: Router
 
+    @Inject
+    lateinit var networkUtil: NetworkUtil
+
     private var lastBackPressTime = 0L
 
     private val nfcAdapter = NfcAdapter()
 
     private var alertDialog: AlertDialog? = null
+
+    private var snackBar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -47,20 +56,28 @@ class HostActivity : AppCompatActivity() {
         setContentView(R.layout.activity_host)
         App.baseComponent.inject(this)
 
+        networkUtil.subscribeToConnectionChange(this.javaClass.simpleName) { isConnected ->
+            if (!isConnected) {
+                snackBar = Snackbar.make(nav_host_container, "Device offline", Snackbar.LENGTH_INDEFINITE)
+                snackBar?.view?.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)?.apply {
+                    isSingleLine = false
+                    textAlignment = View.TEXT_ALIGNMENT_CENTER
+                }
+                snackBar?.show()
+            } else {
+                toast("Соединение восстановлено")
+                snackBar?.dismiss()
+            }
+        }
+
         router.newRootScreen(Screens.LoginScreen())
     }
 
-    private val navigator: Navigator =
-        object : AppNavigator(this, supportFragmentManager, R.id.nav_host_container) {
-            override fun setupFragmentTransaction(
-                command: Command?,
-                currentFragment: Fragment?,
-                nextFragment: Fragment?,
-                fragmentTransaction: FragmentTransaction
-            ) {
+    private val navigator: Navigator = object : AppNavigator(this, supportFragmentManager, R.id.nav_host_container) {
+            override fun setupFragmentTransaction(command: Command?, currentFragment: Fragment?, nextFragment: Fragment?, fragmentTransaction: FragmentTransaction) {
                 fragmentTransaction.setReorderingAllowed(true)
             }
-        }
+    }
 
     override fun onBackPressed() {
         this.hideSoftKeyboard()
@@ -71,8 +88,7 @@ class HostActivity : AppCompatActivity() {
         when {
             supportFragmentManager.backStackEntryCount > 0 -> router.exit()
             lastBackPressTime < System.currentTimeMillis() - PRESS_TWICE_INTERVAL -> {
-                Toast.makeText(this, R.string.toast_exit_app_warning_text, Toast.LENGTH_SHORT)
-                    .show()
+                toast(getString(R.string.toast_exit_app_warning_text))
                 lastBackPressTime = System.currentTimeMillis()
             }
             else -> router.exit()

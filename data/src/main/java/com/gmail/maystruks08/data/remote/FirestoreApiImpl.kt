@@ -1,13 +1,11 @@
 package com.gmail.maystruks08.data.remote
 
 import android.util.Log
-import com.gmail.maystruks08.data.awaitRealtime
 import com.gmail.maystruks08.data.awaitTaskCompletable
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.data.mappers.fromFirestoreRunner
 import com.gmail.maystruks08.data.mappers.toFirestoreCheckpoint
 import com.gmail.maystruks08.data.mappers.toFirestoreRunner
-import com.gmail.maystruks08.data.serializeToMap
 import com.gmail.maystruks08.domain.entities.*
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.android.gms.tasks.Task

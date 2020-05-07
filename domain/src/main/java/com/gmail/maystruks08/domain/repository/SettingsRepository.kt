@@ -7,7 +7,7 @@ interface SettingsRepository {
 
     suspend fun updateConfig(): ResultOfTask<Exception, Config>
 
-    suspend fun getConfig(): Config
+    suspend fun getCachedConfig(): Config
 
     suspend fun changeCurrentCheckpoint(checkpointNumber: Int)
 

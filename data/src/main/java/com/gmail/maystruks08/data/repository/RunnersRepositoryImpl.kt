@@ -11,6 +11,7 @@ import com.gmail.maystruks08.data.mappers.toCheckpointsResult
 import com.gmail.maystruks08.data.mappers.toRunnerTable
 import com.gmail.maystruks08.data.mappers.toRunners
 import com.gmail.maystruks08.data.remote.FirestoreApi
+import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.entities.*
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
@@ -28,7 +29,8 @@ class RunnersRepositoryImpl @Inject constructor(
     private val firestoreApi: FirestoreApi,
     private val runnerDao: RunnerDao,
     private val runnersCache: RunnersCache,
-    private val settingsCache: SettingsCache
+    private val settingsCache: SettingsCache,
+    private val networkUtil: NetworkUtil
 ) : RunnersRepository {
 
     override suspend fun getRunners(type: RunnerType, onlyFinishers: Boolean): List<Runner> =
@@ -40,17 +42,19 @@ class RunnersRepositoryImpl @Inject constructor(
     override suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit) {
         try {
             firestoreApi.subscribeToRunnerDataRealtimeUpdates {
-                it.forEach { change ->
-                    runBlocking {
-                        val resultOfTask = ResultOfTask.build {
-                            when (change.changeType) {
-                                Change.ADD -> insertRunner(change.runner)
-                                Change.UPDATE -> updateRunner(change.runner)
-                                Change.REMOVE -> deleteRunner(change.runner)
+                if (networkUtil.isOnline()) {
+                    it.forEach { change ->
+                        runBlocking {
+                            val resultOfTask = ResultOfTask.build {
+                                when (change.changeType) {
+                                    Change.ADD -> insertRunner(change.runner)
+                                    Change.UPDATE -> updateRunner(change.runner)
+                                    Change.REMOVE -> deleteRunner(change.runner)
+                                }
+                                change
                             }
-                            change
+                            if (type == change.runner.type) onResult.invoke(resultOfTask)
                         }
-                        if (type == change.runner.type) onResult.invoke(resultOfTask)
                     }
                 }
             }
@@ -71,14 +75,16 @@ class RunnersRepositoryImpl @Inject constructor(
             e.printStackTrace()
             throw SaveRunnerDataException(runner.fullName)
         }
-        try {
-            awaitTaskCompletable(firestoreApi.updateRunner(runner))
-        } catch (e: FirebaseFirestoreException) {
-            Timber.e(e, "Saving runner ${runner.id} data to firestore error")
-            e.printStackTrace()
-            runnerDao.markAsNeedToSync(runner.id, true)
-            throw SyncWithServerException()
-        }
+        if (networkUtil.isOnline()) {
+            try {
+                awaitTaskCompletable(firestoreApi.updateRunner(runner))
+            } catch (e: FirebaseFirestoreException) {
+                Timber.e(e, "Saving runner ${runner.id} data to firestore error")
+                e.printStackTrace()
+                runnerDao.markAsNeedToSync(runner.id, true)
+                throw SyncWithServerException()
+            }
+        } else runnerDao.markAsNeedToSync(runner.id, true)
         return runner
     }
 

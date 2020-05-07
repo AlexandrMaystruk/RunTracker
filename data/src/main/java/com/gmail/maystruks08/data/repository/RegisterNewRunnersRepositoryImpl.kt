@@ -7,6 +7,7 @@ import com.gmail.maystruks08.data.local.dao.RunnerDao
 import com.gmail.maystruks08.data.mappers.toCheckpointsResult
 import com.gmail.maystruks08.data.mappers.toRunnerTable
 import com.gmail.maystruks08.data.remote.FirestoreApi
+import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.entities.Checkpoint
 import com.gmail.maystruks08.domain.entities.Runner
 import com.gmail.maystruks08.domain.entities.RunnerType
@@ -18,14 +19,18 @@ class RegisterNewRunnersRepositoryImpl @Inject constructor(
     private val firestoreApi: FirestoreApi,
     private val runnerDao: RunnerDao,
     private val settingsCache: SettingsCache,
-    private val runnersCache: RunnersCache
+    private val runnersCache: RunnersCache,
+    private val networkUtil: NetworkUtil
 ) : RegisterNewRunnersRepository {
 
     override suspend  fun saveNewRunner(runner: Runner) {
         try {
             runnerDao.insertRunner(runner.toRunnerTable(), runner.checkpoints.toCheckpointsResult(runnerId = runner.id))
             runnersCache.getRunnerList(runner.type).add(runner)
-            firestoreApi.updateRunner(runner)
+            if(networkUtil.isOnline())
+                firestoreApi.updateRunner(runner)
+            else
+                runnerDao.markAsNeedToSync(runnerId = runner.id, needToSync = true)
         } catch (e: SQLiteConstraintException) {
             throw RunnerWithIdAlreadyExistException()
         } catch (e: Exception) {
