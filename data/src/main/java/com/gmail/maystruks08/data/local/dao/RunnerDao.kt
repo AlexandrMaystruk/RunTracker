@@ -13,19 +13,19 @@ interface RunnerDao :
     @Transaction
     fun insertOrReplaceRunner(runner: RunnerTable, results: List<ResultTable>) {
         insertOrReplace(runner)
-        insertAllOrReplaceCheckpoint(results)
+        insertAllOrReplaceResults(results)
     }
 
     @Transaction
     fun insertRunner(runner: RunnerTable, results: List<ResultTable>) {
         insert(runner)
-        insertAllCheckpoints(results)
+        insertAllResult(results)
     }
 
     @Transaction
     suspend fun updateRunner(runner: RunnerTable, results: List<ResultTable>) {
         update(runner)
-        results.forEach { update(it) }
+        insertAllOrReplaceResults(results)
     }
 
     @Transaction
@@ -67,13 +67,10 @@ interface RunnerDao :
      * CHECKPOINTS
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAllOrReplaceCheckpoint(obj: List<ResultTable>)
+    fun insertAllOrReplaceResults(obj: List<ResultTable>)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    fun insertAllCheckpoints(obj: List<ResultTable>)
-
-    @Update
-    fun update(obj: ResultTable)
+    fun insertAllResult(obj: List<ResultTable>)
 
 }
 

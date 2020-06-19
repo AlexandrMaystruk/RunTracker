@@ -19,7 +19,7 @@ data class RunnerTable(
     val dateOfBirthday: Date,
     val type: Int,
     val totalResult: Date?,
-    val needToSync: Boolean = false
+    val needToSync: Boolean = true
 )
 
 

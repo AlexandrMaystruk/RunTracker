@@ -51,7 +51,7 @@ class RunnersRepositoryImpl @Inject constructor(
                                     Change.UPDATE -> updateRunner(change.runner)
                                     Change.REMOVE -> deleteRunner(change.runner)
                                 }
-                                change
+                                return@build change
                             }
                             if (type == change.runner.type) onResult.invoke(resultOfTask)
                         }
@@ -78,14 +78,12 @@ class RunnersRepositoryImpl @Inject constructor(
         if (networkUtil.isOnline()) {
             try {
                 awaitTaskCompletable(firestoreApi.updateRunner(runner))
+                runnerDao.markAsNeedToSync(runner.id, false)
             } catch (e: FirebaseFirestoreException) {
                 Timber.e(e, "Saving runner ${runner.id} data to firestore error")
                 e.printStackTrace()
-                runnerDao.markAsNeedToSync(runner.id, true)
                 throw SyncWithServerException()
             }
-        } else {
-            runnerDao.markAsNeedToSync(runner.id, true)
         }
         return runner
     }
