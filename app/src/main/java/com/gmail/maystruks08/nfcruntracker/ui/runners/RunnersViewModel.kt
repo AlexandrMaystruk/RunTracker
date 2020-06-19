@@ -14,8 +14,10 @@ import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerViews
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 class RunnersViewModel @Inject constructor(private val runnersInteractor: RunnersInteractor) : BaseViewModel() {
@@ -41,7 +43,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     }
 
     fun onNfcCardScanned(cardId: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(cardId)) {
                 is ResultOfTask.Value -> handleRunnerChanges(onResult.value)
                 is ResultOfTask.Error -> handleError(onResult.error)
@@ -52,7 +54,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     private suspend fun showAllRunners() {
         when (val result = runnersInteractor.getRunners(runnerType)) {
             is ResultOfTask.Value -> {
-                val runners = result.value.map { it.toRunnerView() }.toMutableList()
+                val runners = result.value.toRunnerViews().toMutableList()
                 _runnersLiveData.postValue(runners)
             }
             is ResultOfTask.Error -> handleError(result.error)
@@ -96,11 +98,11 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     }
 
     private fun handleError(e: Exception) {
+        Timber.e(e)
         when(e){
             is SaveRunnerDataException -> toastLiveData.postValue("Не удалось сохранить данные участника:" + e.message)
             is RunnerNotFoundException -> toastLiveData.postValue("Участник не найден")
             is SyncWithServerException -> toastLiveData.postValue("Данные не сохранились на сервер")
-            else -> e.printStackTrace()
         }
     }
 }

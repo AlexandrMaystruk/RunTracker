@@ -23,7 +23,7 @@ interface RunnerDao :
     }
 
     @Transaction
-    fun updateRunner(runner: RunnerTable, results: List<ResultTable>) {
+    suspend fun updateRunner(runner: RunnerTable, results: List<ResultTable>) {
         update(runner)
         results.forEach { update(it) }
     }
@@ -56,7 +56,7 @@ interface RunnerDao :
 
 
     @Query("UPDATE runners SET needToSync = :needToSync WHERE id = :runnerId")
-    fun markAsNeedToSync(runnerId: String, needToSync: Boolean)
+    suspend fun markAsNeedToSync(runnerId: String, needToSync: Boolean)
 
     @Query("DELETE FROM runners WHERE id =:runnerId ")
     suspend fun delete(runnerId: String): Int

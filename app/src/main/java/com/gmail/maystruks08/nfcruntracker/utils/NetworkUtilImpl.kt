@@ -15,7 +15,7 @@ import javax.inject.Singleton
 @Singleton
 class NetworkUtilImpl @Inject constructor(private val context: Context): NetworkUtil {
 
-    private var isOnline = true
+    private var isOnline = false
 
     private val networkConnectionCallbacks: MutableMap<String, ((Boolean) -> Unit)> = mutableMapOf()
 

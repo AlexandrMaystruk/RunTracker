@@ -8,6 +8,8 @@ import com.gmail.maystruks08.domain.toTimeUTCFormat
 import com.gmail.maystruks08.nfcruntracker.ui.stepview.Bean
 import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepState
 
+fun List<Runner>.toRunnerViews() = this.map { it.toRunnerView() }
+
 fun Runner.toRunnerView() = RunnerView(
     this.id,
     this.number.toString(),
@@ -40,5 +42,5 @@ fun List<Checkpoint>.toCheckpointViews(): List<CheckpointView> {
         } else {
             CheckpointView(it.id, Bean(it.name, StepState.UNDONE))
         }
-    }
+    }.sortedBy { it.id }
 }

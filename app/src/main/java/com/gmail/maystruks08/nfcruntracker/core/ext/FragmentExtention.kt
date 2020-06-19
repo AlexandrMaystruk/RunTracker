@@ -29,6 +29,10 @@ inline fun <reified T : Fragment> Fragment.getChildVisibleFragment(): T? {
     return childFragmentManager.fragments.lastOrNull() as? T
 }
 
+inline fun <reified T : Fragment> Fragment.findFragmentByTag(tag: String): T? {
+    return childFragmentManager.findFragmentByTag(tag) as? T
+}
+
 inline fun <reified T : ViewModel> Fragment.injectViewModel(factory: ViewModelProvider.Factory): T {
     return ViewModelProviders.of(this, factory)[T::class.java]
 }

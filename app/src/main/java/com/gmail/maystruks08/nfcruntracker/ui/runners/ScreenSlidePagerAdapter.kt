@@ -1,7 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
 import android.os.Parcelable
-import android.util.Log
 import android.util.SparseArray
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -9,6 +8,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
+import timber.log.Timber
 
 class ScreenSlidePagerAdapter(
     private val onClickedAtRunner: (RunnerView) -> Unit, fm: FragmentManager
@@ -32,7 +32,7 @@ class ScreenSlidePagerAdapter(
         super.destroyItem(container, position, `object`)
     }
 
-    fun getRegisteredFragment(position: Int): RunnersFragment? = registeredFragments[position]
+    fun getCurrentVisibleFragment(position: Int): RunnersFragment? = registeredFragments[position]
 
     override fun getPageTitle(position: Int): CharSequence? = when (position) {
         0 -> "Бегуны"
@@ -45,7 +45,7 @@ class ScreenSlidePagerAdapter(
         try {
             super.restoreState(state, loader)
         } catch (e: Exception) {
-            Log.d("ScreenSlidePagerAdapter", "Error Restore State of Fragment")
+           Timber.d( "Error Restore State of Fragment")
         }
     }
 }

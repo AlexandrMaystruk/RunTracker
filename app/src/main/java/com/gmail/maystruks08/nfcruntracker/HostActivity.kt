@@ -139,4 +139,9 @@ class HostActivity : AppCompatActivity(){
         nfcAdapter.stopListening(this)
         alertDialog?.dismiss()
     }
+
+    override fun onDestroy() {
+        networkUtil.unsubscribe(this.javaClass.simpleName)
+        super.onDestroy()
+    }
 }

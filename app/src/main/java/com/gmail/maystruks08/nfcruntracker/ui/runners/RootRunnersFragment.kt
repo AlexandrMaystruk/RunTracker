@@ -6,7 +6,6 @@ import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
-import com.gmail.maystruks08.nfcruntracker.core.ext.getChildVisibleFragment
 import com.gmail.maystruks08.nfcruntracker.core.ext.getVisibleFragment
 import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
@@ -39,7 +38,7 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
             })
         )
         .withMenuSearch(InputType.TYPE_CLASS_NUMBER) {
-            val fragment = adapter?.getRegisteredFragment(pager.currentItem)
+            val fragment = adapter?.getCurrentVisibleFragment(pager.currentItem)
             fragment?.viewModel?.onSearchQueryChanged(it)
         }
         .build()
@@ -58,7 +57,7 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
 
     fun onNfcCardScanned(cardId: String) {
         getVisibleFragment<RegisterNewRunnerFragment>()?.viewModel?.onNfcCardScanned(cardId)
-        getChildVisibleFragment<RunnersFragment>()?.viewModel?.onNfcCardScanned(cardId)
+        adapter?.getCurrentVisibleFragment(pager.currentItem)?.viewModel?.onNfcCardScanned(cardId)
     }
 
     private fun onClickedAtRunner(runnerView: RunnerView) {

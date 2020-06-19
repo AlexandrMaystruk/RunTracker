@@ -84,7 +84,9 @@ class RunnersRepositoryImpl @Inject constructor(
                 runnerDao.markAsNeedToSync(runner.id, true)
                 throw SyncWithServerException()
             }
-        } else runnerDao.markAsNeedToSync(runner.id, true)
+        } else {
+            runnerDao.markAsNeedToSync(runner.id, true)
+        }
         return runner
     }
 
