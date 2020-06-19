@@ -36,6 +36,9 @@ class NetworkUtilImpl @Inject constructor(private val context: Context): Network
     @Suppress("DEPRECATION")
     private fun hasNetworkAvailable() {
         val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo: NetworkInfo? = manager.activeNetworkInfo
+        isOnline = networkInfo?.isConnected == true
+        notifyAllListener()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             manager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
@@ -53,8 +56,7 @@ class NetworkUtilImpl @Inject constructor(private val context: Context): Network
             val networkChangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
                 override fun onReceive(context: Context, intent: Intent) {
                     val conn = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                    val networkInfo: NetworkInfo? = conn.activeNetworkInfo
-                    val isConnected = networkInfo?.isConnected == true
+                    val isConnected = conn.activeNetworkInfo?.isConnected == true
                     isOnline = isConnected
                     notifyAllListener()
                 }
