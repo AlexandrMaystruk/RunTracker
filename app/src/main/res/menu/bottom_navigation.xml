@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/item_runners"
+        android:icon="@drawable/ic_running"
+        android:title="@string/tab_runner_result" />
+
+    <item
+        android:id="@+id/item_iron_runners"
+        android:icon="@drawable/ic_running"
+        android:title="@string/tab_iron_runner_result" />
+</menu>

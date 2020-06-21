@@ -10,7 +10,6 @@ import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
-import com.gmail.maystruks08.domain.repository.RunnersRepository
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerResultView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerResultView
@@ -27,15 +26,12 @@ class RunnerResultViewModel @Inject constructor(
 
     private val _runnerResultsLiveData = MutableLiveData<List<RunnerResultView>>()
 
-    private val type: RunnerType = RunnerType.NORMAL //TODO remove hardcode
+    private var type: RunnerType = RunnerType.NORMAL
 
-    init {
-        showAllFinishers()
-    }
-
-   private fun showAllFinishers(){
+    fun provideFinishers(type: RunnerType){
+        this.type = type
         viewModelScope.launch {
-            when (val onResult = interactor.getFinishers(RunnerType.NORMAL)) {
+            when (val onResult = interactor.getFinishers(type)) {
                 is ResultOfTask.Value -> {
                     val sortedResultList = onResult.value
                         .sortedBy { it.totalResult }
@@ -74,7 +70,7 @@ class RunnerResultViewModel @Inject constructor(
                     }
                     is ResultOfTask.Error -> handleError(result.error)
                 }
-            } else showAllFinishers()
+            } else provideFinishers(type)
         }
     }
 }

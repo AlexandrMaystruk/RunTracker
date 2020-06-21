@@ -14,7 +14,7 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
-            android:layout_height="35dp"
+            android:layout_height="25dp"
             app:tabGravity="fill"
             app:tabMode="fixed" />
     </com.google.android.material.appbar.AppBarLayout>

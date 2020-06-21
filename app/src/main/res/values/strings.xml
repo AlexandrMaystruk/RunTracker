@@ -6,12 +6,16 @@
     <string name="screen_runners_results">Результаты</string>
     <string name="screen_runner">Информация об участнике</string>
 
+    <string name="tab_runner_result">Бегуны</string>
+    <string name="tab_iron_runner_result">Железные</string>
 
 
-    <string name="search">Search</string>
-    <string name="signOut">Sign out</string>
 
 
-    <string name="toast_exit_app_warning_text">Tap again to exit</string>
+    <string name="search">Поиск</string>
+    <string name="signOut">Выйти</string>
+
+
+    <string name="toast_exit_app_warning_text">Кликните ещё раз для выхода</string>
 
 </resources>

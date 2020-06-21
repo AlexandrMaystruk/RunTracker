@@ -31,12 +31,14 @@ class LoginViewModel @Inject constructor(
         if (FirebaseAuth.getInstance().currentUser == null) startAuthFlowLiveData.postValue(0) else updateAndStartMainScreen()
     }
 
-   private fun updateAndStartMainScreen(){
+    private fun updateAndStartMainScreen() {
         viewModelScope.launch(Dispatchers.IO) {
-            when(val value = settingsRepository.updateConfig()){
-                is ResultOfTask.Value -> withContext(Dispatchers.Main){ router.newRootScreen(Screens.RootRunnersScreen()) }
-                    is ResultOfTask.Error -> {
-                     withContext(Dispatchers.Main){ router.newRootScreen(Screens.RootRunnersScreen()) }
+            when (val value = settingsRepository.updateConfig()) {
+                is ResultOfTask.Value -> withContext(Dispatchers.Main) {
+                    router.newRootScreen(Screens.RootRunnersScreen())
+                }
+                is ResultOfTask.Error -> {
+                    withContext(Dispatchers.Main) { router.newRootScreen(Screens.RootRunnersScreen()) }
                     Timber.e(value.error)
                 }
             }

@@ -6,6 +6,8 @@ import android.os.Parcelable
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
@@ -35,6 +37,10 @@ inline fun <reified T : Fragment> Fragment.findFragmentByTag(tag: String): T? {
 
 inline fun <reified T : ViewModel> Fragment.injectViewModel(factory: ViewModelProvider.Factory): T {
     return ViewModelProviders.of(this, factory)[T::class.java]
+}
+
+fun FragmentManager.transaction(block: FragmentTransaction.() -> FragmentTransaction) {
+    beginTransaction().block().commit()
 }
 
 fun Any.name(): String = this::class.java.simpleName

@@ -40,7 +40,7 @@ abstract class BaseFragment(private val layout: Int? = null) : Fragment() {
 
     protected abstract fun initToolbar(): FragmentToolbar
 
-    protected abstract fun bindViewModel()
+    protected abstract fun bindViewModel(): Unit?
 
     protected open fun initViews() {}
 

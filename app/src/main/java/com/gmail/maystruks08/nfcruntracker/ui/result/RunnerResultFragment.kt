@@ -3,6 +3,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.result
 import android.text.InputType
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
@@ -43,11 +44,19 @@ class RunnerResultFragment : BaseFragment(R.layout.fragment_runners_results) {
             layoutManager = LinearLayoutManager(runnersResultsRecyclerView.context)
             adapter = resultAdapter
         }
+
+        navigation.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.item_runners -> viewModel.provideFinishers(RunnerType.NORMAL)
+                R.id.item_iron_runners -> viewModel.provideFinishers(RunnerType.IRON)
+            }
+            return@setOnNavigationItemSelectedListener true
+        }
+        navigation.selectedItemId = R.id.item_runners
     }
 
     override fun onDestroyView() {
         App.clearRunnersResultComponent()
         super.onDestroyView()
     }
-
 }
