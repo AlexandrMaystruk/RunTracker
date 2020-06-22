@@ -3,7 +3,6 @@ package com.gmail.maystruks08.nfcruntracker.ui.runner
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
@@ -45,11 +44,11 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
             tvDateOfBirthday.text = runner.dateOfBirthday
             tvRunnerCity.text = runner.city
             if (runner.result != null) {
-                val totalResultStr = "Общее время: ${runner.result}"
+                val totalResultStr = getString(R.string.total_time, runner.result)
                 btnMarkCheckpointAsPassedInManual.text = totalResultStr
                 btnMarkCheckpointAsPassedInManual.isEnabled = false
             } else {
-                btnMarkCheckpointAsPassedInManual.text = "Отметить на текущем КП"
+                btnMarkCheckpointAsPassedInManual.text = getString(R.string.mark_at_current_checkpoint)
                 btnMarkCheckpointAsPassedInManual.isEnabled = true
             }
             checkpointsAdapter?.checkpoints = runner.progress.toMutableList()
@@ -59,8 +58,8 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
     override fun initViews() {
         btnMarkCheckpointAsPassedInManual.setOnClickListener {
             val builder = AlertDialog.Builder(it.context)
-                .setTitle("Внимание!")
-                .setMessage("Отметить участника на КП без карты?")
+                .setTitle(getString(R.string.attention))
+                .setMessage(getString(R.string.mark_runner_without_card))
                 .setPositiveButton(android.R.string.yes) { _, _ ->
                     viewModel.markCheckpointAsPassed(runnerId)
                     alertDialog?.dismiss()
@@ -80,8 +79,8 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
 
     private fun onCheckpointDateLongClicked(checkpointId: Int) {
         val builder = AlertDialog.Builder(requireContext())
-            .setTitle("Внимание!")
-            .setMessage("Удалить участнику прохождение текущего КП?")
+            .setTitle(getString(R.string.attention))
+            .setMessage(getString(R.string.remove_checkpoint_for_runner))
             .setPositiveButton(android.R.string.yes) { _, _ ->
                 viewModel.deleteCheckpointFromRunner(runnerId, checkpointId)
                 alertDialog?.dismiss()

@@ -1,21 +1,44 @@
 <resources>
     <string name="app_name">Run Tracker</string>
 
-    <string name="screen_settings">Настройки</string>
-    <string name="screen_register_new_runner">Регистрация учасника</string>
-    <string name="screen_runners_results">Результаты</string>
-    <string name="screen_runner">Информация об участнике</string>
+    <string name="search">Search</string>
+    <string name="signOut">Logout</string>
 
-    <string name="tab_runner_result">Бегуны</string>
-    <string name="tab_iron_runner_result">Железные</string>
+    <string name="screen_settings">Settings</string>
+    <string name="screen_register_new_runner">Member Registration</string>
+    <string name="screen_runners_results">Results</string>
+    <string name="screen_runner">Member Information</string>
 
+    <string name="tab_runner_result">Runners</string>
+    <string name="tab_iron_runner_result">Iron</string>
 
+    <string name="toast_exit_app_warning_text">Click again to exit</string>
+    <string name="button_start_run_tracker">Start the race</string>
+    <string name="checkpoint_for_iron_people">CP for iron people</string>
+    <string name="checkpoint_for_people">CP for runners</string>
+    <string name="select_your_checkpoint">Indicate which CP you are on</string>
+    <string name="date_of_start">Start date:%1$s</string>
+    <string name="scan_card">Scan the card</string>
+    <string name="button_add">Add</string>
+    <string name="runner_number">Member Number</string>
+    <string name="iron">iron</string>
+    <string name="runner">runner</string>
+    <string name="city">City </string>
+    <string name="date_of_birthday">Date of birth</string>
+    <string name="female">female</string>
+    <string name="male">male</string>
+    <string name="full_name">Name</string>
+    <string name="mark_at_current_checkpoint">Mark on current CP</string>
+    <string name="fill_in_required_fields">Fill in required fields!</string>
+    <string name="card">Card %1$s</string>
 
-
-    <string name="search">Поиск</string>
-    <string name="signOut">Выйти</string>
-
-
-    <string name="toast_exit_app_warning_text">Кликните ещё раз для выхода</string>
+    <string name="error_member_already_exist">A participant with such a card already exists</string>
+    <string name="error_sync_with_server">Sync with server error</string>
+    <string name="error_save_data_to_local_db">Save data to local database error</string>
+    <string name="error_runner_not_found">Runner not found</string>
+    <string name="attention">Attention!</string>
+    <string name ="remove_checkpoint_for_runner">Do you want the participant to clear the current CP?</string>
+    <string name="mark_runner_without_card">Отметить участника на КП без карты?</string>
+    <string name="total_time">Total time: %1$s</string>
 
 </resources>

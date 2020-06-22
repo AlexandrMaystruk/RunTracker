@@ -23,10 +23,12 @@ class RegisterNewRunnerViewModel @Inject constructor(private val interactor: Reg
     val selectDateOfBirthdayClicked get(): LiveData<Unit> = _selectDateOdBirthdayClickedLiveData
     val selectedDateOfBirthday get(): LiveData<Date> = _selectDateOdBirthdaySelectedLiveData
     val scannedCard get() : LiveData<String> = _cardIdLiveData
+    val error get() : LiveData<Throwable> = _errorLiveData
 
     private val _selectDateOdBirthdayClickedLiveData = MutableLiveData<Unit>()
     private val _selectDateOdBirthdaySelectedLiveData = MutableLiveData<Date>()
     private val _cardIdLiveData = MutableLiveData<String>()
+    private val _errorLiveData = MutableLiveData<Throwable>()
 
 
     fun onSelectDateOfBirthdayClicked(){
@@ -63,9 +65,9 @@ class RegisterNewRunnerViewModel @Inject constructor(private val interactor: Reg
 
     private fun handleError(e: Exception) {
         when(e){
-            is SaveRunnerDataException -> {}
-            is SyncWithServerException -> {}
-            is RunnerWithIdAlreadyExistException-> toastLiveData.postValue("Участник с такой картой уже существует")
+            is SaveRunnerDataException,
+            is SyncWithServerException,
+            is RunnerWithIdAlreadyExistException  -> _errorLiveData.postValue(e)
             else ->  e.printStackTrace()
         }
     }

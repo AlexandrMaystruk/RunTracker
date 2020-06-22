@@ -88,7 +88,7 @@
                 android:id="@+id/btnMarkCheckpointAsPassedInManual"
                 style="@style/MainButton"
                 android:layout_margin="@dimen/margin_m"
-                android:text="Отметить на текущем КП"
+                android:text="@string/mark_at_current_checkpoint"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

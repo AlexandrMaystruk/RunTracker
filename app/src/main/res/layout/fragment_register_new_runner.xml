@@ -53,7 +53,7 @@
                     android:drawableStart="@drawable/ic_user"
                     android:drawablePadding="@dimen/margin_m"
                     android:gravity="start"
-                    android:hint="ФИО"
+                    android:hint="@string/full_name"
                     android:inputType="textCapWords"
                     android:textColorHint="@color/colorText" />
 
@@ -95,7 +95,7 @@
                     android:gravity="center"
                     android:paddingTop="@dimen/margin_xs"
                     android:paddingBottom="@dimen/margin_xs"
-                    android:text="мужчина" />
+                    android:text="@string/male" />
 
                 <RadioButton
                     android:id="@+id/rbFemale"
@@ -109,7 +109,7 @@
                     android:gravity="center"
                     android:paddingTop="@dimen/margin_xs"
                     android:paddingBottom="@dimen/margin_xs"
-                    android:text="женщина" />
+                    android:text="@string/female" />
 
             </RadioGroup>
 
@@ -138,7 +138,7 @@
                 android:drawableStart="@drawable/ic_calendar"
                 android:drawablePadding="@dimen/margin_m"
                 android:gravity="start"
-                android:text="Дата рождения"
+                android:text="@string/date_of_birthday"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -181,7 +181,7 @@
                     android:drawableStart="@drawable/ic_hash_key"
                     android:drawablePadding="@dimen/margin_m"
                     android:gravity="start"
-                    android:hint="Город"
+                    android:hint="@string/city"
                     android:inputType="textCapWords"
                     android:textColorHint="@color/colorText"
                     android:textSize="@dimen/text_l" />
@@ -226,7 +226,7 @@
                     android:gravity="center"
                     android:paddingTop="@dimen/margin_xs"
                     android:paddingBottom="@dimen/margin_xs"
-                    android:text="бегун" />
+                    android:text="@string/runner" />
 
                 <RadioButton
                     android:id="@+id/rbIronRunner"
@@ -240,7 +240,7 @@
                     android:gravity="center"
                     android:paddingTop="@dimen/margin_xs"
                     android:paddingBottom="@dimen/margin_xs"
-                    android:text="железный" />
+                    android:text="@string/iron" />
             </RadioGroup>
 
             <View
@@ -279,7 +279,7 @@
                     android:drawableStart="@drawable/ic_hash_key"
                     android:drawablePadding="@dimen/margin_m"
                     android:gravity="start"
-                    android:hint="Номер участника"
+                    android:hint="@string/runner_number"
                     android:inputType="number"
                     android:textColorHint="@color/colorText"
                     android:textSize="@dimen/text_l" />
@@ -312,7 +312,7 @@
                 android:drawableStart="@drawable/ic_running"
                 android:drawablePadding="@dimen/margin_m"
                 android:gravity="start|center_horizontal"
-                android:text="Отсканируйте карту"
+                android:text="@string/scan_card"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -325,7 +325,7 @@
             style="@style/MainButton"
             android:layout_margin="@dimen/margin_m"
             android:layout_marginTop="@dimen/margin_xxl"
-            android:text="Добавить"
+            android:text="@string/button_add"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -57,19 +57,13 @@ class SettingsViewModel @Inject constructor(
 
     fun onCurrentCheckpointChangedForRunners(checkpointNumber: Int) {
         if (!isFirstStart) {
-            viewModelScope.launch {
-                repository.changeCurrentCheckpoint(checkpointNumber)
-                toastLiveData.postValue("Settings changed")
-            }
+            viewModelScope.launch { repository.changeCurrentCheckpoint(checkpointNumber) }
         }
     }
 
     fun onCurrentCheckpointChangedForIronPeoples(checkpointNumber: Int) {
         if (!isFirstStart) {
-            viewModelScope.launch {
-                repository.changeCurrentCheckpointForIronPeoples(checkpointNumber)
-                toastLiveData.postValue("Settings changed")
-            }
+            viewModelScope.launch { repository.changeCurrentCheckpointForIronPeoples(checkpointNumber) }
         }
         isFirstStart = false
     }

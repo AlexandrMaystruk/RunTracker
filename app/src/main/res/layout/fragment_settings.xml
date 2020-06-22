@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_m"
-        android:text="Укажите на каком из КП вы находитесь"
+        android:text="@string/select_your_checkpoint"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_m"
-        android:text="КП для бегунов"
+        android:text="@string/checkpoint_for_people"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvInfo" />
 
@@ -57,7 +57,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_m"
-        android:text="КП для железных людей "
+        android:text="@string/checkpoint_for_iron_people"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvCheckpointForRunners" />
 
@@ -88,7 +88,7 @@
         android:layout_margin="@dimen/margin_m"
         android:layout_marginStart="68dp"
         android:layout_marginTop="152dp"
-        android:text="Дата старта: не указано"
+        android:text="@string/date_of_start"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvCheckpointForIronPeople" />
 
@@ -97,7 +97,7 @@
         style="@style/MainButton"
         android:layout_width="0dp"
         android:layout_margin="@dimen/margin_m"
-        android:text="Log out"
+        android:text="@string/signOut"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/tvStartRunning"
         app:layout_constraintStart_toStartOf="parent" />
@@ -107,7 +107,7 @@
         style="@style/MainButton"
         android:layout_width="0dp"
         android:layout_margin="@dimen/margin_m"
-        android:text="Start run tracking"
+        android:text="@string/button_start_run_tracker"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tvSignOut" />

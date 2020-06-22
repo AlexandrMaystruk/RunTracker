@@ -50,7 +50,11 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
     }
 
     override fun initViews() {
-        adapter = ScreenSlidePagerAdapter(::onClickedAtRunner, childFragmentManager)
+        adapter = ScreenSlidePagerAdapter(
+            ::onClickedAtRunner,
+            arrayOf(getString(R.string.runner), getString(R.string.iron)),
+            childFragmentManager
+        )
         pager.adapter = adapter
         tabs.setupWithViewPager(pager)
     }

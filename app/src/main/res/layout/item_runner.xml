@@ -6,8 +6,8 @@
     android:layout_marginStart="@dimen/margin_xs"
     android:layout_marginTop="@dimen/margin_min"
     android:layout_marginEnd="@dimen/margin_xs"
-    app:cardCornerRadius="5dp"
-    app:cardElevation="5dp"
+    app:cardCornerRadius="@dimen/margin_min"
+    app:cardElevation="@dimen/margin_min"
     app:contentPadding="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -55,9 +55,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvRunnerNumber"
-            app:nodeHeight="25dp"
-            app:textNodeTitleSize="14sp"
-            app:textTitlePadding="5dp" />
+            app:nodeHeight="@dimen/size_l"
+            app:textNodeTitleSize="@dimen/size_s"
+            app:textTitlePadding="@dimen/margin_min" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

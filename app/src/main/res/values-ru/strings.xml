@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Run Tracker</string>
+
+    <string name="search">Поиск</string>
+    <string name="signOut">Выйти</string>
+
+    <string name="screen_settings">Настройки</string>
+    <string name="screen_register_new_runner">Регистрация участника</string>
+    <string name="screen_runners_results">Результаты</string>
+    <string name="screen_runner">Информация об участнике</string>
+
+    <string name="tab_runner_result">Бегуны</string>
+    <string name="tab_iron_runner_result">Железные</string>
+
+    <string name="toast_exit_app_warning_text">Кликните ещё раз для выхода</string>
+    <string name="button_start_run_tracker">Начать забег</string>
+    <string name="checkpoint_for_iron_people">КП для железных людей</string>
+    <string name="checkpoint_for_people">КП для бегунов</string>
+    <string name="select_your_checkpoint">Укажите на каком из КП вы находитесь</string>
+    <string name="date_of_start">Дата старта:%1$s</string>
+    <string name="scan_card">Отсканируйте карту</string>
+    <string name="button_add">Добавить</string>
+    <string name="runner_number">Номер участника</string>
+    <string name="iron">железный</string>
+    <string name="runner">бегун</string>
+    <string name="city">Город</string>
+    <string name="date_of_birthday">Дата рождения</string>
+    <string name="female">женщина</string>
+    <string name="male">мужчина</string>
+    <string name="full_name">ФИО</string>
+    <string name="mark_at_current_checkpoint">Отметить на текущем КП</string>
+    <string name="fill_in_required_fields">Заполните обязательные поля!</string>
+    <string name="card">Карта %1$s</string>
+
+    <string name="error_member_already_exist">Участник с такой картой уже существует</string>
+    <string name="error_sync_with_server">Ошибка синхронизации с сервером</string>
+    <string name="error_save_data_to_local_db">Ошибка сохранения данных в локальной базе данных </string>
+    <string name="error_runner_not_found">Участник не найден</string>
+    <string name="attention">Внимание!</string>
+    <string name="remove_checkpoint_for_runner">Удалить участнику прохождение текущего КП?</string>
+    <string name="mark_runner_without_card">Отметить участника на КП без карты?</string>
+    <string name="total_time">Общее время: %1$s</string>
+
+</resources>

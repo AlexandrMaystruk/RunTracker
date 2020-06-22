@@ -4,6 +4,9 @@ import android.app.DatePickerDialog
 import androidx.lifecycle.Observer
 import com.gmail.maystruks08.domain.entities.RunnerSex
 import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
+import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
+import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.toDateFormat
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
@@ -56,12 +59,20 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
         })
 
         viewModel.scannedCard.observe(viewLifecycleOwner, Observer {
-            tvScanCard.text = "Карта: $it"
+            tvScanCard.text = getString(R.string.card, it)
             runnerCardId = it
         })
 
         viewModel.toast.observe(viewLifecycleOwner, Observer {
             context?.toast(it)
+        })
+
+        viewModel.error.observe(viewLifecycleOwner, Observer {
+            when(it){
+                is SaveRunnerDataException -> context?.toast(getString(R.string.error_save_data_to_local_db))
+                is SyncWithServerException -> context?.toast(getString(R.string.error_sync_with_server))
+                is RunnerWithIdAlreadyExistException ->  context?.toast(getString(R.string.error_member_already_exist))
+            }
         })
     }
 
@@ -103,7 +114,7 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
                     runnerType!!,
                     runnerCardId!!
                 )
-            } else context?.toast("Заполните обязательные поля!")
+            } else context?.toast(getString(R.string.fill_in_required_fields))
         }
     }
 

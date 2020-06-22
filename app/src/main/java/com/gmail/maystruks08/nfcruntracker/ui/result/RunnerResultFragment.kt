@@ -4,11 +4,16 @@ import android.text.InputType
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
+import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
+import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
+import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
+import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import kotlinx.android.synthetic.main.fragment_runners_results.*
 
 class RunnerResultFragment : BaseFragment(R.layout.fragment_runners_results) {
@@ -35,6 +40,13 @@ class RunnerResultFragment : BaseFragment(R.layout.fragment_runners_results) {
     override fun bindViewModel() {
         viewModel.runnerResults.observe(viewLifecycleOwner, Observer { runnersResults ->
             resultAdapter.resultList = runnersResults.toMutableList()
+        })
+
+        viewModel.error.observe(viewLifecycleOwner, Observer {
+            when(it){
+                is RunnerNotFoundException -> context?.toast(getString(R.string.error_runner_not_found))
+                is SaveRunnerDataException -> context?.toast(getString(R.string.error_save_data_to_local_db))
+            }
         })
     }
 

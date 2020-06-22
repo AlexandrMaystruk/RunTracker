@@ -30,13 +30,13 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
 
     override fun bindViewModel() {
         viewModel.config.observe(viewLifecycleOwner, Observer {
-            spinnerForRunners.setSelection(it.checkpointId?:0)
-            spinnerForIronPeople.setSelection(it.checkpointIronPeopleId?:0)
-            tvDateOfStart.text = "Дата старта: ${it.startDate?.toDateTimeFormat()}"
+            spinnerForRunners.setSelection(it.checkpointId ?: 0)
+            spinnerForIronPeople.setSelection(it.checkpointIronPeopleId ?: 0)
+            tvDateOfStart.text = getString(R.string.date_of_start, it.startDate?.toDateTimeFormat()?:"")
         })
 
         viewModel.start.observe(viewLifecycleOwner, Observer {
-            tvDateOfStart.text = "Дата старта: ${it?.toDateTimeFormat()}"
+            tvDateOfStart.text = getString(R.string.date_of_start, it?.toDateTimeFormat()?:"")
         })
 
         viewModel.toast.observe(viewLifecycleOwner, Observer {

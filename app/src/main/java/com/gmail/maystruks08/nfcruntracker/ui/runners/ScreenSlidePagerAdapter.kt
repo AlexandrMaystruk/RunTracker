@@ -11,7 +11,9 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import timber.log.Timber
 
 class ScreenSlidePagerAdapter(
-    private val onClickedAtRunner: (RunnerView) -> Unit, fm: FragmentManager
+    private val onClickedAtRunner: (RunnerView) -> Unit,
+    private val titles: Array<String>,
+    fm: FragmentManager
 ) :
     FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
@@ -19,7 +21,8 @@ class ScreenSlidePagerAdapter(
 
     override fun getCount(): Int = RunnerType.values().size
 
-    override fun getItem(position: Int): Fragment = RunnersFragment.getInstance(position, onClickedAtRunner)
+    override fun getItem(position: Int): Fragment =
+        RunnersFragment.getInstance(position, onClickedAtRunner)
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val fragment = super.instantiateItem(container, position) as RunnersFragment
@@ -34,18 +37,14 @@ class ScreenSlidePagerAdapter(
 
     fun getCurrentVisibleFragment(position: Int): RunnersFragment? = registeredFragments[position]
 
-    override fun getPageTitle(position: Int): CharSequence? = when (position) {
-        0 -> "Бегуны"
-        1 -> "Железные"
-        else -> ""
-    }
+    override fun getPageTitle(position: Int): CharSequence? = titles.getOrNull(position)
 
 
     override fun restoreState(state: Parcelable?, loader: ClassLoader?) {
         try {
             super.restoreState(state, loader)
         } catch (e: Exception) {
-           Timber.d( "Error Restore State of Fragment")
+            Timber.d("Error Restore State of Fragment")
         }
     }
 }

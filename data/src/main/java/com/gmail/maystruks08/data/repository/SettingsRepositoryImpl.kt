@@ -60,8 +60,8 @@ class SettingsRepositoryImpl @Inject constructor(
         val currentIronPeopleCheckpointId = preferences.getCurrentIronPeopleCheckpoint()
         val startDate = Date(preferences.getDateOfStart())
 
-        settingsCache.checkpoints = checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }
-        settingsCache.checkpointsIronPeople = checkpointDAO.getCheckpointsByType(CheckpointType.IRON.ordinal).map { it.toCheckpoint() }
+        settingsCache.checkpoints = checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
+        settingsCache.checkpointsIronPeople = checkpointDAO.getCheckpointsByType(CheckpointType.IRON.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
 
         val checkpoint = settingsCache.checkpoints.find { it.id == currentCheckpointId } ?: settingsCache.checkpoints.first()
         val checkpointIronPeople = settingsCache.checkpointsIronPeople.find { it.id == currentIronPeopleCheckpointId } ?: settingsCache.checkpoints.first()
@@ -91,8 +91,7 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun changeCurrentCheckpointForIronPeoples(checkpointNumber: Int) {
-        settingsCache.currentIronPeopleCheckpoint =
-            settingsCache.checkpointsIronPeople[checkpointNumber]
+        settingsCache.currentIronPeopleCheckpoint = settingsCache.checkpointsIronPeople[checkpointNumber]
         preferences.saveCurrentIronPeopleCheckpointId(checkpointNumber)
         if (networkUtil.isOnline()) {
             firebaseAuth.currentUser?.uid?.let { currentUserId ->

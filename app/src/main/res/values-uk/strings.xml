@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Run Tracker</string>
+
+    <string name="search">Пошук</string>
+    <string name="signOut">Вийти</string>
+
+    <string name="screen_settings">Налаштування</string>
+    <string name="screen_register_new_runner">Реєстрація учасника</string>
+    <string name="screen_runners_results">Результати</string>
+    <string name="screen_runner">Інформація про учасника</string>
+
+    <string name="tab_runner_result">Бігуни</string>
+    <string name="tab_iron_runner_result">Залізні</string>
+
+    <string name="toast_exit_app_warning_text">Натисніть ще раз для виходу</string>
+    <string name="button_start_run_tracker">Начать забег</string>
+    <string name="checkpoint_for_iron_people">КП для залізних людей</string>
+    <string name="checkpoint_for_people">КП для бігунів</string>
+    <string name="select_your_checkpoint">Вкажіть на якому з КП ви перебуваєте</string>
+    <string name="date_of_start">Дата старту:%1$s</string>
+    <string name="scan_card">Відскануте карту</string>
+    <string name="button_add">Добавити</string>
+    <string name="runner_number">Номер участника</string>
+    <string name="iron">залізний</string>
+    <string name="runner">бігун</string>
+    <string name="city">Місто</string>
+    <string name="date_of_birthday">Дата народження</string>
+    <string name="female">жінка</string>
+    <string name="male">чоловік</string>
+    <string name="full_name">ПІБ</string>
+    <string name="mark_at_current_checkpoint">Відзначити на поточному КП</string>
+    <string name="fill_in_required_fields">Заповніть обов\'язкові поля!</string>
+    <string name="card">Карта %1$s</string>
+
+    <string name="error_member_already_exist">Учасник з такою картою вже існує</string>
+    <string name="error_sync_with_server">Помилка синхронізації з сервером</string>
+    <string name="error_save_data_to_local_db">Помилка при збереженні данних до локальної бази даних</string>
+    <string name="error_runner_not_found">Учасника не знайдено</string>
+    <string name="attention">Увага!</string>
+    <string name="remove_checkpoint_for_runner">Видалити учаснику проходження поточного КП?</string>
+    <string name="mark_runner_without_card">Отметить участника на КП без карты?</string>
+    <string name="total_time">Загальний час: %1$s</string>
+
+</resources>

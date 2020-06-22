@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="checkpoints_full_name">
-        <item>Старт</item>
-        <item>КП 15</item>
-        <item>КП 46</item>
-        <item>КП 52</item>
-        <item>КП 70</item>
-        <item>КП 81</item>
-        <item>КП 90</item>
-        <item>Финиш</item>
+        <item>Start</item>
+        <item>CP 15</item>
+        <item>CP 46</item>
+        <item>CP 52</item>
+        <item>CP 70</item>
+        <item>CP 81</item>
+        <item>CP 90</item>
+        <item>Finish</item>
     </string-array>
 
     <string-array name="iron_people_checkpoints_full_name">
         <item>Старт</item>
-        <item>КП 7.5</item>
-        <item>КП 15</item>
-        <item>КП 42</item>
-        <item>КП 52</item>
-        <item>КП 70</item>
-        <item>КП 81</item>
-        <item>КП 91</item>
-        <item>Финиш</item>
+        <item>CP 7.5</item>
+        <item>CP 15</item>
+        <item>CP 42</item>
+        <item>CP 52</item>
+        <item>CP 70</item>
+        <item>CP 81</item>
+        <item>CP 91</item>
+        <item>Finish</item>
     </string-array>
 
 </resources>

@@ -23,8 +23,12 @@ class RunnerResultViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     val runnerResults get(): LiveData<List<RunnerResultView>> = _runnerResultsLiveData
+    val error get() : LiveData<Throwable> = _errorLiveData
 
     private val _runnerResultsLiveData = MutableLiveData<List<RunnerResultView>>()
+    private val _errorLiveData = MutableLiveData<Throwable>()
+
+
 
     private var type: RunnerType = RunnerType.NORMAL
 
@@ -44,10 +48,8 @@ class RunnerResultViewModel @Inject constructor(
     }
 
     private fun handleError(e: Exception) {
-        e.printStackTrace()
         when (e) {
-            is RunnerNotFoundException -> toastLiveData.postValue("Участник не найден =(")
-            is SaveRunnerDataException -> toastLiveData.postValue("Ошибка сохранения данных участника =(")
+            is RunnerNotFoundException, is SaveRunnerDataException -> _errorLiveData.postValue(e)
         }
     }
 
