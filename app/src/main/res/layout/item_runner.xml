@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_item"
     android:layout_width="match_parent"
-    android:layout_height="130dp"
+    android:layout_height="@dimen/runnerItemSmallHeight"
     android:layout_marginStart="@dimen/margin_xs"
     android:layout_marginTop="@dimen/margin_min"
     android:layout_marginEnd="@dimen/margin_xs"
@@ -11,6 +12,7 @@
     app:contentPadding="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/item_constraint_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -31,9 +33,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_s"
+            android:layout_marginTop="@dimen/margin_xs"
+            android:layout_marginBottom="@dimen/margin_xs"
             android:textStyle="italic"
-            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/runnerProgress" />
 
         <TextView

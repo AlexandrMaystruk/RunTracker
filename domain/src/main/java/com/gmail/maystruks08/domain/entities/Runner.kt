@@ -11,8 +11,13 @@ data class Runner(
     val dateOfBirthday: Date,
     val type: RunnerType,
     var totalResult: Date?,
-    val checkpoints: MutableList<Checkpoint> = mutableListOf()
+    val checkpoints: MutableList<Checkpoint> = mutableListOf(),
+    var isOffTrack: Boolean
 ) {
+
+    fun markThatRunnerIsOffTrack(){
+        isOffTrack = true
+    }
 
     /**
      * Add checkpoint to runner entity

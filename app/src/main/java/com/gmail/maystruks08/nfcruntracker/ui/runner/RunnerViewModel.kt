@@ -41,6 +41,16 @@ class RunnerViewModel @Inject constructor(
         }
     }
 
+    fun onRunnerOffTrack() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val runnerId = runner.value?.id ?: return@launch
+            when (val onResult = runnersInteractor.markRunnerGotOffTheRoute(runnerId)) {
+                is ResultOfTask.Value -> handleRunnerData(onResult.value.runner)
+                is ResultOfTask.Error -> handleError(onResult.error)
+            }
+        }
+    }
+
     fun markCheckpointAsPassed(runnerId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(runnerId)) {
@@ -52,7 +62,8 @@ class RunnerViewModel @Inject constructor(
 
     fun deleteCheckpointFromRunner(runnerId: String, checkpointId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val onResult = runnersInteractor.removeCheckpointForRunner(runnerId, checkpointId)) {
+            when (val onResult =
+                runnersInteractor.removeCheckpointForRunner(runnerId, checkpointId)) {
                 is ResultOfTask.Value -> handleRunnerData(onResult.value.runner)
                 is ResultOfTask.Error -> handleError(onResult.error)
             }

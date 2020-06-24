@@ -43,6 +43,15 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
         }
     }
 
+    override suspend fun markRunnerGotOffTheRoute(cardId: String): ResultOfTask<Exception, RunnerChange> {
+        return ResultOfTask.build {
+            val runner = runnersRepository.getRunnerById(cardId) ?: throw RunnerNotFoundException()
+            runner.markThatRunnerIsOffTrack()
+            logHelper.log(INFO, "Runner ${runner.id} ${runner.type} ${runner.fullName} is off track")
+            RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
+        }
+    }
+
     override suspend fun addCurrentCheckpointToRunner(cardId: String ): ResultOfTask<Exception, RunnerChange> {
         return ResultOfTask.build {
             val runner = runnersRepository.getRunnerById(cardId) ?: throw RunnerNotFoundException()

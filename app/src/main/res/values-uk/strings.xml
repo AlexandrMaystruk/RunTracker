@@ -40,5 +40,6 @@
     <string name="remove_checkpoint_for_runner">Видалити учаснику проходження поточного КП?</string>
     <string name="mark_runner_without_card">Отметить участника на КП без карты?</string>
     <string name="total_time">Загальний час: %1$s</string>
+    <string name="off_track">Зійшов з маршруту</string>
 
 </resources>

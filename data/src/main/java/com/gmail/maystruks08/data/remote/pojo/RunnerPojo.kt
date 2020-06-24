@@ -12,5 +12,6 @@ class RunnerPojo(
     val type: Int = 0,
     var totalResult: Date? = null,
     var completeCheckpoints: List<CheckpointResultPojo> = listOf(),
-    val uncompletedCheckpoints: List<CheckpointPojo> = listOf()
+    val uncompletedCheckpoints: List<CheckpointPojo> = listOf(),
+    val isOffTrack: Boolean = false
 )

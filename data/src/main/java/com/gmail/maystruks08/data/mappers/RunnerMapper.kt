@@ -30,7 +30,8 @@ fun List<RunnerTableView>.toRunners(checkpoints: List<Checkpoint>): List<Runner>
                         hasPrevious = result.hasPrevious
                     )
                 } else cp
-            }.toMutableList()
+            }.toMutableList(),
+            isOffTrack = tableView.runnerTable.isOffTrack
         )
     }
 }
@@ -44,7 +45,8 @@ fun Runner.toRunnerTable(): RunnerTable {
         sex = this.sex.ordinal,
         dateOfBirthday = this.dateOfBirthday,
         totalResult = this.totalResult,
-        type = this.type.ordinal
+        type = this.type.ordinal,
+        isOffTrack = this.isOffTrack
     )
 }
 
@@ -58,7 +60,8 @@ fun List<RunnerPojo>.fromFirestoreRunners(): List<Runner> = this.map { it.fromFi
 fun Runner.toFirestoreRunner(): RunnerPojo {
     return RunnerPojo(
         id, number, fullName, sex.ordinal, city, dateOfBirthday, type.ordinal, totalResult,
-        checkpoints.toFirestoreCheckpointsResult(), checkpoints.toFirestoreCheckpoints()
+        checkpoints.toFirestoreCheckpointsResult(), checkpoints.toFirestoreCheckpoints(),
+        isOffTrack
     )
 }
 
@@ -69,7 +72,8 @@ fun RunnerPojo.fromFirestoreRunner(): Runner {
             addAll(completeCheckpoints.fromFirestoreCheckpointsResult())
             addAll(uncompletedCheckpoints.fromFirestoreCheckpoints())
             sortBy { it.id }
-        }
+        },
+        isOffTrack
     )
 }
 

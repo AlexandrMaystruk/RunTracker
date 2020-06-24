@@ -38,7 +38,8 @@
     <string name="error_runner_not_found">Runner not found</string>
     <string name="attention">Attention!</string>
     <string name ="remove_checkpoint_for_runner">Do you want the participant to clear the current CP?</string>
-    <string name="mark_runner_without_card">Отметить участника на КП без карты?</string>
+    <string name="mark_runner_without_card">Mark runner on CP without card?</string>
     <string name="total_time">Total time: %1$s</string>
+    <string name="off_track">Off track</string>
 
 </resources>

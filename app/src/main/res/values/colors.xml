@@ -20,4 +20,8 @@
     <color name="colorCard">#332E4E</color>
     <color name="colorDivider">#808E8E8E</color>
 
+    <color name="colorCardFinisher">#80EEFFDB</color>
+    <color name="colorCardOffTrack">#34FAD9D7</color>
+    <color name="colorCardInProgress">#FFFFFF</color>
+
 </resources>

@@ -1,6 +1,8 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runner
 
+import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.maystruks08.nfcruntracker.App
@@ -31,6 +33,14 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
         .withNavigationIcon(R.drawable.ic_arrow_back) { viewModel.onBackClicked() }
+        .withMenu(R.menu.menu_off_track)
+        .withMenuItems(
+            listOf(R.id.action_runner_off_track),
+            listOf(MenuItem.OnMenuItemClickListener {
+                viewModel.onRunnerOffTrack()
+                true
+            })
+        )
         .withTitle(R.string.screen_runner)
         .build()
 
@@ -43,14 +53,27 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
             tvRunnerFullName.text = runner.fullName
             tvDateOfBirthday.text = runner.dateOfBirthday
             tvRunnerCity.text = runner.city
-            if (runner.result != null) {
-                val totalResultStr = getString(R.string.total_time, runner.result)
-                btnMarkCheckpointAsPassedInManual.text = totalResultStr
-                btnMarkCheckpointAsPassedInManual.isEnabled = false
-            } else {
-                btnMarkCheckpointAsPassedInManual.text = getString(R.string.mark_at_current_checkpoint)
-                btnMarkCheckpointAsPassedInManual.isEnabled = true
+            when {
+                runner.isOffTrack -> {
+                    val buttonText = getString(R.string.off_track)
+                    btnMarkCheckpointAsPassedInManual.text = buttonText
+                    btnMarkCheckpointAsPassedInManual.isEnabled = false
+                    btnMarkCheckpointAsPassedInManual.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_main_btn_red)
+                }
+                runner.result != null -> {
+                    val totalResultStr = getString(R.string.total_time, runner.result)
+                    btnMarkCheckpointAsPassedInManual.text = totalResultStr
+                    btnMarkCheckpointAsPassedInManual.isEnabled = false
+                    btnMarkCheckpointAsPassedInManual.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_main_btn_green)
+
+                }
+                else -> {
+                    btnMarkCheckpointAsPassedInManual.text = getString(R.string.mark_at_current_checkpoint)
+                    btnMarkCheckpointAsPassedInManual.isEnabled = true
+                    btnMarkCheckpointAsPassedInManual.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_main_btn)
+                }
             }
+            checkpointsAdapter?.isOffTrack = runner.isOffTrack
             checkpointsAdapter?.checkpoints = runner.progress.toMutableList()
         })
     }

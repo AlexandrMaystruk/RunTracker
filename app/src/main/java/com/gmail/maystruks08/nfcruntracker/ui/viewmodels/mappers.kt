@@ -18,7 +18,8 @@ fun Runner.toRunnerView() = RunnerView(
     this.totalResult?.toTimeUTCFormat(),
     this.dateOfBirthday.toDateFormat(),
     this.type.ordinal,
-    this.checkpoints.toCheckpointViews()
+    this.checkpoints.toCheckpointViews(),
+    this.isOffTrack
 )
 
 fun Runner.toRunnerResultView(position: Int) = RunnerResultView(

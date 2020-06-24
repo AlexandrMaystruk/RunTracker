@@ -13,5 +13,6 @@ data class RunnerView(
     val result: String?,
     val dateOfBirthday: String,
     val type: Int,
-    val progress: List<CheckpointView>
+    val progress: List<CheckpointView>,
+    val isOffTrack: Boolean
 ) : Parcelable

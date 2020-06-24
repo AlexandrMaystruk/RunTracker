@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runner
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,11 +16,13 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
 import kotlinx.android.synthetic.main.item_checkpoint.view.*
 import kotlin.properties.Delegates
 
-class CheckpointsAdapter(private val longClickListener: (Int) -> Unit) : RecyclerView.Adapter<CheckpointsAdapter.ViewHolder>() {
+class CheckpointsAdapter( private val longClickListener: (Int) -> Unit) : RecyclerView.Adapter<CheckpointsAdapter.ViewHolder>() {
 
     var checkpoints: MutableList<CheckpointView> by Delegates.observable(mutableListOf()) { _, _, _ ->
         notifyDataSetChanged()
     }
+
+    var isOffTrack: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_checkpoint, parent, false)
@@ -65,6 +68,11 @@ class CheckpointsAdapter(private val longClickListener: (Int) -> Unit) : Recycle
             }
 
             itemView.ivCheckpointState.background = ContextCompat.getDrawable(itemView.context, stateDrawable)
+            if(isOffTrack){
+                itemView.tvCheckpointDate.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+            } else {
+                itemView.tvCheckpointDate.paintFlags = Paint.LINEAR_TEXT_FLAG
+            }
             if(item.date != null){
                 itemView.tvCheckpointDate.setOnLongClickListener {
                     longClickListener.invoke(item.id)

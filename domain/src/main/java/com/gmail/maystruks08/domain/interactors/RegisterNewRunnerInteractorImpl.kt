@@ -24,7 +24,8 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(private val runnersRep
                 dateOfBirthday = dateOfBirthday,
                 type = runnerType,
                 totalResult = null,
-                checkpoints = checkpoints
+                checkpoints = checkpoints,
+                isOffTrack = false
             )
             runnersRepository.saveNewRunner(newRunner)
         }

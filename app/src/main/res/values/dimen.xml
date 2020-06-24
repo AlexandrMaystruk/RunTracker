@@ -35,4 +35,7 @@
     <!--Widget size-->
     <item name="mainVerticalGuideline" format="float" type="dimen">0.5</item>
 
+    <dimen name="runnerItemBigHeight">125dp</dimen>
+    <dimen name="runnerItemSmallHeight">85dp</dimen>
+
 </resources>
