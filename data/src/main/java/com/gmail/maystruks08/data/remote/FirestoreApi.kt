@@ -32,4 +32,6 @@ interface FirestoreApi{
 
     suspend fun unregisterUpdatesListener()
 
+
+
 }

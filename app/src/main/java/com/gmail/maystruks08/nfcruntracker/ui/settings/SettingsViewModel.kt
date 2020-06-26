@@ -13,7 +13,6 @@ import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -24,27 +23,32 @@ class SettingsViewModel @Inject constructor(
     private val startRunTrackerBus: StartRunTrackerBus
 ) : BaseViewModel() {
 
-    val config get(): LiveData<SettingsRepository.Config> = configLiveData
+    val config get(): LiveData<SettingsRepository.CheckpointsConfig> = configLiveData
     val start get(): LiveData<Date> = startCommandLiveData
 
-    private val configLiveData = MutableLiveData<SettingsRepository.Config>()
+    private val configLiveData = MutableLiveData<SettingsRepository.CheckpointsConfig>()
     private val startCommandLiveData = MutableLiveData<Date>()
 
 
     private var isFirstStart = true
 
     init {
-        viewModelScope.launch {
-            try {
-                val config = repository.getCachedConfig()
-                configLiveData.value = config
-            } catch (e: Exception){
-                Timber.i("Get cached config error")
-            }
-        }
+        getCachedConfig()
+        updateConfig()
+    }
 
+    private fun updateConfig(){
         viewModelScope.launch(Dispatchers.IO) {
             when (val resultOfTask = repository.updateConfig()) {
+                is ResultOfTask.Value -> getCachedConfig()
+                is ResultOfTask.Error -> resultOfTask.error.printStackTrace()
+            }
+        }
+    }
+
+    private fun getCachedConfig(){
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val resultOfTask = repository.getCachedConfig()) {
                 is ResultOfTask.Value -> configLiveData.postValue(resultOfTask.value)
                 is ResultOfTask.Error -> resultOfTask.error.printStackTrace()
             }

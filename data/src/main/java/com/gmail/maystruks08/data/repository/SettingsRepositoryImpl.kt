@@ -7,9 +7,9 @@ import com.gmail.maystruks08.data.local.dao.CheckpointDAO
 import com.gmail.maystruks08.data.mappers.toCheckpoint
 import com.gmail.maystruks08.data.mappers.toCheckpointTable
 import com.gmail.maystruks08.data.remote.FirestoreApi
+import com.gmail.maystruks08.data.remote.pojo.CheckpointPojo
 import com.gmail.maystruks08.data.toDataClass
 import com.gmail.maystruks08.domain.NetworkUtil
-import com.gmail.maystruks08.domain.entities.Checkpoint
 import com.gmail.maystruks08.domain.entities.CheckpointType
 import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.repository.SettingsRepository
@@ -27,11 +27,11 @@ class SettingsRepositoryImpl @Inject constructor(
     private val networkUtil: NetworkUtil
 ) : SettingsRepository {
 
-    override suspend fun updateConfig(): ResultOfTask<Exception, SettingsRepository.Config> {
+    override suspend fun updateConfig(): ResultOfTask<Exception, Unit> {
         return ResultOfTask.build {
-            if ( networkUtil.isOnline()) {
+            if (networkUtil.isOnline()) {
                 val checkpointsSnapshot = awaitTaskResult(firestoreApi.getCheckpoints())
-                checkpointsSnapshot.data?.toDataClass<HashMap<String, Checkpoint>?>()?.let { hashMap ->
+                checkpointsSnapshot.data?.toDataClass<HashMap<String, CheckpointPojo>?>()?.let { hashMap ->
                         val checkpoints = hashMap.values
                         checkpointDAO.deleteCheckpoints()
                         checkpointDAO.insertAllOrReplace(checkpoints.map { it.toCheckpointTable() })
@@ -45,32 +45,35 @@ class SettingsRepositoryImpl @Inject constructor(
                     val startDate = (startDateResult["Start at"] as? com.google.firebase.Timestamp)?.toDate()
 
                     if (checkpointId != null) preferences.saveCurrentCheckpointId((checkpointId.values.first() as Long).toInt())
-                    if (checkpointIronPeopleId != null) preferences.saveCurrentIronPeopleCheckpointId(
-                        (checkpointIronPeopleId.values.first() as Long).toInt()
-                    )
+                    if (checkpointIronPeopleId != null) preferences.saveCurrentIronPeopleCheckpointId((checkpointIronPeopleId.values.first() as Long).toInt())
                     if (startDate != null) preferences.saveDateOfStart(startDate.time)
                 }
             }
-            getCachedConfig()
         }
     }
 
-    override suspend fun getCachedConfig(): SettingsRepository.Config {
-        val currentCheckpointId = preferences.getCurrentCheckpoint()
-        val currentIronPeopleCheckpointId = preferences.getCurrentIronPeopleCheckpoint()
-        val startDate = Date(preferences.getDateOfStart())
+    override suspend fun getCachedConfig(): ResultOfTask<Exception, SettingsRepository.CheckpointsConfig> {
+        return ResultOfTask.build {
+            val currentCheckpointId = preferences.getCurrentCheckpoint()
+            val currentIronPeopleCheckpointId = preferences.getCurrentIronPeopleCheckpoint()
+            val startDate = Date(preferences.getDateOfStart())
 
-        settingsCache.checkpoints = checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
-        settingsCache.checkpointsIronPeople = checkpointDAO.getCheckpointsByType(CheckpointType.IRON.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
+            settingsCache.checkpoints = checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
+            settingsCache.checkpointsIronPeople = checkpointDAO.getCheckpointsByType(CheckpointType.IRON.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
 
-        val checkpoint = settingsCache.checkpoints.find { it.id == currentCheckpointId } ?: settingsCache.checkpoints.first()
-        val checkpointIronPeople = settingsCache.checkpointsIronPeople.find { it.id == currentIronPeopleCheckpointId } ?: settingsCache.checkpoints.first()
+            val checkpoint = settingsCache.checkpoints.find { it.id == currentCheckpointId } ?: settingsCache.checkpoints.first()
+            val checkpointIronPeople = settingsCache.checkpointsIronPeople.find { it.id == currentIronPeopleCheckpointId } ?: settingsCache.checkpoints.first()
 
-        settingsCache.currentCheckpoint = checkpoint
-        settingsCache.currentIronPeopleCheckpoint = checkpointIronPeople
-        settingsCache.dateOfStart = startDate
+            settingsCache.currentCheckpoint = checkpoint
+            settingsCache.currentIronPeopleCheckpoint = checkpointIronPeople
+            settingsCache.dateOfStart = startDate
 
-        return SettingsRepository.Config(checkpoint.id, checkpointIronPeople.id, startDate)
+            val config = SettingsRepository.Config(checkpoint.id, checkpointIronPeople.id, startDate)
+            val checkpointsTitle = settingsCache.checkpoints.map { it.name }
+            val ironCheckpointsTitle = settingsCache.checkpointsIronPeople.map { it.name }
+
+            SettingsRepository.CheckpointsConfig(checkpointsTitle, ironCheckpointsTitle, config)
+        }
     }
 
     override suspend fun changeCurrentCheckpoint(checkpointNumber: Int) {

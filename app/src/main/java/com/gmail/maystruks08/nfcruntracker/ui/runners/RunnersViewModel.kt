@@ -54,6 +54,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     private suspend fun showAllRunners() {
         when (val result = runnersInteractor.getRunners(runnerType)) {
             is ResultOfTask.Value -> {
+                Timber.e(result.value.toTypedArray().contentToString())
                 val runners = result.value.toRunnerViews().sortedBy { it.result }.toMutableList()
                 _runnersLiveData.postValue(runners)
             }

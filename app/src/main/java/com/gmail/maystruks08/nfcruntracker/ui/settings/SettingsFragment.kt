@@ -2,6 +2,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.settings
 
 import android.view.View
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.lifecycle.Observer
 import com.gmail.maystruks08.domain.toDateTimeFormat
 import com.gmail.maystruks08.nfcruntracker.App
@@ -30,9 +31,16 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
 
     override fun bindViewModel() {
         viewModel.config.observe(viewLifecycleOwner, Observer {
-            spinnerForRunners.setSelection(it.checkpointId ?: 0)
-            spinnerForIronPeople.setSelection(it.checkpointIronPeopleId ?: 0)
-            tvDateOfStart.text = getString(R.string.date_of_start, it.startDate?.toDateTimeFormat()?:"")
+            val adapterRunner = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it.checkpointsName)
+            val adapterIron = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it.checkpointsName)
+            adapterRunner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            adapterIron.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+            spinnerForRunners.adapter = adapterRunner
+            spinnerForIronPeople.adapter = adapterIron
+            spinnerForRunners.setSelection(it.settings.checkpointId ?: 0)
+            spinnerForIronPeople.setSelection(it.settings.checkpointIronPeopleId ?: 0)
+            tvDateOfStart.text = getString(R.string.date_of_start, it.settings.startDate?.toDateTimeFormat() ?: "")
         })
 
         viewModel.start.observe(viewLifecycleOwner, Observer {
@@ -45,6 +53,7 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
     }
 
     override fun initViews() {
+        tvDateOfStart.text = getString(R.string.date_of_start, "")
         viewModel.onInitViewsStarted()
         spinnerForRunners.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {}

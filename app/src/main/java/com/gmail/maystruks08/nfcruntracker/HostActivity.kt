@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -31,7 +32,7 @@ import javax.inject.Inject
 
 const val PRESS_TWICE_INTERVAL = 2000
 
-class HostActivity : AppCompatActivity(){
+class HostActivity : AppCompatActivity() {
 
     @Inject
     lateinit var navigatorHolder: NavigatorHolder
@@ -50,6 +51,8 @@ class HostActivity : AppCompatActivity(){
 
     private var snackBar: Snackbar? = null
 
+    private var toast: Toast? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
@@ -58,14 +61,15 @@ class HostActivity : AppCompatActivity(){
 
         networkUtil.subscribeToConnectionChange(this.javaClass.simpleName) { isConnected ->
             if (!isConnected) {
-                snackBar = Snackbar.make(nav_host_container, "Device offline", Snackbar.LENGTH_INDEFINITE)
-                snackBar?.view?.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)?.apply {
-                    isSingleLine = false
-                    textAlignment = View.TEXT_ALIGNMENT_CENTER
-                }
+                snackBar =
+                    Snackbar.make(nav_host_container, "Device offline", Snackbar.LENGTH_INDEFINITE)
+                snackBar?.view?.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    ?.apply {
+                        isSingleLine = false
+                        textAlignment = View.TEXT_ALIGNMENT_CENTER
+                    }
                 snackBar?.show()
             } else {
-                toast("Соединение восстановлено")
                 snackBar?.dismiss()
             }
         }
@@ -73,11 +77,17 @@ class HostActivity : AppCompatActivity(){
         router.newRootScreen(Screens.LoginScreen())
     }
 
-    private val navigator: Navigator = object : AppNavigator(this, supportFragmentManager, R.id.nav_host_container) {
-            override fun setupFragmentTransaction(command: Command?, currentFragment: Fragment?, nextFragment: Fragment?, fragmentTransaction: FragmentTransaction) {
+    private val navigator: Navigator =
+        object : AppNavigator(this, supportFragmentManager, R.id.nav_host_container) {
+            override fun setupFragmentTransaction(
+                command: Command?,
+                currentFragment: Fragment?,
+                nextFragment: Fragment?,
+                fragmentTransaction: FragmentTransaction
+            ) {
                 fragmentTransaction.setReorderingAllowed(true)
             }
-    }
+        }
 
     override fun onBackPressed() {
         this.hideSoftKeyboard()
@@ -88,7 +98,12 @@ class HostActivity : AppCompatActivity(){
         when {
             supportFragmentManager.backStackEntryCount > 0 -> router.exit()
             lastBackPressTime < System.currentTimeMillis() - PRESS_TWICE_INTERVAL -> {
-                toast(getString(R.string.toast_exit_app_warning_text))
+                toast = Toast.makeText(
+                    this,
+                    getString(R.string.toast_exit_app_warning_text),
+                    Toast.LENGTH_SHORT
+                )
+                toast?.show()
                 lastBackPressTime = System.currentTimeMillis()
             }
             else -> router.exit()
@@ -97,8 +112,7 @@ class HostActivity : AppCompatActivity(){
 
     private fun hideSoftKeyboard() {
         if (currentFocus != null) {
-            val inputMethodManager =
-                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
         }
     }
@@ -129,7 +143,9 @@ class HostActivity : AppCompatActivity(){
         nfcAdapter.processReadCard(intent)?.let { cardId ->
             Timber.log(Log.INFO, "Card scanned: $cardId at ${Date().toDateTimeFormat()}")
             toast("Карта: $cardId")
-            getFragment<RootRunnersFragment>(Screens.RootRunnersScreen.tag())?.onNfcCardScanned(cardId)
+            getFragment<RootRunnersFragment>(Screens.RootRunnersScreen.tag())?.onNfcCardScanned(
+                cardId
+            )
         }
     }
 
@@ -138,9 +154,11 @@ class HostActivity : AppCompatActivity(){
         navigatorHolder.removeNavigator()
         nfcAdapter.stopListening(this)
         alertDialog?.dismiss()
+        this.hideSoftKeyboard()
     }
 
     override fun onDestroy() {
+        toast?.cancel()
         networkUtil.unsubscribe(this.javaClass.simpleName)
         super.onDestroy()
     }
