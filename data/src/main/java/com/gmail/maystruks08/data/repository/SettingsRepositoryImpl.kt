@@ -62,7 +62,7 @@ class SettingsRepositoryImpl @Inject constructor(
             settingsCache.checkpointsIronPeople = checkpointDAO.getCheckpointsByType(CheckpointType.IRON.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
 
             val checkpoint = settingsCache.checkpoints.find { it.id == currentCheckpointId } ?: settingsCache.checkpoints.first()
-            val checkpointIronPeople = settingsCache.checkpointsIronPeople.find { it.id == currentIronPeopleCheckpointId } ?: settingsCache.checkpoints.first()
+            val checkpointIronPeople = settingsCache.checkpointsIronPeople.find { it.id == currentIronPeopleCheckpointId } ?: settingsCache.checkpointsIronPeople.first()
 
             settingsCache.currentCheckpoint = checkpoint
             settingsCache.currentIronPeopleCheckpoint = checkpointIronPeople

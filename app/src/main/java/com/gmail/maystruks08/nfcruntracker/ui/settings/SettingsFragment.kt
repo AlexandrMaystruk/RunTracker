@@ -32,7 +32,7 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
     override fun bindViewModel() {
         viewModel.config.observe(viewLifecycleOwner, Observer {
             val adapterRunner = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it.checkpointsName)
-            val adapterIron = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it.checkpointsName)
+            val adapterIron = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it.ironCheckpointsName)
             adapterRunner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             adapterIron.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
