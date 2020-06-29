@@ -45,6 +45,18 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
     }
+
+    preBuild.doLast {
+        //Copy project git-hook to .git/hooks
+        copy {
+            from "../git-hooks"
+            into "../.git/hooks"
+        }
+        FileTree tree = fileTree('../.git/hooks')
+        tree.each {
+            Runtime.getRuntime().exec("chmod +x ../.git/hooks/${it.name}")
+        }
+    }
 }
 
 dependencies {

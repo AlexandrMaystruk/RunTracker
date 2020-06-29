@@ -1,0 +1,40 @@
+#!/bin/sh
+
+#Step 0: Check if merge/revert
+
+CONTINUE_CHECK=true
+
+COMMIT_MSG=$1
+START_LINE=`head -n1 "$COMMIT_MSG"`
+
+PATTERN_MERGE_REVERT="^Merge|^Revert"
+if [[ "$START_LINE" =~ $PATTERN_MERGE_REVERT ]]; then
+  CONTINUE_CHECK=false
+fi
+
+
+if $CONTINUE_CHECK; then
+  #Step 1: Check if commit text contain [TAG]
+  PATTERN_TAG="^\[([[:upper:]]+)]"
+  if ! [[ "$START_LINE" =~ $PATTERN_TAG ]]; then
+    echo "Bad commit message, see example: <br>[TAG] commit message"
+    exit 1
+  fi
+
+  #Step 2: Check if [TAG] is in list of allowed tags
+  allowed_tags_array=(HF BF NF CR MC OPT REF)
+  if [[ ! "${allowed_tags_array[@]}" =~ "${BASH_REMATCH[1]}" ]]; then
+    echo "Unsupported tag. Please use one of proposed:<br>"
+    echo "HF - Hot Fix <br>"	
+    echo "BF - Bug Fix <br>"
+    echo "NF - New Feature <br>"
+    echo "CR - Change Request <br>"
+    echo "MC - Merge Conflicts fix <br>"
+    echo "OPT - Optimization/Performance <br>"	
+    echo "REF - Refactoring<br>"
+    exit 1
+  fi
+fi
+
+
+
