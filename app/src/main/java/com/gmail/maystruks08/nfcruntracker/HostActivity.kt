@@ -61,8 +61,7 @@ class HostActivity : AppCompatActivity() {
 
         networkUtil.subscribeToConnectionChange(this.javaClass.simpleName) { isConnected ->
             if (!isConnected) {
-                snackBar =
-                    Snackbar.make(nav_host_container, "Device offline", Snackbar.LENGTH_INDEFINITE)
+                snackBar = Snackbar.make(nav_host_container, getString(R.string.device_offline), Snackbar.LENGTH_INDEFINITE)
                 snackBar?.view?.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
                     ?.apply {
                         isSingleLine = false
@@ -123,15 +122,15 @@ class HostActivity : AppCompatActivity() {
         nfcAdapter.startListening(this)
         if (!nfcAdapter.isEnabled()) {
             val builder = AlertDialog.Builder(this)
-                .setTitle("NFC отключен!")
-                .setMessage("Включить NFC для сканирования карт участников?")
+                .setTitle(getString(R.string.nfc_disabled))
+                .setMessage(getString(R.string.is_enable_nfc))
                 .setPositiveButton(android.R.string.yes) { _, _ ->
-                    toast("Пожалуйста, активируйте NFC и нажмите Назад, чтобы вернуться в приложение!")
+                    toast()
                     alertDialog?.dismiss()
                     startActivity(Intent(android.provider.Settings.ACTION_NFC_SETTINGS))
                 }
                 .setNegativeButton(android.R.string.no) { _, _ ->
-                    toast("NFC сканер отключен! Некоторые функции не будут работать!")
+                    toast(getString(R.string.nfc_disabled_full_message))
                     alertDialog?.dismiss()
                 }
             alertDialog = builder.show()
@@ -142,7 +141,6 @@ class HostActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         nfcAdapter.processReadCard(intent)?.let { cardId ->
             Timber.log(Log.INFO, "Card scanned: $cardId at ${Date().toDateTimeFormat()}")
-            toast("Карта: $cardId")
             getFragment<RootRunnersFragment>(Screens.RootRunnersScreen.tag())?.onNfcCardScanned(
                 cardId
             )

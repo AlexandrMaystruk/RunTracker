@@ -19,6 +19,10 @@ fun Context.toast(text: String = "Some text") {
     Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
 }
 
+fun Context.getDisplayWidth() = this.resources.displayMetrics.widthPixels
+
+fun Context.getDisplayHeight() = this.resources.displayMetrics.heightPixels
+
 inline fun <reified T : Fragment> FragmentActivity.getFragment(tag: String): T? {
     return supportFragmentManager.findFragmentByTag(tag) as? T
 }

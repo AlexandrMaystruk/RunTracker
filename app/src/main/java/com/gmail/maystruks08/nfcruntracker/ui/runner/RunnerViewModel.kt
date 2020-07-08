@@ -2,8 +2,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.runner
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.gmail.maystruks08.domain.entities.ResultOfTask
-import com.gmail.maystruks08.domain.entities.Runner
+import com.gmail.maystruks08.domain.entities.*
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
@@ -21,8 +20,10 @@ class RunnerViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     val runner get() = runnerLiveData
+    val showDialog get() = _showSuccessDialogLiveData
 
     private val runnerLiveData = MutableLiveData<RunnerView>()
+    private val _showSuccessDialogLiveData = MutableLiveData<Pair<Checkpoint?, Int>>()
 
     fun onShowRunnerClicked(runnerId: String) {
         viewModelScope.launch {
@@ -54,7 +55,7 @@ class RunnerViewModel @Inject constructor(
     fun markCheckpointAsPassed(runnerId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(runnerId)) {
-                is ResultOfTask.Value -> handleRunnerData(onResult.value.runner)
+                is ResultOfTask.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
                 is ResultOfTask.Error -> handleError(onResult.error)
             }
         }
@@ -68,6 +69,12 @@ class RunnerViewModel @Inject constructor(
                 is ResultOfTask.Error -> handleError(onResult.error)
             }
         }
+    }
+
+    private fun onMarkRunnerOnCheckpointSuccess(runnerChange: RunnerChange) {
+        val lastCheckpoint = runnerChange.runner.checkpoints.maxBy { (it as? CheckpointResult)?.date?.time ?: 0 }
+        _showSuccessDialogLiveData.postValue(lastCheckpoint to runnerChange.runner.number)
+        handleRunnerData(runnerChange.runner)
     }
 
     private fun handleRunnerData(runner: Runner) {

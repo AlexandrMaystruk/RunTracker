@@ -41,5 +41,13 @@
     <string name="mark_runner_without_card">Mark runner on CP without card?</string>
     <string name="total_time">Total time: %1$s</string>
     <string name="off_track">Off track</string>
+    <string name="ok" translatable="false">OK</string>
+    <string name="success">Success</string>
+    <string name="success_message">Checkpoint %1$s added to runner %2$s</string>
+    <string name="nfc_disabled">NFC disabled!</string>
+    <string name="nfc_disabled_full_message">NFC scanner disabled! Some features will not work!</string>
+    <string name="is_enable_nfc">Enable NFC to scan membership cards?</string>
+    <string name="please_enable_nfc">Please activate NFC and click Back to return to the app!</string>
+    <string name="device_offline">Device offline</string>
 
 </resources>

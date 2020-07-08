@@ -37,6 +37,11 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="DialogAnimation">
+    <item name="android:windowEnterAnimation">@android:anim/slide_in_left</item>
+    <item name="android:windowExitAnimation">@android:anim/slide_out_right</item>
+    </style>
+
     <style name="TextTitle">
         <item name="android:textColor">@color/colorText</item>
         <item name="android:textSize">@dimen/margin_s</item>
@@ -78,6 +83,10 @@
         <item name="android:background">@drawable/bg_main_btn</item>
         <item name="android:textSize">@dimen/text_s</item>
         <item name="android:textColor">@color/colorWhite</item>
+    </style>
+
+    <style name="MainButton.Green" parent="MainButton">
+        <item name="android:background">@drawable/bg_main_btn_green</item>
     </style>
 
 </resources>

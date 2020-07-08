@@ -25,21 +25,29 @@ class LoginViewModel @Inject constructor(
 
     val startAuthFlow get() = startAuthFlowLiveData
 
-    private val startAuthFlowLiveData = MutableLiveData<Int>()
+    private val startAuthFlowLiveData = MutableLiveData<Unit>()
 
     init {
-        if (FirebaseAuth.getInstance().currentUser == null) startAuthFlowLiveData.postValue(0) else updateAndStartMainScreen()
+        if (FirebaseAuth.getInstance().currentUser == null) startAuthFlowLiveData.postValue(Unit) else updateAndStartMainScreen()
     }
 
     private fun updateAndStartMainScreen() {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val value = settingsRepository.updateConfig()) {
-                is ResultOfTask.Value -> withContext(Dispatchers.Main) {
-                    router.newRootScreen(Screens.RootRunnersScreen())
+            when (val resultOfTask = settingsRepository.updateConfig()) {
+                is ResultOfTask.Value -> {
+                    when (val task = settingsRepository.getCachedConfig()) {
+                        is ResultOfTask.Value -> withContext(Dispatchers.Main) {
+                            router.newRootScreen(Screens.RootRunnersScreen())
+                        }
+                        is ResultOfTask.Error -> {
+                            Timber.e(task.error)
+                            withContext(Dispatchers.Main) { router.newRootScreen(Screens.RootRunnersScreen()) }
+                        }
+                    }
                 }
                 is ResultOfTask.Error -> {
+                    Timber.e(resultOfTask.error)
                     withContext(Dispatchers.Main) { router.newRootScreen(Screens.RootRunnersScreen()) }
-                    Timber.e(value.error)
                 }
             }
         }

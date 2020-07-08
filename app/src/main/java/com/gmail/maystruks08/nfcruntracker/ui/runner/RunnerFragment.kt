@@ -11,6 +11,8 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
+import com.gmail.maystruks08.nfcruntracker.core.ext.name
+import com.gmail.maystruks08.nfcruntracker.ui.runners.SuccessDialogFragment
 import kotlinx.android.synthetic.main.fragment_runner.*
 
 class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
@@ -46,6 +48,12 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
 
     override fun bindViewModel() {
         viewModel.onShowRunnerClicked(runnerId)
+
+        viewModel.showDialog.observe(viewLifecycleOwner, Observer {
+            val checkpointName = it.first?.name ?: ""
+            val message = getString(R.string.success_message, checkpointName, "#${it.second}")
+            SuccessDialogFragment.getInstance(message).show(childFragmentManager, SuccessDialogFragment.name())
+        })
 
         viewModel.runner.observe(viewLifecycleOwner, Observer { runner ->
             val numberStr = "#" + runner.number
