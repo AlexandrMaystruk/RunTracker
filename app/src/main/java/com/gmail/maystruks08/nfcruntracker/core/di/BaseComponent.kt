@@ -7,11 +7,12 @@ import com.gmail.maystruks08.nfcruntracker.HostActivity
 import com.gmail.maystruks08.nfcruntracker.core.di.login.LoginComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.root.RootRunnersComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.settings.SettingsComponent
+import com.gmail.maystruks08.nfcruntracker.workers.SyncRunnersWorker
 import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AppModule::class, DatabaseModule::class,  NavigationModule::class, SettingsModule::class, NetworkModule::class])
+@Component(modules = [AppModule::class, DatabaseModule::class, SyncModule::class,  NavigationModule::class, SettingsModule::class, NetworkModule::class])
 interface BaseComponent {
 
     fun provideAppContext(): Context
@@ -27,5 +28,7 @@ interface BaseComponent {
     fun inject(app: App)
 
     fun inject(activity: HostActivity)
+
+    fun inject(workHelper: SyncRunnersWorker)
 
 }

@@ -24,13 +24,13 @@ interface RunnerDao :
 
     @Transaction
     suspend fun updateRunner(runner: RunnerTable, results: List<ResultTable>) {
-        update(runner)
+        insertOrReplace(runner)
         insertAllOrReplaceResults(results)
     }
 
     @Transaction
     fun getRunnerWithResults(id: String): RunnerTableView {
-       return RunnerTableView(getRunner(id), getRunnerResults(id))
+        return RunnerTableView(getRunner(id), getRunnerResults(id))
     }
 
     @Transaction
@@ -54,6 +54,10 @@ interface RunnerDao :
     @Query("SELECT * FROM runners WHERE type =:type ")
     fun getRunners(type: Int): List<RunnerTable>
 
+    @Transaction
+    @Query("SELECT * FROM runners WHERE id =:id AND needToSync = 1 ")
+    fun checkNeedToSync(id: String): RunnerTable?
+
 
     @Query("UPDATE runners SET needToSync = :needToSync WHERE id = :runnerId")
     suspend fun markAsNeedToSync(runnerId: String, needToSync: Boolean)
@@ -61,6 +65,15 @@ interface RunnerDao :
     @Query("DELETE FROM runners WHERE id =:runnerId ")
     suspend fun delete(runnerId: String): Int
 
+    @Transaction
+    @Query("SELECT * FROM runners WHERE needToSync = 1")
+    fun getNotUploadedRunners(): List<RunnerTable>
+
+    @Transaction
+    fun getNotUploadedRunnersWithResults(): List<RunnerTableView> {
+        val runners = getNotUploadedRunners()
+        return runners.map { RunnerTableView(it, getRunnerResults(it.id)) }
+    }
 
 
     /**

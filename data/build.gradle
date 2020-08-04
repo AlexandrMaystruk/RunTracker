@@ -46,6 +46,8 @@ dependencies {
     api dataDependencies.firebaseUi
     api dataDependencies.firebaseAuth
 
+    api dataDependencies.workManager
+
     kapt dataDependencies.roomCompiler
 
     implementation dataDependencies.annotations

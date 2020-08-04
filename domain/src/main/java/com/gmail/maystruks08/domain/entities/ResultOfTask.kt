@@ -7,6 +7,7 @@ sealed class ResultOfTask<out E, out V> {
     data class Error<out E>(val error: E) : ResultOfTask<E, Nothing>()
 
     companion object Factory {
+
         inline fun <V> build(function: () -> V): ResultOfTask<Exception, V> =
             try {
                 Value(function.invoke())

@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.gmail.maystruks08.data.repository.SyncRunnersDataScheduler
 import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.toDateTimeFormat
 import com.gmail.maystruks08.nfcruntracker.core.ext.getFragment
@@ -28,6 +29,7 @@ import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.commands.Command
 import timber.log.Timber
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 const val PRESS_TWICE_INTERVAL = 2000
@@ -42,6 +44,9 @@ class HostActivity : AppCompatActivity() {
 
     @Inject
     lateinit var networkUtil: NetworkUtil
+
+    @Inject
+    lateinit var syncDataScheduler: SyncRunnersDataScheduler
 
     private var lastBackPressTime = 0L
 
@@ -73,17 +78,14 @@ class HostActivity : AppCompatActivity() {
             }
         }
 
+        syncDataScheduler.startSyncData(15, TimeUnit.MINUTES)
+
         router.newRootScreen(Screens.LoginScreen())
     }
 
     private val navigator: Navigator =
         object : AppNavigator(this, supportFragmentManager, R.id.nav_host_container) {
-            override fun setupFragmentTransaction(
-                command: Command?,
-                currentFragment: Fragment?,
-                nextFragment: Fragment?,
-                fragmentTransaction: FragmentTransaction
-            ) {
+            override fun setupFragmentTransaction(command: Command?, currentFragment: Fragment?, nextFragment: Fragment?, fragmentTransaction: FragmentTransaction) {
                 fragmentTransaction.setReorderingAllowed(true)
             }
         }
@@ -141,9 +143,7 @@ class HostActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         nfcAdapter.processReadCard(intent)?.let { cardId ->
             Timber.log(Log.INFO, "Card scanned: $cardId at ${Date().toDateTimeFormat()}")
-            getFragment<RootRunnersFragment>(Screens.RootRunnersScreen.tag())?.onNfcCardScanned(
-                cardId
-            )
+            getFragment<RootRunnersFragment>(Screens.RootRunnersScreen.tag())?.onNfcCardScanned(cardId)
         }
     }
 
@@ -153,6 +153,11 @@ class HostActivity : AppCompatActivity() {
         nfcAdapter.stopListening(this)
         alertDialog?.dismiss()
         this.hideSoftKeyboard()
+    }
+
+    override fun onStop() {
+        syncDataScheduler.stopAllWork()
+        super.onStop()
     }
 
     override fun onDestroy() {

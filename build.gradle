@@ -166,7 +166,7 @@ ext {
 
     //WorkManager
     //https://developer.android.com/jetpack/androidx/releases/work#declaring_dependencies
-    workManagerVersion = '2.3.4'
+    workManagerVersion = '2.4.0'
 
     //https://developer.android.com/jetpack/androidx/releases/room
     roomVersion = '2.2.5'

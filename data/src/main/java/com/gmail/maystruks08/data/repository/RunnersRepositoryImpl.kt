@@ -45,15 +45,18 @@ class RunnersRepositoryImpl @Inject constructor(
                 if (networkUtil.isOnline()) {
                     it.forEach { change ->
                         runBlocking {
+                            val canRewriteLocalCache = checkIsDataUploaded(change.runner.id)
                             val resultOfTask = ResultOfTask.build {
-                                when (change.changeType) {
-                                    Change.ADD -> insertRunner(change.runner)
-                                    Change.UPDATE -> updateRunner(change.runner)
-                                    Change.REMOVE -> deleteRunner(change.runner)
+                                if(canRewriteLocalCache){
+                                    when (change.changeType) {
+                                        Change.ADD -> insertRunner(change.runner)
+                                        Change.UPDATE -> updateRunner(change.runner)
+                                        Change.REMOVE -> deleteRunner(change.runner)
+                                    }
                                 }
                                 return@build change
                             }
-                            if (type == change.runner.type) onResult.invoke(resultOfTask)
+                            if (type == change.runner.type && canRewriteLocalCache) onResult.invoke(resultOfTask)
                         }
                     }
                 }
@@ -77,11 +80,11 @@ class RunnersRepositoryImpl @Inject constructor(
         }
         if (networkUtil.isOnline()) {
             try {
-                awaitTaskCompletable(firestoreApi.updateRunner(runner))
                 runnerDao.markAsNeedToSync(runner.id, false)
+                awaitTaskCompletable(firestoreApi.updateRunner(runner))
             } catch (e: FirebaseFirestoreException) {
                 Timber.e(e, "Saving runner ${runner.id} data to firestore error")
-                e.printStackTrace()
+                runnerDao.markAsNeedToSync(runner.id, true)
                 throw SyncWithServerException()
             }
         }
@@ -121,9 +124,15 @@ class RunnersRepositoryImpl @Inject constructor(
         return if (onlyFinishers) runnersCache.ironRunnersList.filter { it.totalResult != null } else runnersCache.ironRunnersList
     }
 
+    private suspend fun checkIsDataUploaded(runnerId: String): Boolean {
+        return withContext(Dispatchers.IO) {
+              runnerDao.checkNeedToSync(runnerId) == null
+         }
+    }
+
     private suspend fun insertRunner(runner: Runner) {
         withContext(Dispatchers.IO) {
-            val runnerTable = runner.toRunnerTable()
+            val runnerTable = runner.toRunnerTable(false)
             val resultTables = runner.checkpoints.toCheckpointsResult(runner.id)
             val index = runnersCache.getRunnerList(runner.type).indexOfFirst { it.number == runner.number }
             if (index != -1) {
@@ -141,7 +150,7 @@ class RunnersRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             val index = runnersCache.getRunnerList(runner.type).indexOfFirst { it.number == runner.number }
             if (index != -1) {
-                runnerDao.updateRunner(runner.toRunnerTable(), runner.checkpoints.toCheckpointsResult(runner.id))
+                runnerDao.updateRunner(runner.toRunnerTable(false), runner.checkpoints.toCheckpointsResult(runner.id))
                 runnersCache.getRunnerList(runner.type).removeAt(index)
                 runnersCache.getRunnerList(runner.type).add(index, runner)
             }

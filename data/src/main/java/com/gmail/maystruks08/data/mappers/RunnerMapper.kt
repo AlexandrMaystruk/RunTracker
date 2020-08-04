@@ -36,7 +36,7 @@ fun List<RunnerTableView>.toRunners(checkpoints: List<Checkpoint>): List<Runner>
     }
 }
 
-fun Runner.toRunnerTable(): RunnerTable {
+fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
     return RunnerTable(
         id = this.id,
         number = this.number,
@@ -46,7 +46,8 @@ fun Runner.toRunnerTable(): RunnerTable {
         dateOfBirthday = this.dateOfBirthday,
         totalResult = this.totalResult,
         type = this.type.ordinal,
-        isOffTrack = this.isOffTrack
+        isOffTrack = this.isOffTrack,
+        needToSync = needToSync
     )
 }
 
