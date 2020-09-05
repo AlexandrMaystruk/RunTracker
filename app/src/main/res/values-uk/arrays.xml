@@ -14,13 +14,12 @@
     <string-array name="iron_people_checkpoints_full_name">
         <item>Старт</item>
         <item>КП 7.5</item>
-        <item>КП 15</item>
-        <item>КП 42</item>
+        <item>КП 40</item>
         <item>КП 52</item>
         <item>КП 70</item>
-        <item>КП 81</item>
-        <item>КП 91</item>
-        <item>Фіниш</item>
+        <item>КП 80</item>
+        <item>КП 90</item>
+        <item>Финиш</item>
     </string-array>
 
 </resources>

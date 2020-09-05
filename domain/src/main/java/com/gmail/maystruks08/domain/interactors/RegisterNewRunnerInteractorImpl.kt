@@ -18,6 +18,8 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(private val runnersRep
             val newRunner = Runner(
                 id = runnerCardId,
                 fullName = fullName,
+                shortName = "def", //TODO implement
+                phone = "def phone", //TODO implement
                 number = runnerNumber,
                 sex = runnerSex,
                 city = city,

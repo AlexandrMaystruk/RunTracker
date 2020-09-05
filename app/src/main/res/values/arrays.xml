@@ -3,10 +3,10 @@
     <string-array name="checkpoints_full_name">
         <item>Start</item>
         <item>CP 15</item>
-        <item>CP 46</item>
-        <item>CP 52</item>
+        <item>CP 40</item>
+        <item>CP 50</item>
         <item>CP 70</item>
-        <item>CP 81</item>
+        <item>CP 80</item>
         <item>CP 90</item>
         <item>Finish</item>
     </string-array>
@@ -14,12 +14,11 @@
     <string-array name="iron_people_checkpoints_full_name">
         <item>Старт</item>
         <item>CP 7.5</item>
-        <item>CP 15</item>
-        <item>CP 42</item>
+        <item>CP 40</item>
         <item>CP 52</item>
         <item>CP 70</item>
-        <item>CP 81</item>
-        <item>CP 91</item>
+        <item>CP 80</item>
+        <item>CP 90</item>
         <item>Finish</item>
     </string-array>
 

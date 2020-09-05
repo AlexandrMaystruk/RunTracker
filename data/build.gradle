@@ -40,6 +40,10 @@ dependencies {
     def dataTestDependencies = rootProject.ext.dataTestDependencies
 
     implementation project(':domain')
+    implementation files('libs/poi.jar')
+
+//    implementation dataDependencies.xlsParcerApacheXML
+//    implementation dataDependencies.xlsParcerApache
 
     api dataDependencies.room
     api dataDependencies.firestore

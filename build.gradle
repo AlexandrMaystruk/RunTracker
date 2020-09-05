@@ -10,7 +10,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.3'
+        classpath 'com.android.tools.build:gradle:4.0.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.3.3'
     }
@@ -185,6 +185,9 @@ ext {
     firebaseUiVersion = '4.3.1'
     firebaseAuthVersion = '17.0.0'
 
+    //xls parcer
+    xlsParcerVersion = '3.17'
+
     //https://github.com/ShawnLin013/NumberPicker
     numberPickerVersion = '2.4.8'
 
@@ -241,20 +244,22 @@ ext {
     ]
 
     dataDependencies = [
-            annotations     : "androidx.annotation:annotation:${androidXToolsVersion}",
-            javaxAnnotation : "javax.annotation:jsr250-api:${javaxAnnotationVersion}",
-            javaxInject     : "javax.inject:javax.inject:${javaxInjectVersion}",
-            kotlin          : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlin_version}",
-            room            : "androidx.room:room-ktx:${roomVersion}",
-            roomCompiler    : "androidx.room:room-compiler:${roomVersion}",
-            workManager     : "androidx.work:work-runtime-ktx:${workManagerVersion}",
-            itextpdf        : "com.itextpdf:itextg:${textPDFVersion}",
-            corutinesCore   : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}",
-            corutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutinesVersion}",
-            firebaseUi      : "com.firebaseui:firebase-ui-auth:${firebaseUiVersion}",
-            firebaseAuth    : "com.google.firebase:firebase-auth:${firebaseAuthVersion}",
-            firestore       : "com.google.firebase:firebase-firestore:${firestoreVersion}",
-            timber          : "com.jakewharton.timber:timber:${timberVersion}"
+            annotations       : "androidx.annotation:annotation:${androidXToolsVersion}",
+            javaxAnnotation   : "javax.annotation:jsr250-api:${javaxAnnotationVersion}",
+            javaxInject       : "javax.inject:javax.inject:${javaxInjectVersion}",
+            kotlin            : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlin_version}",
+            room              : "androidx.room:room-ktx:${roomVersion}",
+            roomCompiler      : "androidx.room:room-compiler:${roomVersion}",
+            workManager       : "androidx.work:work-runtime-ktx:${workManagerVersion}",
+            itextpdf          : "com.itextpdf:itextg:${textPDFVersion}",
+            corutinesCore     : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}",
+            corutinesAndroid  : "org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutinesVersion}",
+            firebaseUi        : "com.firebaseui:firebase-ui-auth:${firebaseUiVersion}",
+            firebaseAuth      : "com.google.firebase:firebase-auth:${firebaseAuthVersion}",
+            firestore         : "com.google.firebase:firebase-firestore:${firestoreVersion}",
+            timber            : "com.jakewharton.timber:timber:${timberVersion}",
+            xlsParcerApache   : "org.apache.poi:poi:${xlsParcerVersion}",
+            xlsParcerApacheXML: "org.apache.poi:poi-ooxml:${xlsParcerVersion}",
     ]
 
     dataTestDependencies = [
