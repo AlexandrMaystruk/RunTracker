@@ -1,5 +1,7 @@
 package com.gmail.maystruks08.data.repository
 
+import com.gmail.maystruks08.data.XLSParcer
+import com.gmail.maystruks08.data.awaitTaskCompletable
 import com.gmail.maystruks08.data.awaitTaskResult
 import com.gmail.maystruks08.data.cache.SettingsCache
 import com.gmail.maystruks08.data.local.ConfigPreferences
@@ -12,6 +14,7 @@ import com.gmail.maystruks08.data.toDataClass
 import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.entities.CheckpointType
 import com.gmail.maystruks08.domain.entities.ResultOfTask
+import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.firebase.auth.FirebaseAuth
 import timber.log.Timber
@@ -24,7 +27,8 @@ class SettingsRepositoryImpl @Inject constructor(
     private val settingsCache: SettingsCache,
     private val firebaseAuth: FirebaseAuth,
     private val checkpointDAO: CheckpointDAO,
-    private val networkUtil: NetworkUtil
+    private val networkUtil: NetworkUtil,
+    private val xlsParcer: XLSParcer
 ) : SettingsRepository {
 
     override suspend fun updateConfig(): ResultOfTask<Exception, Unit> {
@@ -35,7 +39,16 @@ class SettingsRepositoryImpl @Inject constructor(
                         val checkpoints = hashMap.values
                         checkpointDAO.deleteCheckpoints()
                         checkpointDAO.insertAllOrReplace(checkpoints.map { it.toCheckpointTable() })
-                    }
+
+//                    val checkpointsNormal = checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
+//                    val result = xlsParcer.readExcelFileFromAssets(checkpointsNormal, "sotka_single.xls", RunnerType.NORMAL)
+//
+//                   result.forEach {
+//                       awaitTaskCompletable(firestoreApi.updateRunner(it))
+//                       Timber.i("INSERTED RUNNER ${it.shortName}")
+//                   }
+
+                }
                 firebaseAuth.currentUser?.uid?.let { currentUserId ->
                     val result = awaitTaskResult(firestoreApi.getCheckpointsSettings(currentUserId))
                     val startDateResult = awaitTaskResult(firestoreApi.getDateOfStart())

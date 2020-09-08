@@ -23,18 +23,18 @@ class RegisterNewRunnersRepositoryImpl @Inject constructor(
     private val networkUtil: NetworkUtil
 ) : RegisterNewRunnersRepository {
 
-    override suspend  fun saveNewRunner(runner: Runner) {
+    override suspend  fun saveNewRunners(runners: List<Runner>) {
         try {
-            runnerDao.insertRunner(runner.toRunnerTable(), runner.checkpoints.toCheckpointsResult(runnerId = runner.id))
-            runnersCache.getRunnerList(runner.type).add(runner)
-            if(networkUtil.isOnline())
-                firestoreApi.updateRunner(runner)
-            else
-                runnerDao.markAsNeedToSync(runnerId = runner.id, needToSync = true)
+            val runnersData = runners.map { it.toRunnerTable() to it.checkpoints.toCheckpointsResult(runnerId = it.id)  }
+            runnerDao.insertRunners(runnersData)
+            runners.forEach {
+                runnersCache.getRunnerList(it.type).add(it)
+                if(networkUtil.isOnline()) firestoreApi.updateRunner(it) else runnerDao.markAsNeedToSync(runnerId = it.id, needToSync = true)
+            }
         } catch (e: SQLiteConstraintException) {
             throw RunnerWithIdAlreadyExistException()
         } catch (e: Exception) {
-            runnerDao.markAsNeedToSync(runnerId = runner.id, needToSync = true)
+            runners.forEach { runnerDao.markAsNeedToSync(runnerId = it.id, needToSync = true) }
             throw e
         }
     }

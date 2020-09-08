@@ -8,13 +8,18 @@ import java.util.*
 
 interface RegisterNewRunnerInteractor {
 
-    suspend fun registerNewRunner(
-        fullName: String,
-        runnerSex: RunnerSex,
-        dateOfBirthday: Date,
-        city: String,
-        runnerNumber: Int,
-        runnerType: RunnerType,
-        runnerCardId: String
-    ): ResultOfTask<Exception, Unit>
+    suspend fun registerNewRunners(registerInputData: List<RegisterInputData>): ResultOfTask<Exception, Unit>
+
+    data class RegisterInputData(
+        var fullName: String,
+        var shortName: String,
+        var phone: String,
+        var runnerSex: RunnerSex,
+        var dateOfBirthday: Date,
+        var city: String,
+        var runnerNumber: Int,
+        var runnerType: RunnerType,
+        var runnerCardId: String,
+        var teamName: String?
+    )
 }

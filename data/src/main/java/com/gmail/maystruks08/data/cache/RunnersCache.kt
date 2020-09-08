@@ -16,5 +16,9 @@ class RunnersCache @Inject constructor() {
         RunnerType.IRON -> ironRunnersList
     }
 
-    fun findRunner(id: String): Runner? = normalRunnersList.find { it.id == id }?: ironRunnersList.find { it.id == id }
+    fun findRunner(id: String): Runner? =
+        normalRunnersList.find { it.id == id } ?: ironRunnersList.find { it.id == id }
+
+    fun findRunnerTeamMembers(currentRunnerId: String, teamName: String): List<Runner>? =
+        normalRunnersList.filter { it.teamName == teamName && it.id != currentRunnerId }
 }

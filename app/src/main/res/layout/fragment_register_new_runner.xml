@@ -1,336 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_height="match_parent"
+    tools:context=".ui.register.RegisterNewRunnerFragment">
 
+    <include
+        layout="@layout/layout_toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/inputLayout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        tools:context=".ui.register.RegisterNewRunnerFragment">
+        android:layout_margin="@dimen/margin_xs"
+        android:padding="@dimen/margin_m"
+        android:visibility="gone"
+        android:background="@drawable/bg_bottom_corner_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-        <include
-            layout="@layout/layout_toolbar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout"
-            android:layout_width="0dp"
+        <EditText
+            android:id="@+id/etRunnerTeamName"
+            style="@style/TextL"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_xs"
-            android:layout_marginTop="@dimen/margin_m"
-            android:layout_marginEnd="@dimen/margin_xs"
-            android:background="@drawable/bg_bottom_corner_layout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0">
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:drawableStart="@drawable/ic_user"
+            android:drawablePadding="@dimen/margin_m"
+            android:gravity="start"
+            android:hint="@string/team_name"
+            android:inputType="textCapWords"
+            android:textColorHint="@color/colorText" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/inputLayout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_m"
-                android:layout_marginTop="@dimen/margin_xxxl"
-                android:layout_marginEnd="@dimen/margin_m"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+    </com.google.android.material.textfield.TextInputLayout>
 
-                <EditText
-                    android:id="@+id/etRunnerFullName"
-                    style="@style/TextL"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:background="@null"
-                    android:drawableStart="@drawable/ic_user"
-                    android:drawablePadding="@dimen/margin_m"
-                    android:gravity="start"
-                    android:hint="@string/full_name"
-                    android:inputType="textCapWords"
-                    android:textColorHint="@color/colorText" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/registerRunnersRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/margin_m"
+        app:layout_constraintBottom_toTopOf="@+id/btnAddNewRunner"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inputLayout"
+        tools:context=".ui.runners.RunnersFragment" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+    <Button
+        android:id="@+id/btnAddNewRunner"
+        style="@style/MainButton"
+        android:layout_margin="@dimen/margin_m"
+        android:layout_marginTop="@dimen/margin_xxl"
+        android:text="@string/button_add"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
-
-            <View
-                android:id="@+id/view"
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:layout_marginStart="@dimen/margin_m"
-                android:layout_marginTop="@dimen/margin_m"
-                android:layout_marginEnd="@dimen/margin_m"
-                android:background="@color/colorPrimary"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/inputLayout" />
-
-            <RadioGroup
-                android:id="@+id/radioGroupSex"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
-                android:gravity="center"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/view">
-
-                <RadioButton
-                    android:id="@+id/rbMale"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_l"
-                    android:layout_marginEnd="@dimen/margin_l"
-                    android:layout_weight="1"
-                    android:background="@drawable/custom_radio_button"
-                    android:button="@drawable/custom_radio_button"
-                    android:gravity="center"
-                    android:paddingTop="@dimen/margin_xs"
-                    android:paddingBottom="@dimen/margin_xs"
-                    android:text="@string/male" />
-
-                <RadioButton
-                    android:id="@+id/rbFemale"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_l"
-                    android:layout_marginEnd="@dimen/margin_l"
-                    android:layout_weight="1"
-                    android:background="@drawable/custom_radio_button"
-                    android:button="@drawable/custom_radio_button"
-                    android:gravity="center"
-                    android:paddingTop="@dimen/margin_xs"
-                    android:paddingBottom="@dimen/margin_xs"
-                    android:text="@string/female" />
-
-            </RadioGroup>
-
-            <View
-                android:id="@+id/view2"
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:layout_marginStart="@dimen/margin_m"
-                android:layout_marginTop="@dimen/margin_m"
-                android:layout_marginEnd="@dimen/margin_m"
-                android:background="@color/colorPrimary"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/radioGroupSex" />
-
-
-            <TextView
-                android:id="@+id/tvDateOfBirthday"
-                style="@style/TextL"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/number_spinner_height"
-                android:layout_marginStart="@dimen/margin_m"
-                android:layout_marginTop="@dimen/margin_m"
-                android:layout_marginEnd="@dimen/margin_m"
-                android:drawableStart="@drawable/ic_calendar"
-                android:drawablePadding="@dimen/margin_m"
-                android:gravity="start"
-                android:text="@string/date_of_birthday"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/view5" />
-
-
-            <View
-                android:id="@+id/view3"
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:layout_marginStart="@dimen/margin_m"
-                android:layout_marginTop="@dimen/margin_m"
-                android:layout_marginEnd="@dimen/margin_m"
-                android:background="@color/colorPrimary"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/radioGroupRunnerType" />
-
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/inputLayoutCity"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_m"
-                android:layout_marginTop="@dimen/margin_m"
-                android:layout_marginEnd="@dimen/margin_m"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/view3">
-
-                <EditText
-                    android:id="@+id/etRunnerCity"
-                    style="@style/TextL"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:background="@null"
-                    android:drawableStart="@drawable/ic_hash_key"
-                    android:drawablePadding="@dimen/margin_m"
-                    android:gravity="start"
-                    android:hint="@string/city"
-                    android:inputType="textCapWords"
-                    android:textColorHint="@color/colorText"
-                    android:textSize="@dimen/text_l" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <View
-                android:id="@+id/view4"
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:layout_marginStart="@dimen/margin_m"
-                android:layout_marginTop="@dimen/margin_m"
-                android:layout_marginEnd="@dimen/margin_m"
-                android:background="@color/colorPrimary"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/inputLayoutCity" />
-
-
-            <RadioGroup
-                android:id="@+id/radioGroupRunnerType"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_m"
-                android:gravity="center"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/view2">
-
-                <RadioButton
-                    android:id="@+id/rbRunner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_l"
-                    android:layout_marginEnd="@dimen/margin_l"
-                    android:layout_weight="1"
-                    android:background="@drawable/custom_radio_button"
-                    android:button="@android:color/transparent"
-                    android:drawablePadding="@dimen/margin_xs"
-                    android:gravity="center"
-                    android:paddingTop="@dimen/margin_xs"
-                    android:paddingBottom="@dimen/margin_xs"
-                    android:text="@string/runner" />
-
-                <RadioButton
-                    android:id="@+id/rbIronRunner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin_l"
-                    android:layout_marginEnd="@dimen/margin_l"
-                    android:layout_weight="1"
-                    android:background="@drawable/custom_radio_button"
-                    android:button="@android:color/transparent"
-                    android:gravity="center"
-                    android:paddingTop="@dimen/margin_xs"
-                    android:paddingBottom="@dimen/margin_xs"
-                    android:text="@string/iron" />
-            </RadioGroup>
-
-            <View
-                android:id="@+id/view5"
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:layout_marginStart="@dimen/margin_m"
-                android:layout_marginTop="@dimen/margin_m"
-                android:layout_marginEnd="@dimen/margin_m"
-                android:background="@color/colorPrimary"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/inputLayoutNumber" />
-
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/inputLayoutNumber"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_m"
-                android:layout_marginTop="@dimen/margin_m"
-                android:layout_marginEnd="@dimen/margin_m"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/view4">
-
-                <EditText
-                    android:id="@+id/etRunnerNumber"
-                    style="@style/TextL"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:background="@null"
-                    android:drawableStart="@drawable/ic_hash_key"
-                    android:drawablePadding="@dimen/margin_m"
-                    android:gravity="start"
-                    android:hint="@string/runner_number"
-                    android:inputType="number"
-                    android:textColorHint="@color/colorText"
-                    android:textSize="@dimen/text_l" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <View
-                android:id="@+id/view6"
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:layout_marginStart="@dimen/margin_m"
-                android:layout_marginTop="@dimen/margin_m"
-                android:layout_marginEnd="@dimen/margin_m"
-                android:background="@color/colorPrimary"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvDateOfBirthday" />
-
-
-            <TextView
-                android:id="@+id/tvScanCard"
-                style="@style/TextL"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/number_spinner_height"
-                android:layout_marginStart="@dimen/margin_m"
-                android:layout_marginTop="@dimen/margin_m"
-                android:layout_marginEnd="@dimen/margin_m"
-                android:layout_marginBottom="@dimen/margin_l"
-                android:drawableStart="@drawable/ic_running"
-                android:drawablePadding="@dimen/margin_m"
-                android:gravity="start|center_horizontal"
-                android:text="@string/scan_card"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/view6" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <Button
-            android:id="@+id/btnAddNewRunner"
-            style="@style/MainButton"
-            android:layout_margin="@dimen/margin_m"
-            android:layout_marginTop="@dimen/margin_xxl"
-            android:text="@string/button_add"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

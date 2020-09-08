@@ -28,6 +28,8 @@
     <string name="female">женщина</string>
     <string name="male">мужчина</string>
     <string name="full_name">ФИО</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="team_name">Название команды</string>
     <string name="mark_at_current_checkpoint">Отметить на текущем КП</string>
     <string name="fill_in_required_fields">Заполните обязательные поля!</string>
     <string name="card">Карта %1$s</string>

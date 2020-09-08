@@ -14,10 +14,13 @@ data class RunnerTable(
     val id: String,
     val number: Int,
     val fullName: String,
+    val shortName: String,
+    val phone: String,
     val sex: Int,
     val city: String,
     val dateOfBirthday: Date,
     val type: Int,
+    val teamName: String?,
     val totalResult: Date?,
     val isOffTrack: Boolean,
     val needToSync: Boolean = true

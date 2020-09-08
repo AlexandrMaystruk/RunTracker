@@ -17,6 +17,14 @@ interface RunnerDao :
     }
 
     @Transaction
+    fun insertRunners(runnersData: List<Pair<RunnerTable,  List<ResultTable>>>) {
+        runnersData.forEach {
+            insert(it.first)
+            insertAllResult(it.second)
+        }
+    }
+
+    @Transaction
     fun insertRunner(runner: RunnerTable, results: List<ResultTable>) {
         insert(runner)
         insertAllResult(results)

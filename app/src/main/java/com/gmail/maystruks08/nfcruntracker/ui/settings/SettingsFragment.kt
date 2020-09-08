@@ -3,7 +3,6 @@ package com.gmail.maystruks08.nfcruntracker.ui.settings
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.lifecycle.Observer
 import com.gmail.maystruks08.domain.toDateTimeFormat
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
@@ -30,7 +29,7 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
         .build()
 
     override fun bindViewModel() {
-        viewModel.config.observe(viewLifecycleOwner, Observer {
+        viewModel.config.observe(viewLifecycleOwner, {
             val adapterRunner = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it.checkpointsName)
             val adapterIron = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it.ironCheckpointsName)
             adapterRunner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -43,11 +42,11 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
             tvDateOfStart.text = getString(R.string.date_of_start, it.settings.startDate?.toDateTimeFormat() ?: "")
         })
 
-        viewModel.start.observe(viewLifecycleOwner, Observer {
+        viewModel.start.observe(viewLifecycleOwner, {
             tvDateOfStart.text = getString(R.string.date_of_start, it?.toDateTimeFormat()?:"")
         })
 
-        viewModel.toast.observe(viewLifecycleOwner, Observer {
+        viewModel.toast.observe(viewLifecycleOwner, {
             context?.toast(it)
         })
     }

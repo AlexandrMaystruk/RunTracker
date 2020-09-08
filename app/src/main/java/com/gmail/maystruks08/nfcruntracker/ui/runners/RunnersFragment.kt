@@ -1,6 +1,5 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
@@ -37,23 +36,23 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
     override fun initToolbar() = FragmentToolbar.Builder().build()
 
     override fun bindViewModel() {
-        viewModel.runners.observe(viewLifecycleOwner, Observer {
+        viewModel.runners.observe(viewLifecycleOwner, {
             runnerAdapter?.runnerList = it
         })
 
-        viewModel.runnerAdd.observe(viewLifecycleOwner, Observer {
+        viewModel.runnerAdd.observe(viewLifecycleOwner, {
             runnerAdapter?.insertItemOrUpdateIfExist(it)
         })
 
-        viewModel.runnerUpdate.observe(viewLifecycleOwner, Observer {
+        viewModel.runnerUpdate.observe(viewLifecycleOwner, {
             runnerAdapter?.updateItem(it)
         })
 
-        viewModel.runnerRemove.observe(viewLifecycleOwner, Observer {
+        viewModel.runnerRemove.observe(viewLifecycleOwner, {
             runnerAdapter?.removeItem(it)
         })
 
-        viewModel.showDialog.observe(viewLifecycleOwner, Observer {
+        viewModel.showDialog.observe(viewLifecycleOwner, {
             val checkpointName = it.first?.name ?: ""
             val message = getString(R.string.success_message, checkpointName, "#${it.second}")
             SuccessDialogFragment.getInstance(message).show(childFragmentManager, SuccessDialogFragment.name())

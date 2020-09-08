@@ -6,11 +6,14 @@ data class Runner(
     val id: String,
     val number: Int,
     val fullName: String,
+    val shortName: String,
+    val phone: String,
     val sex: RunnerSex,
     val city: String,
     val dateOfBirthday: Date,
     val type: RunnerType,
     var totalResult: Date?,
+    val teamName: String?,
     val checkpoints: MutableList<Checkpoint> = mutableListOf(),
     var isOffTrack: Boolean
 ) {

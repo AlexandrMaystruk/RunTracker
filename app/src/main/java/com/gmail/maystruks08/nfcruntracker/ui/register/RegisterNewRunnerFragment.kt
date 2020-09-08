@@ -1,13 +1,15 @@
 package com.gmail.maystruks08.nfcruntracker.ui.register
 
-import android.app.DatePickerDialog
-import androidx.lifecycle.Observer
-import com.gmail.maystruks08.domain.entities.RunnerSex
-import com.gmail.maystruks08.domain.entities.RunnerType
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.gmail.maystruks08.domain.exception.EmptyRegistrationRunnerDataException
 import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
-import com.gmail.maystruks08.domain.toDateFormat
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
@@ -15,18 +17,15 @@ import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import kotlinx.android.synthetic.main.fragment_register_new_runner.*
-import java.util.*
 
 
 class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_runner) {
 
     lateinit var viewModel: RegisterNewRunnerViewModel
 
-    private val calendar = Calendar.getInstance()
-    private var runnerSex: RunnerSex? = null
-    private var runnerType: RunnerType? = null
-    private var runnerDateOfBirthday: Date? = null
-    private var runnerCardId: String? = null
+    lateinit var adapter: RegisterRunnerAdapter
+
+    private var teamName: String? = null
 
     override fun injectDependencies() {
         App.registerNewRunnerComponent?.inject(this)
@@ -40,81 +39,68 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
         .build()
 
     override fun bindViewModel() {
-        viewModel.selectDateOfBirthdayClicked.observe(viewLifecycleOwner, Observer {
-            DatePickerDialog(
-                requireContext(),
-                DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-                    calendar.set(year, month, dayOfMonth)
-                    viewModel.onDateOfBirthdaySelected(calendar.time)
-                },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-            ).show()
+        viewModel.scannedCard.observe(viewLifecycleOwner, {
+            adapter.setRunnerCardId(it)
         })
 
-        viewModel.selectedDateOfBirthday.observe(viewLifecycleOwner, Observer {
-            runnerDateOfBirthday = it
-            tvDateOfBirthday.text = it.toDateFormat()
+        viewModel.addNewTeamMemberItem.observe(viewLifecycleOwner, {
+            adapter.addInputData(it)
+            resolveTeamNameVisibility()
         })
 
-        viewModel.scannedCard.observe(viewLifecycleOwner, Observer {
-            tvScanCard.text = getString(R.string.card, it)
-            runnerCardId = it
-        })
-
-        viewModel.toast.observe(viewLifecycleOwner, Observer {
+        viewModel.toast.observe(viewLifecycleOwner, {
             context?.toast(it)
         })
 
-        viewModel.error.observe(viewLifecycleOwner, Observer {
-            when(it){
+        viewModel.error.observe(viewLifecycleOwner, {
+            when (it) {
                 is SaveRunnerDataException -> context?.toast(getString(R.string.error_save_data_to_local_db))
                 is SyncWithServerException -> context?.toast(getString(R.string.error_sync_with_server))
-                is RunnerWithIdAlreadyExistException ->  context?.toast(getString(R.string.error_member_already_exist))
+                is RunnerWithIdAlreadyExistException -> context?.toast(getString(R.string.error_member_already_exist))
+                is EmptyRegistrationRunnerDataException -> context?.toast(getString(R.string.fill_in_required_fields))
             }
         })
     }
 
     override fun initViews() {
-        tvDateOfBirthday.setOnClickListener {
-            viewModel.onSelectDateOfBirthdayClicked()
+        adapter = RegisterRunnerAdapter {
+            viewModel.onCreateTeamMemberClick()
         }
-
-        radioGroupSex.setOnCheckedChangeListener { _, checkedId ->
-            runnerSex = when (checkedId) {
-                R.id.rbMale -> RunnerSex.MALE
-                R.id.rbFemale -> RunnerSex.FEMALE
-                else -> null
-            }
-        }
-
-        radioGroupRunnerType.setOnCheckedChangeListener { _, checkedId ->
-            runnerType = when (checkedId) {
-                R.id.rbRunner -> RunnerType.NORMAL
-                R.id.rbIronRunner -> RunnerType.IRON
-                else -> null
-            }
+        registerRunnersRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = this@RegisterNewRunnerFragment.adapter
         }
 
         btnAddNewRunner.setOnClickListener {
-            if (etRunnerFullName.text.isNotEmpty() &&
-                runnerSex != null &&
-                runnerDateOfBirthday != null &&
-                !etRunnerNumber.text.isNullOrEmpty() &&
-                runnerType != null &&
-                runnerCardId != null
-            ) {
-                viewModel.onRegisterNewRunner(
-                    etRunnerFullName.text.toString(),
-                    runnerSex!!,
-                    runnerDateOfBirthday!!,
-                    etRunnerCity.text.toString(),
-                    etRunnerNumber.text.toString().toInt(),
-                    runnerType!!,
-                    runnerCardId!!
-                )
-            } else context?.toast(getString(R.string.fill_in_required_fields))
+            viewModel.onRegisterNewRunnerClicked(adapter.runnerRegisterData, teamName)
+        }
+
+        etRunnerTeamName.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { teamName = s?.toString() }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+        initStaticCardSwipe()
+    }
+
+    private fun initStaticCardSwipe() {
+        val swipeHelper = object : SwipeActionHelper(requireContext()) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                if (direction == ItemTouchHelper.LEFT && adapter.canSwipe()) {
+                    adapter.removeInputField(position)
+                    resolveTeamNameVisibility()
+                }
+            }
+        }
+        ItemTouchHelper(swipeHelper).attachToRecyclerView(registerRunnersRecyclerView)
+    }
+
+    //This is bad solution, move logic to view model
+    private fun resolveTeamNameVisibility() {
+        inputLayout.visibility = if (adapter.runnerRegisterData.size > 1) View.VISIBLE else {
+            teamName = null
+            View.GONE
         }
     }
 

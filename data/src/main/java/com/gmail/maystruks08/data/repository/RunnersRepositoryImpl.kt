@@ -96,6 +96,8 @@ class RunnersRepositoryImpl @Inject constructor(
 
     override suspend fun getRunnerById(cardId: String): Runner? = runnersCache.findRunner(cardId)
 
+    override suspend fun getRunnerTeamMembers(currentRunnerId: String, teamName: String): List<Runner>? = runnersCache.findRunnerTeamMembers(currentRunnerId, teamName)
+
     override suspend fun getCurrentCheckpoint(type: RunnerType): Checkpoint =
         settingsCache.getCurrentCheckpoint(type)
 

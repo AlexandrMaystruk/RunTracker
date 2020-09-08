@@ -2,34 +2,35 @@ package com.gmail.maystruks08.domain.interactors
 
 import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.entities.Runner
-import com.gmail.maystruks08.domain.entities.RunnerSex
-import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.domain.repository.RegisterNewRunnersRepository
-import java.util.*
 import javax.inject.Inject
 
 class RegisterNewRunnerInteractorImpl @Inject constructor(private val runnersRepository: RegisterNewRunnersRepository) :
     RegisterNewRunnerInteractor {
 
-    override suspend fun registerNewRunner(fullName: String, runnerSex: RunnerSex, dateOfBirthday: Date,
-        city: String, runnerNumber: Int, runnerType: RunnerType, runnerCardId: String): ResultOfTask<Exception, Unit> {
+    override suspend fun registerNewRunners(registerInputData: List<RegisterNewRunnerInteractor.RegisterInputData>): ResultOfTask<Exception, Unit> {
         return ResultOfTask.build {
+            val runnerType = registerInputData.first().runnerType
             val checkpoints = runnersRepository.getCheckpoints(runnerType).toMutableList()
-            val newRunner = Runner(
-                id = runnerCardId,
-                fullName = fullName,
-                shortName = "def", //TODO implement
-                phone = "def phone", //TODO implement
-                number = runnerNumber,
-                sex = runnerSex,
-                city = city,
-                dateOfBirthday = dateOfBirthday,
-                type = runnerType,
-                totalResult = null,
-                checkpoints = checkpoints,
-                isOffTrack = false
-            )
-            runnersRepository.saveNewRunner(newRunner)
+            val runners = registerInputData.map {
+                Runner(
+                    id = it.runnerCardId,
+                    fullName = it.fullName,
+                    shortName = it.shortName,
+                    phone = it.phone,
+                    number = it.runnerNumber,
+                    sex = it.runnerSex,
+                    city = it.city,
+                    dateOfBirthday = it.dateOfBirthday,
+                    teamName = it.teamName,
+                    type = runnerType,
+                    totalResult = null,
+                    checkpoints = checkpoints,
+                    isOffTrack = false
+                )
+            }
+            runnersRepository.saveNewRunners(runners)
         }
     }
+
 }

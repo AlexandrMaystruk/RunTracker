@@ -51,15 +51,15 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     }
 
     private fun onMarkRunnerOnCheckpointSuccess(runnerChange: RunnerChange) {
-        val lastCheckpoint = runnerChange.runner.checkpoints.maxBy { (it as? CheckpointResult)?.date?.time ?: 0 }
-            _showSuccessDialogLiveData.postValue(lastCheckpoint to runnerChange.runner.number)
+        val lastCheckpoint =
+            runnerChange.runner.checkpoints.maxByOrNull { (it as? CheckpointResult)?.date?.time ?: 0 }
+        _showSuccessDialogLiveData.postValue(lastCheckpoint to runnerChange.runner.number)
         handleRunnerChanges(runnerChange)
     }
 
     private suspend fun showAllRunners() {
         when (val result = runnersInteractor.getRunners(runnerType)) {
             is ResultOfTask.Value -> {
-                Timber.e(result.value.toTypedArray().contentToString())
                 val runners = result.value.toRunnerViews().sortedBy { it.result }.toMutableList()
                 _runnersLiveData.postValue(runners)
             }

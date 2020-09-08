@@ -12,6 +12,8 @@ interface RunnersRepository {
 
     suspend fun getRunnerById(cardId: String): Runner?
 
+    suspend fun getRunnerTeamMembers(currentRunnerId: String, teamName: String): List<Runner>?
+
     @Throws(SaveRunnerDataException::class, SyncWithServerException::class)
     suspend fun updateRunnerData(runner: Runner): Runner
 

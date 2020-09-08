@@ -111,7 +111,8 @@ class XLSParcer @Inject constructor(private val context: Context) {
                         type = runnerType,
                         totalResult = null,
                         checkpoints = checkpoints.toMutableList(),
-                        isOffTrack = false
+                        isOffTrack = false,
+                        teamName = null //TODO change
                     )
                     result.add(newRunner)
                     Timber.e(newRunner.toString())

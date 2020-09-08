@@ -48,6 +48,13 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
             val runner = runnersRepository.getRunnerById(cardId) ?: throw RunnerNotFoundException()
             runner.markThatRunnerIsOffTrack()
             logHelper.log(INFO, "Runner ${runner.id} ${runner.type} ${runner.fullName} is off track")
+            if(!runner.teamName.isNullOrEmpty()){
+                runnersRepository.getRunnerTeamMembers(runner.id, runner.teamName)?.map { teamRunner ->
+                    teamRunner.markThatRunnerIsOffTrack()
+                    logHelper.log(INFO, "Team runner ${runner.id} ${runner.type} ${runner.fullName} is off track")
+                    runnersRepository.updateRunnerData(teamRunner)
+                }
+            }
             RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
         }
     }
@@ -57,7 +64,15 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
             val runner = runnersRepository.getRunnerById(cardId) ?: throw RunnerNotFoundException()
             val currentCheckpoint = runnersRepository.getCurrentCheckpoint(runner.type)
             val checkpointsCount = runnersRepository.getCheckpoints(runner.type).size
-            runner.addPassedCheckpoint(checkpoint = CheckpointResult(currentCheckpoint.id, currentCheckpoint.name, currentCheckpoint.type, Date()), checkpointsCount = checkpointsCount)
+            val currentDate = Date()
+            runner.addPassedCheckpoint(checkpoint = CheckpointResult(currentCheckpoint.id, currentCheckpoint.name, currentCheckpoint.type, currentDate), checkpointsCount = checkpointsCount)
+            if(!runner.teamName.isNullOrEmpty()){
+               runnersRepository.getRunnerTeamMembers(runner.id, runner.teamName)?.map { teamRunner ->
+                   teamRunner.addPassedCheckpoint(checkpoint = CheckpointResult(currentCheckpoint.id, currentCheckpoint.name, currentCheckpoint.type, currentDate), checkpointsCount = checkpointsCount)
+                   logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.id} to team runner ${teamRunner.id}  ${teamRunner.type}  ${teamRunner.fullName}")
+                   runnersRepository.updateRunnerData(teamRunner)
+                }
+            }
             logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.id} to runner ${runner.id}  ${runner.type}  ${runner.fullName}")
             RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
         }
@@ -68,6 +83,13 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
             val runner = runnersRepository.getRunnerById(cardId) ?: throw RunnerNotFoundException()
             logHelper.log(INFO, "Remove checkpoint: $checkpointId for runner ${runner.id}  ${runner.type}  ${runner.fullName}")
             runner.removeCheckpoint(checkpointId)
+            if(!runner.teamName.isNullOrEmpty()){
+                runnersRepository.getRunnerTeamMembers(runner.id, runner.teamName)?.map { teamRunner ->
+                    logHelper.log(INFO, "Remove checkpoint: $checkpointId for team runner ${teamRunner.id}  ${teamRunner.type}  ${teamRunner.fullName}")
+                    teamRunner.removeCheckpoint(checkpointId)
+                    runnersRepository.updateRunnerData(teamRunner)
+                }
+            }
             RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
         }
     }

@@ -28,6 +28,8 @@
     <string name="female">жінка</string>
     <string name="male">чоловік</string>
     <string name="full_name">ПІБ</string>
+    <string name="team_name">Назва команди</string>
+    <string name="phone_number">Номер телефона</string>
     <string name="mark_at_current_checkpoint">Відзначити на поточному КП</string>
     <string name="fill_in_required_fields">Заповніть обов\'язкові поля!</string>
     <string name="card">Карта %1$s</string>
