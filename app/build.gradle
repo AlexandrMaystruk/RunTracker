@@ -61,6 +61,7 @@ android {
 
 dependencies {
 
+    implementation 'androidx.paging:paging-runtime-ktx:2.1.2'
     def presentationDependencies = rootProject.ext.presentationDependencies
     def presentationTestDependencies = rootProject.ext.presentationTestDependencies
 

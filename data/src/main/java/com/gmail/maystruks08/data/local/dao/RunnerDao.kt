@@ -42,7 +42,7 @@ interface RunnerDao :
     }
 
     @Transaction
-    fun getRunnersWithResults(type: Int): List<RunnerTableView> {
+    fun getRunnersWithResults(type: Int): androidx.paging.DataSource.Factory<Int, RunnerTableView>{
         val runners = getRunners(type)
         return runners.map { RunnerTableView(it, getRunnerResults(it.id)) }
     }
@@ -60,7 +60,7 @@ interface RunnerDao :
 
     @Transaction
     @Query("SELECT * FROM runners WHERE type =:type ")
-    fun getRunners(type: Int): List<RunnerTable>
+    fun getRunners(type: Int): androidx.paging.DataSource.Factory<Int, RunnerTable>
 
     @Transaction
     @Query("SELECT * FROM runners WHERE id =:id AND needToSync = 1 ")

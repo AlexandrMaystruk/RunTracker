@@ -9,6 +9,7 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import kotlinx.android.synthetic.main.fragment_runners.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
 class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
@@ -24,6 +25,9 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
 
     private var runnerAdapter: RunnerAdapter? = null
 
+    @ExperimentalCoroutinesApi
+    private var runnerPagedAdapter: RunnerPagedAdapter? = null
+
     private var runnerTypeId: Int by argument()
 
     private lateinit var onClickedAtRunner: (RunnerView) -> Unit
@@ -35,6 +39,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
 
     override fun initToolbar() = FragmentToolbar.Builder().build()
 
+    @ExperimentalCoroutinesApi
     override fun bindViewModel() {
         viewModel.runners.observe(viewLifecycleOwner, {
             runnerAdapter?.runnerList = it
@@ -57,13 +62,28 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
             val message = getString(R.string.success_message, checkpointName, "#${it.second}")
             SuccessDialogFragment.getInstance(message).show(childFragmentManager, SuccessDialogFragment.name())
         })
+
+
+        viewModel.pagedRunnersLiveData.observe(viewLifecycleOwner, {
+            runnerPagedAdapter?.submitList(it)
+        })
     }
 
+    @ExperimentalCoroutinesApi
     override fun initViews() {
         runnerAdapter = RunnerAdapter { onClickedAtRunner.invoke(it) }
+//        runnersRecyclerView.apply {
+//            layoutManager = LinearLayoutManager(runnersRecyclerView.context)
+//            adapter = runnerAdapter
+//        }
+
         runnersRecyclerView.apply {
             layoutManager = LinearLayoutManager(runnersRecyclerView.context)
-            adapter = runnerAdapter
+            adapter = runnerPagedAdapter
+        }
+
+        runnerPagedAdapter = RunnerPagedAdapter {
+
         }
     }
 

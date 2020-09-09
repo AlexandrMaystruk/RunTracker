@@ -1,7 +1,12 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.DataSource
+import androidx.paging.LivePagedListBuilder
+import androidx.paging.PageKeyedDataSource
+import androidx.paging.PagedList
 import com.gmail.maystruks08.domain.entities.*
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
@@ -12,6 +17,7 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerViews
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -30,6 +36,48 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     private val _runnerUpdateLiveData = MutableLiveData<RunnerView>()
     private val _runnerRemoveLiveData = MutableLiveData<RunnerView>()
     private val _showSuccessDialogLiveData = MutableLiveData<Pair<Checkpoint?, Int>>()
+
+
+    var pagedRunnersLiveData  : LiveData<PagedList<RunnerView>>
+
+    init {
+        val config = PagedList.Config.Builder()
+            .setPageSize(30)
+            .setEnablePlaceholders(false)
+            .build()
+        pagedRunnersLiveData  = initializedPagedListBuilder(config).build()
+    }
+
+    private fun initializedPagedListBuilder(config: PagedList.Config):
+            LivePagedListBuilder<Int, RunnerView> {
+
+        val dataSourceFactory = object : DataSource.Factory<Int, RunnerView>() {
+            override fun create(): DataSource<Int, RunnerView> {
+                return PostsDataSource(viewModelScope)
+            }
+        }
+        return LivePagedListBuilder(dataSourceFactory, config)
+    }
+
+    fun getRunners():LiveData<PagedList<RunnerView>> = pagedRunnersLiveData
+
+
+
+    class PostsDataSource(private val scope: CoroutineScope) : PageKeyedDataSource<Int, RunnerView>() {
+
+        override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, RunnerView>) {
+
+        }
+
+        override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, RunnerView>) {
+
+        }
+
+        override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, RunnerView>) {
+
+        }
+
+    }
 
     private lateinit var runnerType: RunnerType
 
