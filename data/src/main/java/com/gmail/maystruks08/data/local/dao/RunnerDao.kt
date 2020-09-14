@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.data.local.dao
 
+import androidx.paging.DataSource
 import androidx.room.*
 import com.gmail.maystruks08.data.local.entity.CheckpointTable
 import com.gmail.maystruks08.data.local.entity.ResultTable
@@ -41,11 +42,30 @@ interface RunnerDao :
         return RunnerTableView(getRunner(id), getRunnerResults(id))
     }
 
+
+
+
+
     @Transaction
-    fun getRunnersWithResults(type: Int): androidx.paging.DataSource.Factory<Int, RunnerTableView>{
-        val runners = getRunners(type)
-        return runners.map { RunnerTableView(it, getRunnerResults(it.id)) }
+    fun getRunnersWithResults(type: Int, requestedLoadSize: Int):  List<RunnerTableView>{
+        return getRunners(type, requestedLoadSize).map { RunnerTableView(it, getRunnerResults(it.id)) }
     }
+
+    @Transaction
+    fun getRunnersWithResultsAfter(type: Int, key: String, requestedLoadSize: Int): List<RunnerTableView>{
+        return getRunnersAfter(type, key, requestedLoadSize).map { RunnerTableView(it, getRunnerResults(it.id)) }
+    }
+
+    @Query("SELECT * FROM runners WHERE type =:type ORDER BY fullName ASC limit :requestedLoadSize")
+    fun getRunners(type: Int,requestedLoadSize: Int): List<RunnerTable>
+
+    @Query("SELECT * FROM runners WHERE type =:type AND fullName > :key ORDER BY fullName ASC limit :requestedLoadSize")
+    fun getRunnersAfter(type: Int, key: String, requestedLoadSize: Int): List<RunnerTable>
+
+
+
+
+
 
     @Query("SELECT * FROM checkpoints WHERE checkpointType =:type")
     fun getCheckpoints(type: Int): List<CheckpointTable>
@@ -58,9 +78,6 @@ interface RunnerDao :
     @Query("SELECT * FROM result LEFT JOIN runners ON result.runnerId = runners.id WHERE runners.id =:id")
     fun getRunnerResults(id: String): List<ResultTable>
 
-    @Transaction
-    @Query("SELECT * FROM runners WHERE type =:type ")
-    fun getRunners(type: Int): androidx.paging.DataSource.Factory<Int, RunnerTable>
 
     @Transaction
     @Query("SELECT * FROM runners WHERE id =:id AND needToSync = 1 ")

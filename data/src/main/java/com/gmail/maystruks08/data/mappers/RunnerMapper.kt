@@ -9,21 +9,24 @@ import com.gmail.maystruks08.data.remote.pojo.CheckpointResultPojo
 import com.gmail.maystruks08.domain.entities.*
 
 fun List<RunnerTableView>.toRunners(checkpoints: List<Checkpoint>): List<Runner> {
-    return this.map { tableView ->
-        Runner(
-            id = tableView.runnerTable.id,
-            number = tableView.runnerTable.number,
-            fullName = tableView.runnerTable.fullName,
-            shortName = tableView.runnerTable.shortName,
-            phone = tableView.runnerTable.phone,
-            city = tableView.runnerTable.city,
-            sex = RunnerSex.fromOrdinal(tableView.runnerTable.sex),
-            dateOfBirthday = tableView.runnerTable.dateOfBirthday,
-            type = RunnerType.fromOrdinal(tableView.runnerTable.type),
-            teamName = tableView.runnerTable.teamName,
-            totalResult = tableView.runnerTable.totalResult,
+    return this.map { it.toRunner(checkpoints) }
+}
+
+fun RunnerTableView.toRunner(checkpoints: List<Checkpoint>): Runner {
+    return Runner(
+            id = runnerTable.id,
+            number = runnerTable.number,
+            fullName = runnerTable.fullName,
+            shortName = runnerTable.shortName,
+            phone = runnerTable.phone,
+            city = runnerTable.city,
+            sex = RunnerSex.fromOrdinal(runnerTable.sex),
+            dateOfBirthday = runnerTable.dateOfBirthday,
+            type = RunnerType.fromOrdinal(runnerTable.type),
+            teamName = runnerTable.teamName,
+            totalResult = runnerTable.totalResult,
             checkpoints = checkpoints.map { cp ->
-                val result = tableView.results.find { it.checkpointId == cp.id }
+                val result = results.find { it.checkpointId == cp.id }
                 if (result != null) {
                     CheckpointResult(
                         id = cp.id,
@@ -34,9 +37,8 @@ fun List<RunnerTableView>.toRunners(checkpoints: List<Checkpoint>): List<Runner>
                     )
                 } else cp
             }.toMutableList(),
-            isOffTrack = tableView.runnerTable.isOffTrack
+            isOffTrack = runnerTable.isOffTrack
         )
-    }
 }
 
 fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {

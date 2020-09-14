@@ -41,10 +41,6 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
 
     @ExperimentalCoroutinesApi
     override fun bindViewModel() {
-        viewModel.runners.observe(viewLifecycleOwner, {
-            runnerAdapter?.runnerList = it
-        })
-
         viewModel.runnerAdd.observe(viewLifecycleOwner, {
             runnerAdapter?.insertItemOrUpdateIfExist(it)
         })
@@ -64,7 +60,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
         })
 
 
-        viewModel.pagedRunnersLiveData.observe(viewLifecycleOwner, {
+        viewModel.runnersList.observe(viewLifecycleOwner, {
             runnerPagedAdapter?.submitList(it)
         })
     }
@@ -72,10 +68,6 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
     @ExperimentalCoroutinesApi
     override fun initViews() {
         runnerAdapter = RunnerAdapter { onClickedAtRunner.invoke(it) }
-//        runnersRecyclerView.apply {
-//            layoutManager = LinearLayoutManager(runnersRecyclerView.context)
-//            adapter = runnerAdapter
-//        }
 
         runnersRecyclerView.apply {
             layoutManager = LinearLayoutManager(runnersRecyclerView.context)
@@ -83,7 +75,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
         }
 
         runnerPagedAdapter = RunnerPagedAdapter {
-
+            onClickedAtRunner.invoke(it)
         }
     }
 

@@ -42,15 +42,14 @@ dependencies {
     implementation project(':domain')
     implementation files('libs/poi.jar')
 
-//    implementation dataDependencies.xlsParcerApacheXML
-//    implementation dataDependencies.xlsParcerApache
-
     api dataDependencies.room
     api dataDependencies.firestore
     api dataDependencies.firebaseUi
     api dataDependencies.firebaseAuth
 
     api dataDependencies.workManager
+
+    api dataDependencies.paging
 
     kapt dataDependencies.roomCompiler
 
@@ -60,10 +59,6 @@ dependencies {
     implementation dataDependencies.corutinesCore
     implementation dataDependencies.corutinesAndroid
     implementation dataDependencies.timber
-
-    def paging_version = "2.1.2"
-
-    implementation "androidx.paging:paging-runtime:$paging_version"
 
 
     compileOnly dataDependencies.javaxInject

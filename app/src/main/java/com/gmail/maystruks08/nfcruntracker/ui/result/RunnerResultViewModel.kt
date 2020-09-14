@@ -28,8 +28,6 @@ class RunnerResultViewModel @Inject constructor(
     private val _runnerResultsLiveData = MutableLiveData<List<RunnerResultView>>()
     private val _errorLiveData = MutableLiveData<Throwable>()
 
-
-
     private var type: RunnerType = RunnerType.NORMAL
 
     fun provideFinishers(type: RunnerType){

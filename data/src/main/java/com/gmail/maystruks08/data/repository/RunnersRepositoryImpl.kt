@@ -6,10 +6,7 @@ import com.gmail.maystruks08.data.awaitTaskCompletable
 import com.gmail.maystruks08.data.cache.RunnersCache
 import com.gmail.maystruks08.data.cache.SettingsCache
 import com.gmail.maystruks08.data.local.dao.RunnerDao
-import com.gmail.maystruks08.data.mappers.toCheckpoint
-import com.gmail.maystruks08.data.mappers.toCheckpointsResult
-import com.gmail.maystruks08.data.mappers.toRunnerTable
-import com.gmail.maystruks08.data.mappers.toRunners
+import com.gmail.maystruks08.data.mappers.*
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.entities.*
@@ -32,12 +29,6 @@ class RunnersRepositoryImpl @Inject constructor(
     private val settingsCache: SettingsCache,
     private val networkUtil: NetworkUtil
 ) : RunnersRepository {
-
-    override suspend fun getRunners(type: RunnerType, onlyFinishers: Boolean): List<Runner> =
-        when (type) {
-            RunnerType.NORMAL -> getNormalRunners(onlyFinishers)
-            RunnerType.IRON -> getIronRunners(onlyFinishers)
-        }
 
     override suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit) {
         try {
@@ -100,31 +91,6 @@ class RunnersRepositoryImpl @Inject constructor(
 
     override suspend fun getCurrentCheckpoint(type: RunnerType): Checkpoint =
         settingsCache.getCurrentCheckpoint(type)
-
-    private fun getNormalRunners(onlyFinishers: Boolean): List<Runner> {
-        if (runnersCache.normalRunnersList.isEmpty()) {
-            val runners = runnerDao.getRunnersWithResults(RunnerType.NORMAL.ordinal)
-            if (settingsCache.getCheckpointList(RunnerType.NORMAL).isEmpty()) {
-                settingsCache.checkpoints = runnerDao.getCheckpoints(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }
-            }
-            val checkpoints = settingsCache.getCheckpointList(RunnerType.NORMAL)
-            runnersCache.normalRunnersList = runners.toRunners(checkpoints).toMutableList()
-        }
-        return if (onlyFinishers) runnersCache.normalRunnersList.filter { it.totalResult != null } else runnersCache.normalRunnersList
-
-    }
-
-    private fun getIronRunners(onlyFinishers: Boolean): List<Runner> {
-        if (runnersCache.ironRunnersList.isEmpty()) {
-            val runners = runnerDao.getRunnersWithResults(RunnerType.IRON.ordinal)
-            val checkpoints = settingsCache.getCheckpointList(RunnerType.IRON)
-            if (checkpoints.isEmpty()) {
-                settingsCache.checkpointsIronPeople = runnerDao.getCheckpoints(CheckpointType.IRON.ordinal).map { it.toCheckpoint() }
-            }
-            runnersCache.ironRunnersList = runners.toRunners(settingsCache.checkpointsIronPeople).toMutableList()
-        }
-        return if (onlyFinishers) runnersCache.ironRunnersList.filter { it.totalResult != null } else runnersCache.ironRunnersList
-    }
 
     private suspend fun checkIsDataUploaded(runnerId: String): Boolean {
         return withContext(Dispatchers.IO) {

@@ -4,9 +4,7 @@ import com.gmail.maystruks08.domain.entities.*
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
 
-interface RunnersRepository {
-
-    suspend fun getRunners(type: RunnerType, onlyFinishers: Boolean = false): List<Runner>
+interface RunnersRepository{
 
     suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit)
 

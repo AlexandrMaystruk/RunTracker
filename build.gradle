@@ -191,6 +191,8 @@ ext {
     //https://github.com/ShawnLin013/NumberPicker
     numberPickerVersion = '2.4.8'
 
+    pagingVersion = '2.1.2'
+
     //Timber for logs
     timberVersion = '4.7.1'
 
@@ -260,6 +262,7 @@ ext {
             timber            : "com.jakewharton.timber:timber:${timberVersion}",
             xlsParcerApache   : "org.apache.poi:poi:${xlsParcerVersion}",
             xlsParcerApacheXML: "org.apache.poi:poi-ooxml:${xlsParcerVersion}",
+            paging         : "androidx.paging:paging-runtime-ktx:${pagingVersion}"
     ]
 
     dataTestDependencies = [
