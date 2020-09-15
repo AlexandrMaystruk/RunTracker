@@ -66,6 +66,7 @@ class RunnerResultFragment : BaseFragment(R.layout.fragment_runners_results) {
     }
 
     override fun onDestroyView() {
+        runnersResultsRecyclerView.adapter = null
         App.clearRunnersResultComponent()
         super.onDestroyView()
     }

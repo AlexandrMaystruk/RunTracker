@@ -64,7 +64,7 @@ class HostActivity : AppCompatActivity() {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_host)
-        App.baseComponent.inject(this)
+        App.hostComponent?.inject(this)
 
         viewModel = injectViewModel(viewModeFactory)
 
@@ -74,7 +74,11 @@ class HostActivity : AppCompatActivity() {
 
         networkUtil.subscribeToConnectionChange(this.javaClass.simpleName) { isConnected ->
             if (!isConnected) {
-                snackBar = Snackbar.make(nav_host_container, getString(R.string.device_offline), Snackbar.LENGTH_INDEFINITE)
+                snackBar = Snackbar.make(
+                    nav_host_container,
+                    getString(R.string.device_offline),
+                    Snackbar.LENGTH_INDEFINITE
+                )
                 snackBar?.view?.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
                     ?.apply {
                         isSingleLine = false
@@ -103,7 +107,7 @@ class HostActivity : AppCompatActivity() {
             supportFragmentManager.backStackEntryCount > 0 -> router.exit()
             lastBackPressTime < System.currentTimeMillis() - PRESS_TWICE_INTERVAL -> {
                 toast = Toast.makeText(
-                    this,
+                    applicationContext,
                     getString(R.string.toast_exit_app_warning_text),
                     Toast.LENGTH_SHORT
                 )
@@ -158,9 +162,18 @@ class HostActivity : AppCompatActivity() {
         this.hideSoftKeyboard()
     }
 
-    override fun onDestroy() {
+    override fun onStop() {
         toast?.cancel()
         networkUtil.unsubscribe(this.javaClass.simpleName)
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        toast?.cancel()
+        toast = null
+        snackBar?.dismiss()
+        snackBar = null
+        App.clearHostComponent()
         super.onDestroy()
     }
 }

@@ -32,7 +32,7 @@ class SyncRunnersWorker(context: Context, params: WorkerParameters) : CoroutineW
 
     override suspend fun doWork(): Result = coroutineScope {
         Timber.i("Sync runners worker STARTED")
-        App.baseComponent.inject(this@SyncRunnersWorker)
+        App.hostComponent?.inject(this@SyncRunnersWorker)
         val resultOfTask = ResultOfTask.build {
             launch(Dispatchers.IO) {
                 val checkpoints = async { checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() } }

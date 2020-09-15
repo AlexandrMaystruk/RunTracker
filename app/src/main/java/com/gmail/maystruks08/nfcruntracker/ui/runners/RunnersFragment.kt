@@ -27,7 +27,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
 
     private var runnerTypeId: Int by argument()
 
-    private lateinit var onClickedAtRunner: (RunnerView) -> Unit
+    private var onClickedAtRunner: ((RunnerView) -> Unit)? = null
 
     @ExperimentalCoroutinesApi
     override fun injectDependencies() {
@@ -62,7 +62,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
     }
 
     override fun initViews() {
-        runnerAdapter = RunnerAdapter { onClickedAtRunner.invoke(it) }
+        runnerAdapter = RunnerAdapter { onClickedAtRunner?.invoke(it) }
         runnersRecyclerView.apply {
             layoutManager = LinearLayoutManager(runnersRecyclerView.context)
             adapter = runnerAdapter

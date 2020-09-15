@@ -43,6 +43,7 @@
     <string name="mark_runner_without_card">Отметить участника на КП без карты?</string>
     <string name="total_time">Загальний час: %1$s</string>
     <string name="off_track">Зійшов з маршруту</string>
+    <string name="alert_confirm_offtrack_runner">Ви впевнені, що бігун зійшов з маршруту?</string>
     <string name="link_card">Прив\'язати карту</string>
     <string name="success">Успіх!</string>
     <string name="success_message">Бігун %2$s відзначений на кп %1$s</string>

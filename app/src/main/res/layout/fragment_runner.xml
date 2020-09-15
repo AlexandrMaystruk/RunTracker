@@ -31,11 +31,11 @@
                 style="@style/TextL"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_s"
                 android:layout_marginTop="@dimen/margin_s"
+                android:layout_marginEnd="@dimen/margin_xs"
                 android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
@@ -44,67 +44,73 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
-                android:layout_marginEnd="@dimen/margin_xs"
+                android:layout_marginEnd="@dimen/margin_min"
                 android:gravity="start"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/tvRunnerNumber"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tvRunnerNumber"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/tvRunnerNumber"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tvRunnerNumber"
                 app:layout_constraintVertical_bias="0.0" />
 
             <TextView
                 android:id="@+id/tvDateOfBirthday"
                 style="@style/TextM"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_s"
+                android:layout_marginTop="@dimen/margin_xs"
+                android:layout_marginEnd="@dimen/margin_xs"
+                android:gravity="end"
                 android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/tvRunnerCity"
-                app:layout_constraintTop_toTopOf="@+id/tvRunnerCity" />
+                app:layout_constraintTop_toBottomOf="@+id/tvRunnerFullName" />
 
             <TextView
                 android:id="@+id/tvRunnerCity"
                 style="@style/TextM"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_xs"
                 android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="@+id/tvRunnerNumber"
+                app:layout_constraintEnd_toStartOf="@+id/tvDateOfBirthday"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@+id/tvRunnerFullName"
                 app:layout_constraintTop_toBottomOf="@+id/tvRunnerFullName" />
-
 
             <TextView
                 android:id="@+id/tvRunnerCardId"
                 style="@style/TextM"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_xs"
+                android:layout_marginEnd="@dimen/margin_xs"
                 android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="@+id/tvRunnerNumber"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/tvRunnerFullName"
                 app:layout_constraintTop_toBottomOf="@+id/tvRunnerCity" />
-
 
             <TextView
                 android:id="@+id/tvPleaseScanCard"
                 style="@style/TextM"
-                android:visibility="gone"
-                android:text="@string/please_scan_card"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@string/please_scan_card"
+                android:visibility="gone"
                 app:layout_constraintBottom_toTopOf="@+id/btnMarkCheckpointAsPassedInManual"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvRunnerCardId"  />
-
+                app:layout_constraintTop_toBottomOf="@+id/tvRunnerCardId" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/runnerCheckpointsRecyclerView"
                 android:layout_width="0dp"
-                android:visibility="gone"
                 android:layout_height="0dp"
                 android:layout_marginTop="@dimen/margin_xs"
+                android:layout_marginBottom="@dimen/margin_xs"
                 app:layout_constraintBottom_toTopOf="@+id/btnMarkCheckpointAsPassedInManual"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

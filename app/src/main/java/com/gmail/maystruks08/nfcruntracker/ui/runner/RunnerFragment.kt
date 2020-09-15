@@ -39,10 +39,10 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
         .withMenuItems(
             listOf(R.id.action_runner_off_track, R.id.action_runner_link_card),
             listOf(MenuItem.OnMenuItemClickListener {
-                viewModel.onRunnerOffTrack()
+                viewModel.onRunnerOffTrackClicked()
                 true
             }, MenuItem.OnMenuItemClickListener {
-                viewModel.onLinkCardToRunnerClick()
+                viewModel.onLinkCardToRunnerClicked()
                 true
             })
         )
@@ -87,6 +87,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
             if(it){
                 runnerCheckpointsRecyclerView.visibility = View.GONE
                 tvPleaseScanCard.visibility = View.VISIBLE
+                btnMarkCheckpointAsPassedInManual.isEnabled = true
                 btnMarkCheckpointAsPassedInManual.text = getString(R.string.disable_link_card_mode)
             } else {
                 tvPleaseScanCard.visibility = View.GONE
@@ -96,17 +97,35 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
         })
 
         viewModel.showDialog.observe(viewLifecycleOwner, {
-            val builder = AlertDialog.Builder(requireContext())
-                .setTitle(getString(R.string.attention))
-                .setMessage(getString(R.string.mark_runner_without_card))
-                .setPositiveButton(android.R.string.yes) { _, _ ->
-                    viewModel.markCheckpointAsPassed(runnerNumber)
-                    alertDialog?.dismiss()
+            alertDialog?.dismiss()
+            when(it){
+                AlertType.CONFIRM_OFFTRACK -> {
+                    val builder = AlertDialog.Builder(requireContext())
+                        .setTitle(getString(R.string.attention))
+                        .setMessage(getString(R.string.alert_confirm_offtrack_runner))
+                        .setPositiveButton(android.R.string.yes) { _, _ ->
+                            viewModel.onRunnerOffTrack()
+                            alertDialog?.dismiss()
+                        }
+                        .setNegativeButton(android.R.string.no) { _, _ ->
+                            alertDialog?.dismiss()
+                        }
+                    alertDialog = builder.show()
                 }
-                .setNegativeButton(android.R.string.no) { _, _ ->
-                    alertDialog?.dismiss()
+                AlertType.MARK_RUNNER_AT_CHECKPOINT -> {
+                    val builder = AlertDialog.Builder(requireContext())
+                        .setTitle(getString(R.string.attention))
+                        .setMessage(getString(R.string.mark_runner_without_card))
+                        .setPositiveButton(android.R.string.yes) { _, _ ->
+                            viewModel.markCheckpointAsPassed(runnerNumber)
+                            alertDialog?.dismiss()
+                        }
+                        .setNegativeButton(android.R.string.no) { _, _ ->
+                            alertDialog?.dismiss()
+                        }
+                    alertDialog = builder.show()
                 }
-            alertDialog = builder.show()
+            }
         })
 
         viewModel.showSuccessDialog.observe(viewLifecycleOwner, {
@@ -144,6 +163,10 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
     }
 
     override fun onDestroyView() {
+        alertDialog?.dismiss()
+        alertDialog = null
+        checkpointsAdapter = null
+        runnerCheckpointsRecyclerView.adapter = null
         App.clearRunnerComponent()
         super.onDestroyView()
     }

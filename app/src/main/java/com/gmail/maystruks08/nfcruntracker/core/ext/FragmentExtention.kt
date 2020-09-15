@@ -11,7 +11,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import java.util.*
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -41,11 +40,11 @@ inline fun <reified T : Fragment> Fragment.findFragmentByTag(tag: String): T? {
 }
 
 inline fun <reified T : ViewModel> Fragment.injectViewModel(factory: ViewModelProvider.Factory): T {
-    return ViewModelProviders.of(this, factory)[T::class.java]
+    return ViewModelProvider(this, factory).get(T::class.java)
 }
 
 inline fun <reified T : ViewModel> AppCompatActivity.injectViewModel(factory: ViewModelProvider.Factory): T {
-    return ViewModelProviders.of(this, factory)[T::class.java]
+    return ViewModelProvider(this, factory).get(T::class.java)
 }
 
 fun FragmentManager.transaction(block: FragmentTransaction.() -> FragmentTransaction) {
@@ -57,11 +56,13 @@ fun Any.name(): String = this::class.java.simpleName
 @Suppress("UNCHECKED_CAST")
 fun <T> Bundle.put(key: String, value: T) {
     when (value) {
-        is Boolean -> putBoolean(key, value)
         is String -> putString(key, value)
         is Int -> putInt(key, value)
-        is Short -> putShort(key, value)
         is Long -> putLong(key, value)
+        is Boolean -> putBoolean(key, value)
+        is Parcelable -> putParcelable(key, value)
+        is ArrayList<*> -> putParcelableArrayList(key, value as ArrayList<out Parcelable>)
+        is Short -> putShort(key, value)
         is Byte -> putByte(key, value)
         is ByteArray -> putByteArray(key, value)
         is Char -> putChar(key, value)
@@ -69,8 +70,6 @@ fun <T> Bundle.put(key: String, value: T) {
         is CharSequence -> putCharSequence(key, value)
         is Float -> putFloat(key, value)
         is Bundle -> putBundle(key, value)
-        is Parcelable -> putParcelable(key, value)
-        is ArrayList<*> -> putParcelableArrayList(key, value as ArrayList<out Parcelable>)
         else -> throw IllegalStateException("Type of property $key is not supported")
     }
 }

@@ -43,6 +43,8 @@
     <string name="mark_runner_without_card">Mark runner on CP without card?</string>
     <string name="total_time">Total time: %1$s</string>
     <string name="off_track">Off track</string>
+    <string name="alert_confirm_offtrack_runner">Are you sure off-track runner?</string>
+
     <string name="link_card">Link nfc card</string>
     <string name="ok" translatable="false">OK</string>
     <string name="success">Success</string>

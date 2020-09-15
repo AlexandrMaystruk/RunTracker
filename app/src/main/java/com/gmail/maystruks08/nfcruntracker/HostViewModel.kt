@@ -37,7 +37,7 @@ class HostViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        super.onCleared()
         syncDataScheduler.stopAllWork()
+        super.onCleared()
     }
 }

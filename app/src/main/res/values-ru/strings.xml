@@ -42,7 +42,8 @@
     <string name="remove_checkpoint_for_runner">Удалить участнику прохождение текущего КП?</string>
     <string name="mark_runner_without_card">Отметить участника на КП без карты?</string>
     <string name="total_time">Общее время: %1$s</string>
-    <string name="off_track">Сошёл с маршрута</string>
+    <string name="off_track">Сошел с маршрута</string>
+    <string name="alert_confirm_offtrack_runner">Вы уверены, что бегун сошел с маршрута?</string>
     <string name="link_card">Привязать карту</string>
     <string name="success">Успех!</string>
     <string name="success_message">Бегун %2$s отмечен на кп %1$s</string>

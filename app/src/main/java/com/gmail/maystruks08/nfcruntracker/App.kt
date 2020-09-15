@@ -4,6 +4,7 @@ import android.app.Application
 import com.gmail.maystruks08.nfcruntracker.core.di.AppModule
 import com.gmail.maystruks08.nfcruntracker.core.di.BaseComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.DaggerBaseComponent
+import com.gmail.maystruks08.nfcruntracker.core.di.host.HostComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.login.LoginComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.register.RegisterNewRunnerComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.RunnersComponent
@@ -21,20 +22,39 @@ class App : Application() {
 
         lateinit var baseComponent: BaseComponent
 
+        var hostComponent: HostComponent? = null
+            get() {
+                if (field == null)
+                    field = baseComponent.provideHostComponent()
+                return field
+            }
+
+
+
 
         var loginComponent: LoginComponent? = null
             get() {
                 if (field == null)
-                    field = baseComponent.provideLoginComponent()
+                    field = hostComponent?.provideLoginComponent()
                 return field
             }
 
         var settingsComponent: SettingsComponent? = null
             get() {
                 if (field == null)
-                    field = baseComponent.provideSettingsComponent()
+                    field = hostComponent?.provideSettingsComponent()
                 return field
             }
+
+        var rootRunnersComponent: RootRunnersComponent? = null
+            get() {
+                if (field == null)
+                    field = hostComponent?.provideRootRunnersComponent()
+                return field
+            }
+
+
+
 
 
         var registerNewRunnerComponent: RegisterNewRunnerComponent? = null
@@ -44,12 +64,6 @@ class App : Application() {
                 return field
             }
 
-        var rootRunnersComponent: RootRunnersComponent? = null
-            get() {
-                if (field == null)
-                    field = baseComponent.provideRootRunnersComponent()
-                return field
-            }
 
         var runnersComponent: RunnersComponent? = null
             get() {
@@ -57,6 +71,8 @@ class App : Application() {
                     field = rootRunnersComponent?.provideRunnersComponent()
                 return field
             }
+
+
 
         var runnerComponent: RunnerComponent? = null
             get() {
@@ -71,6 +87,10 @@ class App : Application() {
                     field = runnersComponent?.provideRunnerResultComponent()
                 return field
             }
+
+        fun clearHostComponent() {
+            hostComponent = null
+        }
 
         fun clearRootRunnersComponent() {
             rootRunnersComponent = null
