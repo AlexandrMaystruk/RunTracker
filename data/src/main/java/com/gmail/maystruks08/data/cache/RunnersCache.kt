@@ -16,9 +16,16 @@ class RunnersCache @Inject constructor() {
         RunnerType.IRON -> ironRunnersList
     }
 
-    fun findRunner(id: String): Runner? =
-        normalRunnersList.find { it.id == id } ?: ironRunnersList.find { it.id == id }
+    fun findRunnerByCardId(cardId: String): Runner? =
+        normalRunnersList.find { it.cardId == cardId } ?: ironRunnersList.find { it.cardId == cardId }
 
-    fun findRunnerTeamMembers(currentRunnerId: String, teamName: String): List<Runner>? =
-        normalRunnersList.filter { it.teamName == teamName && it.id != currentRunnerId }
+    fun findRunnerByNumber(runnerNumber: Int): Runner? =
+        normalRunnersList.find { it.number == runnerNumber } ?: ironRunnersList.find { it.number == runnerNumber }
+
+    fun findRunnerTeamMembers(currentRunnerNumber: Int, teamName: String): List<Runner>? {
+        val result = normalRunnersList.filter { it.teamName == teamName && it.number != currentRunnerNumber }
+        if (result.any { it.isOffTrack }) return null
+        return result
+    }
+
 }

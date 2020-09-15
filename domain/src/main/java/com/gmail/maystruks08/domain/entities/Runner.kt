@@ -3,8 +3,8 @@ package com.gmail.maystruks08.domain.entities
 import java.util.*
 
 data class Runner(
-    val id: String,
     val number: Int,
+    var cardId: String,
     val fullName: String,
     val shortName: String,
     val phone: String,
@@ -20,6 +20,10 @@ data class Runner(
 
     fun markThatRunnerIsOffTrack(){
         isOffTrack = true
+    }
+
+    fun updateCardId(newCardId: String){
+        cardId = newCardId
     }
 
     /**

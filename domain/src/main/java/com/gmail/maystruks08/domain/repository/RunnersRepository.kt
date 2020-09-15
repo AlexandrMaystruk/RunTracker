@@ -10,9 +10,11 @@ interface RunnersRepository {
 
     suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit)
 
-    suspend fun getRunnerById(cardId: String): Runner?
+    suspend fun getRunnerByCardId(cardId: String): Runner?
 
-    suspend fun getRunnerTeamMembers(currentRunnerId: String, teamName: String): List<Runner>?
+    suspend fun getRunnerByNumber(runnerNumber: Int): Runner?
+
+    suspend fun getRunnerTeamMembers(currentRunnerNumber: Int, teamName: String): List<Runner>?
 
     @Throws(SaveRunnerDataException::class, SyncWithServerException::class)
     suspend fun updateRunnerData(runner: Runner): Runner

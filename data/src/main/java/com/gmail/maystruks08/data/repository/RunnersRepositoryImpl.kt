@@ -45,7 +45,7 @@ class RunnersRepositoryImpl @Inject constructor(
                 if (networkUtil.isOnline()) {
                     it.forEach { change ->
                         runBlocking {
-                            val canRewriteLocalCache = checkIsDataUploaded(change.runner.id)
+                            val canRewriteLocalCache = checkIsDataUploaded(change.runner.number)
                             val resultOfTask = ResultOfTask.build {
                                 if(canRewriteLocalCache){
                                     when (change.changeType) {
@@ -68,23 +68,23 @@ class RunnersRepositoryImpl @Inject constructor(
 
     override suspend fun updateRunnerData(runner: Runner): Runner {
         try {
-            Timber.log(Log.INFO, "Saving runner data: ${runner.id} checkpoints:${runner.checkpoints.map { "${it.name} ${if (it is CheckpointResult) it.date.toDateTimeShortFormat() else ""}" }}")
-            runnerDao.updateRunner(runner.toRunnerTable(), runner.checkpoints.toCheckpointsResult(runner.id))
-            val index = runnersCache.getRunnerList(runner.type).indexOfFirst { it.id == runner.id }
+            Timber.log(Log.INFO, "Saving runner data: ${runner.number} checkpoints:${runner.checkpoints.map { "${it.name} ${if (it is CheckpointResult) it.date.toDateTimeShortFormat() else ""}" }}")
+            runnerDao.updateRunner(runner.toRunnerTable(), runner.checkpoints.toCheckpointsResult(runner.number))
+            val index = runnersCache.getRunnerList(runner.type).indexOfFirst { it.number == runner.number }
             if (index != -1) runnersCache.getRunnerList(runner.type).removeAt(index)
             runnersCache.getRunnerList(runner.type).add(runner)
         } catch (e: SQLiteException) {
-            Timber.e(e, "Saving runner ${runner.id} data to room error")
+            Timber.e(e, "Saving runner ${runner.number} data to room error")
             e.printStackTrace()
             throw SaveRunnerDataException(runner.fullName)
         }
         if (networkUtil.isOnline()) {
             try {
-                runnerDao.markAsNeedToSync(runner.id, false)
+                runnerDao.markAsNeedToSync(runner.number, false)
                 awaitTaskCompletable(firestoreApi.updateRunner(runner))
             } catch (e: FirebaseFirestoreException) {
-                Timber.e(e, "Saving runner ${runner.id} data to firestore error")
-                runnerDao.markAsNeedToSync(runner.id, true)
+                Timber.e(e, "Saving runner ${runner.number} data to firestore error")
+                runnerDao.markAsNeedToSync(runner.number, true)
                 throw SyncWithServerException()
             }
         }
@@ -94,9 +94,11 @@ class RunnersRepositoryImpl @Inject constructor(
     override suspend fun getCheckpoints(type: RunnerType): List<Checkpoint> =
         settingsCache.getCheckpointList(type)
 
-    override suspend fun getRunnerById(cardId: String): Runner? = runnersCache.findRunner(cardId)
+    override suspend fun getRunnerByCardId(cardId: String): Runner? = runnersCache.findRunnerByCardId(cardId)
 
-    override suspend fun getRunnerTeamMembers(currentRunnerId: String, teamName: String): List<Runner>? = runnersCache.findRunnerTeamMembers(currentRunnerId, teamName)
+    override suspend fun getRunnerByNumber(runnerNumber: Int): Runner? = runnersCache.findRunnerByNumber(runnerNumber)
+
+    override suspend fun getRunnerTeamMembers(currentRunnerNumber: Int, teamName: String): List<Runner>? = runnersCache.findRunnerTeamMembers(currentRunnerNumber, teamName)
 
     override suspend fun getCurrentCheckpoint(type: RunnerType): Checkpoint =
         settingsCache.getCurrentCheckpoint(type)
@@ -110,7 +112,7 @@ class RunnersRepositoryImpl @Inject constructor(
             val checkpoints = settingsCache.getCheckpointList(RunnerType.NORMAL)
             runnersCache.normalRunnersList = runners.toRunners(checkpoints).toMutableList()
         }
-        return if (onlyFinishers) runnersCache.normalRunnersList.filter { it.totalResult != null } else runnersCache.normalRunnersList
+        return if (onlyFinishers) runnersCache.normalRunnersList.filter { it.totalResult != null && !it.isOffTrack } else runnersCache.normalRunnersList
 
     }
 
@@ -123,19 +125,19 @@ class RunnersRepositoryImpl @Inject constructor(
             }
             runnersCache.ironRunnersList = runners.toRunners(settingsCache.checkpointsIronPeople).toMutableList()
         }
-        return if (onlyFinishers) runnersCache.ironRunnersList.filter { it.totalResult != null } else runnersCache.ironRunnersList
+        return if (onlyFinishers) runnersCache.ironRunnersList.filter { it.totalResult != null && !it.isOffTrack } else runnersCache.ironRunnersList
     }
 
-    private suspend fun checkIsDataUploaded(runnerId: String): Boolean {
+    private suspend fun checkIsDataUploaded(runnerNumber: Int): Boolean {
         return withContext(Dispatchers.IO) {
-              runnerDao.checkNeedToSync(runnerId) == null
+              runnerDao.checkNeedToSync(runnerNumber) == null
          }
     }
 
     private suspend fun insertRunner(runner: Runner) {
         withContext(Dispatchers.IO) {
             val runnerTable = runner.toRunnerTable(false)
-            val resultTables = runner.checkpoints.toCheckpointsResult(runner.id)
+            val resultTables = runner.checkpoints.toCheckpointsResult(runner.number)
             val index = runnersCache.getRunnerList(runner.type).indexOfFirst { it.number == runner.number }
             if (index != -1) {
                 runnerDao.updateRunner(runnerTable, resultTables)
@@ -152,7 +154,7 @@ class RunnersRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             val index = runnersCache.getRunnerList(runner.type).indexOfFirst { it.number == runner.number }
             if (index != -1) {
-                runnerDao.updateRunner(runner.toRunnerTable(false), runner.checkpoints.toCheckpointsResult(runner.id))
+                runnerDao.updateRunner(runner.toRunnerTable(false), runner.checkpoints.toCheckpointsResult(runner.number))
                 runnersCache.getRunnerList(runner.type).removeAt(index)
                 runnersCache.getRunnerList(runner.type).add(index, runner)
             }
@@ -161,8 +163,8 @@ class RunnersRepositoryImpl @Inject constructor(
 
     private suspend fun deleteRunner(runner: Runner) {
         withContext(Dispatchers.IO) {
-            val count = runnerDao.delete(runner.id)
-            val isRemoved = runnersCache.getRunnerList(runner.type).removeAll { it.id == runner.id }
+            val count = runnerDao.delete(runner.number)
+            val isRemoved = runnersCache.getRunnerList(runner.type).removeAll { it.number == runner.number }
             Timber.i("Removed runner from DB count: $count, from cache removed: $isRemoved")
         }
     }

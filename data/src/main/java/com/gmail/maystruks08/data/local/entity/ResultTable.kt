@@ -7,17 +7,16 @@ import java.util.*
 
 @Entity(
     tableName = "result",
-    primaryKeys = ["runnerId", "checkpointId"],
+    primaryKeys = ["runnerNumber", "checkpointId"],
     foreignKeys = [ForeignKey(
         entity = RunnerTable::class,
-        parentColumns = ["id"],
-        childColumns = ["runnerId"],
+        parentColumns = ["number"],
+        childColumns = ["runnerNumber"],
         onDelete = ForeignKey.CASCADE
-    )],
-    indices = [Index(value = ["runnerId", "checkpointId"])]
+    )]
 )
 data class ResultTable(
-    val runnerId: String,
+    val runnerNumber: Int,
     val checkpointId: Int,
     val time: Date?,
     var hasPrevious: Boolean

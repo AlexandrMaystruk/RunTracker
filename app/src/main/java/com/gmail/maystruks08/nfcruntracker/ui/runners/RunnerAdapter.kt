@@ -21,7 +21,7 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
     }
 
     fun insertItemOrUpdateIfExist(item: RunnerView) {
-        val index = runnerList.indexOfFirst { item.id == it.id }
+        val index = runnerList.indexOfFirst { item.number == it.number }
         if (index == -1) {
             runnerList.add(item)
             notifyItemInserted(runnerList.lastIndex)
@@ -33,7 +33,7 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
     }
 
     fun updateItem(item: RunnerView) {
-        val index = runnerList.indexOfFirst { item.id == it.id }
+        val index = runnerList.indexOfFirst { item.number == it.number }
         if (index == -1) return
         runnerList.removeAt(index)
         runnerList.add(index, item)
@@ -41,7 +41,7 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
     }
 
     fun removeItem(item: RunnerView) {
-        val index = runnerList.indexOfFirst { item.id == it.id }
+        val index = runnerList.indexOfFirst { item.number == it.number }
         if (index == -1) return
         runnerList.removeAt(index)
         notifyItemRemoved(index)

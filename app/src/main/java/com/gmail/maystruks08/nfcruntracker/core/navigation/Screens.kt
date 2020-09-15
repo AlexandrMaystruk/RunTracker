@@ -17,8 +17,8 @@ object Screens {
         }
     }
 
-    class RunnerScreen(private val runnerId: String, private val runnerType: Int) : AppScreen() {
-        override fun getFragment() = RunnerFragment.getInstance(runnerId, runnerType)
+    class RunnerScreen(private val runnerNumber: Int, private val runnerType: Int) : AppScreen() {
+        override fun getFragment() = RunnerFragment.getInstance(runnerNumber, runnerType)
 
         companion object {
             fun tag() = RunnerScreen::class.java.canonicalName ?: ""

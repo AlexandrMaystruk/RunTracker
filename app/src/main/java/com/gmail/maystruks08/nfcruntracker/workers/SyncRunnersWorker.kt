@@ -41,11 +41,11 @@ class SyncRunnersWorker(context: Context, params: WorkerParameters) : CoroutineW
                 Timber.i("Not uploaded runner count ${runnerWithIronRunner.first.size + runnerWithIronRunner.second.size}")
                 runnerWithIronRunner.first.toRunners(checkpoints.await()).forEach {
                     firestoreApi.updateRunner(it)
-                    runnerDao.markAsNeedToSync(runnerId = it.id, needToSync = false)
+                    runnerDao.markAsNeedToSync(runnerNumber = it.number, needToSync = false)
                 }
                 runnerWithIronRunner.second.toRunners( ironCheckpoints.await()).forEach {
                     firestoreApi.updateRunner(it)
-                    runnerDao.markAsNeedToSync(runnerId = it.id, needToSync = false)
+                    runnerDao.markAsNeedToSync(runnerNumber = it.number, needToSync = false)
                 }
             }
         }

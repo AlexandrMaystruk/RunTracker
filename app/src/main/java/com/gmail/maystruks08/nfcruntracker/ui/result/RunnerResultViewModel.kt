@@ -13,6 +13,7 @@ import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerResultView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerResultView
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import javax.inject.Inject
@@ -28,13 +29,11 @@ class RunnerResultViewModel @Inject constructor(
     private val _runnerResultsLiveData = MutableLiveData<List<RunnerResultView>>()
     private val _errorLiveData = MutableLiveData<Throwable>()
 
-
-
     private var type: RunnerType = RunnerType.NORMAL
 
     fun provideFinishers(type: RunnerType){
         this.type = type
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             when (val onResult = interactor.getFinishers(type)) {
                 is ResultOfTask.Value -> {
                     val sortedResultList = onResult.value
@@ -58,7 +57,7 @@ class RunnerResultViewModel @Inject constructor(
     }
 
     fun onSearchQueryChanged(query: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (query.isNotEmpty()) {
                 when (val result = interactor.getFinishers(type)) {
                     is ResultOfTask.Value -> {

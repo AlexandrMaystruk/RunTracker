@@ -3,8 +3,8 @@ package com.gmail.maystruks08.data.remote.pojo
 import java.util.*
 
 data class RunnerPojo(
-    var id: String = "",
     var number: Int = 0,
+    var cardId: String = "",
     var fullName: String = "",
     val shortName: String = "",
     val phone: String = "",

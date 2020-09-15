@@ -9,6 +9,7 @@ import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.getVisibleFragment
 import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
+import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import kotlinx.android.synthetic.main.fragment_view_pager_runners.*
 
@@ -61,11 +62,12 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
 
     fun onNfcCardScanned(cardId: String) {
         getVisibleFragment<RegisterNewRunnerFragment>()?.viewModel?.onNfcCardScanned(cardId)
+        getVisibleFragment<RunnerFragment>()?.viewModel?.onNfcCardScanned(cardId)
         adapter?.getCurrentVisibleFragment(pager.currentItem)?.viewModel?.onNfcCardScanned(cardId)
     }
 
     private fun onClickedAtRunner(runnerView: RunnerView) {
-        viewModel.onClickedAtRunner(runnerView.id, runnerView.type)
+        viewModel.onClickedAtRunner(runnerView.number, runnerView.type)
     }
 
     override fun onDestroyView() {

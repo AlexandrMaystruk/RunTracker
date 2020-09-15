@@ -6,4 +6,10 @@
         android:id="@+id/action_runner_off_track"
         android:title="@string/off_track"
         app:showAsAction="never" />
+
+    <item
+        app:iconTint="@color/colorAccent"
+        android:id="@+id/action_runner_link_card"
+        android:title="@string/link_card"
+        app:showAsAction="never" />
 </menu>

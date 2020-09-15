@@ -78,7 +78,7 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
         db.collection("settings").document(START_DATE_DOCUMENT_NAME).get()
 
     override suspend fun updateRunner(runner: Runner): Task<Void> =
-        db.collection("runners").document(runner.id).set(runner.toFirestoreRunner())
+        db.collection("runners").document(runner.number.toString()).set(runner.toFirestoreRunner())
 
     override fun subscribeToRunnerDataRealtimeUpdates(listener: (List<RunnerChange>) -> Unit) {
         registration = db.collection("runners").addSnapshotListener { snapshots, e ->

@@ -5,9 +5,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
-import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
-import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
@@ -38,7 +36,7 @@ class RunnerResultFragment : BaseFragment(R.layout.fragment_runners_results) {
         .build()
 
     override fun bindViewModel() {
-        viewModel.runnerResults.observe(viewLifecycleOwner, Observer { runnersResults ->
+        viewModel.runnerResults.observe(viewLifecycleOwner, { runnersResults ->
             resultAdapter.resultList = runnersResults.toMutableList()
         })
 

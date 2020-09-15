@@ -11,8 +11,8 @@ import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepState
 fun List<Runner>.toRunnerViews() = this.map { it.toRunnerView() }
 
 fun Runner.toRunnerView() = RunnerView(
-    this.id,
-    this.number.toString(),
+    this.cardId,
+    this.number,
     this.fullName,
     this.city,
     this.totalResult?.toTimeUTCFormat(),
@@ -23,7 +23,7 @@ fun Runner.toRunnerView() = RunnerView(
 )
 
 fun Runner.toRunnerResultView(position: Int) = RunnerResultView(
-    this.id,
+    this.cardId,
     this.fullName,
     this.number.toString(),
     this.totalResult!!.toTimeUTCFormat(),

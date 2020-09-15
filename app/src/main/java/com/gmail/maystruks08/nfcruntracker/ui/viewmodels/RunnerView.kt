@@ -5,8 +5,8 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class RunnerView(
-    val id: String,
-    val number: String,
+    val cardId: String,
+    val number: Int,
     val fullName: String,
     val city: String,
     val result: String?,

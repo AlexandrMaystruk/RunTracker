@@ -14,7 +14,7 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(private val runnersRep
             val checkpoints = runnersRepository.getCheckpoints(runnerType).toMutableList()
             val runners = registerInputData.map {
                 Runner(
-                    id = it.runnerCardId,
+                    cardId = it.runnerCardId,
                     fullName = it.fullName,
                     shortName = it.shortName,
                     phone = it.phone,

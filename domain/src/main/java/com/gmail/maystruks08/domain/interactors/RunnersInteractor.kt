@@ -8,7 +8,7 @@ import java.util.*
 
 interface RunnersInteractor {
 
-    suspend fun getRunner(id: String): ResultOfTask<Exception, Runner>
+    suspend fun getRunner(runnerNumber: Int): ResultOfTask<Exception, Runner>
 
     suspend fun getRunners(type: RunnerType): ResultOfTask<Exception, List<Runner>>
 
@@ -18,11 +18,15 @@ interface RunnersInteractor {
 
     suspend fun addCurrentCheckpointToRunner(cardId: String): ResultOfTask<Exception, RunnerChange>
 
+    suspend fun addCurrentCheckpointToRunner(runnerNumber: Int): ResultOfTask<Exception, RunnerChange>
+
     suspend fun addStartCheckpointToRunners(date: Date)
 
-    suspend fun markRunnerGotOffTheRoute(cardId: String): ResultOfTask<Exception, RunnerChange>
+    suspend fun changeRunnerCardId(runnerNumber: Int, newCardId: String): ResultOfTask<Exception, RunnerChange>
 
-    suspend fun removeCheckpointForRunner(cardId: String, checkpointId: Int): ResultOfTask<Exception, RunnerChange>
+    suspend fun markRunnerGotOffTheRoute(runnerNumber: Int): ResultOfTask<Exception, RunnerChange>
+
+    suspend fun removeCheckpointForRunner(runnerNumber: Int, checkpointId: Int): ResultOfTask<Exception, RunnerChange>
 
     suspend fun finishWork()
 

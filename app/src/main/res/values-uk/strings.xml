@@ -43,6 +43,7 @@
     <string name="mark_runner_without_card">Отметить участника на КП без карты?</string>
     <string name="total_time">Загальний час: %1$s</string>
     <string name="off_track">Зійшов з маршруту</string>
+    <string name="link_card">Прив\'язати карту</string>
     <string name="success">Успіх!</string>
     <string name="success_message">Бігун %2$s відзначений на кп %1$s</string>
     <string name="nfc_disabled">NFC вимкнено!</string>
@@ -50,5 +51,9 @@
     <string name="is_enable_nfc">Включити NFC для сканування карт учасників?</string>
     <string name="please_enable_nfc">Будь ласка, активуйте NFC і натисніть Назад, щоб повернутися в додаток!</string>
     <string name="device_offline">Пристрій офлайн</string>
+    <string name="disable_link_card_mode">Вимкнути режим прив\'язки карти</string>
+    <string name="please_scan_card">"Прикладіть картку до NFC сканера"</string>
+
+
 
 </resources>

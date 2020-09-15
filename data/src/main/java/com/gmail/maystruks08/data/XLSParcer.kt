@@ -77,15 +77,14 @@ class XLSParcer @Inject constructor(private val context: Context) {
                 if (rowNumber != 0) {
                     val cellIterator: Iterator<Cell> = myRow.cellIterator()
                     var columnNumber = 0
-
                     var fullName = ""
                     var shortName = ""
                     var phone = ""
                     var runnerSex = RunnerSex.MALE
                     var city = ""
-                    var number = Random().nextInt(10000)
+                    var number = Random().nextInt(999)
                     var dateOfBirthday = Date()
-
+                    var teamName: String? = null
                     while (cellIterator.hasNext()) {
                         val myCell = cellIterator.next() as HSSFCell
                         when (columnNumber) {
@@ -96,11 +95,15 @@ class XLSParcer @Inject constructor(private val context: Context) {
                             5 -> phone = myCell.toString()
                             6 -> dateOfBirthday = myCell.toString().toDate()
                             8 -> number = myCell.toString().toIntOrNull()?:number
+                            9 -> teamName = myCell.toString()
                         }
                         columnNumber++
                     }
+                    if(result.any { it.number == number }){
+                        number = Random().nextInt(999)
+                    }
                     val newRunner = Runner(
-                        id = UUID.randomUUID().toString(),
+                        cardId = UUID.randomUUID().toString(),
                         fullName = fullName,
                         shortName = shortName,
                         phone =phone ,
@@ -112,7 +115,7 @@ class XLSParcer @Inject constructor(private val context: Context) {
                         totalResult = null,
                         checkpoints = checkpoints.toMutableList(),
                         isOffTrack = false,
-                        teamName = null //TODO change
+                        teamName = if(teamName.isNullOrEmpty()) null else teamName
                     )
                     result.add(newRunner)
                     Timber.e(newRunner.toString())

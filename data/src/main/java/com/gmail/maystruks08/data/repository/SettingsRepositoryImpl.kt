@@ -40,8 +40,8 @@ class SettingsRepositoryImpl @Inject constructor(
                         checkpointDAO.deleteCheckpoints()
                         checkpointDAO.insertAllOrReplace(checkpoints.map { it.toCheckpointTable() })
 
-//                    val checkpointsNormal = checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
-//                    val result = xlsParcer.readExcelFileFromAssets(checkpointsNormal, "sotka_single.xls", RunnerType.NORMAL)
+                    val checkpointsNormal = checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
+                    val result = xlsParcer.readExcelFileFromAssets(checkpointsNormal, "sotka_single.xls", RunnerType.NORMAL)
 //
 //                   result.forEach {
 //                       awaitTaskCompletable(firestoreApi.updateRunner(it))

@@ -7,9 +7,9 @@ import com.gmail.maystruks08.domain.entities.Checkpoint
 import com.gmail.maystruks08.domain.entities.CheckpointResult
 import com.gmail.maystruks08.domain.entities.CheckpointType
 
-fun CheckpointResult.toResultTable(runnerId: String): ResultTable {
+fun CheckpointResult.toResultTable(runnerNumber: Int): ResultTable {
     return ResultTable(
-        runnerId = runnerId,
+        runnerNumber = runnerNumber,
         checkpointId = id,
         time = this.date,
         hasPrevious = this.hasPrevious

@@ -51,8 +51,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     }
 
     private fun onMarkRunnerOnCheckpointSuccess(runnerChange: RunnerChange) {
-        val lastCheckpoint =
-            runnerChange.runner.checkpoints.maxByOrNull { (it as? CheckpointResult)?.date?.time ?: 0 }
+        val lastCheckpoint = runnerChange.runner.checkpoints.maxByOrNull { (it as? CheckpointResult)?.date?.time ?: 0 }
         _showSuccessDialogLiveData.postValue(lastCheckpoint to runnerChange.runner.number)
         handleRunnerChanges(runnerChange)
     }
@@ -88,7 +87,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     }
 
     fun onSearchQueryChanged(query: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (query.isNotEmpty()) {
                 when (val result = runnersInteractor.getRunners(runnerType)) {
                     is ResultOfTask.Value -> {

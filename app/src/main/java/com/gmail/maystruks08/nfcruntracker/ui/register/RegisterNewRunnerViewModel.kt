@@ -43,7 +43,11 @@ class RegisterNewRunnerViewModel @Inject constructor(
         } else {
             viewModelScope.launch(Dispatchers.IO) {
                 val inputData = runnerRegisterData.map {
-                    val shortName = it.shortName ?: it.fullName?.substring(0, it.fullName!!.indexOf(" ")) ?: ""
+                    val shortName = if(it.fullName?.contains(" ".toRegex()) == true){
+                        it.shortName ?: it.fullName?.substring(0, it.fullName!!.indexOf(" ")) ?: ""
+                    } else {
+                        it.shortName ?: it.fullName?: ""
+                    }
                     RegisterNewRunnerInteractor.RegisterInputData(
                         fullName = it.fullName!!,
                         shortName = shortName,

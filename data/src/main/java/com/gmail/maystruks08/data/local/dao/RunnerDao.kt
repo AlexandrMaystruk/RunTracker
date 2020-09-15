@@ -37,41 +37,40 @@ interface RunnerDao :
     }
 
     @Transaction
-    fun getRunnerWithResults(id: String): RunnerTableView {
-        return RunnerTableView(getRunner(id), getRunnerResults(id))
-    }
-
-    @Transaction
     fun getRunnersWithResults(type: Int): List<RunnerTableView> {
         val runners = getRunners(type)
-        return runners.map { RunnerTableView(it, getRunnerResults(it.id)) }
+        return runners.map { RunnerTableView(it, getRunnerResults(it.number)) }
     }
 
     @Query("SELECT * FROM checkpoints WHERE checkpointType =:type")
     fun getCheckpoints(type: Int): List<CheckpointTable>
 
 
-    @Query("SELECT * FROM runners WHERE runners.id =:id")
-    fun getRunner(id: String): RunnerTable
+    @Query("SELECT * FROM runners WHERE runners.cardId =:cardUUID")
+    fun getRunner(cardUUID: String): RunnerTable
 
     @Transaction
-    @Query("SELECT * FROM result LEFT JOIN runners ON result.runnerId = runners.id WHERE runners.id =:id")
-    fun getRunnerResults(id: String): List<ResultTable>
+    @Query("UPDATE runners SET cardId = :newCardUUID WHERE number = :number")
+    fun updateRunnerCardId(number: Int, newCardUUID: String)
+
+    @Transaction
+    @Query("SELECT * FROM result LEFT JOIN runners ON result.runnerNumber = runners.number WHERE runners.number =:runnerNumber")
+    fun getRunnerResults(runnerNumber: Int): List<ResultTable>
 
     @Transaction
     @Query("SELECT * FROM runners WHERE type =:type ")
     fun getRunners(type: Int): List<RunnerTable>
 
     @Transaction
-    @Query("SELECT * FROM runners WHERE id =:id AND needToSync = 1 ")
-    fun checkNeedToSync(id: String): RunnerTable?
+    @Query("SELECT * FROM runners WHERE number =:runnerNumber AND needToSync = 1 ")
+    fun checkNeedToSync(runnerNumber: Int): RunnerTable?
 
 
-    @Query("UPDATE runners SET needToSync = :needToSync WHERE id = :runnerId")
-    suspend fun markAsNeedToSync(runnerId: String, needToSync: Boolean)
+    @Query("UPDATE runners SET needToSync = :needToSync WHERE number = :runnerNumber")
+    suspend fun markAsNeedToSync(runnerNumber: Int, needToSync: Boolean)
 
-    @Query("DELETE FROM runners WHERE id =:runnerId ")
-    suspend fun delete(runnerId: String): Int
+    @Query("DELETE FROM runners WHERE number =:runnerNumber ")
+    suspend fun delete(runnerNumber: Int): Int
 
     @Transaction
     @Query("SELECT * FROM runners WHERE needToSync = 1")
@@ -80,7 +79,7 @@ interface RunnerDao :
     @Transaction
     fun getNotUploadedRunnersWithResults(): List<RunnerTableView> {
         val runners = getNotUploadedRunners()
-        return runners.map { RunnerTableView(it, getRunnerResults(it.id)) }
+        return runners.map { RunnerTableView(it, getRunnerResults(it.number)) }
     }
 
 

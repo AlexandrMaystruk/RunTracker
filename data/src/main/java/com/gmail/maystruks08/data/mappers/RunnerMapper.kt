@@ -11,7 +11,7 @@ import com.gmail.maystruks08.domain.entities.*
 fun List<RunnerTableView>.toRunners(checkpoints: List<Checkpoint>): List<Runner> {
     return this.map { tableView ->
         Runner(
-            id = tableView.runnerTable.id,
+            cardId = tableView.runnerTable.cardId,
             number = tableView.runnerTable.number,
             fullName = tableView.runnerTable.fullName,
             shortName = tableView.runnerTable.shortName,
@@ -41,7 +41,7 @@ fun List<RunnerTableView>.toRunners(checkpoints: List<Checkpoint>): List<Runner>
 
 fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
     return RunnerTable(
-        id = this.id,
+        cardId = this.cardId,
         number = this.number,
         fullName = this.fullName,
         shortName = this.shortName,
@@ -57,16 +57,15 @@ fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
     )
 }
 
-fun List<Checkpoint>.toCheckpointsResult(runnerId: String): List<ResultTable> =
-    this.mapNotNull { if (it is CheckpointResult) it.toResultTable(runnerId) else null }
+fun List<Checkpoint>.toCheckpointsResult(runnerNumber: Int): List<ResultTable> =
+    this.mapNotNull { if (it is CheckpointResult) it.toResultTable(runnerNumber) else null }
 
 
 fun List<Runner>.toFirestoreRunners(): List<RunnerPojo> = this.map { it.toFirestoreRunner() }
 fun List<RunnerPojo>.fromFirestoreRunners(): List<Runner> = this.map { it.fromFirestoreRunner()}
 
 fun Runner.toFirestoreRunner(): RunnerPojo {
-    return RunnerPojo(
-        id, number, fullName, shortName, phone, sex.ordinal, city, dateOfBirthday, type.ordinal, teamName, totalResult,
+    return RunnerPojo(number,cardId, fullName, shortName, phone, sex.ordinal, city, dateOfBirthday, type.ordinal, teamName, totalResult,
         checkpoints.toFirestoreCheckpointsResult(), checkpoints.toFirestoreCheckpoints(),
         isOffTrack
     )
@@ -74,7 +73,7 @@ fun Runner.toFirestoreRunner(): RunnerPojo {
 
 fun RunnerPojo.fromFirestoreRunner(): Runner {
     return  Runner(
-        id, number, fullName, shortName, phone,  RunnerSex.fromOrdinal(sex), city, dateOfBirthday, RunnerType.fromOrdinal(type), totalResult, teamName,
+        number, cardId, fullName, shortName, phone,  RunnerSex.fromOrdinal(sex), city, dateOfBirthday, RunnerType.fromOrdinal(type), totalResult, teamName,
         mutableListOf<Checkpoint>().apply {
             addAll(completeCheckpoints.fromFirestoreCheckpointsResult())
             addAll(uncompletedCheckpoints.fromFirestoreCheckpoints())
