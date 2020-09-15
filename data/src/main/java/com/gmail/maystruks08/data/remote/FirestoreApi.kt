@@ -6,8 +6,7 @@ import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.QuerySnapshot
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 interface FirestoreApi{
@@ -28,7 +27,7 @@ interface FirestoreApi{
 
     suspend fun updateRunner(runner: Runner): Task<Void>
 
-    fun subscribeToRunnerDataRealtimeUpdates(listener: (List<RunnerChange>) -> Unit)
+    suspend fun subscribeToRunnerDataRealtimeUpdates(): Flow<RunnerChange>
 
     suspend fun unregisterUpdatesListener()
 

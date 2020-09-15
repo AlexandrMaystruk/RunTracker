@@ -13,6 +13,8 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerViews
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -33,6 +35,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
 
     private lateinit var runnerType: RunnerType
 
+    @ExperimentalCoroutinesApi
     fun initFragment(runnerTypeId: Int) {
         runnerType = RunnerType.fromOrdinal(runnerTypeId)
         viewModelScope.launch(Dispatchers.IO) {
@@ -66,8 +69,12 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
         }
     }
 
-    private suspend fun updateRunnerCache(){
+    @ExperimentalCoroutinesApi
+    private suspend fun updateRunnerCache() {
         runnersInteractor.updateRunnersCache(runnerType, ::onRunnersUpdates)
+            .catch { e -> handleError(e) }
+            .collect(::handleRunnerChanges)
+
     }
 
     private fun onRunnersUpdates(onResult: ResultOfTask<Exception, RunnerChange>) {
@@ -102,7 +109,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
         }
     }
 
-    private fun handleError(e: Exception) {
+    private fun handleError(e: Throwable) {
         Timber.e(e)
         when(e){
             is SaveRunnerDataException -> toastLiveData.postValue("Не удалось сохранить данные участника:" + e.message)

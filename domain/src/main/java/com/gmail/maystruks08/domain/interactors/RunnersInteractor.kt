@@ -4,6 +4,7 @@ import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.entities.Runner
 import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.entities.RunnerType
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 interface RunnersInteractor {
@@ -14,7 +15,7 @@ interface RunnersInteractor {
 
     suspend fun getFinishers(type: RunnerType): ResultOfTask<Exception, List<Runner>>
 
-    suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit)
+    suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit): Flow<RunnerChange>
 
     suspend fun addCurrentCheckpointToRunner(cardId: String): ResultOfTask<Exception, RunnerChange>
 

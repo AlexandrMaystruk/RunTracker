@@ -13,6 +13,9 @@ dependencies {
 
     implementation domainDependencies.kotlin
 
+    implementation domainDependencies.corutinesCore
+    implementation domainDependencies.corutinesAndroid
+
     testImplementation domainTestDependencies.junit
     implementation domainTestDependencies.mockito
 }

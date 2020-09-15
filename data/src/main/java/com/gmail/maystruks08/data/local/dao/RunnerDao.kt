@@ -63,7 +63,7 @@ interface RunnerDao :
 
     @Transaction
     @Query("SELECT * FROM runners WHERE number =:runnerNumber AND needToSync = 1 ")
-    fun checkNeedToSync(runnerNumber: Int): RunnerTable?
+    suspend fun checkNeedToSync(runnerNumber: Int): RunnerTable?
 
 
     @Query("UPDATE runners SET needToSync = :needToSync WHERE number = :runnerNumber")

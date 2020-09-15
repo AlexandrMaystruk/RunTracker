@@ -6,6 +6,7 @@ import com.gmail.maystruks08.domain.entities.*
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
 import com.gmail.maystruks08.domain.toDateTimeShortFormat
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 import javax.inject.Inject
 
@@ -22,9 +23,9 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
     override suspend fun getFinishers(type: RunnerType): ResultOfTask<Exception, List<Runner>> =
         ResultOfTask.build { runnersRepository.getRunners(type, true) }
 
-    override suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit) {
+    override suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit): Flow<RunnerChange> {
         this.onRunnerChanged = onResult
-        return runnersRepository.updateRunnersCache(type, onResult)
+        return runnersRepository.updateRunnersCache(type)
     }
 
     override suspend fun addStartCheckpointToRunners(date: Date) {

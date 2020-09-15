@@ -18,9 +18,8 @@ import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
 import com.gmail.maystruks08.domain.toDateTimeShortFormat
 import com.google.firebase.firestore.FirebaseFirestoreException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -39,30 +38,19 @@ class RunnersRepositoryImpl @Inject constructor(
             RunnerType.IRON -> getIronRunners(onlyFinishers)
         }
 
-    override suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit) {
-        try {
-            firestoreApi.subscribeToRunnerDataRealtimeUpdates {
-                if (networkUtil.isOnline()) {
-                    it.forEach { change ->
-                        runBlocking {
-                            val canRewriteLocalCache = checkIsDataUploaded(change.runner.number)
-                            val resultOfTask = ResultOfTask.build {
-                                if(canRewriteLocalCache){
-                                    when (change.changeType) {
-                                        Change.ADD -> insertRunner(change.runner)
-                                        Change.UPDATE -> updateRunner(change.runner)
-                                        Change.REMOVE -> deleteRunner(change.runner)
-                                    }
-                                }
-                                return@build change
-                            }
-                            if (type == change.runner.type && canRewriteLocalCache) onResult.invoke(resultOfTask)
-                        }
+    @InternalCoroutinesApi
+    override suspend fun updateRunnersCache(type: RunnerType): Flow<RunnerChange> {
+       return firestoreApi.subscribeToRunnerDataRealtimeUpdates()
+           .mapNotNull { change ->
+            val canRewriteLocalCache = checkIsDataUploaded(change.runner.number)
+                if (canRewriteLocalCache) {
+                    when (change.changeType) {
+                        Change.ADD -> insertRunner(change.runner)
+                        Change.UPDATE -> updateRunner(change.runner)
+                        Change.REMOVE -> deleteRunner(change.runner)
                     }
                 }
-            }
-        } catch (e: Exception) {
-            onResult.invoke(ResultOfTask.build { throw SyncWithServerException() })
+            if (type == change.runner.type && canRewriteLocalCache) return@mapNotNull change else null
         }
     }
 
@@ -129,44 +117,36 @@ class RunnersRepositoryImpl @Inject constructor(
     }
 
     private suspend fun checkIsDataUploaded(runnerNumber: Int): Boolean {
-        return withContext(Dispatchers.IO) {
-              runnerDao.checkNeedToSync(runnerNumber) == null
-         }
+        return runnerDao.checkNeedToSync(runnerNumber) == null
     }
 
     private suspend fun insertRunner(runner: Runner) {
-        withContext(Dispatchers.IO) {
-            val runnerTable = runner.toRunnerTable(false)
-            val resultTables = runner.checkpoints.toCheckpointsResult(runner.number)
-            val index = runnersCache.getRunnerList(runner.type).indexOfFirst { it.number == runner.number }
-            if (index != -1) {
-                runnerDao.updateRunner(runnerTable, resultTables)
-                runnersCache.getRunnerList(runner.type).removeAt(index)
-                runnersCache.getRunnerList(runner.type).add(index, runner)
-            } else {
-                runnerDao.insertOrReplaceRunner(runnerTable, resultTables)
-                runnersCache.getRunnerList(runner.type).add(runner)
-            }
+        val runnerTable = runner.toRunnerTable(false)
+        val resultTables = runner.checkpoints.toCheckpointsResult(runner.number)
+        val index = runnersCache.getRunnerList(runner.type).indexOfFirst { it.number == runner.number }
+        if (index != -1) {
+            runnerDao.updateRunner(runnerTable, resultTables)
+            runnersCache.getRunnerList(runner.type).removeAt(index)
+            runnersCache.getRunnerList(runner.type).add(index, runner)
+        } else {
+            runnerDao.insertOrReplaceRunner(runnerTable, resultTables)
+            runnersCache.getRunnerList(runner.type).add(runner)
         }
     }
 
     private suspend fun updateRunner(runner: Runner) {
-        withContext(Dispatchers.IO) {
-            val index = runnersCache.getRunnerList(runner.type).indexOfFirst { it.number == runner.number }
-            if (index != -1) {
-                runnerDao.updateRunner(runner.toRunnerTable(false), runner.checkpoints.toCheckpointsResult(runner.number))
-                runnersCache.getRunnerList(runner.type).removeAt(index)
-                runnersCache.getRunnerList(runner.type).add(index, runner)
-            }
+        val index = runnersCache.getRunnerList(runner.type).indexOfFirst { it.number == runner.number }
+        if (index != -1) {
+            runnerDao.updateRunner(runner.toRunnerTable(false), runner.checkpoints.toCheckpointsResult(runner.number))
+            runnersCache.getRunnerList(runner.type).removeAt(index)
+            runnersCache.getRunnerList(runner.type).add(index, runner)
         }
     }
 
     private suspend fun deleteRunner(runner: Runner) {
-        withContext(Dispatchers.IO) {
-            val count = runnerDao.delete(runner.number)
-            val isRemoved = runnersCache.getRunnerList(runner.type).removeAll { it.number == runner.number }
-            Timber.i("Removed runner from DB count: $count, from cache removed: $isRemoved")
-        }
+        val count = runnerDao.delete(runner.number)
+        val isRemoved = runnersCache.getRunnerList(runner.type).removeAll { it.number == runner.number }
+        Timber.i("Removed runner from DB count: $count, from cache removed: $isRemoved")
     }
 
     override suspend fun finishWork() {
