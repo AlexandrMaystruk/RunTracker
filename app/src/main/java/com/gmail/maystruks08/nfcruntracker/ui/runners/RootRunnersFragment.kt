@@ -1,7 +1,11 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
+import android.content.Context
 import android.text.InputType
 import android.view.MenuItem
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat.getSystemService
+import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
@@ -13,11 +17,14 @@ import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import kotlinx.android.synthetic.main.fragment_view_pager_runners.*
 
+
 class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
 
     lateinit var viewModel: RootRunnersViewModel
 
     private var adapter: ScreenSlidePagerAdapter? = null
+
+    private var inputManager: InputMethodManager? = null
 
     override fun injectDependencies() {
         App.rootRunnersComponent?.inject(this)
@@ -48,9 +55,14 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
         btnRegisterNewRunner.setOnClickListener {
             viewModel.onRegisterNewRunnerClicked()
         }
+
+        viewModel.invalidateRunnerList.observe(viewLifecycleOwner, {
+            adapter?.invalidateRunnerList()
+        })
     }
 
     override fun initViews() {
+        inputManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         adapter = ScreenSlidePagerAdapter(
             ::onClickedAtRunner,
             arrayOf(getString(R.string.runner), getString(R.string.iron)),
@@ -58,6 +70,12 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
         )
         pager.adapter = adapter
         tabs.setupWithViewPager(pager)
+    }
+
+    fun receiveRunnerUpdateFromServer(runnerChange: RunnerChange){
+        adapter?.getCurrentVisibleFragment(pager.currentItem)?.viewModel?.handleRunnerChanges(
+            runnerChange
+        )
     }
 
     fun onNfcCardScanned(cardId: String) {
@@ -70,7 +88,19 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
         viewModel.onClickedAtRunner(runnerView.number, runnerView.type)
     }
 
+    override fun onStop() {
+        super.onStop()
+        hideSoftKeyboard(inputManager)
+    }
+
+    private fun hideSoftKeyboard(imm: InputMethodManager?) {
+        toolbarManager?.clearSearch()
+        imm?.hideSoftInputFromWindow(view?.rootView?.windowToken, 0)
+    }
+
     override fun onDestroyView() {
+        val inputMethodManager: InputMethodManager? = getSystemService(requireContext(), InputMethodManager::class.java)
+        inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, 0)
         adapter = null
         pager.adapter = null
         App.clearRootRunnersComponent()

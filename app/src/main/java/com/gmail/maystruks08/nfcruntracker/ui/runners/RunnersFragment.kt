@@ -9,6 +9,7 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import kotlinx.android.synthetic.main.fragment_runners.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
 class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
@@ -28,6 +29,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
 
     private lateinit var onClickedAtRunner: (RunnerView) -> Unit
 
+    @ExperimentalCoroutinesApi
     override fun injectDependencies() {
         App.runnersComponent?.inject(this)
         viewModel.initFragment(runnerTypeId)

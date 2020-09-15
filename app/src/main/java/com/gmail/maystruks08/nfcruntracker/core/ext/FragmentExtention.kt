@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -40,6 +41,10 @@ inline fun <reified T : Fragment> Fragment.findFragmentByTag(tag: String): T? {
 }
 
 inline fun <reified T : ViewModel> Fragment.injectViewModel(factory: ViewModelProvider.Factory): T {
+    return ViewModelProviders.of(this, factory)[T::class.java]
+}
+
+inline fun <reified T : ViewModel> AppCompatActivity.injectViewModel(factory: ViewModelProvider.Factory): T {
     return ViewModelProviders.of(this, factory)[T::class.java]
 }
 

@@ -18,7 +18,8 @@ import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
 import com.gmail.maystruks08.domain.toDateTimeShortFormat
 import com.google.firebase.firestore.FirebaseFirestoreException
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -30,29 +31,13 @@ class RunnersRepositoryImpl @Inject constructor(
     private val runnersCache: RunnersCache,
     private val settingsCache: SettingsCache,
     private val networkUtil: NetworkUtil
-) : RunnersRepository {
+) : RunnersRepository, RunnerDataChangeListener {
 
     override suspend fun getRunners(type: RunnerType, onlyFinishers: Boolean): List<Runner> =
         when (type) {
             RunnerType.NORMAL -> getNormalRunners(onlyFinishers)
             RunnerType.IRON -> getIronRunners(onlyFinishers)
         }
-
-    @InternalCoroutinesApi
-    override suspend fun updateRunnersCache(type: RunnerType): Flow<RunnerChange> {
-       return firestoreApi.subscribeToRunnerDataRealtimeUpdates()
-           .mapNotNull { change ->
-            val canRewriteLocalCache = checkIsDataUploaded(change.runner.number)
-                if (canRewriteLocalCache) {
-                    when (change.changeType) {
-                        Change.ADD -> insertRunner(change.runner)
-                        Change.UPDATE -> updateRunner(change.runner)
-                        Change.REMOVE -> deleteRunner(change.runner)
-                    }
-                }
-            if (type == change.runner.type && canRewriteLocalCache) return@mapNotNull change else null
-        }
-    }
 
     override suspend fun updateRunnerData(runner: Runner): Runner {
         try {
@@ -79,8 +64,7 @@ class RunnersRepositoryImpl @Inject constructor(
         return runner
     }
 
-    override suspend fun getCheckpoints(type: RunnerType): List<Checkpoint> =
-        settingsCache.getCheckpointList(type)
+    override suspend fun getCheckpoints(type: RunnerType): List<Checkpoint> = settingsCache.getCheckpointList(type)
 
     override suspend fun getRunnerByCardId(cardId: String): Runner? = runnersCache.findRunnerByCardId(cardId)
 
@@ -149,7 +133,21 @@ class RunnersRepositoryImpl @Inject constructor(
         Timber.i("Removed runner from DB count: $count, from cache removed: $isRemoved")
     }
 
-    override suspend fun finishWork() {
-        firestoreApi.unregisterUpdatesListener()
+    @FlowPreview
+    @ExperimentalCoroutinesApi
+    override suspend fun observeRunnerData(): Flow<RunnerChange> {
+        return firestoreApi.subscribeToRunnerDataRealtimeUpdates().flatMapConcat { runnerChangeList ->
+            runnerChangeList.forEach {
+                val canRewriteLocalCache = checkIsDataUploaded(it.runner.number)
+                if (canRewriteLocalCache) {
+                    when (it.changeType) {
+                        Change.ADD -> insertRunner(it.runner)
+                        Change.UPDATE -> updateRunner(it.runner)
+                        Change.REMOVE -> deleteRunner(it.runner)
+                    }
+                }
+            }
+           return@flatMapConcat channelFlow { runnerChangeList.forEach { offer(it) } }
+        }
     }
 }

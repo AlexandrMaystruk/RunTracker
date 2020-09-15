@@ -12,7 +12,7 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AppModule::class, DatabaseModule::class, SyncModule::class,  NavigationModule::class, SettingsModule::class, NetworkModule::class])
+@Component(modules = [AppModule::class, DatabaseModule::class, HostModule::class, SyncModule::class,  NavigationModule::class, SettingsModule::class, NetworkModule::class])
 interface BaseComponent {
 
     fun provideAppContext(): Context

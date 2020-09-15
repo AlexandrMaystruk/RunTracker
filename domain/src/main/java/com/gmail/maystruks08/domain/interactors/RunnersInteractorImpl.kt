@@ -6,13 +6,10 @@ import com.gmail.maystruks08.domain.entities.*
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
 import com.gmail.maystruks08.domain.toDateTimeShortFormat
-import kotlinx.coroutines.flow.Flow
 import java.util.*
 import javax.inject.Inject
 
 class RunnersInteractorImpl @Inject constructor(private val runnersRepository: RunnersRepository, private val logHelper: LogHelper) : RunnersInteractor {
-
-    private var onRunnerChanged: ((ResultOfTask<Exception, RunnerChange>) -> Unit)? = null
 
     override suspend fun getRunner(runnerNumber: Int): ResultOfTask<Exception, Runner> =
          ResultOfTask.build { runnersRepository.getRunnerByNumber(runnerNumber) ?: throw  RunnerNotFoundException()}
@@ -23,24 +20,21 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
     override suspend fun getFinishers(type: RunnerType): ResultOfTask<Exception, List<Runner>> =
         ResultOfTask.build { runnersRepository.getRunners(type, true) }
 
-    override suspend fun updateRunnersCache(type: RunnerType, onResult: (ResultOfTask<Exception, RunnerChange>) -> Unit): Flow<RunnerChange> {
-        this.onRunnerChanged = onResult
-        return runnersRepository.updateRunnersCache(type)
-    }
-
-    override suspend fun addStartCheckpointToRunners(date: Date) {
-        val checkpoints = runnersRepository.getCheckpoints(RunnerType.NORMAL)
-        val ironCheckpoints = runnersRepository.getCheckpoints(RunnerType.IRON)
-        logHelper.log(INFO, "Add start checkpoint to all runners at: ${date.toDateTimeShortFormat()}")
-        mutableListOf<Runner>()
-            .apply {
-                addAll(runnersRepository.getRunners(RunnerType.NORMAL))
-                addAll(runnersRepository.getRunners(RunnerType.IRON))
-            }.forEach {
-                val startCheckpoint = if (it.type == RunnerType.NORMAL) checkpoints.first() else ironCheckpoints.first()
-                val checkpointsCount = if (it.type == RunnerType.NORMAL) checkpoints.lastIndex else ironCheckpoints.lastIndex
-                it.addPassedCheckpoint(checkpoint = CheckpointResult(startCheckpoint.id, startCheckpoint.name, startCheckpoint.type, date), checkpointsCount =  checkpointsCount, isRestart = true)
-                onRunnerChanged?.invoke(ResultOfTask.build { RunnerChange(runnersRepository.updateRunnerData(it), Change.UPDATE) })
+    override suspend fun addStartCheckpointToRunners(date: Date): ResultOfTask<Exception, Unit>{
+       return ResultOfTask.build {
+            val checkpoints = runnersRepository.getCheckpoints(RunnerType.NORMAL)
+            val ironCheckpoints = runnersRepository.getCheckpoints(RunnerType.IRON)
+            logHelper.log(INFO, "Add start checkpoint to all runners at: ${date.toDateTimeShortFormat()}")
+            mutableListOf<Runner>()
+                .apply {
+                    addAll(runnersRepository.getRunners(RunnerType.NORMAL))
+                    addAll(runnersRepository.getRunners(RunnerType.IRON))
+                }.forEach {
+                    val startCheckpoint = if (it.type == RunnerType.NORMAL) checkpoints.first() else ironCheckpoints.first()
+                    val checkpointsCount = if (it.type == RunnerType.NORMAL) checkpoints.lastIndex else ironCheckpoints.lastIndex
+                    it.addPassedCheckpoint(checkpoint = CheckpointResult(startCheckpoint.id, startCheckpoint.name, startCheckpoint.type, date), checkpointsCount = checkpointsCount, isRestart = true)
+                    runnersRepository.updateRunnerData(it)
+                }
         }
     }
 
@@ -115,10 +109,5 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
             }
             RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
         }
-    }
-
-    override suspend fun finishWork() {
-        onRunnerChanged = null
-        runnersRepository.finishWork()
     }
 }

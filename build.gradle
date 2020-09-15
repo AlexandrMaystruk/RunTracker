@@ -131,7 +131,8 @@ ext {
 
     //Android
     androidBuildToolsVersion = "29.0.0"
-    androidXToolsVersion = "1.0.0"
+    androidXToolsVersion = "1.0.2"
+    appCompatVersion = '1.0.0'
     androidXAppCompatToolsVersion = "1.1.0"
     androidMinSdkVersion = 21
     androidTargetSdkVersion = 29
@@ -202,13 +203,13 @@ ext {
 
     presentationDependencies = [
             kotlin             : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin_version}",
-            supportAndroid     : "androidx.legacy:legacy-support-v4:${androidXToolsVersion}",
-            supportAppCompat   : "androidx.appcompat:appcompat:${androidXToolsVersion}",
+            supportAndroid     : "androidx.legacy:legacy-support-v4:${appCompatVersion}",
+            supportAppCompat   : "androidx.appcompat:appcompat:${appCompatVersion}",
             supportDesign      : "com.google.android.material:material:${designVersion}",
             recyclerView       : "androidx.recyclerview:recyclerview:${androidXToolsVersion}",
             annotations        : "androidx.annotation:annotation:${androidXToolsVersion}",
             constraintLayout   : "androidx.constraintlayout:constraintlayout:${constraintVersion}",
-            cardView           : "androidx.cardview:cardview:${androidXToolsVersion}",
+            cardView           : "androidx.cardview:cardview:${appCompatVersion}",
             kotlinAnko         : "org.jetbrains.anko:anko-commons:${ankoVersion}",
             kotlinKtx          : "androidx.core:core-ktx:${androidXToolsVersion}",
             javaxAnnotation    : "javax.annotation:jsr250-api:${javaxAnnotationVersion}",

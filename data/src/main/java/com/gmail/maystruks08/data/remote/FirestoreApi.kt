@@ -27,10 +27,6 @@ interface FirestoreApi{
 
     suspend fun updateRunner(runner: Runner): Task<Void>
 
-    suspend fun subscribeToRunnerDataRealtimeUpdates(): Flow<RunnerChange>
-
-    suspend fun unregisterUpdatesListener()
-
-
+    suspend fun subscribeToRunnerDataRealtimeUpdates(): Flow<List<RunnerChange>>
 
 }

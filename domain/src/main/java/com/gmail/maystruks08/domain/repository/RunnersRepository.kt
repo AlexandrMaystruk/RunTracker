@@ -3,13 +3,10 @@ package com.gmail.maystruks08.domain.repository
 import com.gmail.maystruks08.domain.entities.*
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
-import kotlinx.coroutines.flow.Flow
 
 interface RunnersRepository {
 
     suspend fun getRunners(type: RunnerType, onlyFinishers: Boolean = false): List<Runner>
-
-    suspend fun updateRunnersCache(type: RunnerType): Flow<RunnerChange>
 
     suspend fun getRunnerByCardId(cardId: String): Runner?
 
@@ -23,7 +20,5 @@ interface RunnersRepository {
     suspend fun getCheckpoints(type: RunnerType): List<Checkpoint>
 
     suspend fun getCurrentCheckpoint(type: RunnerType): Checkpoint
-
-    suspend fun finishWork()
 
 }

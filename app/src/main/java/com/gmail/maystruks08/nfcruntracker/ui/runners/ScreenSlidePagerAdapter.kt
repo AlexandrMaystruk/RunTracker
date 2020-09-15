@@ -3,6 +3,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.runners
 import android.os.Parcelable
 import android.util.SparseArray
 import android.view.ViewGroup
+import androidx.core.util.forEach
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -35,8 +36,6 @@ class ScreenSlidePagerAdapter(
         super.destroyItem(container, position, `object`)
     }
 
-    fun getCurrentVisibleFragment(position: Int): RunnersFragment? = registeredFragments[position]
-
     override fun getPageTitle(position: Int): CharSequence? = titles.getOrNull(position)
 
 
@@ -45,6 +44,14 @@ class ScreenSlidePagerAdapter(
             super.restoreState(state, loader)
         } catch (e: Exception) {
             Timber.d("Error Restore State of Fragment")
+        }
+    }
+
+    fun getCurrentVisibleFragment(position: Int): RunnersFragment? = registeredFragments[position]
+
+    fun invalidateRunnerList(){
+        registeredFragments.forEach { _, fragment ->
+            fragment.viewModel.invalidateRunnerList()
         }
     }
 }

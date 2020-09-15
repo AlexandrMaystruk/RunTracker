@@ -11,13 +11,13 @@ interface RunnerDao :
     BaseDao<RunnerTable> {
 
     @Transaction
-    fun insertOrReplaceRunner(runner: RunnerTable, results: List<ResultTable>) {
+    suspend fun insertOrReplaceRunner(runner: RunnerTable, results: List<ResultTable>) {
         insertOrReplace(runner)
         insertAllOrReplaceResults(results)
     }
 
     @Transaction
-    fun insertRunners(runnersData: List<Pair<RunnerTable,  List<ResultTable>>>) {
+    suspend fun insertRunners(runnersData: List<Pair<RunnerTable,  List<ResultTable>>>) {
         runnersData.forEach {
             insert(it.first)
             insertAllResult(it.second)
@@ -25,7 +25,7 @@ interface RunnerDao :
     }
 
     @Transaction
-    fun insertRunner(runner: RunnerTable, results: List<ResultTable>) {
+    suspend fun insertRunner(runner: RunnerTable, results: List<ResultTable>) {
         insert(runner)
         insertAllResult(results)
     }

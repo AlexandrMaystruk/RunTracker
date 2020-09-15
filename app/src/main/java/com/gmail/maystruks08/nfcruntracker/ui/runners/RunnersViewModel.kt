@@ -14,7 +14,6 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerViews
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -38,10 +37,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     @ExperimentalCoroutinesApi
     fun initFragment(runnerTypeId: Int) {
         runnerType = RunnerType.fromOrdinal(runnerTypeId)
-        viewModelScope.launch(Dispatchers.IO) {
-            showAllRunners()
-            updateRunnerCache()
-        }
+        viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
     }
 
     fun onNfcCardScanned(cardId: String) {
@@ -50,6 +46,39 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
                 is ResultOfTask.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
                 is ResultOfTask.Error -> handleError(onResult.error)
             }
+        }
+    }
+
+    fun invalidateRunnerList(){
+        viewModelScope.launch (Dispatchers.IO) {
+            showAllRunners()
+        }
+    }
+
+    fun handleRunnerChanges(runnerChange: RunnerChange) {
+        val runnerView = runnerChange.runner.toRunnerView()
+        if(runnerType == runnerChange.runner.type) {
+            when (runnerChange.changeType) {
+                Change.ADD -> _runnerAddLiveData.postValue(runnerView)
+                Change.UPDATE -> _runnerUpdateLiveData.postValue(runnerView)
+                Change.REMOVE -> _runnerRemoveLiveData.postValue(runnerView)
+            }
+        }
+    }
+
+    fun onSearchQueryChanged(query: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (query.isNotEmpty()) {
+                when (val result = runnersInteractor.getRunners(runnerType)) {
+                    is ResultOfTask.Value -> {
+                        val pattern = ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
+                        val runners = result.value.filter { pattern.containsMatchIn(it.number.toString().toLowerCase()) }
+                        val runnerViews = runners.map { it.toRunnerView() }.toMutableList()
+                        _runnersLiveData.postValue(runnerViews)
+                    }
+                    is ResultOfTask.Error -> handleError(result.error)
+                }
+            } else showAllRunners()
         }
     }
 
@@ -66,46 +95,6 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
                 _runnersLiveData.postValue(runners)
             }
             is ResultOfTask.Error -> handleError(result.error)
-        }
-    }
-
-    @ExperimentalCoroutinesApi
-    private suspend fun updateRunnerCache() {
-        runnersInteractor.updateRunnersCache(runnerType, ::onRunnersUpdates)
-            .catch { e -> handleError(e) }
-            .collect(::handleRunnerChanges)
-
-    }
-
-    private fun onRunnersUpdates(onResult: ResultOfTask<Exception, RunnerChange>) {
-        when (onResult) {
-            is ResultOfTask.Value -> handleRunnerChanges(onResult.value)
-            is ResultOfTask.Error -> handleError(onResult.error)
-        }
-    }
-
-    private fun handleRunnerChanges(runnerChange: RunnerChange) {
-        val runnerView = runnerChange.runner.toRunnerView()
-            when (runnerChange.changeType) {
-                Change.ADD -> _runnerAddLiveData.postValue(runnerView)
-                Change.UPDATE -> _runnerUpdateLiveData.postValue(runnerView)
-                Change.REMOVE -> _runnerRemoveLiveData.postValue(runnerView)
-            }
-    }
-
-    fun onSearchQueryChanged(query: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (query.isNotEmpty()) {
-                when (val result = runnersInteractor.getRunners(runnerType)) {
-                    is ResultOfTask.Value -> {
-                        val pattern = ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
-                        val runners = result.value.filter { pattern.containsMatchIn(it.number.toString().toLowerCase()) }
-                        val runnerViews = runners.map { it.toRunnerView() }.toMutableList()
-                        _runnersLiveData.postValue(runnerViews)
-                    }
-                    is ResultOfTask.Error -> handleError(result.error)
-                }
-            } else showAllRunners()
         }
     }
 

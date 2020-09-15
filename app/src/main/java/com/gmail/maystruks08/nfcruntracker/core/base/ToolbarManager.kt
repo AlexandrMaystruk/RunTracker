@@ -60,4 +60,11 @@ class ToolbarManager constructor(private var builder: FragmentToolbar, private v
     fun changeToolbarTitle(title: String){
         fragmentToolbar?.title = title
     }
+
+    fun clearSearch(){
+        val menu = fragmentToolbar?.menu
+        val searchView = menu?.findItem(R.id.action_search)?.actionView as? SearchView
+        searchView?.setQuery("", true)
+        fragmentToolbar?.collapseActionView()
+    }
 }

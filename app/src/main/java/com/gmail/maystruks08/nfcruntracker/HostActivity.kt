@@ -12,10 +12,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import com.gmail.maystruks08.data.repository.SyncRunnersDataScheduler
 import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.toDateTimeFormat
+import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.DaggerViewModelFactory
 import com.gmail.maystruks08.nfcruntracker.core.ext.getFragment
+import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.core.navigation.AppNavigator
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
@@ -29,7 +30,6 @@ import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.commands.Command
 import timber.log.Timber
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 const val PRESS_TWICE_INTERVAL = 2000
@@ -46,7 +46,9 @@ class HostActivity : AppCompatActivity() {
     lateinit var networkUtil: NetworkUtil
 
     @Inject
-    lateinit var syncDataScheduler: SyncRunnersDataScheduler
+    lateinit var viewModeFactory: DaggerViewModelFactory
+
+    lateinit var viewModel: HostViewModel
 
     private var lastBackPressTime = 0L
 
@@ -64,6 +66,12 @@ class HostActivity : AppCompatActivity() {
         setContentView(R.layout.activity_host)
         App.baseComponent.inject(this)
 
+        viewModel = injectViewModel(viewModeFactory)
+
+        viewModel.runnerChange.observe(this, {
+            getFragment<RootRunnersFragment>(Screens.RootRunnersScreen.tag())?.receiveRunnerUpdateFromServer(it)
+        })
+
         networkUtil.subscribeToConnectionChange(this.javaClass.simpleName) { isConnected ->
             if (!isConnected) {
                 snackBar = Snackbar.make(nav_host_container, getString(R.string.device_offline), Snackbar.LENGTH_INDEFINITE)
@@ -77,14 +85,9 @@ class HostActivity : AppCompatActivity() {
                 snackBar?.dismiss()
             }
         }
-
-        syncDataScheduler.startSyncData(15, TimeUnit.MINUTES)
-
-        router.newRootScreen(Screens.LoginScreen())
     }
 
-    private val navigator: Navigator =
-        object : AppNavigator(this, supportFragmentManager, R.id.nav_host_container) {
+    private val navigator: Navigator = object : AppNavigator(this, supportFragmentManager, R.id.nav_host_container) {
             override fun setupFragmentTransaction(command: Command?, currentFragment: Fragment?, nextFragment: Fragment?, fragmentTransaction: FragmentTransaction) {
                 fragmentTransaction.setReorderingAllowed(true)
             }
@@ -153,11 +156,6 @@ class HostActivity : AppCompatActivity() {
         nfcAdapter.stopListening(this)
         alertDialog?.dismiss()
         this.hideSoftKeyboard()
-    }
-
-    override fun onStop() {
-        syncDataScheduler.stopAllWork()
-        super.onStop()
     }
 
     override fun onDestroy() {
