@@ -1,6 +1,5 @@
 package com.gmail.maystruks08.data.remote
 
-import android.util.Log
 import com.gmail.maystruks08.data.awaitTaskCompletable
 import com.gmail.maystruks08.data.mappers.fromFirestoreRunner
 import com.gmail.maystruks08.data.mappers.toFirestoreCheckpoint
@@ -16,7 +15,6 @@ import com.google.firebase.firestore.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
@@ -25,8 +23,6 @@ import java.util.*
 import javax.inject.Inject
 
 class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : FirestoreApi {
-
-    private var registration: ListenerRegistration? = null
 
     companion object {
 

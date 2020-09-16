@@ -28,9 +28,7 @@ class RunnerResultFragment : BaseFragment(R.layout.fragment_runners_results) {
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
         .withMenu(R.menu.menu_search)
-        .withMenuSearch(InputType.TYPE_CLASS_NUMBER) {
-          viewModel.onSearchQueryChanged(it)
-        }
+        .withMenuSearch(InputType.TYPE_CLASS_NUMBER) { viewModel.onSearchQueryChanged(it) }
         .withNavigationIcon(R.drawable.ic_arrow_back) { viewModel.onBackClicked() }
         .withTitle(R.string.screen_runners_results)
         .build()

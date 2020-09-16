@@ -21,7 +21,7 @@ class LoginFragment : BaseFragment(R.layout.fui_auth_method_picker_layout) {
     override fun initToolbar() = FragmentToolbar.Builder().build()
 
     override fun bindViewModel() {
-        viewModel.startAuthFlow.observe(viewLifecycleOwner, Observer {
+        viewModel.startAuthFlow.observe(viewLifecycleOwner, {
             startActivityForResult(
                 AuthUI.getInstance()
                     .createSignInIntentBuilder()
@@ -53,5 +53,6 @@ class LoginFragment : BaseFragment(R.layout.fui_auth_method_picker_layout) {
     companion object {
 
         const val RC_SIGN_IN = 777
+
     }
 }

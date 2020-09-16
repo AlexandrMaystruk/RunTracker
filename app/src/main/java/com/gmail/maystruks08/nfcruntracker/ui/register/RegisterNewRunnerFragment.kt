@@ -96,7 +96,7 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
         ItemTouchHelper(swipeHelper).attachToRecyclerView(registerRunnersRecyclerView)
     }
 
-    //This is bad solution, move logic to view model
+    //This is bad solution, move logic to view model, need to refactor
     private fun resolveTeamNameVisibility() {
         inputLayout.visibility = if (adapter.runnerRegisterData.size > 1) View.VISIBLE else {
             teamName = null
