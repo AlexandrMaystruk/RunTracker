@@ -5,6 +5,7 @@ import com.gmail.maystruks08.domain.entities.RunnerType
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.ArrayList
 
 @Singleton
 class SettingsCache @Inject constructor() {
@@ -18,6 +19,8 @@ class SettingsCache @Inject constructor() {
     lateinit var currentIronPeopleCheckpoint: Checkpoint
 
     var dateOfStart: Date? = null
+
+    var adminUserIds = ArrayList<String>()
 
     fun getCheckpointList(type: RunnerType): List<Checkpoint> = when (type) {
         RunnerType.NORMAL -> checkpoints

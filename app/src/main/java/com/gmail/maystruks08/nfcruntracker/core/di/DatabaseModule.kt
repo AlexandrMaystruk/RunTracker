@@ -20,7 +20,7 @@ object DatabaseModule {
     @JvmStatic
     @Provides
     @Singleton
-    fun appDatabase(context: Context): AppDatabase = Room.databaseBuilder(context, AppDatabase::class.java, "sc_db").build()
+    fun appDatabase(context: Context): AppDatabase = Room.databaseBuilder(context, AppDatabase::class.java, "run_tracker_db").fallbackToDestructiveMigration().build()
 
     @JvmStatic
     @Provides

@@ -60,6 +60,12 @@ class HostActivity : AppCompatActivity() {
 
     private var toast: Toast? = null
 
+    private val navigator: Navigator = object : AppNavigator(this, supportFragmentManager, R.id.nav_host_container) {
+        override fun setupFragmentTransaction(command: Command?, currentFragment: Fragment?, nextFragment: Fragment?, fragmentTransaction: FragmentTransaction) {
+            fragmentTransaction.setReorderingAllowed(true)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
@@ -90,12 +96,6 @@ class HostActivity : AppCompatActivity() {
             }
         }
     }
-
-    private val navigator: Navigator = object : AppNavigator(this, supportFragmentManager, R.id.nav_host_container) {
-            override fun setupFragmentTransaction(command: Command?, currentFragment: Fragment?, nextFragment: Fragment?, fragmentTransaction: FragmentTransaction) {
-                fragmentTransaction.setReorderingAllowed(true)
-            }
-        }
 
     override fun onBackPressed() {
         this.hideSoftKeyboard()

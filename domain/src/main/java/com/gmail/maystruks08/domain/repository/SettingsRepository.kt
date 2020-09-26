@@ -15,6 +15,8 @@ interface SettingsRepository {
 
     suspend fun changeStartDate(date: Date)
 
+    fun getAdminUserIds(): List<String>
+
     data class CheckpointsConfig(
         val checkpointsName: List<String>,
         val ironCheckpointsName: List<String>,

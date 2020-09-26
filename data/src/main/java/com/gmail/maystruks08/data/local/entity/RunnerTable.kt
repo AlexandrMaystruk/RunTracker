@@ -2,13 +2,12 @@ package com.gmail.maystruks08.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.Index
+import androidx.room.PrimaryKey
 import java.util.*
 
-@Entity(
-    primaryKeys = ["cardId", "number"], tableName = "runners",
-    indices = [Index(value = arrayOf("number"), unique = true)]
-)
+@Entity(tableName = "runners", indices = [Index(value = arrayOf("number"), unique = true)])
 data class RunnerTable(
+    @PrimaryKey
     val number: Int,
     val cardId: String,
     val fullName: String,

@@ -1,7 +1,5 @@
 package com.gmail.maystruks08.data.repository
 
-import com.gmail.maystruks08.data.XLSParcer
-import com.gmail.maystruks08.data.awaitTaskCompletable
 import com.gmail.maystruks08.data.awaitTaskResult
 import com.gmail.maystruks08.data.cache.SettingsCache
 import com.gmail.maystruks08.data.local.ConfigPreferences
@@ -14,12 +12,14 @@ import com.gmail.maystruks08.data.toDataClass
 import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.entities.CheckpointType
 import com.gmail.maystruks08.domain.entities.ResultOfTask
-import com.gmail.maystruks08.domain.entities.RunnerType
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 class SettingsRepositoryImpl @Inject constructor(
     private val firestoreApi: FirestoreApi,
@@ -27,9 +27,7 @@ class SettingsRepositoryImpl @Inject constructor(
     private val settingsCache: SettingsCache,
     private val firebaseAuth: FirebaseAuth,
     private val checkpointDAO: CheckpointDAO,
-    private val networkUtil: NetworkUtil,
-    private val xlsParcer: XLSParcer
-) : SettingsRepository {
+    private val networkUtil: NetworkUtil) : SettingsRepository {
 
     override suspend fun updateConfig(): ResultOfTask<Exception, Unit> {
         return ResultOfTask.build {
@@ -39,26 +37,21 @@ class SettingsRepositoryImpl @Inject constructor(
                         val checkpoints = hashMap.values
                         checkpointDAO.deleteCheckpoints()
                         checkpointDAO.insertAllOrReplace(checkpoints.map { it.toCheckpointTable() })
-
-//                    val checkpointsNormal = checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
-//                    val result = xlsParcer.readExcelFileFromAssets(checkpointsNormal, "sotka_group.xls", RunnerType.NORMAL)
-//
-//                   result.forEach {
-//                       awaitTaskCompletable(firestoreApi.updateRunner(it))
-//                       Timber.i("INSERTED RUNNER ${it.shortName}")
-//                   }
                 }
                 firebaseAuth.currentUser?.uid?.let { currentUserId ->
-                    val result = awaitTaskResult(firestoreApi.getCheckpointsSettings(currentUserId))
-                    val startDateResult = awaitTaskResult(firestoreApi.getDateOfStart())
+                    val checkpointsSettingsDocument = awaitTaskResult(firestoreApi.getCheckpointsSettings(currentUserId))
+                    val startDateResultDocument = awaitTaskResult(firestoreApi.getDateOfStart())
+                    val adminUserIdsDocument = awaitTaskResult(firestoreApi.getAdminUserIds())
 
-                    val checkpointId = result["checkpointId"] as? HashMap<*, *>
-                    val checkpointIronPeopleId = result["checkpointIronPeopleId"] as? HashMap<*, *>
-                    val startDate = (startDateResult["Start at"] as? com.google.firebase.Timestamp)?.toDate()
+                    val checkpointId = checkpointsSettingsDocument["checkpointId"] as? HashMap<*, *>
+                    val checkpointIronPeopleId = checkpointsSettingsDocument["checkpointIronPeopleId"] as? HashMap<*, *>
+                    val adminUserIds = adminUserIdsDocument.get("UUID") as? ArrayList<*>
+                    val startDate = (startDateResultDocument["Start at"] as? com.google.firebase.Timestamp)?.toDate()
 
                     if (checkpointId != null) preferences.saveCurrentCheckpointId((checkpointId.values.first() as Long).toInt())
                     if (checkpointIronPeopleId != null) preferences.saveCurrentIronPeopleCheckpointId((checkpointIronPeopleId.values.first() as Long).toInt())
                     if (startDate != null) preferences.saveDateOfStart(startDate.time)
+                    if(!adminUserIds.isNullOrEmpty()) preferences.saveAdminUserIds(Gson().toJson(adminUserIds,  object : TypeToken<List<String>>() {}.type))
                 }
             }
         }
@@ -69,6 +62,10 @@ class SettingsRepositoryImpl @Inject constructor(
             val currentCheckpointId = preferences.getCurrentCheckpoint()
             val currentIronPeopleCheckpointId = preferences.getCurrentIronPeopleCheckpoint()
             val startDate = Date(preferences.getDateOfStart())
+            val adminUserIds: List<String> = Gson().fromJson(preferences.getAdminUserIds(),  object : TypeToken<List<String>>() {}.type)
+
+            settingsCache.adminUserIds.clear()
+            settingsCache.adminUserIds.addAll(adminUserIds)
 
             settingsCache.checkpoints = checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
             settingsCache.checkpointsIronPeople = checkpointDAO.getCheckpointsByType(CheckpointType.IRON.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
@@ -132,5 +129,9 @@ class SettingsRepositoryImpl @Inject constructor(
                 Timber.e(e)
             }
         }
+    }
+
+    override fun getAdminUserIds(): List<String> {
+        return settingsCache.adminUserIds
     }
 }

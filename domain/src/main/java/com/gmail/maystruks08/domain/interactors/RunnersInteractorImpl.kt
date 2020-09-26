@@ -23,15 +23,13 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
     override suspend fun addStartCheckpointToRunners(date: Date): ResultOfTask<Exception, Unit>{
        return ResultOfTask.build {
             val checkpoints = runnersRepository.getCheckpoints(RunnerType.NORMAL)
-            val ironCheckpoints = runnersRepository.getCheckpoints(RunnerType.IRON)
             logHelper.log(INFO, "Add start checkpoint to all runners at: ${date.toDateTimeShortFormat()}")
             mutableListOf<Runner>()
                 .apply {
                     addAll(runnersRepository.getRunners(RunnerType.NORMAL))
-                    addAll(runnersRepository.getRunners(RunnerType.IRON))
                 }.forEach {
-                    val startCheckpoint = if (it.type == RunnerType.NORMAL) checkpoints.first() else ironCheckpoints.first()
-                    val checkpointsCount = if (it.type == RunnerType.NORMAL) checkpoints.lastIndex else ironCheckpoints.lastIndex
+                    val startCheckpoint = checkpoints.first()
+                    val checkpointsCount = checkpoints.lastIndex
                     it.addPassedCheckpoint(checkpoint = CheckpointResult(startCheckpoint.id, startCheckpoint.name, startCheckpoint.type, date), checkpointsCount = checkpointsCount, isRestart = true)
                     runnersRepository.updateRunnerData(it)
                 }

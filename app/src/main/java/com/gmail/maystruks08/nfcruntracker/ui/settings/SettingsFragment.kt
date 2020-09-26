@@ -46,6 +46,10 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
             tvDateOfStart.text = getString(R.string.date_of_start, it?.toDateTimeFormat()?:"")
         })
 
+        viewModel.changeStartButtonVisibility.observe(viewLifecycleOwner, {
+            tvStartRunning.visibility = if(it) View.VISIBLE else View.GONE
+        })
+
         viewModel.toast.observe(viewLifecycleOwner, {
             context?.toast(it)
         })

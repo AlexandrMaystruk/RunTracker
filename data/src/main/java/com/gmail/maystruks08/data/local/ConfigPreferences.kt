@@ -16,9 +16,18 @@ class ConfigPreferences @Inject constructor(context: Context) {
 
         private const val DATE_OF_START = "DATE_OF_START"
 
+        private const val ADMIN_USER_IDS = "ADMIN_USER_IDS"
+
     }
 
     private val sp = context.getSharedPreferences(NAME, Context.MODE_PRIVATE)
+
+    fun saveAdminUserIds(adminUserIds: String) {
+        sp.edit().apply {
+            putString(ADMIN_USER_IDS, adminUserIds)
+            apply()
+        }
+    }
 
     fun saveCurrentCheckpointId(checkpoint: Int?) {
         sp.edit().apply {
@@ -51,5 +60,9 @@ class ConfigPreferences @Inject constructor(context: Context) {
 
     fun getDateOfStart(): Long {
         return sp.getLong(DATE_OF_START, 0)
+    }
+
+    fun getAdminUserIds(): String? {
+        return sp.getString(ADMIN_USER_IDS, "")
     }
 }

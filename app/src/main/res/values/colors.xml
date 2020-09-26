@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#262143</color>
-    <color name="colorPrimaryInactive">#9A262143</color>
+    <color name="colorPrimary">#BA3C15</color>
+    <color name="colorPrimaryInactive">#99D84315</color>
     <color name="colorPrimaryDark">#000300</color>
-    <color name="colorAccent">#C6BCFF</color>
+    <color name="colorAccent">#F9A825</color>
     <color name="colorGreen">#00A018</color>
     <color name="colorWhite">#ffffff</color>
     <color name="colorBlack">#000000</color>
     <color name="colorRed">#BD1515</color>
-    <color name="colorGrey">#cb444869</color>
+    <color name="colorGrey">#CB694E44</color>
     <color name="colorGrey700">#616161</color>
-    <color name="colorLightItem">#494561</color>
+    <color name="colorLightItem">#615245</color>
 
     <!--Text-->
     <color name="colorText">#000300</color>
     <color name="colorTextActive">@color/colorText</color>
     <color name="colorTextInactive">#B2000300</color>
 
-    <color name="colorCard">#332E4E</color>
+    <color name="colorCard">#670E05</color>
     <color name="colorDivider">#808E8E8E</color>
 
     <color name="colorCardFinisher">#80EEFFDB</color>

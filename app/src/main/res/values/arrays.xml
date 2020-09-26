@@ -12,8 +12,9 @@
     </string-array>
 
     <string-array name="iron_people_checkpoints_full_name">
-        <item>Старт</item>
+        <item>Start</item>
         <item>CP 7.5</item>
+        <item>CP 15</item>
         <item>CP 40</item>
         <item>CP 52</item>
         <item>CP 70</item>

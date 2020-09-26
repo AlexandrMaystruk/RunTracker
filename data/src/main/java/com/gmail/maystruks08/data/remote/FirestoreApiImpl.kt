@@ -26,16 +26,24 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
 
     companion object {
 
+        private const val RUNNER_COLLECTION= "runners"
+
+        private const val SETTINGS_COLLECTION= "settings"
+
+
         private const val START_DATE_DOCUMENT_NAME = "start_date"
+
+        private const val ADMIN_USER_IDS_DOCUMENT_NAME = "adminUsers"
+
 
         private const val CHECKPOINTS_DOCUMENT_NAME = "checkpoints"
 
     }
 
-    override suspend fun getCheckpoints(): Task<DocumentSnapshot> = db.collection("settings").document(CHECKPOINTS_DOCUMENT_NAME).get()
+    override suspend fun getCheckpoints(): Task<DocumentSnapshot> = db.collection(SETTINGS_COLLECTION).document(CHECKPOINTS_DOCUMENT_NAME).get()
 
     override suspend fun saveCheckpoints(checkpoints: List<Checkpoint>) {
-        val document = db.collection("settings").document(CHECKPOINTS_DOCUMENT_NAME)
+        val document = db.collection(SETTINGS_COLLECTION).document(CHECKPOINTS_DOCUMENT_NAME)
         val map = hashMapOf<String, Any>()
             .apply {
                 checkpoints.forEachIndexed { index, checkpoint ->
@@ -50,11 +58,15 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
     }
 
 
-    override suspend fun getCheckpointsSettings(clientId: String): Task<DocumentSnapshot> = db.collection("settings").document(clientId).get()
+    override suspend fun getCheckpointsSettings(clientId: String): Task<DocumentSnapshot> = db.collection(SETTINGS_COLLECTION).document(clientId).get()
+
+    override suspend fun getAdminUserIds(): Task<DocumentSnapshot> {
+       return db.collection(SETTINGS_COLLECTION).document(ADMIN_USER_IDS_DOCUMENT_NAME).get()
+    }
 
     override suspend fun saveCheckpointsSettings(clientId: String, config: SettingsRepository.Config) {
         if (config.checkpointId != null || config.checkpointIronPeopleId != null) {
-            val document = db.collection("settings").document(clientId)
+            val document = db.collection(SETTINGS_COLLECTION).document(clientId)
             if (config.checkpointId != null) {
                  try {
                     awaitTaskCompletable(document.update("checkpointId", FirestoreApi.Integer(config.checkpointId)))
@@ -72,7 +84,7 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
     }
 
     override suspend fun saveDateOfStart(date: Date) {
-        val document = db.collection("settings").document(START_DATE_DOCUMENT_NAME)
+        val document = db.collection(SETTINGS_COLLECTION).document(START_DATE_DOCUMENT_NAME)
         try {
             awaitTaskCompletable(document.update("Start at", date))
         } catch (e: FirebaseFirestoreException) {
@@ -81,15 +93,15 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
     }
 
     override suspend fun getDateOfStart(): Task<DocumentSnapshot> =
-        db.collection("settings").document(START_DATE_DOCUMENT_NAME).get()
+        db.collection(SETTINGS_COLLECTION).document(START_DATE_DOCUMENT_NAME).get()
 
     override suspend fun updateRunner(runner: Runner): Task<Void> =
-        db.collection("runners").document(runner.number.toString()).set(runner.toFirestoreRunner())
+        db.collection(RUNNER_COLLECTION).document(runner.number.toString()).set(runner.toFirestoreRunner())
 
     @ExperimentalCoroutinesApi
     override suspend fun subscribeToRunnerDataRealtimeUpdates(): Flow<List<RunnerChange>>{
         return channelFlow<List<RunnerChange>> {
-            val eventDocument = db.collection("runners")
+            val eventDocument = db.collection(RUNNER_COLLECTION)
             // 1) Register callback to the API
             val subscription = eventDocument.addSnapshotListener { snapshots, e ->
                 Timber.i("Snapshot size = ${snapshots?.documentChanges?.size}")

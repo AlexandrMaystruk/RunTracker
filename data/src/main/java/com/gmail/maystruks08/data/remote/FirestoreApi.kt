@@ -19,6 +19,8 @@ interface FirestoreApi{
 
     suspend fun getCheckpointsSettings(clientId: String): Task<DocumentSnapshot>
 
+    suspend fun getAdminUserIds(): Task<DocumentSnapshot>
+
     suspend fun saveCheckpointsSettings(clientId: String, config: SettingsRepository.Config)
 
     suspend fun saveDateOfStart(date: Date)

@@ -10,6 +10,7 @@ import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.bus.StartRunTrackerBus
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
@@ -25,9 +26,11 @@ class SettingsViewModel @Inject constructor(
 
     val config get(): LiveData<SettingsRepository.CheckpointsConfig> = configLiveData
     val start get(): LiveData<Date> = startCommandLiveData
+    val changeStartButtonVisibility get(): LiveData<Boolean> = changeStartButtonVisibilityLiveData
 
     private val configLiveData = MutableLiveData<SettingsRepository.CheckpointsConfig>()
     private val startCommandLiveData = MutableLiveData<Date>()
+    private val changeStartButtonVisibilityLiveData = MutableLiveData<Boolean>()
 
 
     private var isFirstStart = true
@@ -49,7 +52,10 @@ class SettingsViewModel @Inject constructor(
     private fun getCachedConfig(){
         viewModelScope.launch(Dispatchers.IO) {
             when (val resultOfTask = repository.getCachedConfig()) {
-                is ResultOfTask.Value -> configLiveData.postValue(resultOfTask.value)
+                is ResultOfTask.Value -> {
+                    configLiveData.postValue(resultOfTask.value)
+                    resolveStartButtonVisibility()
+                }
                 is ResultOfTask.Error -> resultOfTask.error.printStackTrace()
             }
         }
@@ -90,6 +96,11 @@ class SettingsViewModel @Inject constructor(
             .addOnCompleteListener {
                 router.newRootScreen(Screens.LoginScreen())
             }
+    }
+
+    private fun resolveStartButtonVisibility(){
+        val isCurrentUserAdmin = repository.getAdminUserIds().contains(FirebaseAuth.getInstance().currentUser?.uid)
+        changeStartButtonVisibilityLiveData.postValue(isCurrentUserAdmin)
     }
 
     fun onBackClicked() {
