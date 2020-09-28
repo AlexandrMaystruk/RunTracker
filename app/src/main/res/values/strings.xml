@@ -17,7 +17,7 @@
     <string name="checkpoint_for_iron_people">CP for iron people</string>
     <string name="checkpoint_for_people">CP for runners</string>
     <string name="select_your_checkpoint">Indicate which CP you are on</string>
-    <string name="date_of_start">Start date:%1$s</string>
+    <string name="date_of_start">Start date: %1$s</string>
     <string name="scan_card">Scan the card</string>
     <string name="button_add">Save</string>
     <string name="runner_number">Member Number</string>

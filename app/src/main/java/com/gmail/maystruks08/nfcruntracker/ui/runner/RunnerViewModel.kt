@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import javax.inject.Inject
 
-enum class AlertType{ CONFIRM_OFFTRACK, MARK_RUNNER_AT_CHECKPOINT }
+enum class AlertType { CONFIRM_OFFTRACK, MARK_RUNNER_AT_CHECKPOINT }
 
 class RunnerViewModel @Inject constructor(
     private val router: Router,

@@ -91,7 +91,7 @@ class RunnersViewModel @Inject constructor(private val runnersInteractor: Runner
     private suspend fun showAllRunners() {
         when (val result = runnersInteractor.getRunners(runnerType)) {
             is ResultOfTask.Value -> {
-                val runners = result.value.toRunnerViews().sortedBy { it.result }.toMutableList()
+                val runners = result.value.toRunnerViews().sortedBy { it.result }.sortedBy { it.isOffTrack }.toMutableList()
                 _runnersLiveData.postValue(runners)
             }
             is ResultOfTask.Error -> handleError(result.error)

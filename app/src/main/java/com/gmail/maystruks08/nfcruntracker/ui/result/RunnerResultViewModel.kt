@@ -37,7 +37,6 @@ class RunnerResultViewModel @Inject constructor(
             when (val onResult = interactor.getFinishers(type)) {
                 is ResultOfTask.Value -> {
                     val sortedResultList = onResult.value
-                        .sortedBy { it.totalResult }
                         .mapIndexed { index: Int, runner: Runner -> runner.toRunnerResultView(index + 1) }
                     _runnerResultsLiveData.postValue(sortedResultList)
                 }

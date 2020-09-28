@@ -15,10 +15,10 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
          ResultOfTask.build { runnersRepository.getRunnerByNumber(runnerNumber) ?: throw  RunnerNotFoundException()}
 
     override suspend fun getRunners(type: RunnerType): ResultOfTask<Exception, List<Runner>> =
-        ResultOfTask.build { runnersRepository.getRunners(type) }
+        ResultOfTask.build { runnersRepository.getRunners(type).sortedBy { runner -> runner.checkpoints.count { it is CheckpointResult } }.sortedBy { it.totalResult }.sortedBy { it.isOffTrack }}
 
     override suspend fun getFinishers(type: RunnerType): ResultOfTask<Exception, List<Runner>> =
-        ResultOfTask.build { runnersRepository.getRunners(type, true) }
+        ResultOfTask.build { runnersRepository.getRunners(type, true).sortedBy { it.totalResult } }
 
     override suspend fun addStartCheckpointToRunners(date: Date): ResultOfTask<Exception, Unit>{
        return ResultOfTask.build {

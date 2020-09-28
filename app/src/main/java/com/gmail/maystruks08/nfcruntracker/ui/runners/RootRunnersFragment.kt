@@ -73,9 +73,7 @@ class RootRunnersFragment : BaseFragment(R.layout.fragment_view_pager_runners) {
     }
 
     fun receiveRunnerUpdateFromServer(runnerChange: RunnerChange){
-        adapter?.getCurrentVisibleFragment(pager.currentItem)?.viewModel?.handleRunnerChanges(
-            runnerChange
-        )
+        adapter?.getCurrentVisibleFragment(pager.currentItem)?.viewModel?.handleRunnerChanges(runnerChange)
     }
 
     fun onNfcCardScanned(cardId: String) {

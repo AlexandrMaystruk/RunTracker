@@ -37,19 +37,19 @@
         style="@style/Widget.AppCompat.Spinner"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_m"
-        android:layout_marginEnd="@dimen/margin_m"
         android:background="@drawable/spinner_bg"
         android:dropDownWidth="wrap_content"
         android:entries="@array/checkpoints_full_name"
-        android:popupBackground="@color/colorWhite"
+        android:popupBackground="@color/colorPrimary"
         android:popupElevation="3dp"
         android:stateListAnimator="@drawable/spinner_sla"
         app:layout_constraintBottom_toBottomOf="@+id/tvCheckpointForRunners"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.85"
         app:layout_constraintStart_toEndOf="@+id/tvCheckpointForIronPeople"
         app:layout_constraintTop_toTopOf="@+id/tvCheckpointForRunners"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintWidth_percent="0.3" />
 
     <TextView
         android:id="@+id/tvCheckpointForIronPeople"
@@ -66,18 +66,18 @@
         style="@style/Widget.AppCompat.Spinner"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_m"
-        android:layout_marginEnd="@dimen/margin_m"
         android:background="@drawable/spinner_bg"
         android:dropDownWidth="wrap_content"
-        android:entries="@array/iron_people_checkpoints_full_name"
-        android:popupBackground="@color/colorWhite"
+        android:entries="@array/checkpoints_full_name"
+        android:popupBackground="@color/colorPrimary"
         android:popupElevation="3dp"
         android:stateListAnimator="@drawable/spinner_sla"
         app:layout_constraintBottom_toBottomOf="@+id/tvCheckpointForIronPeople"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.85"
         app:layout_constraintStart_toEndOf="@+id/tvCheckpointForIronPeople"
-        app:layout_constraintTop_toTopOf="@+id/tvCheckpointForIronPeople" />
+        app:layout_constraintTop_toTopOf="@+id/tvCheckpointForIronPeople"
+        app:layout_constraintWidth_percent="0.3" />
 
 
     <TextView
