@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.4.0'
+    ext.kotlin_version = '1.4.10'
     ext.navigationSageArgs = '1.0.0'
     repositories {
         google()
@@ -24,19 +24,12 @@ buildscript {
         def versionMajor = versionProps['VERSION_MAJOR'].toInteger()
         def versionMinor = versionProps['VERSION_MINOR'].toInteger()
         def versionPatch = versionProps['VERSION_PATCH'].toInteger()
-
-        if (versionPatch < 10) {
-            versionPatch = 0.toString() + versionPatch.toString()
-        } else {
-            versionPatch = versionPatch.toString()
-        }
+        def versionCode = versionProps['VERSION_CODE'].toInteger()
 
         globalConfiguration.versionMajor = versionMajor
         globalConfiguration.versionMinor = versionMinor
         globalConfiguration.versionPatch = versionPatch
-
-        def versionCode = rootProject.ext.versionMajor.toString() + rootProject.ext.versionMinor.toString() + rootProject.ext.versionPatch.toString()
-        globalConfiguration.versionCode = versionCode.toInteger()
+        globalConfiguration.versionCode = versionCode
 
         versionProps['VERSION_MAJOR'] = versionMajor.toString()
         versionProps['VERSION_MINOR'] = versionMinor.toString()
@@ -48,7 +41,7 @@ buildscript {
 
     task("getApplicationName") {
         doLast {
-            println "SmartCheckOut_${globalConfiguration.versionCode}"
+            println "NFC_RUN_TRACKER_${globalConfiguration.versionCode}"
         }
     }
 
@@ -59,11 +52,12 @@ buildscript {
                 versionProps.load(new FileInputStream(versionPropsFile))
 
                 def versionMajor = versionProps['VERSION_MAJOR'].toInteger() + 1
+                def versionCode = versionProps['VERSION_CODE'].toInteger() + 1
 
                 versionProps['VERSION_MAJOR'] = versionMajor.toString()
                 versionProps['VERSION_MINOR'] = 0.toString()
                 versionProps['VERSION_PATCH'] = 0.toString()
-                versionProps['VERSION_CODE'] = rootProject.ext.versionMajor.toString() + rootProject.ext.versionMinor.toString() + versionPatch.toString()
+                versionProps['VERSION_CODE'] = versionCode.toString()
 
                 versionProps.store(versionPropsFile.newWriter(), null)
             }
@@ -76,10 +70,10 @@ buildscript {
                 Properties versionProps = new Properties()
                 versionProps.load(new FileInputStream(versionPropsFile))
                 def versionMinor = versionProps['VERSION_MINOR'].toInteger() + 1
-
+                def versionCode = versionProps['VERSION_CODE'].toInteger() + 1
                 versionProps['VERSION_MINOR'] = versionMinor.toString()
                 versionProps['VERSION_PATCH'] = 0.toString()
-                versionProps['VERSION_CODE'] = rootProject.ext.versionMajor.toString() + rootProject.ext.versionMinor.toString() + versionPatch.toString()
+                versionProps['VERSION_CODE'] = versionCode.toString()
 
                 versionProps.store(versionPropsFile.newWriter(), null)
             }
@@ -92,19 +86,14 @@ buildscript {
                 Properties versionProps = new Properties()
                 versionProps.load(new FileInputStream(versionPropsFile))
                 def versionPatch = versionProps['VERSION_PATCH'].toInteger() + 1
-                if (versionPatch < 10) {
-                    versionPatch = 0.toString() + versionPatch.toString()
-                } else {
-                    versionPatch = versionPatch.toString()
-                }
-                versionProps['VERSION_PATCH'] = versionPatch
-                versionProps['VERSION_CODE'] = rootProject.ext.versionMajor.toString() + rootProject.ext.versionMinor.toString() + versionPatch
+                def versionCode = versionProps['VERSION_CODE'].toInteger() + 1
+                versionProps['VERSION_PATCH'] = versionPatch.toString()
+                versionProps['VERSION_CODE'] = versionCode.toString()
 
                 versionProps.store(versionPropsFile.newWriter(), null)
             }
         }
     }
-
 }
 
 allprojects {
