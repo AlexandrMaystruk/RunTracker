@@ -27,17 +27,19 @@ class SettingsRepositoryImpl @Inject constructor(
     private val settingsCache: SettingsCache,
     private val firebaseAuth: FirebaseAuth,
     private val checkpointDAO: CheckpointDAO,
-    private val networkUtil: NetworkUtil) : SettingsRepository {
+    private val networkUtil: NetworkUtil
+) : SettingsRepository {
 
     override suspend fun updateConfig(): ResultOfTask<Exception, Unit> {
         return ResultOfTask.build {
             if (networkUtil.isOnline()) {
                 val checkpointsSnapshot = awaitTaskResult(firestoreApi.getCheckpoints())
-                checkpointsSnapshot.data?.toDataClass<HashMap<String, CheckpointPojo>?>()?.let { hashMap ->
+                checkpointsSnapshot.data?.toDataClass<HashMap<String, CheckpointPojo>?>()
+                    ?.let { hashMap ->
                         val checkpoints = hashMap.values
                         checkpointDAO.deleteCheckpoints()
                         checkpointDAO.insertAllOrReplace(checkpoints.map { it.toCheckpointTable() })
-                }
+                    }
                 firebaseAuth.currentUser?.uid?.let { currentUserId ->
                     val checkpointsSettingsDocument = awaitTaskResult(firestoreApi.getCheckpointsSettings(currentUserId))
                     val startDateResultDocument = awaitTaskResult(firestoreApi.getDateOfStart())
@@ -51,7 +53,9 @@ class SettingsRepositoryImpl @Inject constructor(
                     if (checkpointId != null) preferences.saveCurrentCheckpointId((checkpointId.values.first() as Long).toInt())
                     if (checkpointIronPeopleId != null) preferences.saveCurrentIronPeopleCheckpointId((checkpointIronPeopleId.values.first() as Long).toInt())
                     if (startDate != null) preferences.saveDateOfStart(startDate.time)
-                    if(!adminUserIds.isNullOrEmpty()) preferences.saveAdminUserIds(Gson().toJson(adminUserIds,  object : TypeToken<List<String>>() {}.type))
+                    if (!adminUserIds.isNullOrEmpty()) preferences.saveAdminUserIds(Gson().toJson(adminUserIds, object : TypeToken<List<String>?>() {}.type))
+
+                    Timber.e(adminUserIds?.toTypedArray()?.contentToString())
                 }
             }
         }
@@ -62,10 +66,10 @@ class SettingsRepositoryImpl @Inject constructor(
             val currentCheckpointId = preferences.getCurrentCheckpoint()
             val currentIronPeopleCheckpointId = preferences.getCurrentIronPeopleCheckpoint()
             val startDate = Date(preferences.getDateOfStart())
-            val adminUserIds: List<String> = Gson().fromJson(preferences.getAdminUserIds(),  object : TypeToken<List<String>>() {}.type)
+            val adminUserIds: List<String>? = Gson().fromJson(preferences.getAdminUserIds(), object : TypeToken<List<String>?>() {}.type)
 
             settingsCache.adminUserIds.clear()
-            settingsCache.adminUserIds.addAll(adminUserIds)
+            adminUserIds?.let { settingsCache.adminUserIds.addAll(it) }
 
             settingsCache.checkpoints = checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
             settingsCache.checkpointsIronPeople = checkpointDAO.getCheckpointsByType(CheckpointType.IRON.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }

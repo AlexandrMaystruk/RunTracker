@@ -38,8 +38,8 @@
     <item name="dialog_width" format="float" type="dimen">0.9</item>
     <item name="dialog_height" format="float" type="dimen">0.5</item>
 
-    <dimen name="runnerItemBigHeight">125dp</dimen>
-    <dimen name="runnerItemSmallHeight">85dp</dimen>
+    <dimen name="runnerItemBigHeight">130dp</dimen>
+    <dimen name="runnerItemSmallHeight">95dp</dimen>
 
     <dimen name="transition_s">4dp</dimen>
     <dimen name="transition_m">8dp</dimen>

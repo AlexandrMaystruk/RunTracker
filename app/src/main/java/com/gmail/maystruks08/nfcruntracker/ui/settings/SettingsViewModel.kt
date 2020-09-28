@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -44,7 +45,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             when (val resultOfTask = repository.updateConfig()) {
                 is ResultOfTask.Value -> getCachedConfig()
-                is ResultOfTask.Error -> resultOfTask.error.printStackTrace()
+                is ResultOfTask.Error -> Timber.e(resultOfTask.error)
             }
         }
     }
@@ -56,7 +57,7 @@ class SettingsViewModel @Inject constructor(
                     configLiveData.postValue(resultOfTask.value)
                     resolveStartButtonVisibility()
                 }
-                is ResultOfTask.Error -> resultOfTask.error.printStackTrace()
+                is ResultOfTask.Error -> Timber.e(resultOfTask.error)
             }
         }
     }

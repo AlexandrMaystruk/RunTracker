@@ -19,7 +19,7 @@
     <string name="select_your_checkpoint">Укажите на каком из КП вы находитесь</string>
     <string name="date_of_start">Дата старта:%1$s</string>
     <string name="scan_card">Отсканируйте карту</string>
-    <string name="button_add">Добавить</string>
+    <string name="button_add">Сохранить</string>
     <string name="runner_number">Номер участника</string>
     <string name="iron">железный</string>
     <string name="runner">бегун</string>

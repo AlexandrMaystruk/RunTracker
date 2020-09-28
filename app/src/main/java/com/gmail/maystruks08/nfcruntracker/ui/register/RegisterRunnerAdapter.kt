@@ -37,8 +37,7 @@ data class InputDataView(
             runnerCardId.isNullOrEmpty()
 }
 
-class RegisterRunnerAdapter(private val onCreateTeamMemberClick: () -> Unit) :
-    RecyclerView.Adapter<RegisterRunnerAdapter.ViewHolder>() {
+class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHolder>() {
 
     var runnerRegisterData = mutableListOf(InputDataView())
 
@@ -69,7 +68,7 @@ class RegisterRunnerAdapter(private val onCreateTeamMemberClick: () -> Unit) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindHolder(runnerRegisterData[position], onCreateTeamMemberClick)
+        holder.bindHolder(runnerRegisterData[position])
     }
 
     override fun getItemCount(): Int = runnerRegisterData.size
@@ -108,7 +107,7 @@ class RegisterRunnerAdapter(private val onCreateTeamMemberClick: () -> Unit) :
             override fun afterTextChanged(s: Editable?) {}
         }
 
-        fun bindHolder(item: InputDataView, onCreateTeamMemberClick: () -> Unit) {
+        fun bindHolder(item: InputDataView) {
             itemView.apply {
                 etRunnerFullName.setText(item.fullName.orEmpty())
                 etRunnerNumber.setText(item.runnerNumber?.toString().orEmpty())
@@ -169,7 +168,6 @@ class RegisterRunnerAdapter(private val onCreateTeamMemberClick: () -> Unit) :
                     }
                     runnerRegisterData[adapterPosition].runnerType = runnerType
                 }
-                btnAddTeamMemberRunner.setOnClickListener { onCreateTeamMemberClick.invoke() }
                 setOnClickListener { onItemViewClick(itemView, adapterPosition) }
             }
         }

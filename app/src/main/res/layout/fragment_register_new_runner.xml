@@ -11,45 +11,67 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/inputLayout"
-        android:layout_width="0dp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/root_item"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_xs"
-        android:padding="@dimen/margin_m"
-        android:visibility="gone"
-        android:background="@drawable/bg_bottom_corner_layout"
+        android:layout_margin="@dimen/margin_s"
+        app:cardCornerRadius="@dimen/margin_xs"
+        app:cardElevation="@dimen/margin_xs"
+        app:contentPadding="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_goneMarginTop="0dp">
 
-        <EditText
-            android:id="@+id/etRunnerTeamName"
-            style="@style/TextL"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:background="@null"
-            android:drawableStart="@drawable/ic_user"
-            android:drawablePadding="@dimen/margin_m"
-            android:gravity="start"
-            android:hint="@string/team_name"
-            android:inputType="textCapWords"
-            android:textColorHint="@color/colorText" />
+            android:background="@drawable/bg_bottom_corner_layout"
+            android:padding="@dimen/margin_m"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <EditText
+                android:id="@+id/etRunnerTeamName"
+                style="@style/TextL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:background="@null"
+                android:drawableStart="@drawable/ic_user"
+                android:drawablePadding="@dimen/margin_m"
+                android:gravity="start"
+                android:hint="@string/team_name"
+                android:inputType="textCapWords"
+                android:textColorHint="@color/colorText" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </androidx.cardview.widget.CardView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/registerRunnersRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="@dimen/margin_m"
         app:layout_constraintBottom_toTopOf="@+id/btnAddNewRunner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/inputLayout"
+        app:layout_constraintTop_toBottomOf="@+id/root_item"
         tools:context=".ui.runners.RunnersFragment" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnAddTeamMemberRunner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/margin_s"
+        android:src="@drawable/ic_add"
+        app:layout_constraintBottom_toBottomOf="@id/registerRunnersRecyclerView"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/btnAddNewRunner"
@@ -63,3 +85,4 @@
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

@@ -63,12 +63,14 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
     }
 
     override fun initViews() {
-        adapter = RegisterRunnerAdapter {
-            viewModel.onCreateTeamMemberClick()
-        }
+        adapter = RegisterRunnerAdapter()
         registerRunnersRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = this@RegisterNewRunnerFragment.adapter
+        }
+
+        btnAddTeamMemberRunner.setOnClickListener {
+            viewModel.onCreateTeamMemberClick()
         }
 
         btnAddNewRunner.setOnClickListener {
@@ -81,6 +83,7 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
             override fun afterTextChanged(s: Editable?) {}
         })
         initStaticCardSwipe()
+        resolveTeamNameVisibility()
     }
 
     private fun initStaticCardSwipe() {

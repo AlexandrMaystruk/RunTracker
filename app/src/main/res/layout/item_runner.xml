@@ -4,11 +4,11 @@
     android:id="@+id/root_item"
     android:layout_width="match_parent"
     android:layout_height="@dimen/runnerItemSmallHeight"
-    android:layout_marginStart="@dimen/margin_xs"
-    android:layout_marginTop="@dimen/margin_min"
-    android:layout_marginEnd="@dimen/margin_xs"
-    app:cardCornerRadius="@dimen/margin_min"
-    app:cardElevation="@dimen/margin_min"
+    android:layout_marginStart="@dimen/margin_s"
+    android:layout_marginTop="@dimen/margin_s"
+    android:layout_marginEnd="@dimen/margin_s"
+    app:cardCornerRadius="@dimen/margin_xs"
+    app:cardElevation="@dimen/margin_xs"
     app:contentPadding="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -56,6 +56,8 @@
             android:id="@+id/runnerProgress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_min"
+            android:layout_marginEnd="@dimen/margin_min"
             app:layout_constraintBottom_toTopOf="@+id/tvRunnerResult"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -63,6 +65,12 @@
             app:nodeHeight="@dimen/size_l"
             app:textNodeTitleSize="@dimen/size_s"
             app:textTitlePadding="@dimen/margin_min" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

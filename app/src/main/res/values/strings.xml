@@ -19,7 +19,7 @@
     <string name="select_your_checkpoint">Indicate which CP you are on</string>
     <string name="date_of_start">Start date:%1$s</string>
     <string name="scan_card">Scan the card</string>
-    <string name="button_add">Add</string>
+    <string name="button_add">Save</string>
     <string name="runner_number">Member Number</string>
     <string name="iron">iron</string>
     <string name="runner">runner</string>
