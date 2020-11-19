@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.gmail.maystruks08.nfcruntracker.ui.views.CollapsibleToolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutCollapsibleToolbar"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="false"
+    android:minHeight="48dp"
+    app:layoutDescription="@xml/motion_runners_header"
+    app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+
+    <ImageView
+        android:id="@+id/ivDistanceImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:contentDescription="@string/cd_distance_image"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/tvDistanceHeader"
+        style="@style/TextL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Iron man"
+        android:textColor="@color/colorAccent" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvDistanceType"
+        android:layout_width="match_parent"
+        android:scrollbarAlwaysDrawHorizontalTrack="true"
+        android:layout_height="90dp"
+        android:orientation="horizontal" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_size"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark" />
+
+</com.gmail.maystruks08.nfcruntracker.ui.views.CollapsibleToolbar>

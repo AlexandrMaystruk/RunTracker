@@ -8,9 +8,9 @@ import com.gmail.maystruks08.data.local.dao.RunnerDao
 import com.gmail.maystruks08.data.mappers.toCheckpoint
 import com.gmail.maystruks08.data.mappers.toRunners
 import com.gmail.maystruks08.data.remote.FirestoreApi
-import com.gmail.maystruks08.domain.entities.CheckpointType
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointType
 import com.gmail.maystruks08.domain.entities.ResultOfTask
-import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.nfcruntracker.App
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

@@ -8,7 +8,7 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AppModule::class, DatabaseModule::class, NetworkModule::class])
+@Component(modules = [AppModule::class, DatabaseModule::class, NetworkModule::class, AuthModule::class])
 interface BaseComponent {
 
     fun provideAppContext(): Context

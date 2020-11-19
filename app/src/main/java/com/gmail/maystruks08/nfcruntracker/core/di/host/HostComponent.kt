@@ -5,7 +5,7 @@ import com.gmail.maystruks08.nfcruntracker.core.di.NavigationModule
 import com.gmail.maystruks08.nfcruntracker.core.di.SettingsModule
 import com.gmail.maystruks08.nfcruntracker.core.di.SyncModule
 import com.gmail.maystruks08.nfcruntracker.core.di.login.LoginComponent
-import com.gmail.maystruks08.nfcruntracker.core.di.runners.root.RootRunnersComponent
+import com.gmail.maystruks08.nfcruntracker.core.di.runners.RunnersComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.settings.SettingsComponent
 import com.gmail.maystruks08.nfcruntracker.workers.SyncRunnersWorker
 import dagger.Subcomponent
@@ -14,7 +14,7 @@ import dagger.Subcomponent
 @HostScope
 interface HostComponent {
 
-    fun provideRootRunnersComponent(): RootRunnersComponent
+    fun provideRunnersComponent(): RunnersComponent
 
     fun provideSettingsComponent(): SettingsComponent
 

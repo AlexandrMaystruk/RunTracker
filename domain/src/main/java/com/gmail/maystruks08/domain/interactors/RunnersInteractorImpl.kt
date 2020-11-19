@@ -3,6 +3,9 @@ package com.gmail.maystruks08.domain.interactors
 import com.gmail.maystruks08.domain.INFO
 import com.gmail.maystruks08.domain.LogHelper
 import com.gmail.maystruks08.domain.entities.*
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
+import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
 import com.gmail.maystruks08.domain.toDateTimeShortFormat

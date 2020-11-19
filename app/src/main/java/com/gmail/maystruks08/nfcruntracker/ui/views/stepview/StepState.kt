@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.nfcruntracker.ui.stepview
+package com.gmail.maystruks08.nfcruntracker.ui.views.stepview
 
  enum class StepState {
 

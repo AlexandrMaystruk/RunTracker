@@ -29,9 +29,10 @@ class ResultItemsAdapter : RecyclerView.Adapter<ResultItemsAdapter.ViewHolder>()
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bindHolder(item: RunnerResultView) {
+            val runnerNumberText = "#${item.runnerNumber}"
             itemView.tvRunnerPosition.text = item.position.toString()
             itemView.tvRunnerFullName.text = item.runnerFullName
-            itemView.tvRunnerNumber.text = "#${item.runnerNumber}"
+            itemView.tvRunnerNumber.text = runnerNumberText
             itemView.tvRunnerResultTime.text = item.runnerResultTime
         }
     }

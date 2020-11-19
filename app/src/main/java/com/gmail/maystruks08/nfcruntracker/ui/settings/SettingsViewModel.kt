@@ -1,15 +1,14 @@
 package com.gmail.maystruks08.nfcruntracker.ui.settings
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.firebase.ui.auth.AuthUI
 import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.bus.StartRunTrackerBus
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
+import com.gmail.maystruks08.nfcruntracker.ui.login.LogOutUseCase
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,9 +19,9 @@ import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(
     private val router: Router,
-    private val context: Context,
     private val repository: SettingsRepository,
-    private val startRunTrackerBus: StartRunTrackerBus
+    private val startRunTrackerBus: StartRunTrackerBus,
+    private val logOutUseCase: LogOutUseCase
 ) : BaseViewModel() {
 
     val config get(): LiveData<SettingsRepository.CheckpointsConfig> = configLiveData
@@ -92,11 +91,14 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onSignOutClicked() {
-        AuthUI.getInstance()
-            .signOut(context)
-            .addOnCompleteListener {
+        viewModelScope.launch {
+            val isSuccess = logOutUseCase.logout()
+            if (isSuccess) {
                 router.newRootScreen(Screens.LoginScreen())
+            } else {
+                toastLiveData.postValue("Logout error")
             }
+        }
     }
 
     private fun resolveStartButtonVisibility(){

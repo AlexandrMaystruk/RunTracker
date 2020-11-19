@@ -158,7 +158,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/editor/ic_format_list_numbered_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material/icons/materialicons/lock/baseline_lock_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -169,8 +169,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_r_" />
-                            <entry key="sourceFile" value="$USER_HOME$/Downloads/R (1).svg" />
+                            <entry key="outputName" value="ic_google" />
+                            <entry key="sourceFile" value="$USER_HOME$/Downloads/google.svg" />
                           </map>
                         </option>
                       </PersistentState>

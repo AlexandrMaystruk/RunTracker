@@ -1,14 +1,20 @@
 package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
 
-import com.gmail.maystruks08.domain.entities.Checkpoint
-import com.gmail.maystruks08.domain.entities.CheckpointResult
-import com.gmail.maystruks08.domain.entities.Runner
+import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
+import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.toDateFormat
 import com.gmail.maystruks08.domain.toTimeUTCFormat
-import com.gmail.maystruks08.nfcruntracker.ui.stepview.Bean
-import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepState
+import com.gmail.maystruks08.nfcruntracker.ui.views.stepview.Bean
+import com.gmail.maystruks08.nfcruntracker.ui.views.stepview.StepState
 
-fun List<Runner>.toRunnerViews() = this.map { it.toRunnerView() }
+fun List<Runner>.toRunnerViews(): MutableList<RunnerView> {
+    return mutableListOf<RunnerView>().apply {
+        this@toRunnerViews.forEach {
+            add(it.toRunnerView())
+        }
+    }
+}
 
 fun Runner.toRunnerView() = RunnerView(
     this.cardId,

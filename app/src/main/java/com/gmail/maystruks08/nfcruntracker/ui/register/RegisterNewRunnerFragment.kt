@@ -107,9 +107,6 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
         }
     }
 
-    override fun onDestroyView() {
-        App.clearRegisterNewRunnerComponent()
-        super.onDestroyView()
-    }
+    override fun clearInjectedComponents() = App.clearRegisterNewRunnerComponent()
 
 }

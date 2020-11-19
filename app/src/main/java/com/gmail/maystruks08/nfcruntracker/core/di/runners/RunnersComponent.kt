@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.core.di.runners
 
+import com.gmail.maystruks08.nfcruntracker.core.di.register.RegisterNewRunnerComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.result.RunnersResultComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.runner.RunnerComponent
 import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
@@ -15,5 +16,6 @@ interface RunnersComponent {
 
     fun provideRunnerResultComponent(): RunnersResultComponent
 
+    fun provideRegisterRunnerComponent(): RegisterNewRunnerComponent
 
 }

@@ -5,7 +5,7 @@
     android:background="@android:color/transparent"
     android:orientation="horizontal">
 
-    <com.gmail.maystruks08.nfcruntracker.ui.stepview.StepsViewIndicator
+    <com.gmail.maystruks08.nfcruntracker.ui.views.stepview.StepsViewIndicator
         android:id="@+id/steps_indicator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

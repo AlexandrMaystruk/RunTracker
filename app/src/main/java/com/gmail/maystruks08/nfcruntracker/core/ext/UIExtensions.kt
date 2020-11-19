@@ -15,6 +15,12 @@ fun View.hide() {
     this.visibility = View.INVISIBLE
 }
 
-fun DisplayMetrics.toPx (dp: Float): Float = (dp*(this.densityDpi/ DisplayMetrics.DENSITY_DEFAULT))
+
+fun View.setVisibility(isVisible: Boolean) {
+    this.visibility = if (isVisible) View.VISIBLE else View.GONE
+}
+
+fun DisplayMetrics.toPx(dp: Float): Float =
+    (dp * (this.densityDpi / DisplayMetrics.DENSITY_DEFAULT))
 
 

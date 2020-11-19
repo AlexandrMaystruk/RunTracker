@@ -6,7 +6,12 @@ import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.data.local.pojo.RunnerTableView
 import com.gmail.maystruks08.data.remote.pojo.CheckpointPojo
 import com.gmail.maystruks08.data.remote.pojo.CheckpointResultPojo
-import com.gmail.maystruks08.domain.entities.*
+import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointType
+import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.RunnerSex
+import com.gmail.maystruks08.domain.entities.runner.RunnerType
 
 fun List<RunnerTableView>.toRunners(checkpoints: List<Checkpoint>): List<Runner> {
     return this.map { tableView ->

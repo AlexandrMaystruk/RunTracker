@@ -2,10 +2,10 @@
 //
 //import android.content.Context
 //import android.content.res.AssetManager
-//import com.gmail.maystruks08.domain.entities.Checkpoint
-//import com.gmail.maystruks08.domain.entities.Runner
-//import com.gmail.maystruks08.domain.entities.RunnerSex
-//import com.gmail.maystruks08.domain.entities.RunnerType
+//import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+//import com.gmail.maystruks08.domain.entities.runner.Runner
+//import com.gmail.maystruks08.domain.entities.runner.RunnerSex
+//import com.gmail.maystruks08.domain.entities.runner.RunnerType
 //import org.apache.poi.hssf.usermodel.HSSFCell
 //import org.apache.poi.hssf.usermodel.HSSFRow
 //import org.apache.poi.hssf.usermodel.HSSFSheet

@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.domain.repository
 
+import com.gmail.maystruks08.domain.entities.DistanceSettings
 import com.gmail.maystruks08.domain.entities.ResultOfTask
 import java.util.*
 
@@ -17,10 +18,16 @@ interface SettingsRepository {
 
     fun getAdminUserIds(): List<String>
 
+    suspend fun getRaceList(): ResultOfTask<Exception, List<DistanceSettings>>
+
+
+    suspend fun getRaceCheckpoints(raceId: String): ResultOfTask<Exception, DistanceSettings>
+
+
     data class CheckpointsConfig(
         val checkpointsName: List<String>,
         val ironCheckpointsName: List<String>,
-       val settings: Config
+        val settings: Config
     )
 
     data class Config(

@@ -38,6 +38,8 @@ abstract class BaseFragment(private val layout: Int? = null) : Fragment() {
 
     protected abstract fun injectDependencies(): Unit?
 
+    protected abstract fun clearInjectedComponents(): Unit?
+
     protected abstract fun initToolbar(): FragmentToolbar
 
     protected abstract fun bindViewModel(): Unit?
@@ -47,5 +49,10 @@ abstract class BaseFragment(private val layout: Int? = null) : Fragment() {
     override fun onDestroyView() {
         toolbarManager = null
         super.onDestroyView()
+    }
+
+    override fun onDetach() {
+        clearInjectedComponents()
+        super.onDetach()
     }
 }

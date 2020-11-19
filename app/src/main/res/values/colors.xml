@@ -6,11 +6,13 @@
     <color name="colorAccent">#F9A825</color>
     <color name="colorGreen">#00A018</color>
     <color name="colorWhite">#ffffff</color>
+    <color name="colorWhiteInactive">#BFFFFFFF</color>
     <color name="colorBlack">#000000</color>
     <color name="colorRed">#BD1515</color>
     <color name="colorGrey">#CB694E44</color>
     <color name="colorGrey700">#616161</color>
     <color name="colorLightItem">#615245</color>
+    <color name="colorTransparent">#00FFFFFF</color>
 
     <!--Text-->
     <color name="colorText">#000300</color>

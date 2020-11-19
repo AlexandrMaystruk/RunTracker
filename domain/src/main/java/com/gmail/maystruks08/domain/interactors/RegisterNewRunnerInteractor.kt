@@ -1,8 +1,8 @@
 package com.gmail.maystruks08.domain.interactors
 
 import com.gmail.maystruks08.domain.entities.ResultOfTask
-import com.gmail.maystruks08.domain.entities.RunnerSex
-import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.entities.runner.RunnerSex
+import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import java.util.*
 
 

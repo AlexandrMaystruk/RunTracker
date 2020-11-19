@@ -8,8 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.gmail.maystruks08.domain.entities.RunnerSex
-import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.entities.runner.RunnerSex
+import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.domain.toDateFormat
 import com.gmail.maystruks08.nfcruntracker.R
 import kotlinx.android.synthetic.main.item_register_new_runner.view.*

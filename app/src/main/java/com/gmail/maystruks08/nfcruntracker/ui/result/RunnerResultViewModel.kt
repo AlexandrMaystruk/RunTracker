@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.ResultOfTask
-import com.gmail.maystruks08.domain.entities.Runner
-import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor

@@ -81,8 +81,5 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
         }
     }
 
-    override fun onDestroyView() {
-        App.clearSettingsComponent()
-        super.onDestroyView()
-    }
+    override fun clearInjectedComponents() = App.clearSettingsComponent()
 }

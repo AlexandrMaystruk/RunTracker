@@ -1,9 +1,9 @@
 package com.gmail.maystruks08.domain.interactors
 
 import com.gmail.maystruks08.domain.entities.ResultOfTask
-import com.gmail.maystruks08.domain.entities.Runner
+import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.RunnerChange
-import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import java.util.*
 
 interface RunnersInteractor {

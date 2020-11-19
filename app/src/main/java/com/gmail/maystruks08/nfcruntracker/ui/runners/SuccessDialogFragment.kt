@@ -21,7 +21,7 @@ class SuccessDialogFragment : BaseDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
-        dialog.window?.setBackgroundDrawable(ContextCompat.getDrawable(requireContext(), R.color.fui_transparent))
+        dialog.window?.setBackgroundDrawable(ContextCompat.getDrawable(requireContext(), R.color.colorTransparent))
         dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
         return dialog
     }

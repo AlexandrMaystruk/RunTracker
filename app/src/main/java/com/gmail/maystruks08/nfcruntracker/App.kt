@@ -9,7 +9,6 @@ import com.gmail.maystruks08.nfcruntracker.core.di.login.LoginComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.register.RegisterNewRunnerComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.RunnersComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.result.RunnersResultComponent
-import com.gmail.maystruks08.nfcruntracker.core.di.runners.root.RootRunnersComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.runner.RunnerComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.settings.SettingsComponent
 import com.gmail.maystruks08.nfcruntracker.utils.TimberFileTree
@@ -46,21 +45,11 @@ class App : Application() {
                 return field
             }
 
-        var rootRunnersComponent: RootRunnersComponent? = null
-            get() {
-                if (field == null)
-                    field = hostComponent?.provideRootRunnersComponent()
-                return field
-            }
-
-
-
-
 
         var registerNewRunnerComponent: RegisterNewRunnerComponent? = null
             get() {
                 if (field == null)
-                    field = rootRunnersComponent?.provideRegisterRunnerComponent()
+                    field = runnersComponent?.provideRegisterRunnerComponent()
                 return field
             }
 
@@ -68,7 +57,7 @@ class App : Application() {
         var runnersComponent: RunnersComponent? = null
             get() {
                 if (field == null)
-                    field = rootRunnersComponent?.provideRunnersComponent()
+                    field = hostComponent?.provideRunnersComponent()
                 return field
             }
 
@@ -90,10 +79,6 @@ class App : Application() {
 
         fun clearHostComponent() {
             hostComponent = null
-        }
-
-        fun clearRootRunnersComponent() {
-            rootRunnersComponent = null
         }
 
         fun clearRunnersComponent() {

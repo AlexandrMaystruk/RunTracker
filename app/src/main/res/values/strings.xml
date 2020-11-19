@@ -59,4 +59,13 @@
     <string name="please_scan_card">"Please scan card "</string>
 
 
+    <string name="cd_distance_image" translatable="false">RunnersHeaderPhoto</string>
+    <string name="user_name_hint">Username</string>
+    <string name="password_hint">Password</string>
+
+    <string name="signIn">Login</string>
+    <string name="signUp">Sign Up</string>
+
+
+
 </resources>

@@ -10,7 +10,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.android.tools.build:gradle:4.1.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.3.3'
     }
@@ -246,7 +246,6 @@ ext {
             itextpdf          : "com.itextpdf:itextg:${textPDFVersion}",
             corutinesCore     : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}",
             corutinesAndroid  : "org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutinesVersion}",
-            firebaseUi        : "com.firebaseui:firebase-ui-auth:${firebaseUiVersion}",
             firebaseAuth      : "com.google.firebase:firebase-auth:${firebaseAuthVersion}",
             firestore         : "com.google.firebase:firebase-firestore:${firestoreVersion}",
             timber            : "com.jakewharton.timber:timber:${timberVersion}",

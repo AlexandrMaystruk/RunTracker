@@ -1,6 +1,7 @@
 package com.gmail.maystruks08.data.cache
 
-import com.gmail.maystruks08.domain.entities.*
+import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import javax.inject.Inject
 import javax.inject.Singleton
 

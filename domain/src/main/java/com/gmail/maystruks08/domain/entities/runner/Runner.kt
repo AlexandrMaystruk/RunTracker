@@ -1,5 +1,7 @@
-package com.gmail.maystruks08.domain.entities
+package com.gmail.maystruks08.domain.entities.runner
 
+import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
 import java.util.*
 
 data class Runner(

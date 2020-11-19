@@ -10,7 +10,8 @@ import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.data.remote.pojo.CheckpointPojo
 import com.gmail.maystruks08.data.toDataClass
 import com.gmail.maystruks08.domain.NetworkUtil
-import com.gmail.maystruks08.domain.entities.CheckpointType
+import com.gmail.maystruks08.domain.entities.DistanceSettings
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointType
 import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -137,5 +138,13 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override fun getAdminUserIds(): List<String> {
         return settingsCache.adminUserIds
+    }
+
+    override suspend fun getRaceList(): ResultOfTask<Exception, List<DistanceSettings>> {
+        return ResultOfTask.build { throw IllegalStateException() }
+    }
+
+    override suspend fun getRaceCheckpoints(raceId: String): ResultOfTask<Exception, DistanceSettings> {
+        return ResultOfTask.build { throw IllegalStateException() }
     }
 }

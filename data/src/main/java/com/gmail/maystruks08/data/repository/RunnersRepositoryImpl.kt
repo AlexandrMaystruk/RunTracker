@@ -12,7 +12,13 @@ import com.gmail.maystruks08.data.mappers.toRunnerTable
 import com.gmail.maystruks08.data.mappers.toRunners
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.domain.NetworkUtil
-import com.gmail.maystruks08.domain.entities.*
+import com.gmail.maystruks08.domain.entities.Change
+import com.gmail.maystruks08.domain.entities.RunnerChange
+import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointType
+import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
@@ -20,7 +26,9 @@ import com.gmail.maystruks08.domain.toDateTimeShortFormat
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flatMapConcat
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -84,7 +92,7 @@ class RunnersRepositoryImpl @Inject constructor(
             val checkpoints = settingsCache.getCheckpointList(RunnerType.NORMAL)
             runnersCache.normalRunnersList = runners.toRunners(checkpoints).toMutableList()
         }
-        return if (onlyFinishers) runnersCache.normalRunnersList.filter { it.totalResult != null && !it.isOffTrack } else runnersCache.normalRunnersList
+        return if (onlyFinishers) runnersCache.normalRunnersList.filter { it.totalResult != null && !it.isOffTrack } else runnersCache.normalRunnersList.sortedBy { it.totalResult }.sortedBy { it.isOffTrack }
 
     }
 

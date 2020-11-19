@@ -13,10 +13,12 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import kotlinx.android.synthetic.main.item_runner.view.*
 import kotlin.properties.Delegates
 
-class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
+class RunnerAdapter(
+    private val clickListener: (RunnerView) -> Unit
+) :
     RecyclerView.Adapter<RunnerAdapter.ViewHolder>() {
 
-    var runnerList: MutableList<RunnerView> by Delegates.observable(mutableListOf()) { _, _, _ ->
+    var runnerList: MutableList<RunnerView> by Delegates.observable(RunnerView.getPlaceholder()) { _, oldValue, newValue ->
         notifyDataSetChanged()
     }
 
@@ -66,13 +68,21 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
 
         @SuppressLint("SetTextI18n")
         fun bindHolder(runner: RunnerView) {
-            itemView.tvRunnerNumber.text = "#${runner.number}"
-            itemView.tvRunnerFullName.text = runner.fullName
-            itemView.runnerProgress.setStepBean(runner.progress.map { it.bean })
-            when {
-                runner.isOffTrack -> smallCard(R.color.colorCardOffTrack)
-                runner.result != null -> bigCard(runner.result)
-                else -> smallCard(R.color.colorCardInProgress)
+            if (!runner.placeholder) {
+                itemView.tvRunnerNumber.text = "#${runner.number}"
+                itemView.tvRunnerFullName.text =
+                    if (runner.fullName.length > 26) runner.fullName.take(25) + ".." else runner.fullName
+                itemView.runnerProgress.visibility = View.VISIBLE
+                itemView.runnerProgress.setStepBean(runner.progress.map { it.bean })
+                when {
+                    runner.isOffTrack -> smallCard(R.color.colorCardOffTrack)
+                    runner.result != null -> bigCard(runner.result)
+                    else -> smallCard(R.color.colorCardInProgress)
+                }
+                itemView.runnerProgressBar.visibility = View.GONE
+            } else {
+                itemView.runnerProgressBar.visibility = View.VISIBLE
+                itemView.runnerProgress.visibility = View.GONE
             }
         }
 
@@ -80,7 +90,12 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
             val layoutParams = itemView.root_item.layoutParams.apply {
                 height = itemView.resources.getDimensionPixelSize(R.dimen.runnerItemSmallHeight)
             }
-            itemView.item_constraint_layout.setBackgroundColor(ContextCompat.getColor(itemView.context, color))
+            itemView.item_constraint_layout.setBackgroundColor(
+                ContextCompat.getColor(
+                    itemView.context,
+                    color
+                )
+            )
             itemView.root_item.layoutParams = layoutParams
             itemView.tvRunnerResult.text = null
             itemView.tvRunnerResult.gone()
@@ -92,7 +107,12 @@ class RunnerAdapter(private val clickListener: (RunnerView) -> Unit) :
                 height = itemView.resources.getDimensionPixelSize(R.dimen.runnerItemBigHeight)
             }
             itemView.root_item.layoutParams = layoutParams
-            itemView.item_constraint_layout.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.colorCardFinisher))
+            itemView.item_constraint_layout.setBackgroundColor(
+                ContextCompat.getColor(
+                    itemView.context,
+                    R.color.colorCardFinisher
+                )
+            )
             itemView.tvRunnerResult.text = resultStr
             itemView.tvRunnerResult.show()
         }

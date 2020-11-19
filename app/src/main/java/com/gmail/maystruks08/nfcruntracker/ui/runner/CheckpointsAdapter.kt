@@ -11,7 +11,7 @@ import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.ext.gone
 import com.gmail.maystruks08.nfcruntracker.core.ext.hide
 import com.gmail.maystruks08.nfcruntracker.core.ext.show
-import com.gmail.maystruks08.nfcruntracker.ui.stepview.StepState
+import com.gmail.maystruks08.nfcruntracker.ui.views.stepview.StepState
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
 import kotlinx.android.synthetic.main.item_checkpoint.view.*
 import kotlin.properties.Delegates

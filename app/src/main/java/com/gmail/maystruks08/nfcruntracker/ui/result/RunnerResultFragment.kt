@@ -3,7 +3,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.result
 import android.text.InputType
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.nfcruntracker.App
@@ -65,7 +65,8 @@ class RunnerResultFragment : BaseFragment(R.layout.fragment_runners_results) {
 
     override fun onDestroyView() {
         runnersResultsRecyclerView.adapter = null
-        App.clearRunnersResultComponent()
         super.onDestroyView()
     }
+
+    override fun clearInjectedComponents() = App.clearRunnersResultComponent()
 }

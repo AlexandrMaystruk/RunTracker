@@ -1,7 +1,7 @@
 package com.gmail.maystruks08.data.remote
 
-import com.gmail.maystruks08.domain.entities.Checkpoint
-import com.gmail.maystruks08.domain.entities.Runner
+import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.android.gms.tasks.Task

@@ -125,6 +125,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
                         }
                     alertDialog = builder.show()
                 }
+                else -> Unit
             }
         })
 
@@ -167,9 +168,10 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
         alertDialog = null
         checkpointsAdapter = null
         runnerCheckpointsRecyclerView.adapter = null
-        App.clearRunnerComponent()
         super.onDestroyView()
     }
+
+    override fun clearInjectedComponents() =  App.clearRunnerComponent()
 
     companion object {
 

@@ -1,12 +1,13 @@
 package com.gmail.maystruks08.domain.interactors
 
 import com.gmail.maystruks08.domain.entities.ResultOfTask
-import com.gmail.maystruks08.domain.entities.Runner
+import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.repository.RegisterNewRunnersRepository
 import javax.inject.Inject
 
-class RegisterNewRunnerInteractorImpl @Inject constructor(private val runnersRepository: RegisterNewRunnersRepository) :
-    RegisterNewRunnerInteractor {
+class RegisterNewRunnerInteractorImpl @Inject constructor(
+    private val runnersRepository: RegisterNewRunnersRepository
+) : RegisterNewRunnerInteractor {
 
     override suspend fun registerNewRunners(registerInputData: List<RegisterNewRunnerInteractor.RegisterInputData>): ResultOfTask<Exception, Unit> {
         return ResultOfTask.build {
@@ -32,5 +33,4 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(private val runnersRep
             runnersRepository.saveNewRunners(runners)
         }
     }
-
 }

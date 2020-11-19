@@ -35,15 +35,5 @@ object DatabaseModule {
     @JvmStatic
     @Provides
     @Singleton
-    fun firestoreApi(): FirestoreApi = FirestoreApiImpl(FirebaseFirestore.getInstance())
-
-    @JvmStatic
-    @Provides
-    @Singleton
-    fun firebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
-
-    @JvmStatic
-    @Provides
-    @Singleton
     fun gson(): Gson = Gson()
 }

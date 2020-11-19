@@ -11,23 +11,6 @@
         <item name="android:windowBackground">@drawable/bg_splash</item>
     </style>
 
-    <style name="LoginTheme" parent="FirebaseUI">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorButtonNormal">@color/colorAccent</item>
-        <item name="colorControlNormal">@android:color/white</item>
-        <item name="colorControlActivated">@android:color/white</item>
-        <item name="colorControlHighlight">@android:color/white</item>
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorSecondary">@android:color/white</item>
-        <item name="android:windowBackground">@drawable/bg_splash</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:textColorHint">@android:color/white</item>
-    </style>
-
     <style name="AppTheme.Toolbar" parent="AppTheme">
         <item name="android:textColorPrimary">@color/colorAccent</item>
         <item name="android:textColorSecondary">@color/colorAccent</item>
@@ -37,9 +20,14 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="CollapsingToolbarLayoutExpandedTextStyle" parent="AppTheme">
+        <item name="android:textColor">@android:color/transparent</item>
+        <item name="android:textSize">0sp</item>
+    </style>
+
     <style name="DialogAnimation">
-    <item name="android:windowEnterAnimation">@android:anim/slide_in_left</item>
-    <item name="android:windowExitAnimation">@android:anim/slide_out_right</item>
+        <item name="android:windowEnterAnimation">@android:anim/slide_in_left</item>
+        <item name="android:windowExitAnimation">@android:anim/slide_out_right</item>
     </style>
 
     <style name="TextTitle">

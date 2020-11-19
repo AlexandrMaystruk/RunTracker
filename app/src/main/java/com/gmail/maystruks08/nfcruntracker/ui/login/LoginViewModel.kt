@@ -1,16 +1,18 @@
 package com.gmail.maystruks08.nfcruntracker.ui.login
 
-import android.app.Activity
 import android.content.Intent
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.firebase.ui.auth.IdpResponse
 import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.login.LoginFragment.Companion.RC_SIGN_IN
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,43 +25,127 @@ class LoginViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository
 ) : BaseViewModel() {
 
-    val startAuthFlow get() = startAuthFlowLiveData
+    private val auth = FirebaseAuth.getInstance()
 
-    private val startAuthFlowLiveData = MutableLiveData<Unit>()
+    val startAuthFlow: LiveData<AuthState> get() = _startAuthFlowLiveData
+    private val _startAuthFlowLiveData = MutableLiveData<AuthState>()
 
-    init {
-        if (FirebaseAuth.getInstance().currentUser == null) startAuthFlowLiveData.postValue(Unit) else updateAndStartMainScreen()
+    val showProgress: LiveData<Boolean> get() = _showProgressLiveData
+    private val _showProgressLiveData = MutableLiveData<Boolean>()
+
+    fun initView() {
+        if (auth.currentUser != null) onOperationSuccess()
     }
 
-    private fun updateAndStartMainScreen() {
+    fun signInWithGoogle() {
+        _showProgressLiveData.value = true
+        _startAuthFlowLiveData.value = Google
+    }
+
+    fun signInWithEmailClicked() {
+        _startAuthFlowLiveData.value = EmailAndPassword(false)
+    }
+
+    fun registerNewUserCommand() {
+        _startAuthFlowLiveData.value = EmailAndPassword(true)
+    }
+
+    fun onOptionsButtonClicked(email: String, password: String) {
+        _showProgressLiveData.value = true
+        val authMode = startAuthFlow.value
+        when {
+            authMode is EmailAndPassword && authMode.isRegisterNewUser -> {
+                createFirebaseUserWithEmailAndPassword(email, password)
+            }
+            authMode is EmailAndPassword && !authMode.isRegisterNewUser -> {
+                firebaseAuthWithEmailAndPassword(email, password)
+            }
+        }
+    }
+
+    fun handleLoginResult(requestCode: Int, data: Intent?) {
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                val account = task.getResult(ApiException::class.java)!!
+                firebaseAuthWithGoogle(account.idToken!!)
+            } catch (e: ApiException) {
+                _showProgressLiveData.value = false
+                toastLiveData.postValue("Google sign in failed")
+            }
+        }
+    }
+
+    private fun firebaseAuthWithGoogle(idToken: String) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    onOperationSuccess()
+                } else {
+                    _showProgressLiveData.postValue(false)
+                    handleError(SignInWithCredentialExceptions())
+                }
+            }
+    }
+
+    private fun firebaseAuthWithEmailAndPassword(email: String, password: String) {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    onOperationSuccess()
+                } else {
+                    _showProgressLiveData.postValue(false)
+                    handleError(SignInWithCredentialExceptions())
+                }
+            }
+    }
+
+    private fun createFirebaseUserWithEmailAndPassword(email: String, password: String) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    onOperationSuccess()
+                } else {
+                    _showProgressLiveData.postValue(false)
+                    handleError(SignInWithCredentialExceptions())
+                }
+            }
+            .addOnFailureListener {
+                _showProgressLiveData.postValue(false)
+                handleError(it)
+            }
+
+    }
+
+    private fun onOperationSuccess() {
         viewModelScope.launch(Dispatchers.IO) {
             when (val resultOfTask = settingsRepository.updateConfig()) {
                 is ResultOfTask.Value -> {
                     when (val task = settingsRepository.getCachedConfig()) {
                         is ResultOfTask.Value -> withContext(Dispatchers.Main) {
-                            router.newRootScreen(Screens.RootRunnersScreen())
+                            _showProgressLiveData.postValue(false)
+                            router.newRootScreen(Screens.RunnersScreen(0))
                         }
                         is ResultOfTask.Error -> {
+                            _showProgressLiveData.postValue(false)
                             Timber.e(task.error)
-                            withContext(Dispatchers.Main) { router.newRootScreen(Screens.RootRunnersScreen()) }
+                            withContext(Dispatchers.Main) { router.newRootScreen(Screens.RunnersScreen(0)) }
                         }
                     }
                 }
                 is ResultOfTask.Error -> {
+                    _showProgressLiveData.postValue(false)
                     Timber.e(resultOfTask.error)
-                    withContext(Dispatchers.Main) { router.newRootScreen(Screens.RootRunnersScreen()) }
+                    withContext(Dispatchers.Main) { router.newRootScreen(Screens.RunnersScreen(0)) }
                 }
             }
         }
     }
 
-    fun handleLoginResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == RC_SIGN_IN) {
-            when (resultCode) {
-                Activity.RESULT_OK -> updateAndStartMainScreen()
-                Activity.RESULT_CANCELED -> router.exit()
-                else -> toastLiveData.postValue(IdpResponse.fromResultIntent(data)?.error?.localizedMessage)
-            }
-        }
+    private fun handleError(throwable: Throwable) {
+        Timber.e(throwable)
     }
 }
+
+class SignInWithCredentialExceptions : Throwable()

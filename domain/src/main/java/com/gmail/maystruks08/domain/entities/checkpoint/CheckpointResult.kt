@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.domain.entities
+package com.gmail.maystruks08.domain.entities.checkpoint
 
 import java.util.*
 

@@ -8,9 +8,9 @@ import com.gmail.maystruks08.data.mappers.toCheckpointsResult
 import com.gmail.maystruks08.data.mappers.toRunnerTable
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.domain.NetworkUtil
-import com.gmail.maystruks08.domain.entities.Checkpoint
-import com.gmail.maystruks08.domain.entities.Runner
-import com.gmail.maystruks08.domain.entities.RunnerType
+import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
 import com.gmail.maystruks08.domain.repository.RegisterNewRunnersRepository
 import javax.inject.Inject

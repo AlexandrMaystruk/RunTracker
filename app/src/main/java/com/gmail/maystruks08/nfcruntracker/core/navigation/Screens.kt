@@ -4,16 +4,16 @@ import com.gmail.maystruks08.nfcruntracker.ui.login.LoginFragment
 import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.result.RunnerResultFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
-import com.gmail.maystruks08.nfcruntracker.ui.runners.RootRunnersFragment
+import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
 import com.gmail.maystruks08.nfcruntracker.ui.settings.SettingsFragment
 
 object Screens {
 
-    class RootRunnersScreen : AppScreen() {
-        override fun getFragment() = RootRunnersFragment()
+    class RunnersScreen(private val id: Int) : AppScreen() {
+        override fun getFragment() = RunnersFragment.getInstance(id)
 
         companion object {
-            fun tag() = RootRunnersScreen::class.java.canonicalName ?: ""
+            fun tag() = RunnersFragment::class.java.canonicalName ?: ""
         }
     }
 
@@ -42,7 +42,7 @@ object Screens {
     }
 
     class LoginScreen : AppScreen() {
-        override fun getFragment() = LoginFragment()
+        override fun getFragment() = LoginFragment.getInstance()
 
         companion object {
             fun tag() = LoginScreen::class.java.canonicalName ?: ""

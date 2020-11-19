@@ -4,9 +4,9 @@
     android:id="@+id/root_item"
     android:layout_width="match_parent"
     android:layout_height="@dimen/runnerItemSmallHeight"
-    android:layout_marginStart="@dimen/margin_s"
+    android:layout_marginStart="@dimen/margin_min"
     android:layout_marginTop="@dimen/margin_s"
-    android:layout_marginEnd="@dimen/margin_s"
+    android:layout_marginEnd="@dimen/margin_min"
     app:cardCornerRadius="@dimen/margin_xs"
     app:cardElevation="@dimen/margin_xs"
     app:contentPadding="0dp">
@@ -52,7 +52,7 @@
             app:layout_constraintStart_toEndOf="@+id/tvRunnerNumber"
             app:layout_constraintTop_toTopOf="@+id/tvRunnerNumber" />
 
-        <com.gmail.maystruks08.nfcruntracker.ui.stepview.StepProgressView
+        <com.gmail.maystruks08.nfcruntracker.ui.views.stepview.StepProgressView
             android:id="@+id/runnerProgress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -65,6 +65,15 @@
             app:nodeHeight="@dimen/size_l"
             app:textNodeTitleSize="@dimen/size_s"
             app:textTitlePadding="@dimen/margin_min" />
+
+        <ProgressBar
+            android:id="@+id/runnerProgressBar"
+            android:layout_width="@dimen/size_l"
+            android:layout_height="@dimen/size_l"
+            android:layout_margin="@dimen/margin_m"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <View
             android:layout_width="match_parent"

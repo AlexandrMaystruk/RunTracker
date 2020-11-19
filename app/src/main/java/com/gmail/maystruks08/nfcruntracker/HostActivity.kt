@@ -20,13 +20,12 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.core.navigation.AppNavigator
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
-import com.gmail.maystruks08.nfcruntracker.ui.runners.RootRunnersFragment
+import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
 import com.gmail.maystruks08.nfcruntracker.utils.NfcAdapter
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_host.*
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
-import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.commands.Command
 import timber.log.Timber
 import java.util.*
@@ -38,9 +37,6 @@ class HostActivity : AppCompatActivity() {
 
     @Inject
     lateinit var navigatorHolder: NavigatorHolder
-
-    @Inject
-    lateinit var router: Router
 
     @Inject
     lateinit var networkUtil: NetworkUtil
@@ -67,15 +63,15 @@ class HostActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
+        theme.applyStyle(R.style.AppTheme, true)
         setContentView(R.layout.activity_host)
         App.hostComponent?.inject(this)
 
         viewModel = injectViewModel(viewModeFactory)
 
         viewModel.runnerChange.observe(this, {
-            getFragment<RootRunnersFragment>(Screens.RootRunnersScreen.tag())?.receiveRunnerUpdateFromServer(it)
+            getFragment<RunnersFragment>(Screens.RunnerScreen.tag())?.receiveRunnerUpdateFromServer(it)
         })
 
         networkUtil.subscribeToConnectionChange(this.javaClass.simpleName) { isConnected ->
@@ -104,7 +100,7 @@ class HostActivity : AppCompatActivity() {
 
     private fun navigateBack() {
         when {
-            supportFragmentManager.backStackEntryCount > 0 -> router.exit()
+            supportFragmentManager.backStackEntryCount > 0 -> viewModel.exit()
             lastBackPressTime < System.currentTimeMillis() - PRESS_TWICE_INTERVAL -> {
                 toast = Toast.makeText(
                     applicationContext,
@@ -114,7 +110,7 @@ class HostActivity : AppCompatActivity() {
                 toast?.show()
                 lastBackPressTime = System.currentTimeMillis()
             }
-            else -> router.exit()
+            else -> viewModel.exit()
         }
     }
 
@@ -150,7 +146,7 @@ class HostActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         nfcAdapter.processReadCard(intent)?.let { cardId ->
             Timber.log(Log.INFO, "Card scanned: $cardId at ${Date().toDateTimeFormat()}")
-            getFragment<RootRunnersFragment>(Screens.RootRunnersScreen.tag())?.onNfcCardScanned(cardId)
+            getFragment<RunnersFragment>(Screens.RunnerScreen.tag())?.onNfcCardScanned(cardId)
         }
     }
 
@@ -165,15 +161,11 @@ class HostActivity : AppCompatActivity() {
     override fun onStop() {
         toast?.cancel()
         networkUtil.unsubscribe(this.javaClass.simpleName)
-        super.onStop()
-    }
-
-    override fun onDestroy() {
         toast?.cancel()
         toast = null
         snackBar?.dismiss()
         snackBar = null
         App.clearHostComponent()
-        super.onDestroy()
+        super.onStop()
     }
 }

@@ -3,6 +3,9 @@ package com.gmail.maystruks08.nfcruntracker.ui.runner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.*
+import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
+import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor

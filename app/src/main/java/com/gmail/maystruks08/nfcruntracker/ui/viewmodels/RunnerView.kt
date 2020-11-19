@@ -13,5 +13,18 @@ data class RunnerView(
     val dateOfBirthday: String,
     val type: Int,
     val progress: List<CheckpointView>,
-    val isOffTrack: Boolean
-) : Parcelable
+    val isOffTrack: Boolean,
+    val placeholder: Boolean = false
+) : Parcelable{
+
+    companion object{
+        fun getPlaceholder() =  arrayListOf(
+            RunnerView("",  0, "", "", null, "", 1, emptyList(), isOffTrack = false, placeholder = true),
+            RunnerView("",  0, "", "", null, "", 1, emptyList(), isOffTrack = false, placeholder = true),
+            RunnerView("",  0, "", "", null, "", 1, emptyList(), isOffTrack = false, placeholder = true),
+            RunnerView("",  0, "", "", null, "", 1, emptyList(), isOffTrack = false, placeholder = true),
+            RunnerView("",  0, "", "", null, "", 1, emptyList(), isOffTrack = false, placeholder = true),
+            RunnerView("",  0, "", "", null, "", 1, emptyList(), isOffTrack = false, placeholder = true),
+        )
+    }
+}
