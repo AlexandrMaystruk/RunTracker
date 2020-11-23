@@ -74,7 +74,7 @@ class HostActivity : AppCompatActivity() {
             getFragment<RunnersFragment>(Screens.RunnerScreen.tag())?.receiveRunnerUpdateFromServer(it)
         })
 
-        networkUtil.subscribeToConnectionChange(this.javaClass.simpleName) { isConnected ->
+        networkUtil.subscribeToConnectionChange(this) { isConnected ->
             if (!isConnected) {
                 snackBar = Snackbar.make(
                     nav_host_container,
@@ -160,7 +160,7 @@ class HostActivity : AppCompatActivity() {
 
     override fun onStop() {
         toast?.cancel()
-        networkUtil.unsubscribe(this.javaClass.simpleName)
+        networkUtil.unsubscribe(this)
         toast?.cancel()
         toast = null
         snackBar?.dismiss()

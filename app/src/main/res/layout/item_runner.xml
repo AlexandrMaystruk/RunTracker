@@ -66,15 +66,6 @@
             app:textNodeTitleSize="@dimen/size_s"
             app:textTitlePadding="@dimen/margin_min" />
 
-        <ProgressBar
-            android:id="@+id/runnerProgressBar"
-            android:layout_width="@dimen/size_l"
-            android:layout_height="@dimen/size_l"
-            android:layout_margin="@dimen/margin_m"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

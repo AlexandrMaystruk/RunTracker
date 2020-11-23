@@ -2,7 +2,9 @@ package com.gmail.maystruks08.domain.interactors
 
 import com.gmail.maystruks08.domain.INFO
 import com.gmail.maystruks08.domain.LogHelper
-import com.gmail.maystruks08.domain.entities.*
+import com.gmail.maystruks08.domain.entities.Change
+import com.gmail.maystruks08.domain.entities.ResultOfTask
+import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.RunnerType
@@ -17,8 +19,10 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
     override suspend fun getRunner(runnerNumber: Int): ResultOfTask<Exception, Runner> =
          ResultOfTask.build { runnersRepository.getRunnerByNumber(runnerNumber) ?: throw  RunnerNotFoundException()}
 
-    override suspend fun getRunners(type: RunnerType): ResultOfTask<Exception, List<Runner>> =
-        ResultOfTask.build { runnersRepository.getRunners(type).sortedBy { runner -> runner.checkpoints.count { it is CheckpointResult } }.sortedBy { it.totalResult }.sortedBy { it.isOffTrack }}
+    override suspend fun getRunners(type: RunnerType, initSize: Int?): ResultOfTask<Exception, List<Runner>> =
+        ResultOfTask.build {
+            runnersRepository.getRunners(type = type, initSize = initSize)
+        }
 
     override suspend fun getFinishers(type: RunnerType): ResultOfTask<Exception, List<Runner>> =
         ResultOfTask.build { runnersRepository.getRunners(type, true).sortedBy { it.totalResult } }

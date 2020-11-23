@@ -2,10 +2,10 @@ package com.gmail.maystruks08.data.mappers
 
 import com.gmail.maystruks08.data.local.entity.ResultTable
 import com.gmail.maystruks08.data.local.entity.RunnerTable
-import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.data.local.pojo.RunnerTableView
 import com.gmail.maystruks08.data.remote.pojo.CheckpointPojo
 import com.gmail.maystruks08.data.remote.pojo.CheckpointResultPojo
+import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointType
@@ -13,34 +13,37 @@ import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.RunnerSex
 import com.gmail.maystruks08.domain.entities.runner.RunnerType
 
-fun List<RunnerTableView>.toRunners(checkpoints: List<Checkpoint>): List<Runner> {
-    return this.map { tableView ->
-        Runner(
-            cardId = tableView.runnerTable.cardId,
-            number = tableView.runnerTable.number,
-            fullName = tableView.runnerTable.fullName,
-            shortName = tableView.runnerTable.shortName,
-            phone = tableView.runnerTable.phone,
-            city = tableView.runnerTable.city,
-            sex = RunnerSex.fromOrdinal(tableView.runnerTable.sex),
-            dateOfBirthday = tableView.runnerTable.dateOfBirthday,
-            type = RunnerType.fromOrdinal(tableView.runnerTable.type),
-            teamName = tableView.runnerTable.teamName,
-            totalResult = tableView.runnerTable.totalResult,
-            checkpoints = checkpoints.map { cp ->
-                val result = tableView.results.find { it.checkpointId == cp.id }
-                if (result != null) {
-                    CheckpointResult(
-                        id = cp.id,
-                        name = cp.name,
-                        type = cp.type,
-                        date = result.time!!,
-                        hasPrevious = result.hasPrevious
-                    )
-                } else cp
-            }.toMutableList(),
-            isOffTrack = tableView.runnerTable.isOffTrack
-        )
+fun List<RunnerTableView>.toRunners(checkpoints: List<Checkpoint>): MutableList<Runner> {
+    return ArrayList<Runner>().apply {
+        this@toRunners.forEach { tableView ->
+            add(Runner(
+                cardId = tableView.runnerTable.cardId,
+                number = tableView.runnerTable.number,
+                fullName = tableView.runnerTable.fullName,
+                shortName = tableView.runnerTable.shortName,
+                phone = tableView.runnerTable.phone,
+                city = tableView.runnerTable.city,
+                sex = RunnerSex.fromOrdinal(tableView.runnerTable.sex),
+                dateOfBirthday = tableView.runnerTable.dateOfBirthday,
+                type = RunnerType.fromOrdinal(tableView.runnerTable.type),
+                teamName = tableView.runnerTable.teamName,
+                totalResult = tableView.runnerTable.totalResult,
+                checkpoints = checkpoints.map { cp ->
+                    val result = tableView.results.find { it.checkpointId == cp.id }
+                    if (result != null) {
+                        CheckpointResult(
+                            id = cp.id,
+                            name = cp.name,
+                            type = cp.type,
+                            date = result.time!!,
+                            hasPrevious = result.hasPrevious
+                        )
+                    } else cp
+                }.sortedBy { it.id }.toMutableList(),
+                isOffTrack = tableView.runnerTable.isOffTrack
+            )
+            )
+        }
     }
 }
 
@@ -64,10 +67,6 @@ fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
 
 fun List<Checkpoint>.toCheckpointsResult(runnerNumber: Int): List<ResultTable> =
     this.mapNotNull { if (it is CheckpointResult) it.toResultTable(runnerNumber) else null }
-
-
-fun List<Runner>.toFirestoreRunners(): List<RunnerPojo> = this.map { it.toFirestoreRunner() }
-fun List<RunnerPojo>.fromFirestoreRunners(): List<Runner> = this.map { it.fromFirestoreRunner()}
 
 fun Runner.toFirestoreRunner(): RunnerPojo {
     return RunnerPojo(number,cardId, fullName, shortName, phone, sex.ordinal, city, dateOfBirthday, type.ordinal, teamName, totalResult,

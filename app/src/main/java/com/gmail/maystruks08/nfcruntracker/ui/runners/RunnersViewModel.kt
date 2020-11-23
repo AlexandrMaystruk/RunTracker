@@ -22,7 +22,6 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerViews
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
@@ -37,17 +36,13 @@ class RunnersViewModel @Inject constructor(
 
     val distance get() = _distanceLiveData
     val runners get() = _runnersLiveData
-    val runnerAdd get() = _runnerAddLiveData
-    val runnerUpdate get() = _runnerUpdateLiveData
-    val runnerRemove get() = _runnerRemoveLiveData
     val showDialog get() = _showSuccessDialogLiveData
+    val showProgress get() = _showProgressLiveData
 
     private val _distanceLiveData = MutableLiveData<MutableList<DistanceView>>()
     private val _runnersLiveData = MutableLiveData<MutableList<RunnerView>>()
-    private val _runnerAddLiveData = MutableLiveData<RunnerView>()
-    private val _runnerUpdateLiveData = MutableLiveData<RunnerView>()
-    private val _runnerRemoveLiveData = MutableLiveData<RunnerView>()
     private val _showSuccessDialogLiveData = MutableLiveData<Pair<Checkpoint?, Int>>()
+    private val _showProgressLiveData = MutableLiveData<Boolean>()
 
     private lateinit var runnerType: RunnerType
 
@@ -79,9 +74,16 @@ class RunnersViewModel @Inject constructor(
         val runnerView = runnerChange.runner.toRunnerView()
         if(runnerType == runnerChange.runner.type) {
             when (runnerChange.changeType) {
-                Change.ADD -> _runnerAddLiveData.postValue(runnerView)
-                Change.UPDATE -> _runnerUpdateLiveData.postValue(runnerView)
-                Change.REMOVE -> _runnerRemoveLiveData.postValue(runnerView)
+                Change.ADD -> {
+                    _runnersLiveData.value?.add(runnerView)
+                }
+                Change.UPDATE -> {
+                    _runnersLiveData.value?.removeAll { it.number == runnerView.number }
+                    _runnersLiveData.value?.add(runnerView)
+                }
+                Change.REMOVE -> {
+                    _runnersLiveData.value?.removeAll { it.number == runnerView.number }
+                }
             }
         }
     }
@@ -135,19 +137,32 @@ class RunnersViewModel @Inject constructor(
     }
 
     private suspend fun showAllRunners() {
-        when (val result = runnersInteractor.getRunners(runnerType)) {
+        _showProgressLiveData.postValue(true)
+        showSmallInitRunners()
+        when (val result = runnersInteractor.getRunners(runnerType, null)) {
             is ResultOfTask.Value -> {
-                Timber.e("TIME showAllRunners start map ${runnerType.name} ${System.currentTimeMillis()}")
                 val runners = result.value.toRunnerViews()
-                Timber.e("TIME showAllRunners map finished ${runnerType.name} ${System.currentTimeMillis()}")
                 _runnersLiveData.postValue(runners)
-                Timber.e("TIME showAllRunners post called ${runnerType.name} ${System.currentTimeMillis()}")
+                _showProgressLiveData.postValue(false)
+            }
+            is ResultOfTask.Error -> handleError(result.error)
+        }
+    }
+
+
+    private suspend fun showSmallInitRunners() {
+        when (val result = runnersInteractor.getRunners(runnerType, 20)) {
+            is ResultOfTask.Value -> {
+                val runners = result.value.toRunnerViews()
+                _runnersLiveData.postValue(runners)
+                _showProgressLiveData.postValue(false)
             }
             is ResultOfTask.Error -> handleError(result.error)
         }
     }
 
     private fun handleError(e: Throwable) {
+        _showProgressLiveData.postValue(false)
         Timber.e(e)
         when(e){
             is SaveRunnerDataException -> toastLiveData.postValue("Не удалось сохранить данные участника:" + e.message)

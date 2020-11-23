@@ -3,6 +3,7 @@ package com.gmail.maystruks08.domain.entities.runner
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
 import java.util.*
+import kotlin.collections.ArrayList
 
 data class Runner(
     val number: Int,
@@ -16,7 +17,7 @@ data class Runner(
     val type: RunnerType,
     var totalResult: Date?,
     val teamName: String?,
-    val checkpoints: MutableList<Checkpoint> = mutableListOf(),
+    val checkpoints: MutableList<Checkpoint> = ArrayList(),
     var isOffTrack: Boolean
 ) {
 

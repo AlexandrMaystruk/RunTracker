@@ -190,6 +190,8 @@ ext {
     espressoVersion = '3.2.0'
     testingSupportLibVersion = '1.2.0'
 
+
+
     presentationDependencies = [
             kotlin             : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin_version}",
             supportAndroid     : "androidx.legacy:legacy-support-v4:${appCompatVersion}",

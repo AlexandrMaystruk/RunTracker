@@ -4,8 +4,8 @@ interface NetworkUtil {
 
     fun isOnline(): Boolean
 
-    fun subscribeToConnectionChange(key: String, onConnectionChanged: (Boolean) -> Unit)
+    fun subscribeToConnectionChange(key: Any, onConnectionChanged: (Boolean) -> Unit)
 
-    fun unsubscribe(key: String)
+    fun unsubscribe(key: Any)
 
 }

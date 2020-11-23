@@ -10,7 +10,7 @@ interface RunnersInteractor {
 
     suspend fun getRunner(runnerNumber: Int): ResultOfTask<Exception, Runner>
 
-    suspend fun getRunners(type: RunnerType): ResultOfTask<Exception, List<Runner>>
+    suspend fun getRunners(type: RunnerType, initSize: Int? = null): ResultOfTask<Exception, List<Runner>>
 
     suspend fun getFinishers(type: RunnerType): ResultOfTask<Exception, List<Runner>>
 

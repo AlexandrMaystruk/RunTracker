@@ -25,12 +25,12 @@ class NetworkUtilImpl @Inject constructor(private val context: Context): Network
         hasNetworkAvailable()
     }
 
-    override fun subscribeToConnectionChange(key: String, onConnectionChanged: (Boolean) -> Unit) {
-        networkConnectionCallbacks[key] = onConnectionChanged
+    override fun subscribeToConnectionChange(key: Any, onConnectionChanged: (Boolean) -> Unit) {
+        networkConnectionCallbacks[key.javaClass.simpleName] = onConnectionChanged
     }
 
-    override fun unsubscribe(key: String) {
-        networkConnectionCallbacks.remove(key)
+    override fun unsubscribe(key: Any) {
+        networkConnectionCallbacks.remove(key.javaClass.simpleName)
     }
 
     @Suppress("DEPRECATION")

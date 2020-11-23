@@ -49,5 +49,5 @@ fun List<Checkpoint>.toCheckpointViews(): List<CheckpointView> {
         } else {
             CheckpointView(it.id, Bean(it.name, StepState.UNDONE))
         }
-    }.sortedBy { it.id }
+    }
 }

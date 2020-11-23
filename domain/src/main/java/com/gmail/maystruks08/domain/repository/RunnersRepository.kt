@@ -8,7 +8,7 @@ import com.gmail.maystruks08.domain.exception.SyncWithServerException
 
 interface RunnersRepository {
 
-    suspend fun getRunners(type: RunnerType, onlyFinishers: Boolean = false): List<Runner>
+    suspend fun getRunners(type: RunnerType, onlyFinishers: Boolean = false, initSize: Int? = null): List<Runner>
 
     suspend fun getRunnerByCardId(cardId: String): Runner?
 

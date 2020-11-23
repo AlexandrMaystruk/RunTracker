@@ -12,14 +12,16 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
+import com.gmail.maystruks08.nfcruntracker.core.ext.setVisibility
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.DistanceAdapter
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.RunnerListAdapter
+import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import kotlinx.android.synthetic.main.fragment_runners.*
-import kotlinx.android.synthetic.main.layout_runners_content.*
-import kotlinx.android.synthetic.main.layout_runners_header.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import timber.log.Timber
 import javax.inject.Inject
 
-class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
+class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapter.Interaction {
 
     /**
      * Created RunnersViewModel without ViewModel providers
@@ -30,7 +32,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
     @Inject
     lateinit var viewModel: RunnersViewModel
 
-    private lateinit var runnerAdapter: RunnerAdapter
+    private lateinit var runnerAdapter: RunnerListAdapter
     private lateinit var distanceAdapter: DistanceAdapter
 
     private var runnerTypeId: Int by argument()
@@ -65,19 +67,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
         })
 
         viewModel.runners.observe(viewLifecycleOwner, {
-            runnerAdapter.runnerList = it
-        })
-
-        viewModel.runnerAdd.observe(viewLifecycleOwner, {
-            runnerAdapter.insertItemOrUpdateIfExist(it)
-        })
-
-        viewModel.runnerUpdate.observe(viewLifecycleOwner, {
-            runnerAdapter.updateItem(it)
-        })
-
-        viewModel.runnerRemove.observe(viewLifecycleOwner, {
-            runnerAdapter.removeItem(it)
+            runnerAdapter.submitList(it)
         })
 
         viewModel.showDialog.observe(viewLifecycleOwner, {
@@ -86,17 +76,21 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
             SuccessDialogFragment.getInstance(message)
                 .show(childFragmentManager, SuccessDialogFragment.name())
         })
+
+        viewModel.showProgress.observe(viewLifecycleOwner, {
+            runnerProgressBar.setVisibility(it)
+        })
     }
 
     @ExperimentalCoroutinesApi
     override fun initViews() {
-        runnerAdapter = RunnerAdapter { viewModel.onClickedAtRunner(it.number, it.type) }
+        runnerAdapter = RunnerListAdapter(this)
         rvRunners.apply {
             layoutManager = LinearLayoutManager(rvRunners.context)
             adapter = runnerAdapter
         }
         distanceAdapter = DistanceAdapter {
-            tvDistanceHeader.text = it.name
+            tvRunnersTitle.text = "Название дистанции"
             viewModel.changeRunnerType(it.id)
         }
         rvDistanceType.apply {
@@ -108,6 +102,10 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
         btnRegisterNewRunner.setOnClickListener {
             viewModel.onRegisterNewRunnerClicked()
         }
+    }
+
+    override fun onItemSelected(item: RunnerView) {
+        viewModel.onClickedAtRunner(item.number, item.type)
     }
 
     fun receiveRunnerUpdateFromServer(runnerChange: RunnerChange) {
@@ -135,6 +133,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners) {
     }
 
     override fun onDestroyView() {
+        runnerAdapter.interaction = null
         rvRunners.adapter = null
         super.onDestroyView()
     }

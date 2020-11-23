@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/end"
+        motion:constraintSetStart="@id/start"
+        motion:duration="1000">
+
+        <OnSwipe
+            motion:dragDirection="dragUp"
+            motion:touchAnchorId="@id/rvRunners" />
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+        <Constraint
+            android:id="@+id/rvRunners"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            motion:layout_constraintBottom_toBottomOf="@id/view_card"
+            motion:layout_constraintLeft_toLeftOf="@id/view_card"
+            motion:layout_constraintRight_toRightOf="@id/view_card"
+            motion:layout_constraintTop_toBottomOf="@+id/tvCurrentCheckpoint" />
+        <Constraint
+            android:id="@+id/view_card"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/margin_m"
+            android:layout_marginEnd="@dimen/margin_m"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintTop_toBottomOf="@+id/rvDistanceType"
+            android:layout_marginBottom="0dp" />
+        <Constraint
+            android:id="@+id/tvRunnersTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_m"
+            android:layout_marginTop="@dimen/margin_m"
+            motion:layout_constraintStart_toStartOf="@id/view_card"
+            motion:layout_constraintTop_toTopOf="@id/view_card" />
+        <Constraint
+            android:id="@+id/tvCurrentCheckpoint"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_xs"
+            android:layout_marginEnd="@dimen/margin_xs"
+            motion:layout_constraintStart_toStartOf="@id/tvRunnersTitle"
+            motion:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
+        <Constraint
+            android:id="@+id/tvTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_xs"
+            android:layout_marginTop="@dimen/margin_xs"
+            android:layout_marginEnd="@dimen/margin_m"
+            motion:layout_constraintEnd_toEndOf="@id/view_card"
+            motion:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
+        <Constraint
+            android:id="@+id/rvDistanceType"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:alpha="1"
+            android:layout_marginStart="@dimen/margin_m"
+            android:layout_marginEnd="@dimen/margin_m"
+            motion:layout_constraintBottom_toBottomOf="@id/view_background"
+            motion:layout_constraintEnd_toEndOf="@id/view_card"
+            motion:layout_constraintStart_toStartOf="@id/view_card"
+            motion:layout_constraintTop_toBottomOf="@id/toolbar"
+            android:layout_marginTop="@dimen/margin_s" />
+        <Constraint
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_size"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent" />
+        <Constraint
+            android:id="@+id/view_background"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@id/toolbar" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_size"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent" />
+        <Constraint
+            android:id="@+id/view_background"
+            android:layout_width="match_parent"
+            android:layout_height="0.000001dp"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@id/toolbar" />
+        <Constraint
+            android:id="@+id/rvDistanceType"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:alpha="0"
+            android:layout_marginTop="@dimen/margin_xs"
+            motion:layout_constraintBottom_toBottomOf="@id/view_background"
+            motion:layout_constraintEnd_toEndOf="@id/view_card"
+            motion:layout_constraintStart_toStartOf="@id/view_card"
+            motion:layout_constraintTop_toBottomOf="@id/toolbar" />
+        <Constraint
+            android:id="@+id/view_card"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/margin_m"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="@dimen/margin_m"
+            android:layout_marginBottom="0dp"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintTop_toBottomOf="@id/toolbar" />
+        <Constraint
+            android:id="@+id/tvRunnersTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_m"
+            android:layout_marginTop="@dimen/margin_m"
+            android:alpha="0"
+            motion:layout_constraintStart_toStartOf="@id/view_card"
+            motion:layout_constraintTop_toTopOf="@id/view_card" />
+        <Constraint
+            android:id="@+id/tvCurrentCheckpoint"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_xs"
+            android:layout_marginEnd="@dimen/margin_xs"
+            android:alpha="0"
+            motion:layout_constraintStart_toStartOf="@id/tvRunnersTitle"
+            motion:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
+        <Constraint
+            android:id="@+id/tvTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_xs"
+            android:layout_marginTop="@dimen/margin_xs"
+            android:layout_marginEnd="@dimen/margin_m"
+            android:alpha="0"
+            motion:layout_constraintEnd_toEndOf="@id/view_card"
+            motion:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
+        <Constraint
+            android:id="@+id/rvRunners"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:elevation="0dp"
+            motion:layout_constraintBottom_toBottomOf="@id/view_card"
+            motion:layout_constraintLeft_toLeftOf="@id/view_card"
+            motion:layout_constraintRight_toRightOf="@id/view_card"
+            motion:layout_constraintTop_toTopOf="@+id/view_card" />
+    </ConstraintSet>
+</MotionScene>

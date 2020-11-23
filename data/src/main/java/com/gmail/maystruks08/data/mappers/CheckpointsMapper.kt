@@ -43,3 +43,9 @@ fun CheckpointTable.toCheckpoint(): Checkpoint {
         CheckpointType.fromOrdinal(this.checkpointType)
     )
 }
+
+fun List<CheckpointTable>.toCheckpoints(): List<Checkpoint> {
+    return ArrayList<Checkpoint>().apply {
+        this@toCheckpoints.forEach { add(it.toCheckpoint()) }
+    }.sortedBy { it.id }
+}
