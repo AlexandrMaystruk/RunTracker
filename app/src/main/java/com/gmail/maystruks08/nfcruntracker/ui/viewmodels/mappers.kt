@@ -8,9 +8,9 @@ import com.gmail.maystruks08.domain.toTimeUTCFormat
 import com.gmail.maystruks08.nfcruntracker.ui.views.stepview.Bean
 import com.gmail.maystruks08.nfcruntracker.ui.views.stepview.StepState
 
-fun List<Runner>.toRunnerViews(): MutableList<RunnerView> {
+fun toRunnerViews(runners: List<Runner>): MutableList<RunnerView> {
     return mutableListOf<RunnerView>().apply {
-        val iterator = this@toRunnerViews.iterator()
+        val iterator = runners.iterator()
         while (iterator.hasNext()) {
             val item = iterator.next()
             this.add(item.toRunnerView())

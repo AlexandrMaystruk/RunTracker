@@ -28,7 +28,6 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerViews
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.ticker
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import java.util.*
@@ -151,7 +150,10 @@ class RunnersViewModel @Inject constructor(
                     }
                     is ResultOfTask.Error -> handleError(result.error)
                 }
-            } else showAllRunners()
+            } else {
+                Timber.w("showAllRunners  onSearchQueryChanged")
+                showAllRunners()
+            }
         }
     }
 
@@ -199,7 +201,8 @@ class RunnersViewModel @Inject constructor(
         showSmallInitRunners()
         when (val result = runnersInteractor.getRunners(runnerType, null)) {
             is ResultOfTask.Value -> {
-                val runners = result.value.toRunnerViews()
+                Timber.w("showAllRunners")
+                val runners = toRunnerViews(result.value)
                 _runnersLiveData.postValue(runners)
             }
             is ResultOfTask.Error -> handleError(result.error)
@@ -212,7 +215,8 @@ class RunnersViewModel @Inject constructor(
     private suspend fun showSmallInitRunners() {
         when (val result = runnersInteractor.getRunners(runnerType, 20)) {
             is ResultOfTask.Value -> {
-                val runners = result.value.toRunnerViews()
+                Timber.w("showAllRunners  showSmallInitRunners")
+                val runners = toRunnerViews(result.value)
                 _runnersLiveData.postValue(runners)
             }
             is ResultOfTask.Error -> handleError(result.error)

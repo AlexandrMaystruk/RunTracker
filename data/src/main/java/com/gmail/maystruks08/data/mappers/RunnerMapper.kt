@@ -15,37 +15,39 @@ import com.gmail.maystruks08.domain.entities.runner.RunnerType
 
 fun List<RunnerTableView>.toRunners(checkpoints: List<Checkpoint>): MutableList<Runner> {
     return ArrayList<Runner>().apply {
-        this@toRunners.forEach { tableView ->
-            add(Runner(
-                cardId = tableView.runnerTable.cardId,
-                number = tableView.runnerTable.number,
-                fullName = tableView.runnerTable.fullName,
-                shortName = tableView.runnerTable.shortName,
-                phone = tableView.runnerTable.phone,
-                city = tableView.runnerTable.city,
-                sex = RunnerSex.fromOrdinal(tableView.runnerTable.sex),
-                dateOfBirthday = tableView.runnerTable.dateOfBirthday,
-                type = RunnerType.fromOrdinal(tableView.runnerTable.type),
-                teamName = tableView.runnerTable.teamName,
-                totalResult = tableView.runnerTable.totalResult,
-                checkpoints = checkpoints.map { cp ->
-                    val result = tableView.results.find { it.checkpointId == cp.id }
-                    if (result != null) {
-                        CheckpointResult(
-                            id = cp.id,
-                            name = cp.name,
-                            type = cp.type,
-                            date = result.time!!,
-                            hasPrevious = result.hasPrevious
-                        )
-                    } else cp
-                }.sortedBy { it.id }.toMutableList(),
-                isOffTrack = tableView.runnerTable.isOffTrack
-            )
-            )
-        }
+        this@toRunners.forEach { add(it.toRunner(checkpoints)) }
     }
 }
+
+fun RunnerTableView.toRunner(checkpoints: List<Checkpoint>): Runner {
+    return Runner(
+        cardId = runnerTable.cardId,
+        number = runnerTable.number,
+        fullName = runnerTable.fullName,
+        shortName = runnerTable.shortName,
+        phone = runnerTable.phone,
+        city = runnerTable.city,
+        sex = RunnerSex.fromOrdinal(runnerTable.sex),
+        dateOfBirthday = runnerTable.dateOfBirthday,
+        type = RunnerType.fromOrdinal(runnerTable.type),
+        teamName = runnerTable.teamName,
+        totalResult = runnerTable.totalResult,
+        checkpoints = checkpoints.map { cp ->
+            val result = results.find { it.checkpointId == cp.id }
+            if (result != null) {
+                CheckpointResult(
+                    id = cp.id,
+                    name = cp.name,
+                    type = cp.type,
+                    date = result.time!!,
+                    hasPrevious = result.hasPrevious
+                )
+            } else cp
+        }.sortedBy { it.id }.toMutableList(),
+        isOffTrack = runnerTable.isOffTrack
+    )
+}
+
 
 fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
     return RunnerTable(

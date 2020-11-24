@@ -77,8 +77,7 @@ class RunnersRepositoryImpl @Inject constructor(
 
     override suspend fun getRunnerTeamMembers(currentRunnerNumber: Int, teamName: String): List<Runner>? = runnersCache.findRunnerTeamMembers(currentRunnerNumber, teamName)
 
-    override suspend fun getCurrentCheckpoint(type: RunnerType): Checkpoint =
-        settingsCache.getCurrentCheckpoint(type)
+    override suspend fun getCurrentCheckpoint(type: RunnerType): Checkpoint = settingsCache.getCurrentCheckpoint(type)
 
     private fun getNormalRunners(onlyFinishers: Boolean, initSize: Int? = null): List<Runner> {
         if (runnersCache.normalRunnersList.isEmpty()) {
@@ -86,49 +85,43 @@ class RunnersRepositoryImpl @Inject constructor(
             if (settingsCache.getCheckpointList(RunnerType.NORMAL).isEmpty()) {
                 settingsCache.checkpoints = runnerDao.getCheckpoints(CheckpointType.NORMAL.ordinal).toCheckpoints()
             }
-            val checkpoints = settingsCache.getCheckpointList(RunnerType.NORMAL)
-            runnersCache.normalRunnersList = runners.toRunners(checkpoints).run {
-                sortWith(compareBy<Runner> { it.totalResult }.thenBy { it.isOffTrack }.thenBy { checkpoints.count { it is CheckpointResult }  })
-                this
+            runners.forEach {
+                val runner = it.toRunner(settingsCache.checkpoints)
+                runnersCache.normalRunnersList.add(runner)
             }
         }
-        val result =
-            if (onlyFinishers) runnersCache.normalRunnersList.filter { it.totalResult != null && !it.isOffTrack }
-            else runnersCache.normalRunnersList
+        val result = runnersCache.normalRunnersList.run { if (onlyFinishers) filter { it.totalResult != null && !it.isOffTrack } else this }
         return result.let {
             if (initSize != null) {
                 try {
                     it.take(initSize)
                 } catch (e: IllegalArgumentException) {
-                    it
+                    it.toMutableList()
                 }
-            } else it
+            } else it.toMutableList()
         }
     }
 
     private fun getIronRunners(onlyFinishers: Boolean, initSize: Int? = null): List<Runner> {
         if (runnersCache.ironRunnersList.isEmpty()) {
             val runners = runnerDao.getRunnersWithResults(RunnerType.IRON.ordinal)
-            val checkpoints = settingsCache.getCheckpointList(RunnerType.IRON)
-            if (checkpoints.isEmpty()) {
+            if (settingsCache.getCheckpointList(RunnerType.IRON).isEmpty()) {
                 settingsCache.checkpointsIronPeople = runnerDao.getCheckpoints(CheckpointType.IRON.ordinal).toCheckpoints()
             }
-            runnersCache.ironRunnersList = runners.toRunners(settingsCache.checkpointsIronPeople).run {
-                sortWith(compareBy<Runner> { it.totalResult }.thenBy { it.isOffTrack }.thenBy { checkpoints.count { it is CheckpointResult }} )
-                this
+            runners.forEach {
+                val runner = it.toRunner(settingsCache.checkpointsIronPeople)
+                runnersCache.ironRunnersList.add(runner)
             }
         }
-        val result =
-            if (onlyFinishers) runnersCache.ironRunnersList.filter { it.totalResult != null && !it.isOffTrack }
-            else runnersCache.ironRunnersList
+        val result = runnersCache.ironRunnersList.run { if (onlyFinishers) filter { it.totalResult != null && !it.isOffTrack } else this }
         return result.let {
             if (initSize != null) {
                 try {
                     it.take(initSize)
                 } catch (e: IllegalArgumentException) {
-                    it
+                    it.toMutableList()
                 }
-            } else it
+            } else it.toMutableList()
         }
     }
 

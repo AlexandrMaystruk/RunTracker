@@ -21,6 +21,11 @@ abstract class BaseFragment(private val layout: Int? = null) : Fragment() {
         injectDependencies()
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        bindViewModel()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -31,7 +36,6 @@ abstract class BaseFragment(private val layout: Int? = null) : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bindViewModel()
         toolbarManager = ToolbarManager(initToolbar(), view).apply { prepareToolbar() }
         initViews()
     }
