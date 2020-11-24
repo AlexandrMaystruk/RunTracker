@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
+import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.login.LoginFragment.Companion.RC_SIGN_IN
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -28,10 +29,10 @@ class LoginViewModel @Inject constructor(
     private val auth = FirebaseAuth.getInstance()
 
     val startAuthFlow: LiveData<AuthState> get() = _startAuthFlowLiveData
-    private val _startAuthFlowLiveData = MutableLiveData<AuthState>()
+    private val _startAuthFlowLiveData = SingleLiveEvent<AuthState>()
 
     val showProgress: LiveData<Boolean> get() = _showProgressLiveData
-    private val _showProgressLiveData = MutableLiveData<Boolean>()
+    private val _showProgressLiveData = SingleLiveEvent<Boolean>()
 
     fun initView() {
         if (auth.currentUser != null) onOperationSuccess()

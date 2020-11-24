@@ -79,18 +79,8 @@
         android:layout_marginTop="@dimen/margin_xs"
         android:layout_marginEnd="@dimen/margin_m"
         android:gravity="end"
-        android:text="Время: 00.05.00"
         app:layout_constraintEnd_toEndOf="@id/view_card"
         app:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
-
-    <ProgressBar
-        android:id="@+id/runnerProgressBar"
-        android:layout_width="@dimen/size_l"
-        android:layout_height="@dimen/size_l"
-        android:layout_marginEnd="@dimen/margin_m"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@+id/view_card"
-        app:layout_constraintTop_toTopOf="@+id/tvRunnersTitle" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRunners"

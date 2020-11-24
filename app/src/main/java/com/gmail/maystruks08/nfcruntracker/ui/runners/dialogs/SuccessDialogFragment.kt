@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.nfcruntracker.ui.runners
+package com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs
 
 import android.app.Dialog
 import android.os.Bundle

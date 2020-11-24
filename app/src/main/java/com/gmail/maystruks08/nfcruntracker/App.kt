@@ -4,6 +4,7 @@ import android.app.Application
 import com.gmail.maystruks08.nfcruntracker.core.di.AppModule
 import com.gmail.maystruks08.nfcruntracker.core.di.BaseComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.DaggerBaseComponent
+import com.gmail.maystruks08.nfcruntracker.core.di.checkpoint_editor.CheckpointEditorComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.host.HostComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.login.LoginComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.register.RegisterNewRunnerComponent
@@ -35,6 +36,14 @@ class App : Application() {
             get() {
                 if (field == null)
                     field = hostComponent?.provideLoginComponent()
+                return field
+            }
+
+
+        var checkpointEditorComponent: CheckpointEditorComponent? = null
+            get() {
+                if (field == null)
+                    field = hostComponent?.provideCheckpointEditorComponent()
                 return field
             }
 
@@ -103,6 +112,10 @@ class App : Application() {
 
         fun clearRegisterNewRunnerComponent() {
             registerNewRunnerComponent = null
+        }
+
+        fun clearCheckpointEditorComponent(){
+            checkpointEditorComponent = null
         }
     }
 

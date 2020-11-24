@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.core.navigation
 
+import com.gmail.maystruks08.nfcruntracker.ui.checkpoint_editor.CheckpointEditorFragment
 import com.gmail.maystruks08.nfcruntracker.ui.login.LoginFragment
 import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.result.RunnerResultFragment
@@ -30,6 +31,15 @@ object Screens {
 
         companion object {
             fun tag() = RunnerResultFragment::class.java.canonicalName ?: ""
+        }
+    }
+
+
+    class CheckpointEditorScreen() : AppScreen() {
+        override fun getFragment() = CheckpointEditorFragment.getInstance()
+
+        companion object {
+            fun tag() = RunnerScreen::class.java.canonicalName ?: ""
         }
     }
 

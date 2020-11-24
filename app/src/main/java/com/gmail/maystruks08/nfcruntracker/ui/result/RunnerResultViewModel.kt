@@ -11,6 +11,7 @@ import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
+import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerResultView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerResultView
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +28,7 @@ class RunnerResultViewModel @Inject constructor(
     val error get() : LiveData<Throwable> = _errorLiveData
 
     private val _runnerResultsLiveData = MutableLiveData<List<RunnerResultView>>()
-    private val _errorLiveData = MutableLiveData<Throwable>()
+    private val _errorLiveData = SingleLiveEvent<Throwable>()
 
     private var type: RunnerType = RunnerType.NORMAL
 

@@ -54,5 +54,11 @@
     <string name="device_offline">Интеренет отключен</string>
     <string name="disable_link_card_mode">Выключить режим привязки карты</string>
     <string name="please_scan_card">"Приложите чип к  NFC сканеру"</string>
+    <string name="user_name_hint">Имя пользователя</string>
+    <string name="password_hint">Пароль</string>
+
+    <string name="signIn">Логин</string>
+    <string name="signUp">Выйти</string>
+    <string name="competition_time">Время: %1$s</string>
 
 </resources>

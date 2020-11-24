@@ -40,6 +40,9 @@
     <item name="dialog_width" format="float" type="dimen">0.9</item>
     <item name="dialog_height" format="float" type="dimen">0.5</item>
 
+    <item name="dialog_width_standard" format="float" type="dimen">1.0</item>
+    <item name="dialog_height_standard" format="float" type="dimen">0.8</item>
+
     <dimen name="runnerItemBigHeight">130dp</dimen>
     <dimen name="runnerItemSmallHeight">95dp</dimen>
 

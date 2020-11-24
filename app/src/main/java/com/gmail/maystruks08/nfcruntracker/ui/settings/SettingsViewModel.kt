@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
+import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.core.bus.StartRunTrackerBus
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.login.LogOutUseCase
@@ -28,9 +29,9 @@ class SettingsViewModel @Inject constructor(
     val start get(): LiveData<Date> = startCommandLiveData
     val changeStartButtonVisibility get(): LiveData<Boolean> = changeStartButtonVisibilityLiveData
 
-    private val configLiveData = MutableLiveData<SettingsRepository.CheckpointsConfig>()
-    private val startCommandLiveData = MutableLiveData<Date>()
-    private val changeStartButtonVisibilityLiveData = MutableLiveData<Boolean>()
+    private val configLiveData = SingleLiveEvent<SettingsRepository.CheckpointsConfig>()
+    private val startCommandLiveData = SingleLiveEvent<Date>()
+    private val changeStartButtonVisibilityLiveData = SingleLiveEvent<Boolean>()
 
 
     private var isFirstStart = true

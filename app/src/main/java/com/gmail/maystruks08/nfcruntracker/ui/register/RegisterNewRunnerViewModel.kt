@@ -10,6 +10,7 @@ import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.interactors.RegisterNewRunnerInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
+import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import kotlinx.coroutines.*
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
@@ -24,9 +25,9 @@ class RegisterNewRunnerViewModel @Inject constructor(
     val addNewTeamMemberItem get() : LiveData<InputDataView> = _addNewTeamMemberItem
     val error get() : LiveData<Throwable> = _errorLiveData
 
-    private val _cardIdLiveData = MutableLiveData<String>()
-    private val _addNewTeamMemberItem = MutableLiveData<InputDataView>()
-    private val _errorLiveData = MutableLiveData<Throwable>()
+    private val _cardIdLiveData = SingleLiveEvent<String>()
+    private val _addNewTeamMemberItem = SingleLiveEvent<InputDataView>()
+    private val _errorLiveData = SingleLiveEvent<Throwable>()
 
     fun onNfcCardScanned(cardId: String) {
         _cardIdLiveData.postValue(cardId)

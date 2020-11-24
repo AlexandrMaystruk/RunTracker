@@ -54,6 +54,12 @@
     <string name="device_offline">Пристрій офлайн</string>
     <string name="disable_link_card_mode">Вимкнути режим прив\'язки карти</string>
     <string name="please_scan_card">"Прикладіть картку до NFC сканера"</string>
+    <string name="user_name_hint">Iм\'я користувача</string>
+    <string name="password_hint">Пароль</string>
+
+    <string name="signIn">Авторизуватись</string>
+    <string name="signUp">Вийти</string>
+    <string name="competition_time">Час: %1$s</string>
 
 
 

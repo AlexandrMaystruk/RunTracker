@@ -1,8 +1,8 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runner
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.gmail.maystruks08.domain.entities.*
+import com.gmail.maystruks08.domain.entities.ResultOfTask
+import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
 import com.gmail.maystruks08.domain.entities.runner.Runner
@@ -10,6 +10,7 @@ import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
+import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +18,9 @@ import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import javax.inject.Inject
 
-enum class AlertType { CONFIRM_OFFTRACK, MARK_RUNNER_AT_CHECKPOINT }
+sealed class AlertType(val position: Int)
+class AlertTypeConfirmOfftrack(position: Int): AlertType(position)
+class AlertTypeMarkRunnerAtCheckpoint(position: Int): AlertType(position)
 
 class RunnerViewModel @Inject constructor(
     private val router: Router,
@@ -29,10 +32,10 @@ class RunnerViewModel @Inject constructor(
     val showSuccessDialog get() = _showSuccessDialogLiveData
     val linkCardModeEnable get() = _linkCardModeEnableLiveData
 
-    private val _runnerLiveData = MutableLiveData<RunnerView>()
-    private val _showAlertDialogLiveData = MutableLiveData<AlertType>()
-    private val _showSuccessDialogLiveData = MutableLiveData<Pair<Checkpoint?, Int>>()
-    private val _linkCardModeEnableLiveData = MutableLiveData(false)
+    private val _runnerLiveData = SingleLiveEvent<RunnerView>()
+    private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
+    private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, Int>>()
+    private val _linkCardModeEnableLiveData = SingleLiveEvent<Boolean>()
 
     fun onShowRunnerClicked(runnerNumber: Int) {
         viewModelScope.launch {
@@ -44,11 +47,10 @@ class RunnerViewModel @Inject constructor(
     }
 
     fun onRunnerOffTrackClicked() {
-        _showAlertDialogLiveData.value = AlertType.CONFIRM_OFFTRACK
+        _showAlertDialogLiveData.value = AlertTypeConfirmOfftrack(0)
     }
 
     fun onRunnerOffTrack() {
-        _showAlertDialogLiveData.value = AlertType.CONFIRM_OFFTRACK
         viewModelScope.launch(Dispatchers.IO) {
             val runnerNumber = runner.value?.number ?: return@launch
             if (isRunnerOfftrack()) return@launch
@@ -82,7 +84,7 @@ class RunnerViewModel @Inject constructor(
         if (linkCardModeEnable.value == true) linkCardModeEnable.value = false
         else {
             if (isRunnerOfftrack() || isRunnerHasResult()) return
-            _showAlertDialogLiveData.value = AlertType.MARK_RUNNER_AT_CHECKPOINT
+            _showAlertDialogLiveData.value = AlertTypeMarkRunnerAtCheckpoint(0)
         }
     }
 

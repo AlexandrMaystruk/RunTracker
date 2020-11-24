@@ -12,7 +12,7 @@ import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
-import com.gmail.maystruks08.nfcruntracker.ui.runners.SuccessDialogFragment
+import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SuccessDialogFragment
 import kotlinx.android.synthetic.main.fragment_runner.*
 
 class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
@@ -99,7 +99,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
         viewModel.showDialog.observe(viewLifecycleOwner, {
             alertDialog?.dismiss()
             when(it){
-                AlertType.CONFIRM_OFFTRACK -> {
+                is AlertTypeConfirmOfftrack -> {
                     val builder = AlertDialog.Builder(requireContext())
                         .setTitle(getString(R.string.attention))
                         .setMessage(getString(R.string.alert_confirm_offtrack_runner))
@@ -112,7 +112,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner) {
                         }
                     alertDialog = builder.show()
                 }
-                AlertType.MARK_RUNNER_AT_CHECKPOINT -> {
+                is AlertTypeMarkRunnerAtCheckpoint -> {
                     val builder = AlertDialog.Builder(requireContext())
                         .setTitle(getString(R.string.attention))
                         .setMessage(getString(R.string.mark_runner_without_card))

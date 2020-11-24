@@ -10,8 +10,10 @@ import com.gmail.maystruks08.nfcruntracker.ui.views.stepview.StepState
 
 fun List<Runner>.toRunnerViews(): MutableList<RunnerView> {
     return mutableListOf<RunnerView>().apply {
-        this@toRunnerViews.forEach {
-            add(it.toRunnerView())
+        val iterator = this@toRunnerViews.iterator()
+        while (iterator.hasNext()) {
+            val item = iterator.next()
+            this.add(item.toRunnerView())
         }
     }
 }

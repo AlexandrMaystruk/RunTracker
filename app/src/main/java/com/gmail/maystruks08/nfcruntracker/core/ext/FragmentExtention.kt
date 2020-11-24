@@ -11,6 +11,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -107,5 +110,17 @@ class FragmentNullableArgumentDelegate<T : Any?> : ReadWriteProperty<Fragment, T
         val args = thisRef.arguments ?: Bundle().also(thisRef::setArguments)
         val key = property.name
         value?.let { args.put(key, it) } ?: args.remove(key)
+    }
+}
+
+inline fun CoroutineScope.startCoroutineTimer(delayMillis: Long = 0, repeatMillis: Long = 0, crossinline action: () -> Unit) = launch {
+    delay(delayMillis)
+    if (repeatMillis > 0) {
+        while (true) {
+            action()
+            delay(repeatMillis)
+        }
+    } else {
+        action()
     }
 }

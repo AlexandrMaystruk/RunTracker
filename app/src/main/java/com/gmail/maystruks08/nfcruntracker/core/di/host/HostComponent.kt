@@ -4,6 +4,7 @@ import com.gmail.maystruks08.nfcruntracker.HostActivity
 import com.gmail.maystruks08.nfcruntracker.core.di.NavigationModule
 import com.gmail.maystruks08.nfcruntracker.core.di.SettingsModule
 import com.gmail.maystruks08.nfcruntracker.core.di.SyncModule
+import com.gmail.maystruks08.nfcruntracker.core.di.checkpoint_editor.CheckpointEditorComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.login.LoginComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.runners.RunnersComponent
 import com.gmail.maystruks08.nfcruntracker.core.di.settings.SettingsComponent
@@ -19,6 +20,8 @@ interface HostComponent {
     fun provideSettingsComponent(): SettingsComponent
 
     fun provideLoginComponent(): LoginComponent
+
+    fun provideCheckpointEditorComponent(): CheckpointEditorComponent
 
     fun inject(activity: HostActivity)
 
