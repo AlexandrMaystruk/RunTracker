@@ -7,14 +7,17 @@ import com.gmail.maystruks08.nfcruntracker.ui.result.RunnerResultFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
 import com.gmail.maystruks08.nfcruntracker.ui.settings.SettingsFragment
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 
+@ObsoleteCoroutinesApi
 object Screens {
 
     class RunnersScreen(private val id: Int) : AppScreen() {
+
         override fun getFragment() = RunnersFragment.getInstance(id)
 
         companion object {
-            fun tag() = RunnersFragment::class.java.canonicalName ?: ""
+            fun tag() = RunnersFragment::class.java.canonicalName.orEmpty()
         }
     }
 
@@ -22,7 +25,7 @@ object Screens {
         override fun getFragment() = RunnerFragment.getInstance(runnerNumber, runnerType)
 
         companion object {
-            fun tag() = RunnerScreen::class.java.canonicalName ?: ""
+            fun tag() = RunnerScreen::class.java.canonicalName.orEmpty()
         }
     }
 
@@ -30,7 +33,7 @@ object Screens {
         override fun getFragment() = RunnerResultFragment()
 
         companion object {
-            fun tag() = RunnerResultFragment::class.java.canonicalName ?: ""
+            fun tag() = RunnerResultFragment::class.java.canonicalName.orEmpty()
         }
     }
 
@@ -39,7 +42,7 @@ object Screens {
         override fun getFragment() = CheckpointEditorFragment.getInstance()
 
         companion object {
-            fun tag() = RunnerScreen::class.java.canonicalName ?: ""
+            fun tag() = RunnerScreen::class.java.canonicalName.orEmpty()
         }
     }
 
@@ -47,7 +50,7 @@ object Screens {
         override fun getFragment() = SettingsFragment()
 
         companion object {
-            fun tag() = SettingsScreen::class.java.canonicalName ?: ""
+            fun tag() = SettingsScreen::class.java.canonicalName.orEmpty()
         }
     }
 
@@ -55,7 +58,7 @@ object Screens {
         override fun getFragment() = LoginFragment.getInstance()
 
         companion object {
-            fun tag() = LoginScreen::class.java.canonicalName ?: ""
+            fun tag() = LoginScreen::class.java.canonicalName.orEmpty()
         }
     }
 
@@ -63,7 +66,7 @@ object Screens {
         override fun getFragment() = RegisterNewRunnerFragment()
 
         companion object {
-            fun tag() = RegisterNewRunnerScreen::class.java.canonicalName ?: ""
+            fun tag() = RegisterNewRunnerScreen::class.java.canonicalName.orEmpty()
         }
     }
 }

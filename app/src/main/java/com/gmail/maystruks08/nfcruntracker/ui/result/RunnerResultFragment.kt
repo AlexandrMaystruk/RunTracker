@@ -1,6 +1,9 @@
 package com.gmail.maystruks08.nfcruntracker.ui.result
 
+import android.os.Bundle
 import android.text.InputType
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.maystruks08.domain.entities.runner.RunnerType
@@ -12,12 +15,12 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
-import kotlinx.android.synthetic.main.fragment_runners_results.*
+import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnersResultsBinding
 
-class RunnerResultFragment : BaseFragment(R.layout.fragment_runners_results) {
+class RunnerResultFragment : BaseFragment() {
 
-    lateinit var viewModel: RunnerResultViewModel
-
+    private lateinit var binding: FragmentRunnersResultsBinding
+    private lateinit var viewModel: RunnerResultViewModel
     private lateinit var resultAdapter: ResultItemsAdapter
 
     override fun injectDependencies() {
@@ -32,6 +35,15 @@ class RunnerResultFragment : BaseFragment(R.layout.fragment_runners_results) {
         .withNavigationIcon(R.drawable.ic_arrow_back) { viewModel.onBackClicked() }
         .withTitle(R.string.screen_runners_results)
         .build()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ) = FragmentRunnersResultsBinding.inflate(inflater, container, false).let {
+        binding = it
+        it.root
+    }
 
     override fun bindViewModel() {
         viewModel.runnerResults.observe(viewLifecycleOwner, { runnersResults ->
@@ -48,23 +60,25 @@ class RunnerResultFragment : BaseFragment(R.layout.fragment_runners_results) {
 
     override fun initViews() {
         resultAdapter = ResultItemsAdapter()
-        runnersResultsRecyclerView.apply {
-            layoutManager = LinearLayoutManager(runnersResultsRecyclerView.context)
-            adapter = resultAdapter
-        }
-
-        navigation.setOnNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.item_runners -> viewModel.provideFinishers(RunnerType.NORMAL)
-                R.id.item_iron_runners -> viewModel.provideFinishers(RunnerType.IRON)
+        with(binding) {
+            runnersResultsRecyclerView.apply {
+                layoutManager = LinearLayoutManager(runnersResultsRecyclerView.context)
+                adapter = resultAdapter
             }
-            return@setOnNavigationItemSelectedListener true
+
+            navigation.setOnNavigationItemSelectedListener {
+                when (it.itemId) {
+                    R.id.item_runners -> viewModel.provideFinishers(RunnerType.NORMAL)
+                    R.id.item_iron_runners -> viewModel.provideFinishers(RunnerType.IRON)
+                }
+                return@setOnNavigationItemSelectedListener true
+            }
+            navigation.selectedItemId = R.id.item_runners
         }
-        navigation.selectedItemId = R.id.item_runners
     }
 
     override fun onDestroyView() {
-        runnersResultsRecyclerView.adapter = null
+        binding.runnersResultsRecyclerView.adapter = null
         super.onDestroyView()
     }
 

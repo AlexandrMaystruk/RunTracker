@@ -2,14 +2,12 @@ package com.gmail.maystruks08.nfcruntracker.core.base
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.DaggerViewModelFactory
 import javax.inject.Inject
 
-abstract class BaseFragment(private val layout: Int? = null) : Fragment() {
+abstract class BaseFragment : Fragment() {
 
     var toolbarManager: ToolbarManager? = null
 
@@ -24,14 +22,6 @@ abstract class BaseFragment(private val layout: Int? = null) : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         bindViewModel()
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layout?.let { inflater.inflate(layout, container, false) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

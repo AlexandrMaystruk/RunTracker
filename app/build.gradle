@@ -24,6 +24,13 @@ android {
             }
         }
     }
+
+    androidExtensions {
+        features = ["parcelize"]
+    }
+    buildFeatures {
+        viewBinding true
+    }
     buildTypes {
         debug {
             minifyEnabled false
@@ -66,10 +73,6 @@ dependencies {
 
     implementation project(':domain')
     api project(':data')
-
-    def paging_version = "3.0.0-alpha09"
-    implementation 'androidx.fragment:fragment-ktx:1.2.5'
-    implementation "androidx.paging:paging-runtime:$paging_version"
 
     implementation presentationDependencies.kotlin
     implementation presentationDependencies.kotlinAnko

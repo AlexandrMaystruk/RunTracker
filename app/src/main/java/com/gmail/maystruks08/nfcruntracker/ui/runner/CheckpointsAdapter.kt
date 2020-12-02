@@ -11,9 +11,9 @@ import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.ext.gone
 import com.gmail.maystruks08.nfcruntracker.core.ext.hide
 import com.gmail.maystruks08.nfcruntracker.core.ext.show
+import com.gmail.maystruks08.nfcruntracker.databinding.ItemCheckpointBinding
 import com.gmail.maystruks08.nfcruntracker.ui.views.stepview.StepState
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
-import kotlinx.android.synthetic.main.item_checkpoint.view.*
 import kotlin.properties.Delegates
 
 class CheckpointsAdapter( private val longClickListener: (Int) -> Unit) : RecyclerView.Adapter<CheckpointsAdapter.ViewHolder>() {
@@ -37,50 +37,54 @@ class CheckpointsAdapter( private val longClickListener: (Int) -> Unit) : Recycl
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+        private val binding = ItemCheckpointBinding.bind(itemView)
+
+
         fun bindHolder(item: CheckpointView, position: Int, longClickListener: (Int) -> Unit) {
-            val stateDrawable = when (item.bean.state) {
-                StepState.UNDONE -> R.drawable.ic_unchecked
-                StepState.DONE -> R.drawable.ic_check_circle
-                StepState.CURRENT -> R.drawable.ic_checked
-                StepState.DONE_WARNING -> R.drawable.ic_check_warning
+            with(binding) {
+                val stateDrawable = when (item.bean.state) {
+                    StepState.UNDONE -> R.drawable.ic_unchecked
+                    StepState.DONE -> R.drawable.ic_check_circle
+                    StepState.CURRENT -> R.drawable.ic_checked
+                    StepState.DONE_WARNING -> R.drawable.ic_check_warning
+                }
+                if (item.bean.state == StepState.CURRENT) ivRunner.show() else ivRunner.hide()
+                when (position) {
+                    0 -> {
+                        topView.gone()
+                        bottomView.show()
+                        tvCheckpointName.text = null
+                        tvCheckpointName.background = ContextCompat.getDrawable(root.context, R.drawable.ic_start)
+                    }
+                    checkpoints.lastIndex -> {
+                        tvCheckpointName.text = null
+                        tvCheckpointName.background = ContextCompat.getDrawable(root.context, R.drawable.ic_finish)
+                        topView.show()
+                        bottomView.gone()
+                    }
+                    else -> {
+                        tvCheckpointName.text = item.bean.title
+                        tvCheckpointName.background = null
+                        topView.show()
+                        bottomView.show()
+                    }
+                }
 
+                ivCheckpointState.background = ContextCompat.getDrawable(root.context, stateDrawable)
+                if (isOffTrack) {
+                    tvCheckpointDate.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+                } else {
+                    tvCheckpointDate.paintFlags = Paint.LINEAR_TEXT_FLAG
+                }
+                if (item.date != null) {
+                    tvCheckpointDate.setOnLongClickListener {
+                        longClickListener.invoke(item.id)
+                        true
+                    }
+                    tvCheckpointDate.show()
+                    tvCheckpointDate.text = item.date?.toDateTimeShortFormat()
+                } else tvCheckpointDate.gone()
             }
-            if (item.bean.state ==  StepState.CURRENT) itemView.ivRunner.show() else itemView.ivRunner.hide()
-            when (position) {
-                0 -> {
-                    itemView.topView.gone()
-                    itemView.bottomView.show()
-                    itemView.tvCheckpointName.text = null
-                    itemView.tvCheckpointName.background = ContextCompat.getDrawable(itemView.context, R.drawable.ic_start)
-                }
-                checkpoints.lastIndex -> {
-                    itemView.tvCheckpointName.text = null
-                    itemView.tvCheckpointName.background = ContextCompat.getDrawable(itemView.context, R.drawable.ic_finish)
-                    itemView.topView.show()
-                    itemView.bottomView.gone()
-                }
-                else -> {
-                    itemView.tvCheckpointName.text = item.bean.title
-                    itemView.tvCheckpointName.background = null
-                    itemView.topView.show()
-                    itemView.bottomView.show()
-                }
-            }
-
-            itemView.ivCheckpointState.background = ContextCompat.getDrawable(itemView.context, stateDrawable)
-            if(isOffTrack){
-                itemView.tvCheckpointDate.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
-            } else {
-                itemView.tvCheckpointDate.paintFlags = Paint.LINEAR_TEXT_FLAG
-            }
-            if(item.date != null){
-                itemView.tvCheckpointDate.setOnLongClickListener {
-                    longClickListener.invoke(item.id)
-                    true
-                }
-                itemView.tvCheckpointDate.show()
-                itemView.tvCheckpointDate.text = item.date?.toDateTimeShortFormat()
-            } else itemView.tvCheckpointDate.gone()
         }
     }
 }

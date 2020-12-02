@@ -2,34 +2,54 @@ package com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs
 
 import android.app.Dialog
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseDialogFragment
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
-import kotlinx.android.synthetic.main.dialog_success.*
+import com.gmail.maystruks08.nfcruntracker.databinding.DialogSuccessBinding
 
 
 class SuccessDialogFragment : BaseDialogFragment() {
 
+    private lateinit var binding: DialogSuccessBinding
+
     private var message: String by argument()
 
-    override val viewResource: Int = R.layout.dialog_success
     override val dialogWidth: Int = R.dimen.dialog_width
     override val dialogHeight: Int = R.dimen.dialog_height
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ) = DialogSuccessBinding.inflate(inflater, container, false)
+        .let { dialogSuccessBinding ->
+            binding = dialogSuccessBinding
+            return@let binding.root
+        }
 
     override fun injectDependencies(): Unit? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
-        dialog.window?.setBackgroundDrawable(ContextCompat.getDrawable(requireContext(), R.color.colorTransparent))
-        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
-        return dialog
+        return super.onCreateDialog(savedInstanceState).apply {
+            window?.setBackgroundDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.color.colorTransparent
+                )
+            )
+            window?.attributes?.windowAnimations = R.style.DialogAnimation
+        }
     }
 
     override fun initViews() {
-        tvAlertText.text = message
-        buttonOk.setOnClickListener { dismiss() }
-        view?.postDelayed({ dismiss() }, 3000L)
+        with(binding) {
+            tvAlertText.text = message
+            buttonOk.setOnClickListener { dismiss() }
+            root.postDelayed({ dismiss() }, 3000L)
+        }
     }
 
     companion object {

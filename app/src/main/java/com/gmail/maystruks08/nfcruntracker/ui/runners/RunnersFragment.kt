@@ -1,8 +1,11 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
 import android.content.Context
+import android.os.Bundle
 import android.text.InputType
+import android.view.LayoutInflater
 import android.view.MenuItem
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -13,7 +16,10 @@ import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
-import com.gmail.maystruks08.nfcruntracker.core.ext.*
+import com.gmail.maystruks08.nfcruntracker.core.ext.argument
+import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
+import com.gmail.maystruks08.nfcruntracker.core.ext.name
+import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnersBinding
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.DistanceAdapter
@@ -21,16 +27,18 @@ import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.RunnerListAdapter
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.SwipeActionHelper
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SelectCheckpointDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SuccessDialogFragment
+import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.DistanceView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
-import kotlinx.android.synthetic.main.fragment_runners.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 
 
 @ObsoleteCoroutinesApi
-class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapter.Interaction {
+class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
+    DistanceAdapter.Interaction {
 
-    lateinit var viewModel: RunnersViewModel
+    private lateinit var binding: FragmentRunnersBinding
+    private lateinit var viewModel: RunnersViewModel
 
     private lateinit var runnerAdapter: RunnerListAdapter
     private lateinit var distanceAdapter: DistanceAdapter
@@ -43,6 +51,16 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
         App.runnersComponent?.inject(this)
         viewModel = injectViewModel(viewModeFactory)
     }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ) = FragmentRunnersBinding.inflate(inflater, container, false)
+        .let { runnersBinding ->
+            binding = runnersBinding
+            return@let runnersBinding.root
+        }
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
@@ -74,51 +92,22 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
 
         viewModel.showConfirmationDialog.observe(viewLifecycleOwner, {
             alertDialog?.dismiss()
-            when(it){
-                is AlertTypeConfirmOfftrack -> {
-                    val builder = AlertDialog.Builder(requireContext())
-                        .setTitle(getString(R.string.attention))
-                        .setMessage(getString(R.string.alert_confirm_offtrack_runner))
-                        .setPositiveButton(android.R.string.yes) { _, _ ->
-                            viewModel.onRunnerOffTrack()
-                            runnerAdapter.notifyItemChanged(it.position)
-                            alertDialog?.dismiss()
-                        }
-                        .setNegativeButton(android.R.string.no) { _, _ ->
-                            runnerAdapter.notifyItemChanged(it.position)
-                            alertDialog?.dismiss()
-                        }
-                    alertDialog = builder.show()
-                }
-                is AlertTypeMarkRunnerAtCheckpoint -> {
-                    val builder = AlertDialog.Builder(requireContext())
-                        .setTitle(getString(R.string.attention))
-                        .setMessage(getString(R.string.mark_runner_without_card))
-                        .setPositiveButton(android.R.string.yes) { _, _ ->
-                            viewModel.markCheckpointAsPassed()
-                            runnerAdapter.notifyItemChanged(it.position)
-                            alertDialog?.dismiss()
-                        }
-                        .setNegativeButton(android.R.string.no) { _, _ ->
-                            runnerAdapter.notifyItemChanged(it.position)
-                            alertDialog?.dismiss()
-                        }
-                    alertDialog = builder.show()
-                }
+            when (it) {
+                is AlertTypeConfirmOfftrack -> showConfirmOffTrackDialog(it.position)
+                is AlertTypeMarkRunnerAtCheckpoint -> showConfirmMarkRunnerAtCheckpointDialog(it.position)
                 else -> Unit
             }
         })
 
-
-        viewModel.showDialog.observe(viewLifecycleOwner, {
+        viewModel.showSuccessDialog.observe(viewLifecycleOwner, {
             val checkpointName = it?.first?.name ?: ""
             val message = getString(R.string.success_message, checkpointName, "#${it.second}")
             SuccessDialogFragment.getInstance(message)
                 .show(childFragmentManager, SuccessDialogFragment.name())
         })
 
-        viewModel.showSelectCheckpointDialog.observe(viewLifecycleOwner, {
-            SelectCheckpointDialogFragment.getInstance(0) {
+        viewModel.showSelectCheckpointDialog.observe(viewLifecycleOwner, { arrayOfCheckpointViews ->
+            SelectCheckpointDialogFragment.getInstance(arrayOfCheckpointViews) {
                 viewModel.onNewCurrentCheckpointSelected(it)
             }.show(childFragmentManager, SelectCheckpointDialogFragment.name())
         })
@@ -128,31 +117,29 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
         })
 
         viewModel.showTime.observe(viewLifecycleOwner, {
-            tvTime.text = getString(R.string.competition_time, it)
+            binding.tvTime.text = getString(R.string.competition_time, it)
         })
     }
 
     @ExperimentalCoroutinesApi
     override fun initViews() {
         runnerAdapter = RunnerListAdapter(this)
-        rvRunners.apply {
-            layoutManager = LinearLayoutManager(rvRunners.context)
+        binding.rvRunners.apply {
+            layoutManager = LinearLayoutManager(binding.rvRunners.context)
             adapter = runnerAdapter
         }
-        distanceAdapter = DistanceAdapter {
-            tvRunnersTitle.text = "Название дистанции"
-            viewModel.changeRunnerType(it.id)
-        }
-        rvDistanceType.apply {
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        distanceAdapter = DistanceAdapter(this)
+        binding.rvDistanceType.apply {
+            layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = distanceAdapter
         }
         viewModel.initFragment(runnerTypeId)
 
-        btnRegisterNewRunner.setOnClickListener {
+        binding.btnRegisterNewRunner.setOnClickListener {
             viewModel.onRegisterNewRunnerClicked()
         }
-        tvCurrentCheckpoint.setOnClickListener {
+        binding.tvCurrentCheckpoint.setOnClickListener {
             viewModel.onCurrentCheckpointTextClicked()
         }
 
@@ -171,11 +158,16 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
                 }
             }
         }
-        ItemTouchHelper(orderSwipeActionHelper).attachToRecyclerView(rvRunners)
+        ItemTouchHelper(orderSwipeActionHelper).attachToRecyclerView(binding.rvRunners)
     }
 
     override fun onItemSelected(item: RunnerView) {
         viewModel.onClickedAtRunner(item.number, item.type)
+    }
+
+    override fun onItemSelected(item: DistanceView) {
+        binding.tvRunnersTitle.text = item.name
+        viewModel.changeRunnerType(item.id)
     }
 
     fun receiveRunnerUpdateFromServer(runnerChange: RunnerChange) {
@@ -188,9 +180,37 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
         viewModel.onNfcCardScanned(cardId)
     }
 
-    override fun onStop() {
-        super.onStop()
-        hideSoftKeyboard(inputManager)
+    private fun showConfirmOffTrackDialog(position: Int) {
+        val builder = AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.attention))
+            .setMessage(getString(R.string.alert_confirm_offtrack_runner))
+            .setPositiveButton(android.R.string.yes) { _, _ ->
+                viewModel.onRunnerOffTrack()
+                runnerAdapter.notifyItemChanged(position)
+                alertDialog?.dismiss()
+            }
+            .setNegativeButton(android.R.string.no) { _, _ ->
+                runnerAdapter.notifyItemChanged(position)
+                alertDialog?.dismiss()
+            }
+        alertDialog = builder.show()
+
+    }
+
+    private fun showConfirmMarkRunnerAtCheckpointDialog(position: Int) {
+        val builder = AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.attention))
+            .setMessage(getString(R.string.mark_runner_without_card))
+            .setPositiveButton(android.R.string.yes) { _, _ ->
+                viewModel.markCheckpointAsPassed()
+                runnerAdapter.notifyItemChanged(position)
+                alertDialog?.dismiss()
+            }
+            .setNegativeButton(android.R.string.no) { _, _ ->
+                runnerAdapter.notifyItemChanged(position)
+                alertDialog?.dismiss()
+            }
+        alertDialog = builder.show()
     }
 
     private fun hideSoftKeyboard(imm: InputMethodManager) {
@@ -202,9 +222,14 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
         requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
 
+    override fun onStop() {
+        super.onStop()
+        hideSoftKeyboard(inputManager)
+    }
+
     override fun onDestroyView() {
         runnerAdapter.interaction = null
-        rvRunners.adapter = null
+        binding.rvRunners.adapter = null
         super.onDestroyView()
     }
 

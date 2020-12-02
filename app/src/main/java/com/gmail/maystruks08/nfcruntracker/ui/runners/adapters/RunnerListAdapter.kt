@@ -8,7 +8,7 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 
 
 class RunnerListAdapter(var interaction: Interaction? = null) :
-    ListAdapter<RunnerView, RunnerViewHolder>(UserDiffCallback) {
+    ListAdapter<RunnerView, RunnerViewHolder>(RunnerDiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RunnerViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_runner, parent, false)

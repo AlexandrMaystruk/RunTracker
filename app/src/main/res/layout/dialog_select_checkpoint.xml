@@ -35,21 +35,18 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_l"
         android:gravity="center"
-        android:text="@string/success"
+        android:text="@string/select_checkpoint"
         android:textColor="@color/colorPrimary"
         android:translationZ="@dimen/transition_m"
         app:layout_constraintEnd_toEndOf="@+id/cornerView"
         app:layout_constraintStart_toStartOf="@+id/cornerView"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
-    <TextView
-        android:id="@+id/tvAlertText"
-        style="@style/TextM"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCheckpoints"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_margin="@dimen/margin_l"
-        android:gravity="center"
-        android:textColor="@color/colorPrimary"
         app:layout_constraintBottom_toTopOf="@+id/buttonOk"
         app:layout_constraintEnd_toEndOf="@+id/cornerView"
         app:layout_constraintStart_toStartOf="@+id/cornerView"

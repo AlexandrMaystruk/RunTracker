@@ -23,10 +23,7 @@ import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertType
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.DistanceView
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerViews
+import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.*
 import kotlinx.coroutines.*
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
@@ -42,7 +39,7 @@ class RunnersViewModel @Inject constructor(
 
     val distance get() = _distanceLiveData
     val runners get() = _runnersLiveData
-    val showDialog get() = _showSuccessDialogLiveData
+    val showSuccessDialog get() = _showSuccessDialogLiveData
     val showConfirmationDialog get() = _showAlertDialogLiveData
     val showProgress get() = _showProgressLiveData
     val showTime get() = _showTimeLiveData
@@ -54,7 +51,7 @@ class RunnersViewModel @Inject constructor(
     private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
     private val _showProgressLiveData = SingleLiveEvent<Boolean>()
     private val _showTimeLiveData = SingleLiveEvent<String>()
-    private val _selectCheckpointDialogLiveData = SingleLiveEvent<Unit>()
+    private val _selectCheckpointDialogLiveData = SingleLiveEvent<Array<CheckpointView>>()
 
     private lateinit var runnerType: RunnerType
     private var lastSelectedRunner: RunnerView? = null
@@ -177,7 +174,7 @@ class RunnersViewModel @Inject constructor(
         _selectCheckpointDialogLiveData.call()
     }
 
-    fun onNewCurrentCheckpointSelected(newCheckpointId: Int) {
+    fun onNewCurrentCheckpointSelected(checkpointView: CheckpointView) {
         //TODO implement
     }
 

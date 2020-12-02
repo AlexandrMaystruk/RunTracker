@@ -1,8 +1,12 @@
 package com.gmail.maystruks08.nfcruntracker.ui.register
 
-import android.text.Editable
-import android.text.TextWatcher
+import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,14 +20,14 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
-import kotlinx.android.synthetic.main.fragment_register_new_runner.*
+import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRegisterNewRunnerBinding
 
 
-class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_runner) {
+class RegisterNewRunnerFragment : BaseFragment() {
 
-    lateinit var viewModel: RegisterNewRunnerViewModel
-
-    lateinit var adapter: RegisterRunnerAdapter
+    private lateinit var binding: FragmentRegisterNewRunnerBinding
+    private lateinit var viewModel: RegisterNewRunnerViewModel
+    private lateinit var adapter: RegisterRunnerAdapter
 
     private var teamName: String? = null
 
@@ -37,6 +41,15 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
         .withNavigationIcon(R.drawable.ic_arrow_back) { viewModel.onBackClicked() }
         .withTitle(R.string.screen_register_new_runner)
         .build()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ) = FragmentRegisterNewRunnerBinding.inflate(inflater, container, false).let {
+        binding = it
+        it.root
+    }
 
     override fun bindViewModel() {
         viewModel.scannedCard.observe(viewLifecycleOwner, {
@@ -64,47 +77,54 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
 
     override fun initViews() {
         adapter = RegisterRunnerAdapter()
-        registerRunnersRecyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = this@RegisterNewRunnerFragment.adapter
+        with(binding){
+            registerRunnersRecyclerView.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = this@RegisterNewRunnerFragment.adapter
+            }
+            btnAddTeamMemberRunner.setOnClickListener {
+                viewModel.onCreateTeamMemberClick()
+            }
+            btnAddNewRunner.setOnClickListener {
+                viewModel.onRegisterNewRunnerClicked(adapter.runnerRegisterData, teamName)
+            }
+            etRunnerTeamName.addTextChangedListener {
+                teamName = it?.toString()
+            }
         }
-
-        btnAddTeamMemberRunner.setOnClickListener {
-            viewModel.onCreateTeamMemberClick()
-        }
-
-        btnAddNewRunner.setOnClickListener {
-            viewModel.onRegisterNewRunnerClicked(adapter.runnerRegisterData, teamName)
-        }
-
-        etRunnerTeamName.addTextChangedListener(object : TextWatcher{
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { teamName = s?.toString() }
-            override fun afterTextChanged(s: Editable?) {}
-        })
         initStaticCardSwipe()
         resolveTeamNameVisibility()
+    }
+
+    private fun hideSoftKeyboard() {
+        val inputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(binding.rootItem.windowToken, 0)
     }
 
     private fun initStaticCardSwipe() {
         val swipeHelper = object : SwipeActionHelper(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
+                val position = viewHolder.bindingAdapterPosition
                 if (direction == ItemTouchHelper.LEFT && adapter.canSwipe()) {
                     adapter.removeInputField(position)
                     resolveTeamNameVisibility()
                 }
             }
         }
-        ItemTouchHelper(swipeHelper).attachToRecyclerView(registerRunnersRecyclerView)
+        ItemTouchHelper(swipeHelper).attachToRecyclerView(binding.registerRunnersRecyclerView)
     }
 
     //This is bad solution, move logic to view model, need to refactor
     private fun resolveTeamNameVisibility() {
-        inputLayout.visibility = if (adapter.runnerRegisterData.size > 1) View.VISIBLE else {
+        binding.inputLayout.visibility = if (adapter.runnerRegisterData.size > 1) View.VISIBLE else {
             teamName = null
             View.GONE
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        hideSoftKeyboard()
     }
 
     override fun clearInjectedComponents() = App.clearRegisterNewRunnerComponent()

@@ -5,8 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.nfcruntracker.R
+import com.gmail.maystruks08.nfcruntracker.databinding.ItemResultBinding
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerResultView
-import kotlinx.android.synthetic.main.item_result.view.*
 import kotlin.properties.Delegates
 
 class ResultItemsAdapter : RecyclerView.Adapter<ResultItemsAdapter.ViewHolder>() {
@@ -28,12 +28,16 @@ class ResultItemsAdapter : RecyclerView.Adapter<ResultItemsAdapter.ViewHolder>()
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+        private val binding = ItemResultBinding.bind(itemView)
+
         fun bindHolder(item: RunnerResultView) {
             val runnerNumberText = "#${item.runnerNumber}"
-            itemView.tvRunnerPosition.text = item.position.toString()
-            itemView.tvRunnerFullName.text = item.runnerFullName
-            itemView.tvRunnerNumber.text = runnerNumberText
-            itemView.tvRunnerResultTime.text = item.runnerResultTime
+            with(binding){
+                tvRunnerPosition.text = item.position.toString()
+                tvRunnerFullName.text = item.runnerFullName
+                tvRunnerNumber.text = runnerNumberText
+                tvRunnerResultTime.text = item.runnerResultTime
+            }
         }
     }
 }

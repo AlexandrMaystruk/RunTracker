@@ -20,10 +20,11 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.core.navigation.AppNavigator
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
+import com.gmail.maystruks08.nfcruntracker.databinding.ActivityHostBinding
 import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
 import com.gmail.maystruks08.nfcruntracker.utils.NfcAdapter
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_host.*
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.commands.Command
@@ -34,6 +35,8 @@ import javax.inject.Inject
 const val PRESS_TWICE_INTERVAL = 2000
 
 class HostActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityHostBinding
 
     @Inject
     lateinit var navigatorHolder: NavigatorHolder
@@ -62,10 +65,12 @@ class HostActivity : AppCompatActivity() {
         }
     }
 
+    @ObsoleteCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         theme.applyStyle(R.style.AppTheme, true)
-        setContentView(R.layout.activity_host)
+        binding = ActivityHostBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         App.hostComponent?.inject(this)
 
         viewModel = injectViewModel(viewModeFactory)
@@ -77,7 +82,7 @@ class HostActivity : AppCompatActivity() {
         networkUtil.subscribeToConnectionChange(this) { isConnected ->
             if (!isConnected) {
                 snackBar = Snackbar.make(
-                    nav_host_container,
+                    binding.navHostContainer,
                     getString(R.string.device_offline),
                     Snackbar.LENGTH_INDEFINITE
                 )
@@ -142,6 +147,7 @@ class HostActivity : AppCompatActivity() {
         } else alertDialog?.dismiss()
     }
 
+    @ObsoleteCoroutinesApi
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         nfcAdapter.processReadCard(intent)?.let { cardId ->

@@ -57,6 +57,9 @@
     <string name="user_name_hint">Iм\'я користувача</string>
     <string name="password_hint">Пароль</string>
 
+    <string name="select_checkpoint">Select checkpoint</string>
+
+
     <string name="signIn">Авторизуватись</string>
     <string name="signUp">Вийти</string>
     <string name="competition_time">Час: %1$s</string>

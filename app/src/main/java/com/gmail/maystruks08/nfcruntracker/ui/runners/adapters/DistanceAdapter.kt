@@ -6,14 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.nfcruntracker.R
+import com.gmail.maystruks08.nfcruntracker.databinding.ItemDistanceBinding
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.DistanceView
-import kotlinx.android.synthetic.main.item_distance.view.*
 import kotlin.properties.Delegates
 
-class DistanceAdapter(private val clickListener: (DistanceView) -> Unit) : RecyclerView.Adapter<DistanceAdapter.ViewHolder>() {
+class DistanceAdapter(private val interaction: Interaction) : RecyclerView.Adapter<DistanceAdapter.ViewHolder>() {
 
     private var selectedPosition = 0
-    private var selectedView: View? = null
+    private var selectedBindingView: ItemDistanceBinding? = null
 
     var items: MutableList<DistanceView> by Delegates.observable(ArrayList()) { _, _, _ ->
         notifyDataSetChanged()
@@ -48,7 +48,7 @@ class DistanceAdapter(private val clickListener: (DistanceView) -> Unit) : Recyc
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_distance, parent, false)
-        return ViewHolder(view)
+        return ViewHolder(view, interaction)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -57,37 +57,43 @@ class DistanceAdapter(private val clickListener: (DistanceView) -> Unit) : Recyc
 
     override fun getItemCount(): Int = items.size
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolder(itemView: View,private val  interaction: Interaction) : RecyclerView.ViewHolder(itemView) {
 
-        init {
-            itemView.setOnClickListener {
-                deselectView()
-                selectView()
-                if (isAdapterPositionCorrect()) clickListener(items[adapterPosition])
-            }
-        }
+        private val binding = ItemDistanceBinding.bind(itemView)
 
         @SuppressLint("SetTextI18n")
         fun bindHolder(runner: DistanceView) {
-            itemView.tvDistanceName.text = runner.name
-            if(selectedPosition == adapterPosition){
-                selectedView = itemView
-                itemView.tvDistanceName.setBackgroundResource(R.drawable.bg_corner_border_selected)
-            } else {
-                itemView.tvDistanceName.setBackgroundResource(R.drawable.bg_corner_border)
+            with(binding){
+                tvDistanceName.text = runner.name
+                if(selectedPosition == bindingAdapterPosition){
+                    selectedBindingView = this
+                    tvDistanceName.setBackgroundResource(R.drawable.bg_corner_border_selected)
+                } else {
+                    tvDistanceName.setBackgroundResource(R.drawable.bg_corner_border)
+                }
+                itemView.setOnClickListener {
+                    deselectView()
+                    selectView()
+                    interaction.onItemSelected(runner)
+                }
             }
         }
 
         private fun selectView(){
             selectedPosition = absoluteAdapterPosition
-            selectedView = itemView
-            itemView.tvDistanceName.setBackgroundResource(R.drawable.bg_corner_border_selected)
+            selectedBindingView = binding
+            binding.tvDistanceName.setBackgroundResource(R.drawable.bg_corner_border_selected)
         }
 
         private fun deselectView(){
-            selectedView?.setBackgroundResource(R.drawable.bg_corner_border)
+            selectedBindingView?.tvDistanceName?.setBackgroundResource(R.drawable.bg_corner_border)
         }
+    }
 
-        private fun isAdapterPositionCorrect(): Boolean = adapterPosition in 0..items.lastIndex
+
+    interface Interaction {
+
+        fun onItemSelected(item: DistanceView)
+
     }
 }

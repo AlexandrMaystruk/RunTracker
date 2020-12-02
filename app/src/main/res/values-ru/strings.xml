@@ -57,6 +57,9 @@
     <string name="user_name_hint">Имя пользователя</string>
     <string name="password_hint">Пароль</string>
 
+    <string name="select_checkpoint">Select checkpoint</string>
+
+
     <string name="signIn">Логин</string>
     <string name="signUp">Выйти</string>
     <string name="competition_time">Время: %1$s</string>
