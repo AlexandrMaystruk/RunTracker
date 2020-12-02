@@ -149,7 +149,7 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
     private fun setUpItemTouchHelper() {
         val orderSwipeActionHelper = object : SwipeActionHelper(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.bindingAdapterPosition
+                val position = viewHolder.adapterPosition
                 val swipedRunner =  runnerAdapter.currentList[position]
                 if (direction == ItemTouchHelper.LEFT) {
                     viewModel.onRunnerSwipedLeft(position, swipedRunner)

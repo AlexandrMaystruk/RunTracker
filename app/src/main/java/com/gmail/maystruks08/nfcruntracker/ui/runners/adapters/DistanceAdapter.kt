@@ -65,7 +65,7 @@ class DistanceAdapter(private val interaction: Interaction) : RecyclerView.Adapt
         fun bindHolder(runner: DistanceView) {
             with(binding){
                 tvDistanceName.text = runner.name
-                if(selectedPosition == bindingAdapterPosition){
+                if(selectedPosition == adapterPosition){
                     selectedBindingView = this
                     tvDistanceName.setBackgroundResource(R.drawable.bg_corner_border_selected)
                 } else {
@@ -80,7 +80,7 @@ class DistanceAdapter(private val interaction: Interaction) : RecyclerView.Adapt
         }
 
         private fun selectView(){
-            selectedPosition = absoluteAdapterPosition
+            selectedPosition = adapterPosition
             selectedBindingView = binding
             binding.tvDistanceName.setBackgroundResource(R.drawable.bg_corner_border_selected)
         }

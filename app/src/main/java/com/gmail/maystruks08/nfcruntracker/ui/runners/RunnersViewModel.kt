@@ -171,7 +171,7 @@ class RunnersViewModel @Inject constructor(
     }
 
     fun onCurrentCheckpointTextClicked() {
-        _selectCheckpointDialogLiveData.call()
+        _selectCheckpointDialogLiveData.postValue(emptyArray())
     }
 
     fun onNewCurrentCheckpointSelected(checkpointView: CheckpointView) {

@@ -104,7 +104,7 @@ class RegisterNewRunnerFragment : BaseFragment() {
     private fun initStaticCardSwipe() {
         val swipeHelper = object : SwipeActionHelper(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.bindingAdapterPosition
+                val position = viewHolder.adapterPosition
                 if (direction == ItemTouchHelper.LEFT && adapter.canSwipe()) {
                     adapter.removeInputField(position)
                     resolveTeamNameVisibility()

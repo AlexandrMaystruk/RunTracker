@@ -18,7 +18,7 @@ class SingleLiveEvent<T> : MutableLiveData<T>() {
         }
 
         // Observe the internal MutableLiveData
-        super.observe(owner, Observer<T> { t ->
+        super.observe(owner, { t ->
             if (pending.compareAndSet(true, false)) {
                 observer.onChanged(t)
             }
@@ -37,9 +37,5 @@ class SingleLiveEvent<T> : MutableLiveData<T>() {
     @MainThread
     fun call() {
         value = null
-    }
-
-    companion object {
-        private const val TAG = "SingleLiveEvent"
     }
 }

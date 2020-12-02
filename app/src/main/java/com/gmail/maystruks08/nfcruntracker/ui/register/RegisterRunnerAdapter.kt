@@ -80,7 +80,7 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
         private val fullName = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                runnerRegisterData[bindingAdapterPosition].fullName = s?.toString()
+                runnerRegisterData[adapterPosition].fullName = s?.toString()
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -89,7 +89,7 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
         private val runnerNumber = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                runnerRegisterData[bindingAdapterPosition].runnerNumber =
+                runnerRegisterData[adapterPosition].runnerNumber =
                     s?.toString()?.toIntOrNull()
             }
             override fun afterTextChanged(s: Editable?) {}
@@ -98,7 +98,7 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
         private val city = object : TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                runnerRegisterData[bindingAdapterPosition].city = s?.toString()
+                runnerRegisterData[adapterPosition].city = s?.toString()
             }
             override fun afterTextChanged(s: Editable?) {}
         }
@@ -106,7 +106,7 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
       private val phone = object : TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                runnerRegisterData[bindingAdapterPosition].phone = s?.toString()
+                runnerRegisterData[adapterPosition].phone = s?.toString()
             }
             override fun afterTextChanged(s: Editable?) {}
         }
@@ -134,7 +134,7 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
                 }
 
                 val focusChange = View.OnFocusChangeListener { _, hasFocus ->
-                    if (hasFocus) onItemViewClick(itemView, bindingAdapterPosition)
+                    if (hasFocus) onItemViewClick(itemView, adapterPosition)
                 }
 
                 etRunnerFullName.onFocusChangeListener = focusChange
@@ -143,13 +143,13 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
                 etRunnerCity.onFocusChangeListener = focusChange
 
                 tvDateOfBirthday.setOnClickListener {
-                    onItemViewClick(itemView, bindingAdapterPosition)
+                    onItemViewClick(itemView, adapterPosition)
                     DatePickerDialog(
                         itemView.context,
                         { _, year, month, dayOfMonth ->
                             calendar.set(year, month, dayOfMonth)
                             tvDateOfBirthday.text = calendar.time.toDateFormat()
-                            runnerRegisterData[bindingAdapterPosition].dateOfBirthday =
+                            runnerRegisterData[adapterPosition].dateOfBirthday =
                                 calendar.time
                         },
                         calendar.get(Calendar.YEAR),
@@ -159,24 +159,24 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
                 }
 
                 radioGroupSex.setOnCheckedChangeListener { _, checkedId ->
-                    onItemViewClick(itemView, bindingAdapterPosition)
+                    onItemViewClick(itemView, adapterPosition)
                     val runnerSex = when (checkedId) {
                         R.id.rbMale -> RunnerSex.MALE
                         R.id.rbFemale -> RunnerSex.FEMALE
                         else -> null
                     }
-                    runnerRegisterData[bindingAdapterPosition].runnerSex = runnerSex
+                    runnerRegisterData[adapterPosition].runnerSex = runnerSex
                 }
                 radioGroupRunnerType.setOnCheckedChangeListener { _, checkedId ->
-                    onItemViewClick(itemView, bindingAdapterPosition)
+                    onItemViewClick(itemView, adapterPosition)
                     val runnerType = when (checkedId) {
                         R.id.rbRunner -> RunnerType.NORMAL
                         R.id.rbIronRunner -> RunnerType.IRON
                         else -> null
                     }
-                    runnerRegisterData[bindingAdapterPosition].runnerType = runnerType
+                    runnerRegisterData[adapterPosition].runnerType = runnerType
                 }
-                rootItem.setOnClickListener { onItemViewClick(itemView, bindingAdapterPosition) }
+                rootItem.setOnClickListener { onItemViewClick(itemView, adapterPosition) }
             }
         }
 
