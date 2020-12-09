@@ -20,6 +20,7 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.core.navigation.AppNavigator
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.databinding.ActivityHostBinding
+import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
 import com.gmail.maystruks08.nfcruntracker.utils.NfcAdapter
@@ -151,6 +152,8 @@ class HostActivity : AppCompatActivity() {
             Timber.log(Log.INFO, "Card scanned: $cardId at ${Date().toDateTimeFormat()}")
             getFragment<RunnersFragment>(Screens.RunnersScreen.tag())?.onNfcCardScanned(cardId)
             getFragment<RunnerFragment>(Screens.RunnerScreen.tag())?.onNfcCardScanned(cardId)
+            getFragment<RegisterNewRunnerFragment>(Screens.RegisterNewRunnerScreen.tag())?.onNfcCardScanned(cardId)
+
         }
     }
 

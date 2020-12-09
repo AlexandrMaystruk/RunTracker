@@ -17,12 +17,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
+import javax.inject.Inject
 
-@ActivityScoped
-class RegisterNewRunnerViewModel @ViewModelInject constructor(
-    private val interactor: RegisterNewRunnerInteractor,
-    private val router: Router
-) : BaseViewModel() {
+class RegisterNewRunnerViewModel @ViewModelInject constructor(private val router: Router) : BaseViewModel() {
+
+    @Inject
+    lateinit var interactor: RegisterNewRunnerInteractor
 
     val scannedCard get() : LiveData<String> = _cardIdLiveData
     val addNewTeamMemberItem get() : LiveData<InputDataView> = _addNewTeamMemberItem

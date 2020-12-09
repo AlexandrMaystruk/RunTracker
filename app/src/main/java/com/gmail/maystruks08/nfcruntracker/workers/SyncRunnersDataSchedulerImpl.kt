@@ -7,8 +7,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class SyncRunnersWorkHelper @Inject constructor(@ApplicationContext context: Context) :
-    SyncRunnersDataScheduler {
+class SyncRunnersDataSchedulerImpl @Inject constructor(@ApplicationContext context: Context) : SyncRunnersDataScheduler {
 
     private val mWorkManager: WorkManager = WorkManager.getInstance(context)
 

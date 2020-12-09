@@ -20,12 +20,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
-import javax.inject.Inject
 
 @ObsoleteCoroutinesApi
 class LoginViewModel @ViewModelInject constructor(
     private val router: Router,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
 ) : BaseViewModel() {
 
     private val auth = FirebaseAuth.getInstance()

@@ -8,16 +8,12 @@ import com.gmail.maystruks08.data.local.dao.CheckpointDAO
 import com.gmail.maystruks08.data.local.dao.RunnerDao
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.data.remote.FirestoreApiImpl
-import com.gmail.maystruks08.data.repository.SettingsRepositoryImpl
 import com.gmail.maystruks08.data.repository.SyncRunnersDataScheduler
 import com.gmail.maystruks08.domain.LogHelper
 import com.gmail.maystruks08.domain.NetworkUtil
-import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.gmail.maystruks08.nfcruntracker.R
-import com.gmail.maystruks08.nfcruntracker.ui.login.LogOutUseCase
-import com.gmail.maystruks08.nfcruntracker.ui.login.LogOutUseCaseImpl
 import com.gmail.maystruks08.nfcruntracker.utils.NetworkUtilImpl
-import com.gmail.maystruks08.nfcruntracker.workers.SyncRunnersWorkHelper
+import com.gmail.maystruks08.nfcruntracker.workers.SyncRunnersDataSchedulerImpl
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -30,9 +26,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import ru.terrakok.cicerone.Cicerone
-import ru.terrakok.cicerone.NavigatorHolder
-import ru.terrakok.cicerone.Router
 import javax.inject.Singleton
 
 @Module
@@ -41,15 +34,7 @@ abstract class AppModule {
 
     @Binds
     @Singleton
-    abstract fun provideLogoutUseCase(logOutUseCase: LogOutUseCaseImpl): LogOutUseCase
-
-    @Binds
-    @Singleton
     abstract fun bindNetworkUtil(impl: NetworkUtilImpl): NetworkUtil
-
-    @Binds
-    @Singleton
-    abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
 
     @Binds
     @Singleton
@@ -57,7 +42,7 @@ abstract class AppModule {
 
     @Binds
     @Singleton
-    abstract fun provideSyncRunnersDataScheduler(syncRunnersWorkHelper: SyncRunnersWorkHelper): SyncRunnersDataScheduler
+    abstract fun provideSyncRunnersDataScheduler(syncRunnersDataSchedulerImpl: SyncRunnersDataSchedulerImpl): SyncRunnersDataScheduler
 
 }
 
@@ -83,8 +68,7 @@ object AuthModule {
     fun provideGoogleSignInClient(
         @ApplicationContext context: Context,
         gso: GoogleSignInOptions
-    ): GoogleSignInClient =
-        GoogleSignIn.getClient(context, gso)
+    ): GoogleSignInClient = GoogleSignIn.getClient(context, gso)
 
     @Provides
     @Singleton
@@ -98,40 +82,19 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun appDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, "run_tracker_db")
-            .fallbackToDestructiveMigration().build()
+        Room.databaseBuilder(context, AppDatabase::class.java, "run_tracker_db").fallbackToDestructiveMigration().build()
 
     @Provides
     @Singleton
-    fun userDao(appDatabase: AppDatabase): RunnerDao = appDatabase.runnerDao()
+    fun runnerDao(appDatabase: AppDatabase): RunnerDao = appDatabase.runnerDao()
 
     @Provides
     @Singleton
-    fun provideCheckpointDao(appDatabase: AppDatabase): CheckpointDAO =
-        appDatabase.checkpointDao()
+    fun provideCheckpointDao(appDatabase: AppDatabase): CheckpointDAO = appDatabase.checkpointDao()
 
     @Provides
     @Singleton
     fun gson(): Gson = Gson()
-}
-
-
-@Module
-@InstallIn(SingletonComponent::class)
-object NavigationModule {
-
-    @Provides
-    @Singleton
-    fun cicerone(): Cicerone<Router> = Cicerone.create()
-
-    @Provides
-    @Singleton
-    fun router(cicerone: Cicerone<Router>): Router = cicerone.router
-
-    @Provides
-    @Singleton
-    fun navigatorHolder(cicerone: Cicerone<Router>): NavigatorHolder = cicerone.navigatorHolder
-
 }
 
 @Module
@@ -144,6 +107,5 @@ object FirebaseModule {
 
     @Provides
     @Singleton
-    fun firestoreApi(firebaseFirestore: FirebaseFirestore): FirestoreApi =
-        FirestoreApiImpl(firebaseFirestore)
+    fun firestoreApi(firebaseFirestore: FirebaseFirestore): FirestoreApi = FirestoreApiImpl(firebaseFirestore)
 }

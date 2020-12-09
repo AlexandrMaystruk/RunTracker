@@ -93,6 +93,10 @@ class RegisterNewRunnerFragment : BaseFragment() {
         resolveTeamNameVisibility()
     }
 
+    fun onNfcCardScanned(cardId: String){
+        viewModel.onNfcCardScanned(cardId)
+    }
+
     private fun hideSoftKeyboard() {
         val inputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(binding.rootItem.windowToken, 0)

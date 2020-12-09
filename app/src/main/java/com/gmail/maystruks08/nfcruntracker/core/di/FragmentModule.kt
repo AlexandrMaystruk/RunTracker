@@ -7,20 +7,28 @@ import com.gmail.maystruks08.domain.repository.RegisterNewRunnersRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
-import dagger.hilt.android.scopes.ActivityScoped
+import dagger.hilt.android.components.FragmentComponent
+import dagger.hilt.android.scopes.FragmentScoped
 
+@InstallIn(FragmentComponent::class)
 @Module
-@InstallIn(ActivityComponent::class)
-abstract class RegisterNewRunnerModule {
+abstract class RegisterFragmentModule {
 
     @Binds
-    @ActivityScoped
+    @FragmentScoped
     abstract fun bindRegisterRunnersRepository(impl: RegisterNewRunnersRepositoryImpl): RegisterNewRunnersRepository
 
     @Binds
-    @ActivityScoped
+    @FragmentScoped
     abstract fun bindRegisterNewRunnerInteractor(impl: RegisterNewRunnerInteractorImpl): RegisterNewRunnerInteractor
 
 }
 
+
+@InstallIn(FragmentComponent::class)
+@Module
+abstract class CheckpointEditorFragmentModule {
+
+    
+
+}
