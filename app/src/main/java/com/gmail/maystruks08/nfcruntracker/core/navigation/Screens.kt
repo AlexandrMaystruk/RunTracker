@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.core.navigation
 
+import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.ui.checkpoint_editor.CheckpointEditorFragment
 import com.gmail.maystruks08.nfcruntracker.ui.login.LoginFragment
 import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
@@ -17,7 +18,7 @@ object Screens {
         override fun getFragment() = RunnersFragment.getInstance(id)
 
         companion object {
-            fun tag() = RunnersFragment::class.java.canonicalName.orEmpty()
+            fun tag() = RunnersFragment.name()
         }
     }
 
@@ -25,7 +26,7 @@ object Screens {
         override fun getFragment() = RunnerFragment.getInstance(runnerNumber, runnerType)
 
         companion object {
-            fun tag() = RunnerScreen::class.java.canonicalName.orEmpty()
+            fun tag() = RunnerScreen.name()
         }
     }
 
@@ -33,7 +34,7 @@ object Screens {
         override fun getFragment() = RunnerResultFragment()
 
         companion object {
-            fun tag() = RunnerResultFragment::class.java.canonicalName.orEmpty()
+            fun tag() = RunnersResultsScreen.name()
         }
     }
 
@@ -42,7 +43,7 @@ object Screens {
         override fun getFragment() = CheckpointEditorFragment.getInstance()
 
         companion object {
-            fun tag() = RunnerScreen::class.java.canonicalName.orEmpty()
+            fun tag() = CheckpointEditorScreen.name()
         }
     }
 
@@ -50,7 +51,7 @@ object Screens {
         override fun getFragment() = SettingsFragment()
 
         companion object {
-            fun tag() = SettingsScreen::class.java.canonicalName.orEmpty()
+            fun tag() = SettingsScreen.name()
         }
     }
 
@@ -58,7 +59,7 @@ object Screens {
         override fun getFragment() = LoginFragment.getInstance()
 
         companion object {
-            fun tag() = LoginScreen::class.java.canonicalName.orEmpty()
+            fun tag() = LoginScreen.name()
         }
     }
 
@@ -66,7 +67,7 @@ object Screens {
         override fun getFragment() = RegisterNewRunnerFragment()
 
         companion object {
-            fun tag() = RegisterNewRunnerScreen::class.java.canonicalName.orEmpty()
+            fun tag() = RegisterNewRunnerScreen.name()
         }
     }
 }

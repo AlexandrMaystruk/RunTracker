@@ -3,10 +3,11 @@ package com.gmail.maystruks08.nfcruntracker.workers
 import android.content.Context
 import androidx.work.*
 import com.gmail.maystruks08.data.repository.SyncRunnersDataScheduler
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class SyncRunnersWorkHelper @Inject constructor(context: Context) :
+class SyncRunnersWorkHelper @Inject constructor(@ApplicationContext context: Context) :
     SyncRunnersDataScheduler {
 
     private val mWorkManager: WorkManager = WorkManager.getInstance(context)

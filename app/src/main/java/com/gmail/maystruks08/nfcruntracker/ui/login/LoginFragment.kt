@@ -6,29 +6,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
-import com.gmail.maystruks08.nfcruntracker.App
+import androidx.fragment.app.viewModels
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
-import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.setVisibility
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentLoginBinding
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import javax.inject.Inject
 
+@ObsoleteCoroutinesApi
+@AndroidEntryPoint
 class LoginFragment : BaseFragment() {
 
+    private val viewModel: LoginViewModel by viewModels()
     private lateinit var binding: FragmentLoginBinding
-    private lateinit var viewModel: LoginViewModel
 
     @Inject
     lateinit var googleSignInClient: GoogleSignInClient
-
-    override fun injectDependencies() {
-        App.loginComponent?.inject(this)
-        viewModel = injectViewModel(viewModeFactory)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -124,8 +122,6 @@ class LoginFragment : BaseFragment() {
             }
         }
     }
-
-    override fun clearInjectedComponents() = App.clearLoginComponent()
 
     companion object {
 

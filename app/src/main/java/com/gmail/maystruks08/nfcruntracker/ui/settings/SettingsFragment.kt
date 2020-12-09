@@ -6,34 +6,33 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.fragment.app.viewModels
 import com.gmail.maystruks08.domain.toDateTimeFormat
-import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
-import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentSettingsBinding
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import java.util.*
 
+@ObsoleteCoroutinesApi
+@AndroidEntryPoint
 class SettingsFragment : BaseFragment() {
 
-    private lateinit var binding: FragmentSettingsBinding
-    private lateinit var viewModel: SettingsViewModel
+    private val viewModel: SettingsViewModel by viewModels()
 
-    override fun injectDependencies() {
-        App.settingsComponent?.inject(this)
-        viewModel = injectViewModel(viewModeFactory)
-    }
+    private lateinit var binding: FragmentSettingsBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ) = FragmentSettingsBinding.inflate(inflater, container, false)
-        .let { runnersBinding ->
-            binding = runnersBinding
-            return@let runnersBinding.root
+        .let {
+            binding = it
+            return@let binding.root
         }
 
     override fun initToolbar() = FragmentToolbar.Builder()
@@ -103,6 +102,4 @@ class SettingsFragment : BaseFragment() {
             }
         }
     }
-
-    override fun clearInjectedComponents() = App.clearSettingsComponent()
 }

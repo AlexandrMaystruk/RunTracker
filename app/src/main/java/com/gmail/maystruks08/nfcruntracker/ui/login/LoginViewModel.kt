@@ -1,10 +1,10 @@
 package com.gmail.maystruks08.nfcruntracker.ui.login
 
 import android.content.Intent
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.gmail.maystruks08.domain.entities.ResultOfTask
+import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
@@ -15,13 +15,15 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import javax.inject.Inject
 
-class LoginViewModel @Inject constructor(
+@ObsoleteCoroutinesApi
+class LoginViewModel @ViewModelInject constructor(
     private val router: Router,
     private val settingsRepository: SettingsRepository
 ) : BaseViewModel() {
@@ -122,20 +124,20 @@ class LoginViewModel @Inject constructor(
     private fun onOperationSuccess() {
         viewModelScope.launch(Dispatchers.IO) {
             when (val resultOfTask = settingsRepository.updateConfig()) {
-                is ResultOfTask.Value -> {
+                is TaskResult.Value -> {
                     when (val task = settingsRepository.getCachedConfig()) {
-                        is ResultOfTask.Value -> withContext(Dispatchers.Main) {
+                        is TaskResult.Value -> withContext(Dispatchers.Main) {
                             _showProgressLiveData.postValue(false)
                             router.newRootScreen(Screens.RunnersScreen(0))
                         }
-                        is ResultOfTask.Error -> {
+                        is TaskResult.Error -> {
                             _showProgressLiveData.postValue(false)
                             Timber.e(task.error)
                             withContext(Dispatchers.Main) { router.newRootScreen(Screens.RunnersScreen(0)) }
                         }
                     }
                 }
-                is ResultOfTask.Error -> {
+                is TaskResult.Error -> {
                     _showProgressLiveData.postValue(false)
                     Timber.e(resultOfTask.error)
                     withContext(Dispatchers.Main) { router.newRootScreen(Screens.RunnersScreen(0)) }

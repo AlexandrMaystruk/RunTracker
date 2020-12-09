@@ -7,31 +7,29 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
-import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnerBinding
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SuccessDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class RunnerFragment : BaseFragment() {
 
+    private val viewModel: RunnerViewModel by viewModels()
+
     private lateinit var binding: FragmentRunnerBinding
-    private lateinit var viewModel: RunnerViewModel
     private lateinit var checkpointsAdapter: CheckpointsAdapter
 
     private var alertDialog: AlertDialog? = null
     private var runnerNumber: Int by argument()
     private var runnerType: Int by argument()
 
-    override fun injectDependencies() {
-        App.runnerComponent?.inject(this)
-        viewModel = injectViewModel(viewModeFactory)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -165,6 +163,10 @@ class RunnerFragment : BaseFragment() {
         }
     }
 
+    fun onNfcCardScanned(cardId: String) {
+        viewModel.onNfcCardScanned(cardId)
+    }
+
     private fun onCheckpointDateLongClicked(checkpointId: Int) {
         val builder = AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.attention))
@@ -186,7 +188,6 @@ class RunnerFragment : BaseFragment() {
         super.onDestroyView()
     }
 
-    override fun clearInjectedComponents() =  App.clearRunnerComponent()
 
     companion object {
 

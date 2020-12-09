@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,27 +15,23 @@ import com.gmail.maystruks08.domain.exception.EmptyRegistrationRunnerDataExcepti
 import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
-import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
-import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRegisterNewRunnerBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class RegisterNewRunnerFragment : BaseFragment() {
 
+    private val viewModel: RegisterNewRunnerViewModel by viewModels()
+
     private lateinit var binding: FragmentRegisterNewRunnerBinding
-    private lateinit var viewModel: RegisterNewRunnerViewModel
     private lateinit var adapter: RegisterRunnerAdapter
 
     private var teamName: String? = null
 
-    override fun injectDependencies() {
-        App.registerNewRunnerComponent?.inject(this)
-        viewModel = injectViewModel(viewModeFactory)
-    }
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
@@ -126,7 +123,5 @@ class RegisterNewRunnerFragment : BaseFragment() {
         super.onPause()
         hideSoftKeyboard()
     }
-
-    override fun clearInjectedComponents() = App.clearRegisterNewRunnerComponent()
 
 }

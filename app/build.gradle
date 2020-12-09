@@ -1,7 +1,9 @@
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'kotlin-kapt'
+
 
 android {
     def globalConfiguration = rootProject.ext
@@ -16,18 +18,8 @@ android {
 
         testInstrumentationRunner globalConfiguration["testInstrumentationRunner"]
         vectorDrawables.useSupportLibrary = true
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments << ["dagger.gradle.incremental": "true"]
-                arguments = ["room.incremental":"true"]
-            }
-        }
     }
 
-    androidExtensions {
-        features = ["parcelize"]
-    }
     buildFeatures {
         viewBinding true
     }
@@ -50,7 +42,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
     preBuild.doLast {
@@ -74,23 +66,23 @@ dependencies {
     implementation project(':domain')
     api project(':data')
 
-    def fragment_version = "1.2.5"
-    implementation "androidx.fragment:fragment-ktx:$fragment_version"
-
     implementation presentationDependencies.kotlin
-    implementation presentationDependencies.kotlinAnko
     implementation presentationDependencies.kotlinKtx
 
     implementation presentationDependencies.lifecycleExtensions
     implementation presentationDependencies.lifecycleLivedata
     implementation presentationDependencies.lifecycleViewmodel
-    implementation presentationDependencies.dagger
+
+    implementation presentationDependencies.fragmentX
+    implementation presentationDependencies.daggerHiltAndroid
+    implementation presentationDependencies.daggerHiltWorker
+    implementation presentationDependencies.daggerHiltLifecycle
+    kapt presentationDependencies.daggerHiltCompiler
+    kapt presentationDependencies.daggerHiltAndroidCompiler
+
     implementation presentationDependencies.cicerone
     implementation presentationDependencies.numberPicker
     implementation presentationDependencies.timber
-
-
-    kapt presentationDependencies.daggerCompiler
 
     implementation presentationDependencies.supportAndroid
     implementation presentationDependencies.supportAppCompat
@@ -106,4 +98,8 @@ dependencies {
 
     androidTestImplementation presentationTestDependencies.espresso
     androidTestImplementation presentationTestDependencies.testingSupportLib
+}
+
+kapt {
+    correctErrorTypes true
 }

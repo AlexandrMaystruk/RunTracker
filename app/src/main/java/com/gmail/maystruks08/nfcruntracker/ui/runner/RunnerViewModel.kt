@@ -1,8 +1,9 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runner
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
-import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.entities.RunnerChange
+import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
 import com.gmail.maystruks08.domain.entities.runner.Runner
@@ -16,13 +17,12 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
-import javax.inject.Inject
 
 sealed class AlertType(val position: Int)
 class AlertTypeConfirmOfftrack(position: Int): AlertType(position)
 class AlertTypeMarkRunnerAtCheckpoint(position: Int): AlertType(position)
 
-class RunnerViewModel @Inject constructor(
+class RunnerViewModel @ViewModelInject constructor(
     private val router: Router,
     private val runnersInteractor: RunnersInteractor
 ) : BaseViewModel() {
@@ -40,8 +40,8 @@ class RunnerViewModel @Inject constructor(
     fun onShowRunnerClicked(runnerNumber: Int) {
         viewModelScope.launch {
             when (val onResult = runnersInteractor.getRunner(runnerNumber)) {
-                is ResultOfTask.Value -> handleRunnerData(onResult.value)
-                is ResultOfTask.Error -> handleError(onResult.error)
+                is TaskResult.Value -> handleRunnerData(onResult.value)
+                is TaskResult.Error -> handleError(onResult.error)
             }
         }
     }
@@ -55,8 +55,8 @@ class RunnerViewModel @Inject constructor(
             val runnerNumber = runner.value?.number ?: return@launch
             if (isRunnerOfftrack()) return@launch
             when (val onResult = runnersInteractor.markRunnerGotOffTheRoute(runnerNumber)) {
-                is ResultOfTask.Value -> handleRunnerData(onResult.value.runner)
-                is ResultOfTask.Error -> handleError(onResult.error)
+                is TaskResult.Value -> handleRunnerData(onResult.value.runner)
+                is TaskResult.Error -> handleError(onResult.error)
             }
         }
     }
@@ -65,17 +65,18 @@ class RunnerViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (isRunnerOfftrack() || isRunnerHasResult()) return@launch
             when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(runnerNumber)) {
-                is ResultOfTask.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
-                is ResultOfTask.Error -> handleError(onResult.error)
+                is TaskResult.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
+                is TaskResult.Error -> handleError(onResult.error)
             }
         }
     }
 
     fun deleteCheckpointFromRunner(runnerNumber: Int, checkpointId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val onResult = runnersInteractor.removeCheckpointForRunner(runnerNumber, checkpointId)) {
-                is ResultOfTask.Value -> handleRunnerData(onResult.value.runner)
-                is ResultOfTask.Error -> handleError(onResult.error)
+            when (val onResult =
+                runnersInteractor.removeCheckpointForRunner(runnerNumber, checkpointId)) {
+                is TaskResult.Value -> handleRunnerData(onResult.value.runner)
+                is TaskResult.Error -> handleError(onResult.error)
             }
         }
     }
@@ -97,12 +98,12 @@ class RunnerViewModel @Inject constructor(
             _runnerLiveData.value?.let {
                 viewModelScope.launch(Dispatchers.IO) {
                     when (val onResult = runnersInteractor.changeRunnerCardId(it.number, cardId)) {
-                        is ResultOfTask.Value -> {
+                        is TaskResult.Value -> {
                             handleRunnerData(onResult.value.runner)
                             toastLiveData.postValue("Карта успешно изменена")
                             linkCardModeEnable.postValue(false)
                         }
-                        is ResultOfTask.Error -> handleError(onResult.error)
+                        is TaskResult.Error -> handleError(onResult.error)
                     }
                 }
             }

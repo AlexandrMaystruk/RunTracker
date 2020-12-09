@@ -1,16 +1,18 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.Change
-import com.gmail.maystruks08.domain.entities.ResultOfTask
 import com.gmail.maystruks08.domain.entities.RunnerChange
+import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
 import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
+import com.gmail.maystruks08.domain.interactors.CheckpointInteractor
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.domain.toTimeFormat
@@ -24,15 +26,17 @@ import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertType
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import java.util.*
-import javax.inject.Inject
 
 @ObsoleteCoroutinesApi
-class RunnersViewModel @Inject constructor(
+class RunnersViewModel @ViewModelInject constructor(
     private val runnersInteractor: RunnersInteractor,
+    private val checkpointInteractor: CheckpointInteractor,
     private val router: Router,
     private val startRunTrackerBus: StartRunTrackerBus
 ) : BaseViewModel() {
@@ -78,8 +82,8 @@ class RunnersViewModel @Inject constructor(
     fun onNfcCardScanned(cardId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(cardId)) {
-                is ResultOfTask.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
-                is ResultOfTask.Error -> handleError(onResult.error)
+                is TaskResult.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
+                is TaskResult.Error -> handleError(onResult.error)
             }
         }
     }
@@ -99,8 +103,8 @@ class RunnersViewModel @Inject constructor(
             val runnerNumber = lastSelectedRunner?.number ?: return@launch
             if (lastSelectedRunner?.isOffTrack == true) return@launch
             when (val onResult = runnersInteractor.markRunnerGotOffTheRoute(runnerNumber)) {
-                is ResultOfTask.Value -> handleRunnerChanges(onResult.value)
-                is ResultOfTask.Error -> handleError(onResult.error)
+                is TaskResult.Value -> handleRunnerChanges(onResult.value)
+                is TaskResult.Error -> handleError(onResult.error)
             }
             lastSelectedRunner = null
         }
@@ -109,9 +113,10 @@ class RunnersViewModel @Inject constructor(
     fun markCheckpointAsPassed() {
         viewModelScope.launch(Dispatchers.IO) {
             if (isRunnerOfftrack() || isRunnerHasResult()) return@launch
-            when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(lastSelectedRunner?.number?:-1)) {
-                is ResultOfTask.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
-                is ResultOfTask.Error -> handleError(onResult.error)
+            when (val onResult =
+                runnersInteractor.addCurrentCheckpointToRunner(lastSelectedRunner?.number ?: -1)) {
+                is TaskResult.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
+                is TaskResult.Error -> handleError(onResult.error)
             }
             lastSelectedRunner = null
         }
@@ -139,13 +144,18 @@ class RunnersViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (query.isNotEmpty()) {
                 when (val result = runnersInteractor.getRunners(runnerType)) {
-                    is ResultOfTask.Value -> {
-                        val pattern = ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
-                        val runners = result.value.filter { pattern.containsMatchIn(it.number.toString().toLowerCase()) }
+                    is TaskResult.Value -> {
+                        val pattern =
+                            ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
+                        val runners = result.value.filter {
+                            pattern.containsMatchIn(
+                                it.number.toString().toLowerCase()
+                            )
+                        }
                         val runnerViews = runners.map { it.toRunnerView() }.toMutableList()
                         _runnersLiveData.postValue(runnerViews)
                     }
-                    is ResultOfTask.Error -> handleError(result.error)
+                    is TaskResult.Error -> handleError(result.error)
                 }
             } else {
                 Timber.w("showAllRunners  onSearchQueryChanged")
@@ -171,18 +181,28 @@ class RunnersViewModel @Inject constructor(
     }
 
     fun onCurrentCheckpointTextClicked() {
-        _selectCheckpointDialogLiveData.postValue(emptyArray())
+        viewModelScope.launch(Dispatchers.IO) {
+            val hardcodeDistanceId = 0L
+            when (val result = checkpointInteractor.getCheckpoints(hardcodeDistanceId)) {
+                is TaskResult.Value -> {
+                    val checkpoints = result.value.map { it.toCheckpointView() }.toTypedArray()
+                    _selectCheckpointDialogLiveData.postValue(checkpoints)
+                }
+                is TaskResult.Error -> handleError(result.error)
+            }
+        }
     }
 
     fun onNewCurrentCheckpointSelected(checkpointView: CheckpointView) {
+        checkpointView.bean
         //TODO implement
     }
 
     private fun onRunningStart(date: Date) {
         viewModelScope.launch(Dispatchers.IO) {
             when (val onResult = runnersInteractor.addStartCheckpointToRunners(date)) {
-                is ResultOfTask.Value -> viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
-                is ResultOfTask.Error -> Timber.e(onResult.error)
+                is TaskResult.Value -> viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
+                is TaskResult.Error -> Timber.e(onResult.error)
             }
         }
     }
@@ -197,12 +217,12 @@ class RunnersViewModel @Inject constructor(
         _showProgressLiveData.postValue(true)
         showSmallInitRunners()
         when (val result = runnersInteractor.getRunners(runnerType, null)) {
-            is ResultOfTask.Value -> {
+            is TaskResult.Value -> {
                 Timber.w("showAllRunners")
                 val runners = toRunnerViews(result.value)
                 _runnersLiveData.postValue(runners)
             }
-            is ResultOfTask.Error -> handleError(result.error)
+            is TaskResult.Error -> handleError(result.error)
         }
         _showProgressLiveData.postValue(false)
 
@@ -211,12 +231,12 @@ class RunnersViewModel @Inject constructor(
 
     private suspend fun showSmallInitRunners() {
         when (val result = runnersInteractor.getRunners(runnerType, 20)) {
-            is ResultOfTask.Value -> {
+            is TaskResult.Value -> {
                 Timber.w("showAllRunners  showSmallInitRunners")
                 val runners = toRunnerViews(result.value)
                 _runnersLiveData.postValue(runners)
             }
-            is ResultOfTask.Error -> handleError(result.error)
+            is TaskResult.Error -> handleError(result.error)
         }
         _showProgressLiveData.postValue(false)
     }

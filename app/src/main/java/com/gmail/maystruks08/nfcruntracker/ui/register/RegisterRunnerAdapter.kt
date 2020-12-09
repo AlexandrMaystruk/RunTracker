@@ -134,7 +134,7 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
                 }
 
                 val focusChange = View.OnFocusChangeListener { _, hasFocus ->
-                    if (hasFocus) onItemViewClick(itemView, adapterPosition)
+                    if (hasFocus) onItemViewClick(adapterPosition)
                 }
 
                 etRunnerFullName.onFocusChangeListener = focusChange
@@ -143,7 +143,7 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
                 etRunnerCity.onFocusChangeListener = focusChange
 
                 tvDateOfBirthday.setOnClickListener {
-                    onItemViewClick(itemView, adapterPosition)
+                    onItemViewClick(adapterPosition)
                     DatePickerDialog(
                         itemView.context,
                         { _, year, month, dayOfMonth ->
@@ -159,7 +159,7 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
                 }
 
                 radioGroupSex.setOnCheckedChangeListener { _, checkedId ->
-                    onItemViewClick(itemView, adapterPosition)
+                    onItemViewClick(adapterPosition)
                     val runnerSex = when (checkedId) {
                         R.id.rbMale -> RunnerSex.MALE
                         R.id.rbFemale -> RunnerSex.FEMALE
@@ -168,7 +168,7 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
                     runnerRegisterData[adapterPosition].runnerSex = runnerSex
                 }
                 radioGroupRunnerType.setOnCheckedChangeListener { _, checkedId ->
-                    onItemViewClick(itemView, adapterPosition)
+                    onItemViewClick(adapterPosition)
                     val runnerType = when (checkedId) {
                         R.id.rbRunner -> RunnerType.NORMAL
                         R.id.rbIronRunner -> RunnerType.IRON
@@ -176,11 +176,11 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
                     }
                     runnerRegisterData[adapterPosition].runnerType = runnerType
                 }
-                rootItem.setOnClickListener { onItemViewClick(itemView, adapterPosition) }
+                rootItem.setOnClickListener { onItemViewClick(adapterPosition) }
             }
         }
 
-        private fun onItemViewClick(view: View, position: Int) {
+        private fun onItemViewClick(position: Int) {
             //deselect previous view
             selectedViewBinding?.let { selectView(it, false) }
             //select new view

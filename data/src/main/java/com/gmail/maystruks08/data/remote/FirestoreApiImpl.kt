@@ -6,12 +6,15 @@ import com.gmail.maystruks08.data.mappers.toFirestoreCheckpoint
 import com.gmail.maystruks08.data.mappers.toFirestoreRunner
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.domain.entities.Change
+import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.runner.Runner
-import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -102,8 +105,7 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
     override suspend fun subscribeToRunnerDataRealtimeUpdates(): Flow<List<RunnerChange>>{
         return channelFlow<List<RunnerChange>> {
             val eventDocument = db.collection(RUNNER_COLLECTION)
-            // 1) Register callback to the API
-            val subscription = eventDocument.addSnapshotListener { snapshots, e ->
+            val subscription = eventDocument.addSnapshotListener { snapshots, _ ->
                 Timber.i("Snapshot size = ${snapshots?.documentChanges?.size}")
                 snapshots?.documentChanges?.map { doc ->
                     val changeType = when (doc.type) {
@@ -111,15 +113,12 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
                         DocumentChange.Type.MODIFIED -> Change.UPDATE
                         DocumentChange.Type.REMOVED -> Change.REMOVE
                     }
-                    RunnerChange(doc.document.toObject(RunnerPojo::class.java).fromFirestoreRunner(), changeType)
-                }?.let{
-                    // 2) Send items to the Flow
-                    channel.offer(it)
-                }
+                    RunnerChange(
+                        doc.document.toObject(RunnerPojo::class.java).fromFirestoreRunner(),
+                        changeType
+                    )
+                }?.let { channel.offer(it) }
             }
-            // 3) Don't close the stream of data, keep it open until the consumer
-            // stops listening or the API calls onCompleted or onError.
-            // When that happens, cancel the subscription to the 3P library
             awaitClose {
                 subscription.remove()
                 Timber.e("Chanel closed")

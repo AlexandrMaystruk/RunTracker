@@ -1,9 +1,10 @@
 package com.gmail.maystruks08.nfcruntracker.ui.result
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.gmail.maystruks08.domain.entities.ResultOfTask
+import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
@@ -17,9 +18,8 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerResultView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
-import javax.inject.Inject
 
-class RunnerResultViewModel @Inject constructor(
+class RunnerResultViewModel @ViewModelInject constructor(
     private val router: Router,
     private val interactor: RunnersInteractor
 ) : BaseViewModel() {
@@ -36,12 +36,12 @@ class RunnerResultViewModel @Inject constructor(
         this.type = type
         viewModelScope.launch(Dispatchers.IO) {
             when (val onResult = interactor.getFinishers(type)) {
-                is ResultOfTask.Value -> {
+                is TaskResult.Value -> {
                     val sortedResultList = onResult.value
                         .mapIndexed { index: Int, runner: Runner -> runner.toRunnerResultView(index + 1) }
                     _runnerResultsLiveData.postValue(sortedResultList)
                 }
-                is ResultOfTask.Error -> handleError(onResult.error)
+                is TaskResult.Error -> handleError(onResult.error)
             }
         }
     }
@@ -60,7 +60,7 @@ class RunnerResultViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (query.isNotEmpty()) {
                 when (val result = interactor.getFinishers(type)) {
-                    is ResultOfTask.Value -> {
+                    is TaskResult.Value -> {
                         val pattern = ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
                         val filteredList = result.value
                             .filter { pattern.containsMatchIn(it.number.toString().toLowerCase()) }
@@ -69,7 +69,7 @@ class RunnerResultViewModel @Inject constructor(
                             }
                         _runnerResultsLiveData.postValue(filteredList)
                     }
-                    is ResultOfTask.Error -> handleError(result.error)
+                    is TaskResult.Error -> handleError(result.error)
                 }
             } else provideFinishers(type)
         }

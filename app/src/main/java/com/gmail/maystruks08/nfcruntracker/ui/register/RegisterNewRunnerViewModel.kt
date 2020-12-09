@@ -1,9 +1,9 @@
 package com.gmail.maystruks08.nfcruntracker.ui.register
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.gmail.maystruks08.domain.entities.ResultOfTask
+import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.exception.EmptyRegistrationRunnerDataException
 import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
@@ -11,12 +11,15 @@ import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.interactors.RegisterNewRunnerInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
-import kotlinx.coroutines.*
+import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
-import javax.inject.Inject
 
-class RegisterNewRunnerViewModel @Inject constructor(
+@ActivityScoped
+class RegisterNewRunnerViewModel @ViewModelInject constructor(
     private val interactor: RegisterNewRunnerInteractor,
     private val router: Router
 ) : BaseViewModel() {
@@ -44,10 +47,10 @@ class RegisterNewRunnerViewModel @Inject constructor(
         } else {
             viewModelScope.launch(Dispatchers.IO) {
                 val inputData = runnerRegisterData.map {
-                    val shortName = if(it.fullName?.contains(" ".toRegex()) == true){
+                    val shortName = if (it.fullName?.contains(" ".toRegex()) == true) {
                         it.shortName ?: it.fullName?.substring(0, it.fullName!!.indexOf(" ")) ?: ""
                     } else {
-                        it.shortName ?: it.fullName?: ""
+                        it.shortName ?: it.fullName ?: ""
                     }
                     RegisterNewRunnerInteractor.RegisterInputData(
                         fullName = it.fullName!!,
@@ -63,8 +66,8 @@ class RegisterNewRunnerViewModel @Inject constructor(
                     )
                 }
                 when (val result = interactor.registerNewRunners(inputData)) {
-                    is ResultOfTask.Value -> withContext(Dispatchers.Main) { onBackClicked() }
-                    is ResultOfTask.Error -> handleError(result.error)
+                    is TaskResult.Value -> withContext(Dispatchers.Main) { onBackClicked() }
+                    is TaskResult.Error -> handleError(result.error)
                 }
             }
         }

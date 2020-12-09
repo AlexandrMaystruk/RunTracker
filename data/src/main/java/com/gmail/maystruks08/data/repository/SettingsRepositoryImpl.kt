@@ -12,7 +12,7 @@ import com.gmail.maystruks08.data.toDataClass
 import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.entities.DistanceSettings
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointType
-import com.gmail.maystruks08.domain.entities.ResultOfTask
+import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
@@ -31,8 +31,8 @@ class SettingsRepositoryImpl @Inject constructor(
     private val networkUtil: NetworkUtil
 ) : SettingsRepository {
 
-    override suspend fun updateConfig(): ResultOfTask<Exception, Unit> {
-        return ResultOfTask.build {
+    override suspend fun updateConfig(): TaskResult<Exception, Unit> {
+        return TaskResult.build {
             if (networkUtil.isOnline()) {
                 val checkpointsSnapshot = awaitTaskResult(firestoreApi.getCheckpoints())
                 checkpointsSnapshot.data?.toDataClass<HashMap<String, CheckpointPojo>?>()
@@ -62,8 +62,8 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCachedConfig(): ResultOfTask<Exception, SettingsRepository.CheckpointsConfig> {
-        return ResultOfTask.build {
+    override suspend fun getCachedConfig(): TaskResult<Exception, SettingsRepository.CheckpointsConfig> {
+        return TaskResult.build {
             val currentCheckpointId = preferences.getCurrentCheckpoint()
             val currentIronPeopleCheckpointId = preferences.getCurrentIronPeopleCheckpoint()
             val startDate = Date(preferences.getDateOfStart())
@@ -140,11 +140,11 @@ class SettingsRepositoryImpl @Inject constructor(
         return settingsCache.adminUserIds
     }
 
-    override suspend fun getRaceList(): ResultOfTask<Exception, List<DistanceSettings>> {
-        return ResultOfTask.build { throw IllegalStateException() }
+    override suspend fun getRaceList(): TaskResult<Exception, List<DistanceSettings>> {
+        return TaskResult.build { throw IllegalStateException() }
     }
 
-    override suspend fun getRaceCheckpoints(raceId: String): ResultOfTask<Exception, DistanceSettings> {
-        return ResultOfTask.build { throw IllegalStateException() }
+    override suspend fun getRaceCheckpoints(raceId: String): TaskResult<Exception, DistanceSettings> {
+        return TaskResult.build { throw IllegalStateException() }
     }
 }

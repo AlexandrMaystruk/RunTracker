@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -10,15 +11,16 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-class HostViewModel @Inject constructor(
+@ObsoleteCoroutinesApi
+class HostViewModel @ViewModelInject constructor(
     firebaseAuth: FirebaseAuth,
     private val router: Router,
     private val syncDataScheduler: SyncRunnersDataScheduler,

@@ -1,6 +1,5 @@
 package com.gmail.maystruks08.nfcruntracker.core.base
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
@@ -13,14 +12,7 @@ abstract class BaseDialogFragment : DialogFragment() {
     protected abstract val dialogWidth: Int
     protected abstract val dialogHeight: Int
 
-    protected abstract fun injectDependencies(): Unit?
-
     protected abstract fun initViews(): Unit?
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        injectDependencies()
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

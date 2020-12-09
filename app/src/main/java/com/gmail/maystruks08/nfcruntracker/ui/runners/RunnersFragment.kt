@@ -8,16 +8,15 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.domain.entities.RunnerChange
-import com.gmail.maystruks08.nfcruntracker.App
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
-import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnersBinding
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
@@ -29,28 +28,25 @@ import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SelectCheckpointDi
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SuccessDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.DistanceView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 
 
 @ObsoleteCoroutinesApi
+@AndroidEntryPoint
 class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
     DistanceAdapter.Interaction {
 
-    private lateinit var binding: FragmentRunnersBinding
-    private lateinit var viewModel: RunnersViewModel
+    private val viewModel: RunnersViewModel by viewModels()
 
+    private lateinit var binding: FragmentRunnersBinding
     private lateinit var runnerAdapter: RunnerListAdapter
     private lateinit var distanceAdapter: DistanceAdapter
 
     private var alertDialog: AlertDialog? = null
 
     private var runnerTypeId: Int by argument()
-
-    override fun injectDependencies() {
-        App.runnersComponent?.inject(this)
-        viewModel = injectViewModel(viewModeFactory)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -90,14 +86,14 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
             runnerAdapter.submitList(it)
         })
 
-        viewModel.showConfirmationDialog.observe(viewLifecycleOwner, {
+        viewModel.showConfirmationDialog.observe(viewLifecycleOwner) {
             alertDialog?.dismiss()
             when (it) {
                 is AlertTypeConfirmOfftrack -> showConfirmOffTrackDialog(it.position)
                 is AlertTypeMarkRunnerAtCheckpoint -> showConfirmMarkRunnerAtCheckpointDialog(it.position)
                 else -> Unit
             }
-        })
+        }
 
         viewModel.showSuccessDialog.observe(viewLifecycleOwner, {
             val checkpointName = it?.first?.name ?: ""
@@ -232,8 +228,6 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
         binding.rvRunners.adapter = null
         super.onDestroyView()
     }
-
-    override fun clearInjectedComponents() = App.clearRunnersComponent()
 
     companion object {
 

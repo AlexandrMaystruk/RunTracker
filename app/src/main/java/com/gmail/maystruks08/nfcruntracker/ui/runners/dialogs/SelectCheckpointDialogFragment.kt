@@ -19,16 +19,16 @@ class SelectCheckpointDialogFragment : BaseDialogFragment() {
     override val dialogWidth: Int = R.dimen.dialog_width_standard
     override val dialogHeight: Int = R.dimen.dialog_height_standard
 
-    override fun injectDependencies(): Unit? = null
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = DialogSelectCheckpointBinding.inflate(inflater, container, false).let {
-        binding = it
-        binding.root
-    }
+    ) = DialogSelectCheckpointBinding.inflate(inflater, container, false)
+        .let {
+            binding = it
+            return@let it.root
+        }
+
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return super.onCreateDialog(savedInstanceState).apply {

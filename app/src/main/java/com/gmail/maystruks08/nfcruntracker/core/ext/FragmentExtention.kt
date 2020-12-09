@@ -30,6 +30,7 @@ inline fun <reified T : Fragment> FragmentActivity.getFragment(tag: String): T? 
     return supportFragmentManager.findFragmentByTag(tag) as? T
 }
 
+@Suppress("DEPRECATION")
 inline fun <reified T : Fragment> Fragment.getVisibleFragment(): T? {
     return fragmentManager?.fragments?.lastOrNull() as? T
 }

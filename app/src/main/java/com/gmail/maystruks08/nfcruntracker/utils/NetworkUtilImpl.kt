@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.gmail.maystruks08.nfcruntracker.utils
 
 import android.content.BroadcastReceiver

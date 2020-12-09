@@ -53,3 +53,7 @@ fun List<Checkpoint>.toCheckpointViews(): List<CheckpointView> {
         }
     }
 }
+
+fun Checkpoint.toCheckpointView(): CheckpointView {
+    return CheckpointView(id, Bean(name, StepState.UNDONE))
+}

@@ -8,22 +8,23 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.toDateTimeFormat
-import com.gmail.maystruks08.nfcruntracker.core.di.viewmodel.DaggerViewModelFactory
 import com.gmail.maystruks08.nfcruntracker.core.ext.getFragment
-import com.gmail.maystruks08.nfcruntracker.core.ext.injectViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.core.navigation.AppNavigator
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.databinding.ActivityHostBinding
+import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
 import com.gmail.maystruks08.nfcruntracker.utils.NfcAdapter
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
@@ -34,6 +35,8 @@ import javax.inject.Inject
 
 const val PRESS_TWICE_INTERVAL = 2000
 
+@ObsoleteCoroutinesApi
+@AndroidEntryPoint
 class HostActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHostBinding
@@ -44,10 +47,7 @@ class HostActivity : AppCompatActivity() {
     @Inject
     lateinit var networkUtil: NetworkUtil
 
-    @Inject
-    lateinit var viewModeFactory: DaggerViewModelFactory
-
-    lateinit var viewModel: HostViewModel
+    private val viewModel: HostViewModel by viewModels()
 
     private var lastBackPressTime = 0L
 
@@ -71,9 +71,6 @@ class HostActivity : AppCompatActivity() {
         theme.applyStyle(R.style.AppTheme, true)
         binding = ActivityHostBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        App.hostComponent?.inject(this)
-
-        viewModel = injectViewModel(viewModeFactory)
 
         viewModel.runnerChange.observe(this, {
             getFragment<RunnersFragment>(Screens.RunnerScreen.tag())?.receiveRunnerUpdateFromServer(it)
@@ -152,7 +149,8 @@ class HostActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         nfcAdapter.processReadCard(intent)?.let { cardId ->
             Timber.log(Log.INFO, "Card scanned: $cardId at ${Date().toDateTimeFormat()}")
-            getFragment<RunnersFragment>(Screens.RunnerScreen.tag())?.onNfcCardScanned(cardId)
+            getFragment<RunnersFragment>(Screens.RunnersScreen.tag())?.onNfcCardScanned(cardId)
+            getFragment<RunnerFragment>(Screens.RunnerScreen.tag())?.onNfcCardScanned(cardId)
         }
     }
 
@@ -171,7 +169,6 @@ class HostActivity : AppCompatActivity() {
         toast = null
         snackBar?.dismiss()
         snackBar = null
-        App.clearHostComponent()
         super.onStop()
     }
 }

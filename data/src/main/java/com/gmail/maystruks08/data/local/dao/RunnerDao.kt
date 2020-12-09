@@ -7,8 +7,8 @@ import com.gmail.maystruks08.data.local.entity.RunnerTable
 import com.gmail.maystruks08.data.local.pojo.RunnerTableView
 
 @Dao
-interface RunnerDao :
-    BaseDao<RunnerTable> {
+@SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
+interface RunnerDao : BaseDao<RunnerTable> {
 
     @Transaction
     suspend fun insertOrReplaceRunner(runner: RunnerTable, results: List<ResultTable>) {

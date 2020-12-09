@@ -1,9 +1,9 @@
 package com.gmail.maystruks08.nfcruntracker.ui.settings
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.gmail.maystruks08.domain.entities.ResultOfTask
+import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
@@ -12,13 +12,14 @@ import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.login.LogOutUseCase
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import java.util.*
-import javax.inject.Inject
 
-class SettingsViewModel @Inject constructor(
+@ObsoleteCoroutinesApi
+class SettingsViewModel @ViewModelInject constructor(
     private val router: Router,
     private val repository: SettingsRepository,
     private val startRunTrackerBus: StartRunTrackerBus,
@@ -44,8 +45,8 @@ class SettingsViewModel @Inject constructor(
     private fun updateConfig(){
         viewModelScope.launch(Dispatchers.IO) {
             when (val resultOfTask = repository.updateConfig()) {
-                is ResultOfTask.Value -> getCachedConfig()
-                is ResultOfTask.Error -> Timber.e(resultOfTask.error)
+                is TaskResult.Value -> getCachedConfig()
+                is TaskResult.Error -> Timber.e(resultOfTask.error)
             }
         }
     }
@@ -53,11 +54,11 @@ class SettingsViewModel @Inject constructor(
     private fun getCachedConfig(){
         viewModelScope.launch(Dispatchers.IO) {
             when (val resultOfTask = repository.getCachedConfig()) {
-                is ResultOfTask.Value -> {
+                is TaskResult.Value -> {
                     configLiveData.postValue(resultOfTask.value)
                     resolveStartButtonVisibility()
                 }
-                is ResultOfTask.Error -> Timber.e(resultOfTask.error)
+                is TaskResult.Error -> Timber.e(resultOfTask.error)
             }
         }
     }

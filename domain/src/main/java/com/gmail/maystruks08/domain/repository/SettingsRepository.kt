@@ -1,14 +1,14 @@
 package com.gmail.maystruks08.domain.repository
 
 import com.gmail.maystruks08.domain.entities.DistanceSettings
-import com.gmail.maystruks08.domain.entities.ResultOfTask
+import com.gmail.maystruks08.domain.entities.TaskResult
 import java.util.*
 
 interface SettingsRepository {
 
-    suspend fun updateConfig(): ResultOfTask<Exception, Unit>
+    suspend fun updateConfig(): TaskResult<Exception, Unit>
 
-    suspend fun getCachedConfig(): ResultOfTask<Exception, CheckpointsConfig>
+    suspend fun getCachedConfig(): TaskResult<Exception, CheckpointsConfig>
 
     suspend fun changeCurrentCheckpoint(checkpointNumber: Int)
 
@@ -18,10 +18,10 @@ interface SettingsRepository {
 
     fun getAdminUserIds(): List<String>
 
-    suspend fun getRaceList(): ResultOfTask<Exception, List<DistanceSettings>>
+    suspend fun getRaceList(): TaskResult<Exception, List<DistanceSettings>>
 
 
-    suspend fun getRaceCheckpoints(raceId: String): ResultOfTask<Exception, DistanceSettings>
+    suspend fun getRaceCheckpoints(raceId: String): TaskResult<Exception, DistanceSettings>
 
 
     data class CheckpointsConfig(

@@ -3,7 +3,7 @@ package com.gmail.maystruks08.domain.interactors
 import com.gmail.maystruks08.domain.INFO
 import com.gmail.maystruks08.domain.LogHelper
 import com.gmail.maystruks08.domain.entities.Change
-import com.gmail.maystruks08.domain.entities.ResultOfTask
+import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
 import com.gmail.maystruks08.domain.entities.runner.Runner
@@ -16,19 +16,19 @@ import javax.inject.Inject
 
 class RunnersInteractorImpl @Inject constructor(private val runnersRepository: RunnersRepository, private val logHelper: LogHelper) : RunnersInteractor {
 
-    override suspend fun getRunner(runnerNumber: Int): ResultOfTask<Exception, Runner> =
-         ResultOfTask.build { runnersRepository.getRunnerByNumber(runnerNumber) ?: throw  RunnerNotFoundException()}
+    override suspend fun getRunner(runnerNumber: Int): TaskResult<Exception, Runner> =
+         TaskResult.build { runnersRepository.getRunnerByNumber(runnerNumber) ?: throw  RunnerNotFoundException()}
 
-    override suspend fun getRunners(type: RunnerType, initSize: Int?): ResultOfTask<Exception, List<Runner>> =
-        ResultOfTask.build {
+    override suspend fun getRunners(type: RunnerType, initSize: Int?): TaskResult<Exception, List<Runner>> =
+        TaskResult.build {
             runnersRepository.getRunners(type = type, initSize = initSize)
         }
 
-    override suspend fun getFinishers(type: RunnerType): ResultOfTask<Exception, List<Runner>> =
-        ResultOfTask.build { runnersRepository.getRunners(type, true).sortedBy { it.totalResult } }
+    override suspend fun getFinishers(type: RunnerType): TaskResult<Exception, List<Runner>> =
+        TaskResult.build { runnersRepository.getRunners(type, true).sortedBy { it.totalResult } }
 
-    override suspend fun addStartCheckpointToRunners(date: Date): ResultOfTask<Exception, Unit>{
-       return ResultOfTask.build {
+    override suspend fun addStartCheckpointToRunners(date: Date): TaskResult<Exception, Unit>{
+       return TaskResult.build {
             val checkpoints = runnersRepository.getCheckpoints(RunnerType.NORMAL)
             logHelper.log(INFO, "Add start checkpoint to all runners at: ${date.toDateTimeShortFormat()}")
             mutableListOf<Runner>()
@@ -43,8 +43,8 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
         }
     }
 
-    override suspend fun changeRunnerCardId(runnerNumber: Int, newCardId: String): ResultOfTask<Exception, RunnerChange> {
-        return ResultOfTask.build {
+    override suspend fun changeRunnerCardId(runnerNumber: Int, newCardId: String): TaskResult<Exception, RunnerChange> {
+        return TaskResult.build {
             val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
             val oldRunnerCardId = runner.cardId
             runner.updateCardId(newCardId)
@@ -53,8 +53,8 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
         }
     }
 
-    override suspend fun markRunnerGotOffTheRoute(runnerNumber: Int): ResultOfTask<Exception, RunnerChange> {
-        return ResultOfTask.build {
+    override suspend fun markRunnerGotOffTheRoute(runnerNumber: Int): TaskResult<Exception, RunnerChange> {
+        return TaskResult.build {
             val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
             runner.markThatRunnerIsOffTrack()
             logHelper.log(INFO, "Runner ${runner.number} ${runner.type} ${runner.fullName} is off track")
@@ -62,8 +62,8 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
         }
     }
 
-    override suspend fun addCurrentCheckpointToRunner(cardId: String ): ResultOfTask<Exception, RunnerChange> {
-        return ResultOfTask.build {
+    override suspend fun addCurrentCheckpointToRunner(cardId: String ): TaskResult<Exception, RunnerChange> {
+        return TaskResult.build {
             val runner = runnersRepository.getRunnerByCardId(cardId) ?: throw RunnerNotFoundException()
             val currentCheckpoint = runnersRepository.getCurrentCheckpoint(runner.type)
             val checkpointsCount = runnersRepository.getCheckpoints(runner.type).size
@@ -81,8 +81,8 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
         }
     }
 
-    override suspend fun addCurrentCheckpointToRunner(runnerNumber: Int): ResultOfTask<Exception, RunnerChange> {
-        return ResultOfTask.build {
+    override suspend fun addCurrentCheckpointToRunner(runnerNumber: Int): TaskResult<Exception, RunnerChange> {
+        return TaskResult.build {
             val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
             val currentCheckpoint = runnersRepository.getCurrentCheckpoint(runner.type)
             val checkpointsCount = runnersRepository.getCheckpoints(runner.type).size
@@ -100,8 +100,8 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
         }
     }
 
-    override suspend fun removeCheckpointForRunner(runnerNumber: Int, checkpointId: Int): ResultOfTask<Exception, RunnerChange> {
-        return ResultOfTask.build {
+    override suspend fun removeCheckpointForRunner(runnerNumber: Int, checkpointId: Int): TaskResult<Exception, RunnerChange> {
+        return TaskResult.build {
             val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
             logHelper.log(INFO, "Remove checkpoint: $checkpointId for runner ${runner.number}  ${runner.type}  ${runner.fullName}")
             runner.removeCheckpoint(checkpointId)

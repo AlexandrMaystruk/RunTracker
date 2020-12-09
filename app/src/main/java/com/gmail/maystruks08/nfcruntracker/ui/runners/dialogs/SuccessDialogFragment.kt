@@ -25,12 +25,10 @@ class SuccessDialogFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ) = DialogSuccessBinding.inflate(inflater, container, false)
-        .let { dialogSuccessBinding ->
-            binding = dialogSuccessBinding
-            return@let binding.root
+        .let {
+            binding = it
+            return@let it.root
         }
-
-    override fun injectDependencies(): Unit? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return super.onCreateDialog(savedInstanceState).apply {
@@ -48,7 +46,7 @@ class SuccessDialogFragment : BaseDialogFragment() {
         with(binding) {
             tvAlertText.text = message
             buttonOk.setOnClickListener { dismiss() }
-            root.postDelayed({ dismiss() }, 3000L)
+            root.postDelayed({ dismiss() }, 2000L)
         }
     }
 
