@@ -9,7 +9,7 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.core.bus.StartRunTrackerBus
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
-import com.gmail.maystruks08.nfcruntracker.ui.login.LogOutUseCase
+import com.gmail.maystruks08.domain.interactors.LogOutUseCase
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ObsoleteCoroutinesApi

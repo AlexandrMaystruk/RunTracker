@@ -17,6 +17,7 @@ import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
+import com.gmail.maystruks08.nfcruntracker.core.ext.argumentNullable
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnersBinding
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
@@ -46,7 +47,7 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
 
     private var alertDialog: AlertDialog? = null
 
-    private var runnerTypeId: Int by argument()
+    private var distanceId: Long? by argumentNullable()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -96,7 +97,7 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
         }
 
         viewModel.showSuccessDialog.observe(viewLifecycleOwner, {
-            val checkpointName = it?.first?.name ?: ""
+            val checkpointName = it?.first?.getName() ?: ""
             val message = getString(R.string.success_message, checkpointName, "#${it.second}")
             SuccessDialogFragment.getInstance(message)
                 .show(childFragmentManager, SuccessDialogFragment.name())
@@ -130,7 +131,7 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
                 LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = distanceAdapter
         }
-        viewModel.initFragment(runnerTypeId)
+        distanceId?.let { viewModel.initFragment(it) }
 
         binding.btnRegisterNewRunner.setOnClickListener {
             viewModel.onRegisterNewRunnerClicked()
@@ -158,12 +159,12 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
     }
 
     override fun onItemSelected(item: RunnerView) {
-        viewModel.onClickedAtRunner(item.number, item.type)
+        viewModel.onClickedAtRunner(item.number, item.actualDistanceId)
     }
 
-    override fun onItemSelected(item: DistanceView) {
-        binding.tvRunnersTitle.text = item.name
-        viewModel.changeRunnerType(item.id)
+    override fun onItemSelected(distance: DistanceView) {
+        binding.tvRunnersTitle.text = distance.name
+        viewModel.changeDistance(distance.id)
     }
 
     fun receiveRunnerUpdateFromServer(runnerChange: RunnerChange) {
@@ -231,8 +232,8 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
 
     companion object {
 
-        fun getInstance(runnerTypeId: Int) = RunnersFragment().apply {
-            this.runnerTypeId = runnerTypeId
+        fun getInstance(raceId: Long, distanceId: Long?) = RunnersFragment().apply {
+            this.distanceId = distanceId
         }
     }
 }

@@ -13,6 +13,7 @@ import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
+import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerResultView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerResultView
 import kotlinx.coroutines.Dispatchers
@@ -30,12 +31,12 @@ class RunnerResultViewModel @ViewModelInject constructor(
     private val _runnerResultsLiveData = MutableLiveData<List<RunnerResultView>>()
     private val _errorLiveData = SingleLiveEvent<Throwable>()
 
-    private var type: RunnerType = RunnerType.NORMAL
+    private var distanceId: Long = -1
 
-    fun provideFinishers(type: RunnerType){
-        this.type = type
+    fun provideFinishers(distanceId: Long){
+        this.distanceId = distanceId
         viewModelScope.launch(Dispatchers.IO) {
-            when (val onResult = interactor.getFinishers(type)) {
+            when (val onResult = interactor.getFinishers(distanceId)) {
                 is TaskResult.Value -> {
                     val sortedResultList = onResult.value
                         .mapIndexed { index: Int, runner: Runner -> runner.toRunnerResultView(index + 1) }
@@ -59,7 +60,7 @@ class RunnerResultViewModel @ViewModelInject constructor(
     fun onSearchQueryChanged(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
             if (query.isNotEmpty()) {
-                when (val result = interactor.getFinishers(type)) {
+                when (val result = interactor.getFinishers(distanceId)) {
                     is TaskResult.Value -> {
                         val pattern = ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
                         val filteredList = result.value
@@ -71,7 +72,7 @@ class RunnerResultViewModel @ViewModelInject constructor(
                     }
                     is TaskResult.Error -> handleError(result.error)
                 }
-            } else provideFinishers(type)
+            } else provideFinishers(distanceId)
         }
     }
 }

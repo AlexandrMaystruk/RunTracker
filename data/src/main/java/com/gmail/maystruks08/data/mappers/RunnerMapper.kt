@@ -1,50 +1,52 @@
 package com.gmail.maystruks08.data.mappers
 
-import com.gmail.maystruks08.data.local.entity.ResultTable
-import com.gmail.maystruks08.data.local.entity.RunnerTable
+import com.gmail.maystruks08.data.local.entity.tables.ResultTable
+import com.gmail.maystruks08.data.local.entity.tables.RunnerTable
 import com.gmail.maystruks08.data.local.pojo.RunnerTableView
 import com.gmail.maystruks08.data.remote.pojo.CheckpointPojo
 import com.gmail.maystruks08.data.remote.pojo.CheckpointResultPojo
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointType
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.RunnerSex
-import com.gmail.maystruks08.domain.entities.runner.RunnerType
 
-fun List<RunnerTableView>.toRunners(checkpoints: List<Checkpoint>): MutableList<Runner> {
+fun List<RunnerTableView>.toRunners(checkpoints: List<CheckpointImpl>): MutableList<Runner> {
     return ArrayList<Runner>().apply {
         this@toRunners.forEach { add(it.toRunner(checkpoints)) }
     }
 }
 
-fun RunnerTableView.toRunner(checkpoints: List<Checkpoint>): Runner {
+fun RunnerTableView.toRunner(checkpoints: List<CheckpointImpl>): Runner {
     return Runner(
         cardId = runnerTable.cardId,
-        number = runnerTable.number,
+        number = runnerTable.runnerNumber,
         fullName = runnerTable.fullName,
         shortName = runnerTable.shortName,
         phone = runnerTable.phone,
         city = runnerTable.city,
         sex = RunnerSex.fromOrdinal(runnerTable.sex),
         dateOfBirthday = runnerTable.dateOfBirthday,
-        type = RunnerType.fromOrdinal(runnerTable.type),
         teamName = runnerTable.teamName,
         totalResult = runnerTable.totalResult,
-        checkpoints = checkpoints.map { cp ->
-            val result = results.find { it.checkpointId == cp.id }
-            if (result != null) {
-                CheckpointResult(
-                    id = cp.id,
-                    name = cp.name,
-                    type = cp.type,
-                    date = result.time!!,
-                    hasPrevious = result.hasPrevious
-                )
-            } else cp
-        }.sortedBy { it.id }.toMutableList(),
-        isOffTrack = runnerTable.isOffTrack
+//        checkpoints = checkpoints.map { cp ->
+//            val result = results.find { it.checkpointId == cp.id }
+//            if (result != null) {
+//                CheckpointResultIml(
+//                    id = cp.id,
+//                    name = cp.name,
+//                    type = cp.type,
+//                    date = result.time!!,
+//                    hasPrevious = result.hasPrevious
+//                )
+//            } else cp
+//        }.sortedBy { it.id }.toMutableList(),
+
+        checkpoints = mutableListOf(),
+        isOffTrack = runnerTable.isOffTrack,
+        distanceIds = mutableListOf(),
+        actualDistanceId = 0
     )
 }
 
@@ -52,7 +54,7 @@ fun RunnerTableView.toRunner(checkpoints: List<Checkpoint>): Runner {
 fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
     return RunnerTable(
         cardId = this.cardId,
-        number = this.number,
+        runnerNumber = this.number,
         fullName = this.fullName,
         shortName = this.shortName,
         phone = this.phone,
@@ -61,44 +63,71 @@ fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
         dateOfBirthday = this.dateOfBirthday,
         teamName = this.teamName,
         totalResult = this.totalResult,
-        type = this.type.ordinal,
         isOffTrack = this.isOffTrack,
         needToSync = needToSync
     )
 }
 
-fun List<Checkpoint>.toCheckpointsResult(runnerNumber: Int): List<ResultTable> =
-    this.mapNotNull { if (it is CheckpointResult) it.toResultTable(runnerNumber) else null }
+fun List<CheckpointImpl>.toCheckpointsResult(runnerNumber: Int): List<ResultTable> =
+//    this.mapNotNull { if (it is CheckpointResultIml) it.toResultTable(runnerNumber) else null }
+    mutableListOf()
 
 fun Runner.toFirestoreRunner(): RunnerPojo {
-    return RunnerPojo(number,cardId, fullName, shortName, phone, sex.ordinal, city, dateOfBirthday, type.ordinal, teamName, totalResult,
-        checkpoints.toFirestoreCheckpointsResult(), checkpoints.toFirestoreCheckpoints(),
+    return RunnerPojo(
+        number,
+        cardId,
+        fullName,
+        shortName,
+        phone,
+        sex.ordinal,
+        city,
+        dateOfBirthday,
+       0,
+        teamName,
+        totalResult,
+        mutableListOf(),
+        mutableListOf(),
         isOffTrack
     )
 }
 
 fun RunnerPojo.fromFirestoreRunner(): Runner {
-    return  Runner(
-        number, cardId, fullName, shortName, phone,  RunnerSex.fromOrdinal(sex), city, dateOfBirthday, RunnerType.fromOrdinal(type), totalResult, teamName,
-        mutableListOf<Checkpoint>().apply {
-            addAll(completeCheckpoints.fromFirestoreCheckpointsResult())
-            addAll(uncompletedCheckpoints.fromFirestoreCheckpoints())
-            sortBy { it.id }
-        },
-        isOffTrack
+    return Runner(
+        number.toLong(),
+        cardId,
+        fullName,
+        shortName,
+        phone,
+        RunnerSex.fromOrdinal(sex),
+        city,
+        dateOfBirthday,
+        0,
+        listOf(),
+        mutableListOf(),
+        isOffTrack,
+        teamName,
+        totalResult
     )
 }
 
-fun List<Checkpoint>.toFirestoreCheckpoints(): List<CheckpointPojo> = this.mapNotNull { if (it !is CheckpointResult) it.toFirestoreCheckpoint() else null }
-fun List<Checkpoint>.toFirestoreCheckpointsResult(): List<CheckpointResultPojo> = this.mapNotNull { if (it is CheckpointResult) it.toFirestoreCheckpointResult() else null }
+fun List<CheckpointImpl>.toFirestoreCheckpoints(): List<CheckpointPojo> = emptyList()
+//    this.mapNotNull { if (it !is CheckpointResultIml) it.toFirestoreCheckpoint() else null }
 
-fun List<CheckpointPojo>.fromFirestoreCheckpoints(): List<Checkpoint> = this.map { it.fromFirestoreCheckpoint()}
-fun List<CheckpointResultPojo>.fromFirestoreCheckpointsResult(): List<CheckpointResult> = this.map { it.fromFirestoreCheckpointResult()}
+fun List<CheckpointImpl>.toFirestoreCheckpointsResult(): List<CheckpointResultPojo> = emptyList()
+//    this.mapNotNull { if (it is CheckpointResultIml) it.toFirestoreCheckpointResult() else null }
 
-fun Checkpoint.toFirestoreCheckpoint() = CheckpointPojo(id, name, type.ordinal)
-fun CheckpointResult.toFirestoreCheckpointResult() = CheckpointResultPojo(id, name, type.ordinal, date, hasPrevious)
+fun List<CheckpointPojo>.fromFirestoreCheckpoints(): List<CheckpointImpl> =
+    this.map { it.fromFirestoreCheckpoint() }
 
-fun CheckpointPojo.fromFirestoreCheckpoint() = Checkpoint(id, name, CheckpointType.fromOrdinal(type))
-fun CheckpointResultPojo.fromFirestoreCheckpointResult() = CheckpointResult(id, name, CheckpointType.fromOrdinal(type), date, hasPrevious)
+fun List<CheckpointResultPojo>.fromFirestoreCheckpointsResult(): List<CheckpointResultIml> =
+    this.map { it.fromFirestoreCheckpointResult() }
+
+fun Checkpoint.toFirestoreCheckpoint() = CheckpointPojo(getId(), getName(), getDistanceId())
+fun Checkpoint.toFirestoreCheckpointResult() =
+    CheckpointResultPojo(getId(), getName(), getDistanceId(), getResult()!!, hasPrevious())
+
+fun CheckpointPojo.fromFirestoreCheckpoint() = CheckpointImpl(id, name, distanceId)
+
+fun CheckpointResultPojo.fromFirestoreCheckpointResult() = CheckpointResultIml(CheckpointImpl(id, name, distanceId), date, hasPrevious)
 
 

@@ -3,15 +3,15 @@ package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
 import android.os.Parcel
 import android.os.Parcelable
 
-data class DistanceView(val id: Int, val name: String) : Parcelable {
+data class DistanceView(val id: Long, val name: String) : Parcelable {
 
     constructor(parcel: Parcel) : this(
-        parcel.readInt(),
+        parcel.readLong(),
         parcel.readString().orEmpty()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(id)
+        parcel.writeLong(id)
         parcel.writeString(name)
     }
 

@@ -5,13 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
+import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
 import kotlinx.coroutines.Dispatchers
@@ -34,10 +36,10 @@ class RunnerViewModel @ViewModelInject constructor(
 
     private val _runnerLiveData = SingleLiveEvent<RunnerView>()
     private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
-    private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, Int>>()
+    private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, Long>>()
     private val _linkCardModeEnableLiveData = SingleLiveEvent<Boolean>()
 
-    fun onShowRunnerClicked(runnerNumber: Int) {
+    fun onShowRunnerClicked(distanceId: Long, runnerNumber: Long) {
         viewModelScope.launch {
             when (val onResult = runnersInteractor.getRunner(runnerNumber)) {
                 is TaskResult.Value -> handleRunnerData(onResult.value)
@@ -61,7 +63,7 @@ class RunnerViewModel @ViewModelInject constructor(
         }
     }
 
-    fun markCheckpointAsPassed(runnerNumber: Int) {
+    fun markCheckpointAsPassed(runnerNumber: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             if (isRunnerOfftrack() || isRunnerHasResult()) return@launch
             when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(runnerNumber)) {
@@ -71,10 +73,10 @@ class RunnerViewModel @ViewModelInject constructor(
         }
     }
 
-    fun deleteCheckpointFromRunner(runnerNumber: Int, checkpointId: Int) {
+    fun deleteCheckpointFromRunner(runnerNumber: Long, checkpointId: CheckpointView) {
         viewModelScope.launch(Dispatchers.IO) {
             when (val onResult =
-                runnersInteractor.removeCheckpointForRunner(runnerNumber, checkpointId)) {
+                runnersInteractor.removeCheckpointForRunner(runnerNumber, checkpointId.id)) {
                 is TaskResult.Value -> handleRunnerData(onResult.value.runner)
                 is TaskResult.Error -> handleError(onResult.error)
             }
@@ -115,7 +117,7 @@ class RunnerViewModel @ViewModelInject constructor(
     }
 
     private fun onMarkRunnerOnCheckpointSuccess(runnerChange: RunnerChange) {
-        val lastCheckpoint = runnerChange.runner.checkpoints.maxByOrNull { (it as? CheckpointResult)?.date?.time ?: 0 }
+        val lastCheckpoint = runnerChange.runner.checkpoints.maxByOrNull { it.getResult()?.time ?: 0 }
         _showSuccessDialogLiveData.postValue(lastCheckpoint to runnerChange.runner.number)
         handleRunnerData(runnerChange.runner)
     }

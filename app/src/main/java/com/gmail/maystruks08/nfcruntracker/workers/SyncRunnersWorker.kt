@@ -7,11 +7,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.gmail.maystruks08.data.local.dao.CheckpointDAO
 import com.gmail.maystruks08.data.local.dao.RunnerDao
-import com.gmail.maystruks08.data.mappers.toCheckpoint
-import com.gmail.maystruks08.data.mappers.toRunners
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.domain.entities.TaskResult
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointType
 import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -33,18 +30,18 @@ class SyncRunnersWorker @WorkerInject constructor(
         Timber.i("Sync runners worker STARTED")
         val resultOfTask = TaskResult.build {
             launch(Dispatchers.IO) {
-                val checkpoints = async { checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() } }
-                val ironCheckpoints = async { checkpointDAO.getCheckpointsByType(CheckpointType.IRON.ordinal).map { it.toCheckpoint() } }
-                val runnerWithIronRunner = runnerDao.getNotUploadedRunnersWithResults().partition { it.runnerTable.type == RunnerType.NORMAL.ordinal }
-                Timber.i("Not uploaded runner count ${runnerWithIronRunner.first.size + runnerWithIronRunner.second.size}")
-                runnerWithIronRunner.first.toRunners(checkpoints.await()).forEach {
-                    firestoreApi.updateRunner(it)
-                    runnerDao.markAsNeedToSync(runnerNumber = it.number, needToSync = false)
-                }
-                runnerWithIronRunner.second.toRunners(ironCheckpoints.await()).forEach {
-                    firestoreApi.updateRunner(it)
-                    runnerDao.markAsNeedToSync(runnerNumber = it.number, needToSync = false)
-                }
+//                val checkpoints = async { checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() } }
+//                val ironCheckpoints = async { checkpointDAO.getCheckpointsByType(CheckpointType.IRON.ordinal).map { it.toCheckpoint() } }
+//                val runnerWithIronRunner = runnerDao.getNotUploadedRunnersWithResults().partition { it.runnerTable.type == RunnerType.NORMAL.ordinal }
+//                Timber.i("Not uploaded runner count ${runnerWithIronRunner.first.size + runnerWithIronRunner.second.size}")
+//                runnerWithIronRunner.first.toRunners(checkpoints.await()).forEach {
+//                    firestoreApi.updateRunner(it)
+//                    runnerDao.markAsNeedToSync(runnerNumber = it.number, needToSync = false)
+//                }
+//                runnerWithIronRunner.second.toRunners(ironCheckpoints.await()).forEach {
+//                    firestoreApi.updateRunner(it)
+//                    runnerDao.markAsNeedToSync(runnerNumber = it.number, needToSync = false)
+//                }
             }
         }
         when (resultOfTask) {

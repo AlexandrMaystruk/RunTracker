@@ -1,6 +1,6 @@
 package com.gmail.maystruks08.data.cache
 
-import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import java.util.*
 import javax.inject.Inject
@@ -10,24 +10,24 @@ import kotlin.collections.ArrayList
 @Singleton
 class SettingsCache @Inject constructor() {
 
-    var checkpoints = listOf<Checkpoint>()
+    var checkpoints = listOf<CheckpointImpl>()
 
-    var checkpointsIronPeople = listOf<Checkpoint>()
+    var checkpointsIronPeople = listOf<CheckpointImpl>()
 
-    lateinit var currentCheckpoint: Checkpoint
+    lateinit var currentCheckpoint: CheckpointImpl
 
-    lateinit var currentIronPeopleCheckpoint: Checkpoint
+    lateinit var currentIronPeopleCheckpoint: CheckpointImpl
 
     var dateOfStart: Date? = null
 
     var adminUserIds = ArrayList<String>()
 
-    fun getCheckpointList(type: RunnerType): List<Checkpoint> = when (type) {
+    fun getCheckpointList(type: RunnerType): List<CheckpointImpl> = when (type) {
         RunnerType.NORMAL -> checkpoints
         RunnerType.IRON -> checkpointsIronPeople
     }
 
-    fun getCurrentCheckpoint(type: RunnerType): Checkpoint = when (type) {
+    fun getCurrentCheckpoint(type: RunnerType): CheckpointImpl = when (type) {
         RunnerType.NORMAL -> currentCheckpoint
         RunnerType.IRON -> currentIronPeopleCheckpoint
     }

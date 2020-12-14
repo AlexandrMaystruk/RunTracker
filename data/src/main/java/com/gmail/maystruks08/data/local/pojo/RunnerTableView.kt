@@ -1,7 +1,7 @@
 package com.gmail.maystruks08.data.local.pojo
 
-import com.gmail.maystruks08.data.local.entity.ResultTable
-import com.gmail.maystruks08.data.local.entity.RunnerTable
+import com.gmail.maystruks08.data.local.entity.tables.ResultTable
+import com.gmail.maystruks08.data.local.entity.tables.RunnerTable
 
 data class RunnerTableView(
 

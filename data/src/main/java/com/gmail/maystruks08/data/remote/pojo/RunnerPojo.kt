@@ -3,7 +3,7 @@ package com.gmail.maystruks08.data.remote.pojo
 import java.util.*
 
 data class RunnerPojo(
-    var number: Int = 0,
+    var number: Long = 0,
     var cardId: String = "",
     var fullName: String = "",
     val shortName: String = "",

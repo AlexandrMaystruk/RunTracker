@@ -93,7 +93,7 @@ class DistanceAdapter(private val interaction: Interaction) : RecyclerView.Adapt
 
     interface Interaction {
 
-        fun onItemSelected(item: DistanceView)
+        fun onItemSelected(distance: DistanceView)
 
     }
 }

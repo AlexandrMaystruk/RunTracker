@@ -1,13 +1,14 @@
 package com.gmail.maystruks08.nfcruntracker.ui.login
 
 import com.gmail.maystruks08.data.awaitTaskCompletable
+import com.gmail.maystruks08.domain.interactors.LogOutUseCase
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
 import javax.inject.Inject
 
 class LogOutUseCaseImpl @Inject constructor(
     private val auth: FirebaseAuth,
-    private var googleSignInClient: GoogleSignInClient
+    private val googleSignInClient: GoogleSignInClient
 ) : LogOutUseCase {
 
     override suspend fun revokeAccess(): Boolean {

@@ -1,3 +1,22 @@
 package com.gmail.maystruks08.domain.entities.checkpoint
 
-open class Checkpoint(val id: Int, val name: String, val type: CheckpointType)
+import java.util.*
+
+interface Checkpoint {
+
+    fun getId(): Long
+
+    fun getName(): String
+
+    fun getDistanceId(): Long
+
+    fun getResult(): Date?
+
+    fun hasPrevious(): Boolean
+
+    fun setHasPrevious(flag: Boolean)
+
+}
+
+
+

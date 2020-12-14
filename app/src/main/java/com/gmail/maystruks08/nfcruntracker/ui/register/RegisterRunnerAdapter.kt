@@ -23,7 +23,7 @@ data class InputDataView(
     var runnerSex: RunnerSex? = null,
     var dateOfBirthday: Date? = Date(),
     var city: String? = null,
-    var runnerNumber: Int? = null,
+    var runnerNumber: Long? = null,
     var runnerType: RunnerType? = null,
     var runnerCardId: String? = null
 ) {
@@ -89,8 +89,7 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
         private val runnerNumber = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                runnerRegisterData[adapterPosition].runnerNumber =
-                    s?.toString()?.toIntOrNull()
+                runnerRegisterData[adapterPosition].runnerNumber = s?.toString()?.toLongOrNull()
             }
             override fun afterTextChanged(s: Editable?) {}
         }

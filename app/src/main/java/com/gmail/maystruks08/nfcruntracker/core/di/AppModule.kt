@@ -5,6 +5,8 @@ import androidx.room.Room
 import com.gmail.maystruks08.data.LogHelperImpl
 import com.gmail.maystruks08.data.local.AppDatabase
 import com.gmail.maystruks08.data.local.dao.CheckpointDAO
+import com.gmail.maystruks08.data.local.dao.DistanceDAO
+import com.gmail.maystruks08.data.local.dao.RaceDAO
 import com.gmail.maystruks08.data.local.dao.RunnerDao
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.data.remote.FirestoreApiImpl
@@ -86,11 +88,20 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun runnerDao(appDatabase: AppDatabase): RunnerDao = appDatabase.runnerDao()
+    fun  provideRaceDao(appDatabase: AppDatabase): RaceDAO = appDatabase.raceDao()
+
+    @Provides
+    @Singleton
+    fun  provideDistanceDao(appDatabase: AppDatabase): DistanceDAO = appDatabase.distanceDao()
+
+    @Provides
+    @Singleton
+    fun  provideRunnerDao(appDatabase: AppDatabase): RunnerDao = appDatabase.runnerDao()
 
     @Provides
     @Singleton
     fun provideCheckpointDao(appDatabase: AppDatabase): CheckpointDAO = appDatabase.checkpointDao()
+
 
     @Provides
     @Singleton

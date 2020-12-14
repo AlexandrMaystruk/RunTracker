@@ -5,59 +5,57 @@ import com.gmail.maystruks08.domain.LogHelper
 import com.gmail.maystruks08.domain.entities.Change
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.RunnerChange
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
 import com.gmail.maystruks08.domain.entities.runner.Runner
-import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
-import com.gmail.maystruks08.domain.toDateTimeShortFormat
 import java.util.*
 import javax.inject.Inject
 
 class RunnersInteractorImpl @Inject constructor(private val runnersRepository: RunnersRepository, private val logHelper: LogHelper) : RunnersInteractor {
 
-    override suspend fun getRunner(runnerNumber: Int): TaskResult<Exception, Runner> =
+    override suspend fun getRunner(runnerNumber: Long): TaskResult<Exception, Runner> =
          TaskResult.build { runnersRepository.getRunnerByNumber(runnerNumber) ?: throw  RunnerNotFoundException()}
 
-    override suspend fun getRunners(type: RunnerType, initSize: Int?): TaskResult<Exception, List<Runner>> =
+    override suspend fun getRunners(distanceId: Long, initSize: Int?): TaskResult<Exception, List<Runner>> =
         TaskResult.build {
-            runnersRepository.getRunners(type = type, initSize = initSize)
+//            runnersRepository.getRunners(type = type, initSize = initSize)
+            listOf()
         }
 
-    override suspend fun getFinishers(type: RunnerType): TaskResult<Exception, List<Runner>> =
-        TaskResult.build { runnersRepository.getRunners(type, true).sortedBy { it.totalResult } }
+    override suspend fun getFinishers(distanceId: Long): TaskResult<Exception, List<Runner>> =
+        TaskResult.build { runnersRepository.getRunners(distanceId, true).sortedBy { it.totalResult } }
 
     override suspend fun addStartCheckpointToRunners(date: Date): TaskResult<Exception, Unit>{
        return TaskResult.build {
-            val checkpoints = runnersRepository.getCheckpoints(RunnerType.NORMAL)
-            logHelper.log(INFO, "Add start checkpoint to all runners at: ${date.toDateTimeShortFormat()}")
-            mutableListOf<Runner>()
-                .apply {
-                    addAll(runnersRepository.getRunners(RunnerType.NORMAL))
-                }.forEach {
-                    val startCheckpoint = checkpoints.first()
-                    val checkpointsCount = checkpoints.lastIndex
-                    it.addPassedCheckpoint(checkpoint = CheckpointResult(startCheckpoint.id, startCheckpoint.name, startCheckpoint.type, date), checkpointsCount = checkpointsCount, isRestart = true)
-                    runnersRepository.updateRunnerData(it)
-                }
+//            val checkpoints = runnersRepository.getCheckpoints(RunnerType.NORMAL)
+//            logHelper.log(INFO, "Add start checkpoint to all runners at: ${date.toDateTimeShortFormat()}")
+//            mutableListOf<Runner>()
+//                .apply {
+//                    addAll(runnersRepository.getRunners(RunnerType.NORMAL))
+//                }.forEach {
+//                    val startCheckpoint = checkpoints.first()
+//                    val checkpointsCount = checkpoints.lastIndex
+//                    it.addPassedCheckpoint(checkpoint = CheckpointResult(startCheckpoint.id, startCheckpoint.name, startCheckpoint.type, date), checkpointsCount = checkpointsCount, isRestart = true)
+//                    runnersRepository.updateRunnerData(it)
+//                }
         }
     }
 
-    override suspend fun changeRunnerCardId(runnerNumber: Int, newCardId: String): TaskResult<Exception, RunnerChange> {
+    override suspend fun changeRunnerCardId(runnerNumber: Long, newCardId: String): TaskResult<Exception, RunnerChange> {
         return TaskResult.build {
             val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
             val oldRunnerCardId = runner.cardId
             runner.updateCardId(newCardId)
-            logHelper.log(INFO, "Attach new card with id $newCardId to runner ${runner.type} ${runner.fullName}. Old card id = $oldRunnerCardId")
+            logHelper.log(INFO, "Attach new card with id $newCardId to runner ${runner.fullName}. Old card id = $oldRunnerCardId")
             RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
         }
     }
 
-    override suspend fun markRunnerGotOffTheRoute(runnerNumber: Int): TaskResult<Exception, RunnerChange> {
+    override suspend fun markRunnerGotOffTheRoute(runnerNumber: Long): TaskResult<Exception, RunnerChange> {
         return TaskResult.build {
             val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
             runner.markThatRunnerIsOffTrack()
-            logHelper.log(INFO, "Runner ${runner.number} ${runner.type} ${runner.fullName} is off track")
+            logHelper.log(INFO, "Runner ${runner.number} ${runner.fullName} is off track")
             RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
         }
     }
@@ -65,53 +63,53 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
     override suspend fun addCurrentCheckpointToRunner(cardId: String ): TaskResult<Exception, RunnerChange> {
         return TaskResult.build {
             val runner = runnersRepository.getRunnerByCardId(cardId) ?: throw RunnerNotFoundException()
-            val currentCheckpoint = runnersRepository.getCurrentCheckpoint(runner.type)
-            val checkpointsCount = runnersRepository.getCheckpoints(runner.type).size
-            val currentDate = Date()
-            runner.addPassedCheckpoint(checkpoint = CheckpointResult(currentCheckpoint.id, currentCheckpoint.name, currentCheckpoint.type, currentDate), checkpointsCount = checkpointsCount)
-            if(!runner.teamName.isNullOrEmpty() && !runner.isOffTrack){
-               runnersRepository.getRunnerTeamMembers(runner.number, runner.teamName)?.map { teamRunner ->
-                   teamRunner.addPassedCheckpoint(checkpoint = CheckpointResult(currentCheckpoint.id, currentCheckpoint.name, currentCheckpoint.type, currentDate), checkpointsCount = checkpointsCount)
-                   logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.id} to team runner ${teamRunner.number}  ${teamRunner.type}  ${teamRunner.fullName}")
-                   runnersRepository.updateRunnerData(teamRunner)
-                }
-            }
-            logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.id} to runner ${runner.number}  ${runner.type}  ${runner.fullName}")
+//            val currentCheckpoint = runnersRepository.getCurrentCheckpoint(runner.type)
+//            val checkpointsCount = runnersRepository.getCheckpoints(runner.type).size
+//            val currentDate = Date()
+//            runner.addPassedCheckpoint(checkpoint = CheckpointResult(currentCheckpoint.id, currentCheckpoint.name, currentCheckpoint.type, currentDate), checkpointsCount = checkpointsCount)
+//            if(!runner.teamName.isNullOrEmpty() && !runner.isOffTrack){
+//               runnersRepository.getRunnerTeamMembers(runner.number, runner.teamName)?.map { teamRunner ->
+//                   teamRunner.addPassedCheckpoint(checkpoint = CheckpointResult(currentCheckpoint.id, currentCheckpoint.name, currentCheckpoint.type, currentDate), checkpointsCount = checkpointsCount)
+//                   logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.id} to team runner ${teamRunner.number}  ${teamRunner.type}  ${teamRunner.fullName}")
+//                   runnersRepository.updateRunnerData(teamRunner)
+//                }
+//            }
+//            logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.id} to runner ${runner.number}  ${runner.type}  ${runner.fullName}")
             RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
         }
     }
 
-    override suspend fun addCurrentCheckpointToRunner(runnerNumber: Int): TaskResult<Exception, RunnerChange> {
+    override suspend fun addCurrentCheckpointToRunner(runnerNumber: Long): TaskResult<Exception, RunnerChange> {
         return TaskResult.build {
             val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
-            val currentCheckpoint = runnersRepository.getCurrentCheckpoint(runner.type)
-            val checkpointsCount = runnersRepository.getCheckpoints(runner.type).size
-            val currentDate = Date()
-            runner.addPassedCheckpoint(checkpoint = CheckpointResult(currentCheckpoint.id, currentCheckpoint.name, currentCheckpoint.type, currentDate), checkpointsCount = checkpointsCount)
-            if(!runner.teamName.isNullOrEmpty() && !runner.isOffTrack){
-                runnersRepository.getRunnerTeamMembers(runner.number, runner.teamName)?.map { teamRunner ->
-                    teamRunner.addPassedCheckpoint(checkpoint = CheckpointResult(currentCheckpoint.id, currentCheckpoint.name, currentCheckpoint.type, currentDate), checkpointsCount = checkpointsCount)
-                    logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.id} to team runner ${teamRunner.number}  ${teamRunner.type}  ${teamRunner.fullName}")
-                    runnersRepository.updateRunnerData(teamRunner)
-                }
-            }
-            logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.id} to runner ${runner.number}  ${runner.type}  ${runner.fullName}")
+//            val currentCheckpoint = runnersRepository.getCurrentCheckpoint(runner.type)
+//            val checkpointsCount = runnersRepository.getCheckpoints(runner.type).size
+//            val currentDate = Date()
+//            runner.addPassedCheckpoint(checkpoint = CheckpointResult(currentCheckpoint.id, currentCheckpoint.name, currentCheckpoint.type, currentDate), checkpointsCount = checkpointsCount)
+//            if(!runner.teamName.isNullOrEmpty() && !runner.isOffTrack){
+//                runnersRepository.getRunnerTeamMembers(runner.number, runner.teamName)?.map { teamRunner ->
+//                    teamRunner.addPassedCheckpoint(checkpoint = CheckpointResult(currentCheckpoint.id, currentCheckpoint.name, currentCheckpoint.type, currentDate), checkpointsCount = checkpointsCount)
+//                    logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.id} to team runner ${teamRunner.number}  ${teamRunner.type}  ${teamRunner.fullName}")
+//                    runnersRepository.updateRunnerData(teamRunner)
+//                }
+//            }
+//            logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.id} to runner ${runner.number} ${runner.fullName}")
             RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
         }
     }
 
-    override suspend fun removeCheckpointForRunner(runnerNumber: Int, checkpointId: Int): TaskResult<Exception, RunnerChange> {
+    override suspend fun removeCheckpointForRunner(runnerNumber: Long, checkpointId: Long): TaskResult<Exception, RunnerChange> {
         return TaskResult.build {
             val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
-            logHelper.log(INFO, "Remove checkpoint: $checkpointId for runner ${runner.number}  ${runner.type}  ${runner.fullName}")
-            runner.removeCheckpoint(checkpointId)
-            if(!runner.teamName.isNullOrEmpty() && !runner.isOffTrack){
-                runnersRepository.getRunnerTeamMembers(runner.number, runner.teamName)?.map { teamRunner ->
-                    logHelper.log(INFO, "Remove checkpoint: $checkpointId for team runner ${teamRunner.number}  ${teamRunner.type}  ${teamRunner.fullName}")
-                    teamRunner.removeCheckpoint(checkpointId)
-                    runnersRepository.updateRunnerData(teamRunner)
-                }
-            }
+//            logHelper.log(INFO, "Remove checkpoint: $checkpointId for runner ${runner.number}  ${runner.type}  ${runner.fullName}")
+//            runner.removeCheckpoint(checkpointId)
+//            if(!runner.teamName.isNullOrEmpty() && !runner.isOffTrack){
+//                runnersRepository.getRunnerTeamMembers(runner.number, runner.teamName)?.map { teamRunner ->
+//                    logHelper.log(INFO, "Remove checkpoint: $checkpointId for team runner ${teamRunner.number}  ${teamRunner.type}  ${teamRunner.fullName}")
+//                    teamRunner.removeCheckpoint(checkpointId)
+//                    runnersRepository.updateRunnerData(teamRunner)
+//                }
+//            }
             RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
         }
     }

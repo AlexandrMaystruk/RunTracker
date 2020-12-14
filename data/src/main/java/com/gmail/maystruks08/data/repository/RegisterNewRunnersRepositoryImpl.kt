@@ -8,7 +8,7 @@ import com.gmail.maystruks08.data.mappers.toCheckpointsResult
 import com.gmail.maystruks08.data.mappers.toRunnerTable
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.domain.NetworkUtil
-import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
@@ -25,12 +25,12 @@ class RegisterNewRunnersRepositoryImpl @Inject constructor(
 
     override suspend  fun saveNewRunners(runners: List<Runner>) {
         try {
-            val runnersData = runners.map { it.toRunnerTable() to it.checkpoints.toCheckpointsResult(runnerNumber = it.number)  }
-            runnerDao.insertRunners(runnersData)
-            runners.forEach {
-                runnersCache.getRunnerList(it.type).add(it)
-                if(networkUtil.isOnline()) firestoreApi.updateRunner(it) else runnerDao.markAsNeedToSync(runnerNumber = it.number, needToSync = true)
-            }
+//            val runnersData = runners.map { it.toRunnerTable() to it.checkpoints.toCheckpointsResult(runnerNumber = it.number)  }
+//            runnerDao.insertRunners(runnersData)
+//            runners.forEach {
+//                runnersCache.getRunnerList(it.type).add(it)
+//                if(networkUtil.isOnline()) firestoreApi.updateRunner(it) else runnerDao.markAsNeedToSync(runnerNumber = it.number, needToSync = true)
+//            }
         } catch (e: SQLiteConstraintException) {
             throw RunnerWithIdAlreadyExistException()
         } catch (e: Exception) {
@@ -39,6 +39,6 @@ class RegisterNewRunnersRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCheckpoints(type: RunnerType): List<Checkpoint> = settingsCache.getCheckpointList(type)
+    override suspend fun getCheckpoints(type: RunnerType): List<CheckpointImpl> = settingsCache.getCheckpointList(type)
 
 }

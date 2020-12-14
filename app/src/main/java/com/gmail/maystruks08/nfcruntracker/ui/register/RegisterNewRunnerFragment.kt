@@ -1,11 +1,9 @@
 package com.gmail.maystruks08.nfcruntracker.ui.register
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -95,11 +93,6 @@ class RegisterNewRunnerFragment : BaseFragment() {
 
     fun onNfcCardScanned(cardId: String){
         viewModel.onNfcCardScanned(cardId)
-    }
-
-    private fun hideSoftKeyboard() {
-        val inputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(binding.rootItem.windowToken, 0)
     }
 
     private fun initStaticCardSwipe() {

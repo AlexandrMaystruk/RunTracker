@@ -8,6 +8,8 @@
     <string name="screen_register_new_runner">Member Registration</string>
     <string name="screen_runners_results">Results</string>
     <string name="screen_runner">Member Information</string>
+    <string name="screen_race_list">Race list</string>
+
 
     <string name="tab_runner_result">Runners</string>
     <string name="tab_iron_runner_result">Iron</string>

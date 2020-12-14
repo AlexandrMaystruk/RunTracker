@@ -1,10 +1,11 @@
 package com.gmail.maystruks08.domain.repository
 
-import com.gmail.maystruks08.domain.entities.DistanceSettings
 import com.gmail.maystruks08.domain.entities.TaskResult
 import java.util.*
 
 interface SettingsRepository {
+
+    fun getAdminUserIds(): List<String>
 
     suspend fun updateConfig(): TaskResult<Exception, Unit>
 
@@ -15,13 +16,6 @@ interface SettingsRepository {
     suspend fun changeCurrentCheckpointForIronPeoples(checkpointNumber: Int)
 
     suspend fun changeStartDate(date: Date)
-
-    fun getAdminUserIds(): List<String>
-
-    suspend fun getRaceList(): TaskResult<Exception, List<DistanceSettings>>
-
-
-    suspend fun getRaceCheckpoints(raceId: String): TaskResult<Exception, DistanceSettings>
 
 
     data class CheckpointsConfig(

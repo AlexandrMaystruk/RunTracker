@@ -7,8 +7,8 @@ import com.gmail.maystruks08.domain.entities.Change
 import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
-import com.gmail.maystruks08.domain.entities.runner.RunnerType
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
@@ -51,13 +51,13 @@ class RunnersViewModel @ViewModelInject constructor(
 
     private val _distanceLiveData = MutableLiveData<MutableList<DistanceView>>()
     private val _runnersLiveData = MutableLiveData<MutableList<RunnerView>>()
-    private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, Int>>()
+    private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, Long>>()
     private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
     private val _showProgressLiveData = SingleLiveEvent<Boolean>()
     private val _showTimeLiveData = SingleLiveEvent<String>()
     private val _selectCheckpointDialogLiveData = SingleLiveEvent<Array<CheckpointView>>()
 
-    private lateinit var runnerType: RunnerType
+    private var distanceId: Long = -1
     private var lastSelectedRunner: RunnerView? = null
 
     init {
@@ -68,14 +68,14 @@ class RunnersViewModel @ViewModelInject constructor(
         }
     }
 
-    fun initFragment(runnerTypeId: Int) {
-        runnerType = RunnerType.fromOrdinal(runnerTypeId)
-        _distanceLiveData.value = RunnerType.values().map { DistanceView(it.ordinal, it.name) }.toMutableList()
+    fun initFragment(distanceId: Long) {
+        this.distanceId = distanceId
+        _distanceLiveData.value = mutableListOf(DistanceView(0, "Normal"), DistanceView(1, "Iron"))
         viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
     }
 
-    fun changeRunnerType(runnerTypeId: Int) {
-        runnerType = RunnerType.fromOrdinal(runnerTypeId)
+    fun changeDistance(distanceId: Long) {
+        this.distanceId = distanceId
         viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
     }
 
@@ -124,7 +124,7 @@ class RunnersViewModel @ViewModelInject constructor(
 
     fun handleRunnerChanges(runnerChange: RunnerChange) {
         val runnerView = runnerChange.runner.toRunnerView()
-        if(runnerType == runnerChange.runner.type) {
+        if(distanceId == runnerChange.runner.actualDistanceId) {
             when (runnerChange.changeType) {
                 Change.ADD -> {
                     _runnersLiveData.value?.add(runnerView)
@@ -143,7 +143,7 @@ class RunnersViewModel @ViewModelInject constructor(
     fun onSearchQueryChanged(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
             if (query.isNotEmpty()) {
-                when (val result = runnersInteractor.getRunners(runnerType)) {
+                when (val result = runnersInteractor.getRunners(distanceId)) {
                     is TaskResult.Value -> {
                         val pattern =
                             ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
@@ -172,8 +172,8 @@ class RunnersViewModel @ViewModelInject constructor(
         router.navigateTo(Screens.RegisterNewRunnerScreen())
     }
 
-    fun onClickedAtRunner(runnerNumber: Int, runnerType: Int) {
-        router.navigateTo(Screens.RunnerScreen(runnerNumber, runnerType))
+    fun onClickedAtRunner(runnerNumber: Long, distanceId: Long) {
+        router.navigateTo(Screens.RunnerScreen(runnerNumber, distanceId))
     }
 
     fun onShowResultsClicked() {
@@ -208,7 +208,7 @@ class RunnersViewModel @ViewModelInject constructor(
     }
 
     private fun onMarkRunnerOnCheckpointSuccess(runnerChange: RunnerChange) {
-        val lastCheckpoint = runnerChange.runner.checkpoints.maxByOrNull { (it as? CheckpointResult)?.date?.time ?: 0 }
+        val lastCheckpoint = runnerChange.runner.checkpoints.maxByOrNull { it.getResult()?.time ?: 0 }
         _showSuccessDialogLiveData.postValue(lastCheckpoint to runnerChange.runner.number)
         handleRunnerChanges(runnerChange)
     }
@@ -216,7 +216,7 @@ class RunnersViewModel @ViewModelInject constructor(
     private suspend fun showAllRunners() {
         _showProgressLiveData.postValue(true)
         showSmallInitRunners()
-        when (val result = runnersInteractor.getRunners(runnerType, null)) {
+        when (val result = runnersInteractor.getRunners(distanceId, null)) {
             is TaskResult.Value -> {
                 Timber.w("showAllRunners")
                 val runners = toRunnerViews(result.value)
@@ -230,7 +230,7 @@ class RunnersViewModel @ViewModelInject constructor(
 
 
     private suspend fun showSmallInitRunners() {
-        when (val result = runnersInteractor.getRunners(runnerType, 20)) {
+        when (val result = runnersInteractor.getRunners(distanceId, 20)) {
             is TaskResult.Value -> {
                 Timber.w("showAllRunners  showSmallInitRunners")
                 val runners = toRunnerViews(result.value)

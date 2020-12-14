@@ -11,8 +11,6 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(
 
     override suspend fun registerNewRunners(registerInputData: List<RegisterNewRunnerInteractor.RegisterInputData>): TaskResult<Exception, Unit> {
         return TaskResult.build {
-            val runnerType = registerInputData.first().runnerType
-            val checkpoints = runnersRepository.getCheckpoints(runnerType).toMutableList()
             val runners = registerInputData.map {
                 Runner(
                     cardId = it.runnerCardId,
@@ -24,10 +22,11 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(
                     city = it.city,
                     dateOfBirthday = it.dateOfBirthday,
                     teamName = it.teamName,
-                    type = runnerType,
                     totalResult = null,
-                    checkpoints = checkpoints,
-                    isOffTrack = false
+                    checkpoints = mutableListOf(),
+                    isOffTrack = false,
+                    distanceIds = emptyList(),
+                    actualDistanceId = 0
                 )
             }
             runnersRepository.saveNewRunners(runners)

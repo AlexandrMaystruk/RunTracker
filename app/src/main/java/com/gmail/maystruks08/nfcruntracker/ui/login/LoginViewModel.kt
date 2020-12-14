@@ -127,19 +127,19 @@ class LoginViewModel @ViewModelInject constructor(
                     when (val task = settingsRepository.getCachedConfig()) {
                         is TaskResult.Value -> withContext(Dispatchers.Main) {
                             _showProgressLiveData.postValue(false)
-                            router.newRootScreen(Screens.RunnersScreen(0))
+                            router.newRootScreen(Screens.RunnersScreen(0,null))
                         }
                         is TaskResult.Error -> {
                             _showProgressLiveData.postValue(false)
                             Timber.e(task.error)
-                            withContext(Dispatchers.Main) { router.newRootScreen(Screens.RunnersScreen(0)) }
+                            withContext(Dispatchers.Main) { router.newRootScreen(Screens.RunnersScreen(0, null)) }
                         }
                     }
                 }
                 is TaskResult.Error -> {
                     _showProgressLiveData.postValue(false)
                     Timber.e(resultOfTask.error)
-                    withContext(Dispatchers.Main) { router.newRootScreen(Screens.RunnersScreen(0)) }
+                    withContext(Dispatchers.Main) { router.newRootScreen(Screens.RunnersScreen(0, null)) }
                 }
             }
         }

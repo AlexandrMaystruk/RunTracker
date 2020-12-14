@@ -5,12 +5,12 @@ import android.os.Parcelable
 
 data class RunnerView(
     val cardId: String,
-    val number: Int,
+    val number: Long,
     val fullName: String,
     val city: String,
     val result: String?,
     val dateOfBirthday: String,
-    val type: Int,
+    val actualDistanceId: Long,
     val progress: List<CheckpointView>,
     val isOffTrack: Boolean,
     val placeholder: Boolean = false
@@ -18,12 +18,12 @@ data class RunnerView(
 
     constructor(source: Parcel) : this(
         source.readString().orEmpty(),
-        source.readInt(),
+        source.readLong(),
         source.readString().orEmpty(),
         source.readString().orEmpty(),
         source.readString(),
         source.readString().orEmpty(),
-        source.readInt(),
+        source.readLong(),
         listOf<CheckpointView>().apply { source.readList(this, CheckpointView::class.java.classLoader) },
         1 == source.readInt(),
         1 == source.readInt()
@@ -33,12 +33,12 @@ data class RunnerView(
 
     override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
         writeString(cardId)
-        writeInt(number)
+        writeLong(number)
         writeString(fullName)
         writeString(city)
         writeString(result)
         writeString(dateOfBirthday)
-        writeInt(type)
+        writeLong(actualDistanceId)
         writeList(progress)
         writeInt((if (isOffTrack) 1 else 0))
         writeInt((if (placeholder) 1 else 0))

@@ -12,11 +12,13 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.gone
 import com.gmail.maystruks08.nfcruntracker.core.ext.hide
 import com.gmail.maystruks08.nfcruntracker.core.ext.show
 import com.gmail.maystruks08.nfcruntracker.databinding.ItemCheckpointBinding
-import com.gmail.maystruks08.nfcruntracker.ui.views.stepview.StepState
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
+import com.gmail.maystruks08.nfcruntracker.ui.views.stepview.StepState
 import kotlin.properties.Delegates
 
-class CheckpointsAdapter( private val longClickListener: (Int) -> Unit) : RecyclerView.Adapter<CheckpointsAdapter.ViewHolder>() {
+class CheckpointsAdapter(
+    private val interaction: Interaction
+) : RecyclerView.Adapter<CheckpointsAdapter.ViewHolder>() {
 
     var checkpoints: MutableList<CheckpointView> by Delegates.observable(mutableListOf()) { _, _, _ ->
         notifyDataSetChanged()
@@ -25,12 +27,13 @@ class CheckpointsAdapter( private val longClickListener: (Int) -> Unit) : Recycl
     var isOffTrack: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_checkpoint, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_checkpoint, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindHolder(checkpoints[position], position, longClickListener)
+        holder.bindHolder(checkpoints[position], position, interaction)
     }
 
     override fun getItemCount(): Int = checkpoints.size
@@ -40,7 +43,7 @@ class CheckpointsAdapter( private val longClickListener: (Int) -> Unit) : Recycl
         private val binding = ItemCheckpointBinding.bind(itemView)
 
 
-        fun bindHolder(item: CheckpointView, position: Int, longClickListener: (Int) -> Unit) {
+        fun bindHolder(item: CheckpointView, position: Int, interaction: Interaction) {
             with(binding) {
                 val stateDrawable = when (item.bean.state) {
                     StepState.UNDONE -> R.drawable.ic_unchecked
@@ -54,7 +57,8 @@ class CheckpointsAdapter( private val longClickListener: (Int) -> Unit) : Recycl
                         topView.gone()
                         bottomView.show()
                         tvCheckpointName.text = null
-                        tvCheckpointName.background = ContextCompat.getDrawable(root.context, R.drawable.ic_start)
+                        tvCheckpointName.background =
+                            ContextCompat.getDrawable(root.context, R.drawable.ic_start)
                     }
                     checkpoints.lastIndex -> {
                         tvCheckpointName.text = null
@@ -78,7 +82,7 @@ class CheckpointsAdapter( private val longClickListener: (Int) -> Unit) : Recycl
                 }
                 if (item.date != null) {
                     tvCheckpointDate.setOnLongClickListener {
-                        longClickListener.invoke(item.id)
+                        interaction.onLongCLickAtCheckpointDate(item)
                         true
                     }
                     tvCheckpointDate.show()
@@ -86,5 +90,11 @@ class CheckpointsAdapter( private val longClickListener: (Int) -> Unit) : Recycl
                 } else tvCheckpointDate.gone()
             }
         }
+    }
+
+    interface Interaction {
+
+        fun onLongCLickAtCheckpointDate(checkpointView: CheckpointView)
+
     }
 }

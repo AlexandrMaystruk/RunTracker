@@ -4,14 +4,11 @@ import com.gmail.maystruks08.data.awaitTaskResult
 import com.gmail.maystruks08.data.cache.SettingsCache
 import com.gmail.maystruks08.data.local.ConfigPreferences
 import com.gmail.maystruks08.data.local.dao.CheckpointDAO
-import com.gmail.maystruks08.data.mappers.toCheckpoint
 import com.gmail.maystruks08.data.mappers.toCheckpointTable
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.data.remote.pojo.CheckpointPojo
 import com.gmail.maystruks08.data.toDataClass
 import com.gmail.maystruks08.domain.NetworkUtil
-import com.gmail.maystruks08.domain.entities.DistanceSettings
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointType
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -72,21 +69,21 @@ class SettingsRepositoryImpl @Inject constructor(
             settingsCache.adminUserIds.clear()
             adminUserIds?.let { settingsCache.adminUserIds.addAll(it) }
 
-            settingsCache.checkpoints = checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
-            settingsCache.checkpointsIronPeople = checkpointDAO.getCheckpointsByType(CheckpointType.IRON.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
+//            settingsCache.checkpoints = checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
+//            settingsCache.checkpointsIronPeople = checkpointDAO.getCheckpointsByType(CheckpointType.IRON.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
+//
+//            val checkpoint = settingsCache.checkpoints.find { it.id == currentCheckpointId } ?: settingsCache.checkpoints.first()
+//            val checkpointIronPeople = settingsCache.checkpointsIronPeople.find { it.id == currentIronPeopleCheckpointId } ?: settingsCache.checkpointsIronPeople.first()
+//
+//            settingsCache.currentCheckpoint = checkpoint
+//            settingsCache.currentIronPeopleCheckpoint = checkpointIronPeople
+//            settingsCache.dateOfStart = startDate
+//
+            val config = SettingsRepository.Config(0, 1, startDate)
+//            val checkpointsTitle = settingsCache.checkpoints.map { it.name }
+//            val ironCheckpointsTitle = settingsCache.checkpointsIronPeople.map { it.name }
 
-            val checkpoint = settingsCache.checkpoints.find { it.id == currentCheckpointId } ?: settingsCache.checkpoints.first()
-            val checkpointIronPeople = settingsCache.checkpointsIronPeople.find { it.id == currentIronPeopleCheckpointId } ?: settingsCache.checkpointsIronPeople.first()
-
-            settingsCache.currentCheckpoint = checkpoint
-            settingsCache.currentIronPeopleCheckpoint = checkpointIronPeople
-            settingsCache.dateOfStart = startDate
-
-            val config = SettingsRepository.Config(checkpoint.id, checkpointIronPeople.id, startDate)
-            val checkpointsTitle = settingsCache.checkpoints.map { it.name }
-            val ironCheckpointsTitle = settingsCache.checkpointsIronPeople.map { it.name }
-
-            SettingsRepository.CheckpointsConfig(checkpointsTitle, ironCheckpointsTitle, config)
+            SettingsRepository.CheckpointsConfig(listOf(), listOf(), config)
         }
     }
 
@@ -138,13 +135,5 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override fun getAdminUserIds(): List<String> {
         return settingsCache.adminUserIds
-    }
-
-    override suspend fun getRaceList(): TaskResult<Exception, List<DistanceSettings>> {
-        return TaskResult.build { throw IllegalStateException() }
-    }
-
-    override suspend fun getRaceCheckpoints(raceId: String): TaskResult<Exception, DistanceSettings> {
-        return TaskResult.build { throw IllegalStateException() }
     }
 }

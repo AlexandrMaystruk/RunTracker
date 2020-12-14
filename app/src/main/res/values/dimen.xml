@@ -46,6 +46,10 @@
     <dimen name="runnerItemBigHeight">130dp</dimen>
     <dimen name="runnerItemSmallHeight">95dp</dimen>
 
+
+    <dimen name="raceItemHeight">160dp</dimen>
+
+
     <dimen name="transition_s">4dp</dimen>
     <dimen name="transition_m">8dp</dimen>
     <dimen name="transition_l">12dp</dimen>

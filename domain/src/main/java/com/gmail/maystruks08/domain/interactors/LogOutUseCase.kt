@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.nfcruntracker.ui.login
+package com.gmail.maystruks08.domain.interactors
 
 interface LogOutUseCase {
 

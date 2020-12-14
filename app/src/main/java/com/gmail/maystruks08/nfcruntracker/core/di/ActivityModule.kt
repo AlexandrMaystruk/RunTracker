@@ -1,15 +1,11 @@
 package com.gmail.maystruks08.nfcruntracker.core.di
 
-import com.gmail.maystruks08.data.repository.RunnerDataChangeListener
-import com.gmail.maystruks08.data.repository.RunnersRepositoryImpl
-import com.gmail.maystruks08.data.repository.SettingsRepositoryImpl
-import com.gmail.maystruks08.domain.interactors.CheckpointInteractor
-import com.gmail.maystruks08.domain.interactors.CheckpointInteractorImpl
-import com.gmail.maystruks08.domain.interactors.RunnersInteractor
-import com.gmail.maystruks08.domain.interactors.RunnersInteractorImpl
+import com.gmail.maystruks08.data.repository.*
+import com.gmail.maystruks08.domain.interactors.*
 import com.gmail.maystruks08.domain.repository.RunnersRepository
 import com.gmail.maystruks08.domain.repository.SettingsRepository
-import com.gmail.maystruks08.nfcruntracker.ui.login.LogOutUseCase
+import com.gmail.maystruks08.domain.repository.CheckpointsRepository
+import com.gmail.maystruks08.domain.repository.RaceRepository
 import com.gmail.maystruks08.nfcruntracker.ui.login.LogOutUseCaseImpl
 import dagger.Binds
 import dagger.Module
@@ -29,9 +25,12 @@ abstract class ActivityModule {
     @ActivityScoped
     abstract fun provideLogoutUseCase(logOutUseCase: LogOutUseCaseImpl): LogOutUseCase
 
+
+
     @Binds
     @ActivityScoped
-    abstract fun bindRunnerDataChangeListener(viewModel: RunnersRepositoryImpl): RunnerDataChangeListener
+    abstract fun bindRunnersInteractor(impl: RunnersInteractorImpl): RunnersInteractor
+
 
     @Binds
     @ActivityScoped
@@ -39,7 +38,18 @@ abstract class ActivityModule {
 
     @Binds
     @ActivityScoped
-    abstract fun bindRunnersInteractor(impl: RunnersInteractorImpl): RunnersInteractor
+    abstract fun bindRunnerDataChangeListener(viewModel: RunnersRepositoryImpl): RunnerDataChangeListener
+
+
+
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
+
+
+
 
     @Binds
     @ActivityScoped
@@ -47,7 +57,22 @@ abstract class ActivityModule {
 
     @Binds
     @ActivityScoped
-    abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+    abstract fun bindCheckpointsRepository(impl: CheckpointsRepositoryImpl): CheckpointsRepository
+
+
+
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindRaceInteractor(impl: RaceInteractorImpl): RaceInteractor
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindRaceRepository(impl: RaceRepositoryImpl): RaceRepository
+
+
+
+
 
 }
 

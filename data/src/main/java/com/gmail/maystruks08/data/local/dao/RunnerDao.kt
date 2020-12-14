@@ -1,96 +1,94 @@
 package com.gmail.maystruks08.data.local.dao
 
 import androidx.room.*
-import com.gmail.maystruks08.data.local.entity.CheckpointTable
-import com.gmail.maystruks08.data.local.entity.ResultTable
-import com.gmail.maystruks08.data.local.entity.RunnerTable
-import com.gmail.maystruks08.data.local.pojo.RunnerTableView
+import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
+import com.gmail.maystruks08.data.local.entity.relation.RunnerWithResult
+import com.gmail.maystruks08.data.local.entity.tables.ResultTable
+import com.gmail.maystruks08.data.local.entity.tables.RunnerTable
 
 @Dao
 @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
 interface RunnerDao : BaseDao<RunnerTable> {
 
+
+    /** INSERT */
     @Transaction
-    suspend fun insertOrReplaceRunner(runner: RunnerTable, results: List<ResultTable>) {
+    suspend fun insertOrReplaceRunner(
+        distanceId: Long,
+        runner: RunnerTable,
+        results: List<ResultTable>
+    ) {
         insertOrReplace(runner)
         insertAllOrReplaceResults(results)
+        insertOrReplaceJoin(DistanceRunnerCrossRef(distanceId, runner.runnerNumber))
     }
 
     @Transaction
-    suspend fun insertRunners(runnersData: List<Pair<RunnerTable,  List<ResultTable>>>) {
-        runnersData.forEach {
-            insert(it.first)
-            insertAllResult(it.second)
-        }
-    }
-
-    @Transaction
-    suspend fun insertRunner(runner: RunnerTable, results: List<ResultTable>) {
+    suspend fun insertRunner(distanceId: Long, runner: RunnerTable, results: List<ResultTable>) {
         insert(runner)
         insertAllResult(results)
+        insertJoin(DistanceRunnerCrossRef(distanceId, runner.runnerNumber))
     }
+
+
+    /** GET */
 
     @Transaction
-    suspend fun updateRunner(runner: RunnerTable, results: List<ResultTable>) {
-        insertOrReplace(runner)
-        insertAllOrReplaceResults(results)
-    }
+    @Query("SELECT * FROM runners WHERE runners.runnerNumber =:runnerNumber")
+    fun getRunnerWithResults(runnerNumber: Int): RunnerWithResult
 
     @Transaction
-    fun getRunnersWithResults(type: Int): List<RunnerTableView> {
-        val runners = getRunners(type)
-        return runners.map { RunnerTableView(it, getRunnerResults(it.number)) }
-    }
-
-    @Query("SELECT * FROM checkpoints WHERE checkpointType =:type")
-    fun getCheckpoints(type: Int): List<CheckpointTable>
+    @Query("SELECT * FROM runners WHERE runners.cardId =:cardUUID")
+    fun getRunnerWithResults(cardUUID: String): RunnerWithResult
 
 
     @Query("SELECT * FROM runners WHERE runners.cardId =:cardUUID")
-    fun getRunner(cardUUID: String): RunnerTable
+    fun getRunnerTable(cardUUID: String): RunnerTable
+
 
     @Transaction
-    @Query("UPDATE runners SET cardId = :newCardUUID WHERE number = :number")
-    fun updateRunnerCardId(number: Int, newCardUUID: String)
-
-    @Transaction
-    @Query("SELECT * FROM result LEFT JOIN runners ON result.runnerNumber = runners.number WHERE runners.number =:runnerNumber")
-    fun getRunnerResults(runnerNumber: Int): List<ResultTable>
-
-    @Transaction
-    @Query("SELECT * FROM runners WHERE type =:type ")
-    fun getRunners(type: Int): List<RunnerTable>
-
-    @Transaction
-    @Query("SELECT * FROM runners WHERE number =:runnerNumber AND needToSync = 1 ")
-    suspend fun checkNeedToSync(runnerNumber: Int): RunnerTable?
-
-
-    @Query("UPDATE runners SET needToSync = :needToSync WHERE number = :runnerNumber")
-    suspend fun markAsNeedToSync(runnerNumber: Int, needToSync: Boolean)
-
-    @Query("DELETE FROM runners WHERE number =:runnerNumber ")
-    suspend fun delete(runnerNumber: Int): Int
+    @Query("SELECT * FROM runners WHERE runners.runnerNumber =:runnerNumber")
+    fun getRunnerResults(runnerNumber: Long): List<RunnerWithResult>
 
     @Transaction
     @Query("SELECT * FROM runners WHERE needToSync = 1")
-    fun getNotUploadedRunners(): List<RunnerTable>
+    fun getNotUploadedRunners(): List<RunnerWithResult>
+
 
     @Transaction
-    fun getNotUploadedRunnersWithResults(): List<RunnerTableView> {
-        val runners = getNotUploadedRunners()
-        return runners.map { RunnerTableView(it, getRunnerResults(it.number)) }
-    }
+    @Query("UPDATE runners SET cardId = :newCardUUID WHERE runnerNumber = :number")
+    fun updateRunnerCardId(number: Int, newCardUUID: String)
+
+    @Transaction
+    @Query("SELECT * FROM runners WHERE runnerNumber =:runnerNumber AND needToSync = 1 ")
+    suspend fun checkNeedToSync(runnerNumber: Long): RunnerTable?
+
+    @Query("UPDATE runners SET needToSync = :needToSync WHERE runnerNumber = :runnerNumber")
+    suspend fun markAsNeedToSync(runnerNumber: Long, needToSync: Boolean)
 
 
-    /**
-     * CHECKPOINTS
-     */
+    @Query("DELETE FROM runners WHERE runnerNumber =:runnerNumber ")
+    suspend fun delete(runnerNumber: Long): Int
+
+
+    @Delete
+    suspend fun deleteJoin(join: DistanceRunnerCrossRef): Int
+
+
+    /** CHECKPOINTS */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAllOrReplaceResults(obj: List<ResultTable>)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insertAllResult(obj: List<ResultTable>)
+
+
+    /** JOIN */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertJoin(join: DistanceRunnerCrossRef)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertOrReplaceJoin(join: DistanceRunnerCrossRef)
 
 }
 

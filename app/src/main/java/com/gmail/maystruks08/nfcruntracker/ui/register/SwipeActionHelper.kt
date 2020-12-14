@@ -11,8 +11,7 @@ import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.ext.toPx
 
 
-abstract class SwipeActionHelper(context: Context)
-    : ItemTouchHelper.SimpleCallback(0,  ItemTouchHelper.LEFT) {
+abstract class SwipeActionHelper(context: Context) : ItemTouchHelper.SimpleCallback(0,  ItemTouchHelper.LEFT) {
 
     private val deleteIcon: Drawable? = ContextCompat.getDrawable(context, R.drawable.ic_trash)
     private val deleteBg: Drawable

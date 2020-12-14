@@ -1,6 +1,6 @@
 package com.gmail.maystruks08.data.remote
 
-import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.repository.SettingsRepository
@@ -15,7 +15,7 @@ interface FirestoreApi{
 
     suspend fun getCheckpoints(): Task<DocumentSnapshot>
 
-    suspend fun saveCheckpoints(checkpoints: List<Checkpoint>)
+    suspend fun saveCheckpoints(checkpoints: List<CheckpointImpl>)
 
     suspend fun getCheckpointsSettings(clientId: String): Task<DocumentSnapshot>
 

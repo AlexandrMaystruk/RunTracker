@@ -62,10 +62,11 @@ class RunnerResultFragment : BaseFragment() {
                 adapter = resultAdapter
             }
 
+            //TODO refactor
             navigation.setOnNavigationItemSelectedListener {
                 when (it.itemId) {
-                    R.id.item_runners -> viewModel.provideFinishers(RunnerType.NORMAL)
-                    R.id.item_iron_runners -> viewModel.provideFinishers(RunnerType.IRON)
+                    R.id.item_runners -> viewModel.provideFinishers(0)
+                    R.id.item_iron_runners -> viewModel.provideFinishers(1)
                 }
                 return@setOnNavigationItemSelectedListener true
             }

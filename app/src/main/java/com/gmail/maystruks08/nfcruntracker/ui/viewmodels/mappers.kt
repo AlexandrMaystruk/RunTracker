@@ -1,7 +1,9 @@
 package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
 
+import com.gmail.maystruks08.domain.entities.Race
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.toDateFormat
 import com.gmail.maystruks08.domain.toTimeUTCFormat
@@ -25,7 +27,7 @@ fun Runner.toRunnerView() = RunnerView(
     this.city,
     this.totalResult?.toTimeUTCFormat(),
     this.dateOfBirthday.toDateFormat(),
-    this.type.ordinal,
+    this.actualDistanceId,
     this.checkpoints.toCheckpointViews(),
     this.isOffTrack
 )
@@ -39,21 +41,27 @@ fun Runner.toRunnerResultView(position: Int) = RunnerResultView(
 )
 
 fun List<Checkpoint>.toCheckpointViews(): List<CheckpointView> {
-    val current = this.findLast { it is CheckpointResult }
-    return this.map {
-        if (it is CheckpointResult) {
-            val state = if (current?.id == it.id) {
-                StepState.CURRENT
-            } else {
-                if (it.hasPrevious) StepState.DONE else StepState.DONE_WARNING
-            }
-            CheckpointView(it.id, Bean(it.name, state), it.date)
-        } else {
-            CheckpointView(it.id, Bean(it.name, StepState.UNDONE))
-        }
-    }
+    return emptyList()
+//    val current = this.findLast { it is CheckpointResultIml }
+//    return this.map {
+//        if (it is CheckpointResultIml) {
+//            val state = if (current?.id == it.id) {
+//                StepState.CURRENT
+//            } else {
+//                if (it.hasPrevious) StepState.DONE else StepState.DONE_WARNING
+//            }
+//            CheckpointView(it.id, Bean(it.name, state), it.date)
+//        } else {
+//            CheckpointView(it.id, Bean(it.name, StepState.UNDONE))
+//        }
+//    }
 }
 
 fun Checkpoint.toCheckpointView(): CheckpointView {
-    return CheckpointView(id, Bean(name, StepState.UNDONE))
+    return CheckpointView(getId(), Bean(getName(), StepState.UNDONE))
+}
+
+
+fun Race.toView(): RaceView {
+    return RaceView(id, name, distanceList.firstOrNull()?.id)
 }

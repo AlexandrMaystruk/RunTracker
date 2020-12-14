@@ -60,7 +60,6 @@ class RegisterNewRunnerViewModel @ViewModelInject constructor(private val router
                         dateOfBirthday = it.dateOfBirthday!!,
                         city = it.city!!,
                         runnerNumber = it.runnerNumber!!,
-                        runnerType = it.runnerType!!,
                         runnerCardId = it.runnerCardId!!,
                         teamName = teamName
                     )

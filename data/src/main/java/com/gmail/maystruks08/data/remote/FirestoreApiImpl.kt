@@ -7,7 +7,7 @@ import com.gmail.maystruks08.data.mappers.toFirestoreRunner
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.domain.entities.Change
 import com.gmail.maystruks08.domain.entities.RunnerChange
-import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.android.gms.tasks.Task
@@ -45,7 +45,7 @@ class FirestoreApiImpl @Inject constructor(private val db: FirebaseFirestore) : 
 
     override suspend fun getCheckpoints(): Task<DocumentSnapshot> = db.collection(SETTINGS_COLLECTION).document(CHECKPOINTS_DOCUMENT_NAME).get()
 
-    override suspend fun saveCheckpoints(checkpoints: List<Checkpoint>) {
+    override suspend fun saveCheckpoints(checkpoints: List<CheckpointImpl>) {
         val document = db.collection(SETTINGS_COLLECTION).document(CHECKPOINTS_DOCUMENT_NAME)
         val map = hashMapOf<String, Any>()
             .apply {

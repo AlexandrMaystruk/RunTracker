@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_item"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/raceItemHeight"
+    android:layout_marginStart="@dimen/margin_xs"
+    android:layout_marginTop="@dimen/margin_xs"
+    android:layout_marginEnd="@dimen/margin_xs"
+    app:cardCornerRadius="@dimen/margin_xs"
+    app:cardElevation="@dimen/margin_xs"
+    app:contentPadding="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tvRunnerPosition"
+            style="@style/TextM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_s"
+            android:layout_marginTop="@dimen/margin_s"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvRunnerFullName"
+            style="@style/TextM"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_xs"
+            android:layout_marginTop="@dimen/margin_s"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/tvRunnerNumber"
+            app:layout_constraintStart_toEndOf="@+id/tvRunnerPosition"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvRunnerNumber"
+            style="@style/TextM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_xs"
+            android:layout_marginTop="@dimen/margin_s"
+            android:layout_marginEnd="@dimen/margin_s"
+            android:gravity="end"
+            app:layout_constraintBottom_toBottomOf="@+id/tvRunnerFullName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvRunnerFullName"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvRunnerResultTime"
+            style="@style/TextM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_s"
+            android:gravity="end"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvRunnerFullName" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

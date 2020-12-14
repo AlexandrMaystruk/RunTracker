@@ -8,22 +8,22 @@ import java.util.*
 
 interface RunnersInteractor {
 
-    suspend fun getRunner(runnerNumber: Int): TaskResult<Exception, Runner>
+    suspend fun getRunner(runnerNumber: Long): TaskResult<Exception, Runner>
 
-    suspend fun getRunners(type: RunnerType, initSize: Int? = null): TaskResult<Exception, List<Runner>>
+    suspend fun getRunners(distanceId: Long, initSize: Int? = null): TaskResult<Exception, List<Runner>>
 
-    suspend fun getFinishers(type: RunnerType): TaskResult<Exception, List<Runner>>
+    suspend fun getFinishers(distanceId: Long): TaskResult<Exception, List<Runner>>
 
     suspend fun addCurrentCheckpointToRunner(cardId: String): TaskResult<Exception, RunnerChange>
 
-    suspend fun addCurrentCheckpointToRunner(runnerNumber: Int): TaskResult<Exception, RunnerChange>
+    suspend fun addCurrentCheckpointToRunner(runnerNumber: Long): TaskResult<Exception, RunnerChange>
 
     suspend fun addStartCheckpointToRunners(date: Date): TaskResult<Exception, Unit>
 
-    suspend fun changeRunnerCardId(runnerNumber: Int, newCardId: String): TaskResult<Exception, RunnerChange>
+    suspend fun changeRunnerCardId(runnerNumber: Long, newCardId: String): TaskResult<Exception, RunnerChange>
 
-    suspend fun markRunnerGotOffTheRoute(runnerNumber: Int): TaskResult<Exception, RunnerChange>
+    suspend fun markRunnerGotOffTheRoute(runnerNumber: Long): TaskResult<Exception, RunnerChange>
 
-    suspend fun removeCheckpointForRunner(runnerNumber: Int, checkpointId: Int): TaskResult<Exception, RunnerChange>
+    suspend fun removeCheckpointForRunner(runnerNumber: Long, checkpointId: Long): TaskResult<Exception, RunnerChange>
 
 }

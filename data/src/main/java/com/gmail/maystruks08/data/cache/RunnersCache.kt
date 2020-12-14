@@ -1,6 +1,6 @@
 package com.gmail.maystruks08.data.cache
 
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResult
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import javax.inject.Inject
@@ -12,13 +12,13 @@ class RunnersCache @Inject constructor() {
     val normalRunnersList: MutableSet<Runner> = sortedSetOf(
         compareBy<Runner> { it.totalResult }
             .thenBy { it.isOffTrack }
-            .thenBy { runner -> runner.checkpoints.count { it is CheckpointResult } }
+            .thenBy { runner -> runner.checkpoints.count { it is CheckpointResultIml } }
     )
 
     val ironRunnersList: MutableSet<Runner> = sortedSetOf(
         compareBy<Runner> { it.totalResult }
             .thenBy { it.isOffTrack }
-            .thenBy { runner -> runner.checkpoints.count { it is CheckpointResult } }
+            .thenBy { runner -> runner.checkpoints.count { it is CheckpointResultIml } }
     )
 
     fun getRunnerList(type: RunnerType): MutableList<Runner> = when (type) {
@@ -29,10 +29,10 @@ class RunnersCache @Inject constructor() {
     fun findRunnerByCardId(cardId: String): Runner? =
         normalRunnersList.find { it.cardId == cardId } ?: ironRunnersList.find { it.cardId == cardId }
 
-    fun findRunnerByNumber(runnerNumber: Int): Runner? =
+    fun findRunnerByNumber(runnerNumber: Long): Runner? =
         normalRunnersList.find { it.number == runnerNumber } ?: ironRunnersList.find { it.number == runnerNumber }
 
-    fun findRunnerTeamMembers(currentRunnerNumber: Int, teamName: String): List<Runner>? {
+    fun findRunnerTeamMembers(currentRunnerNumber: Long, teamName: String): List<Runner>? {
         val result = normalRunnersList.filter { it.teamName == teamName && it.number != currentRunnerNumber }
         if (result.any { it.isOffTrack }) return null
         return result
