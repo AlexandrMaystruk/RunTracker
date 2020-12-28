@@ -28,7 +28,6 @@ class RaceFragment : BaseFragment(), RaceAdapter.Interaction {
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
-        .withNavigationIcon(R.drawable.ic_arrow_back) { viewModel.onBackClicked() }
         .withMenu(R.menu.menu_search)
         .withMenuSearch(InputType.TYPE_CLASS_NUMBER) { viewModel.onSearchQueryChanged(it) }
         .withTitle(R.string.screen_race_list)
@@ -57,7 +56,7 @@ class RaceFragment : BaseFragment(), RaceAdapter.Interaction {
         adapter = RaceAdapter(this)
         with(binding) {
             raceRecyclerView.apply {
-                layoutManager = GridLayoutManager(requireContext(), 3)
+                layoutManager = GridLayoutManager(requireContext(), 2)
                 adapter = this@RaceFragment.adapter
             }
 

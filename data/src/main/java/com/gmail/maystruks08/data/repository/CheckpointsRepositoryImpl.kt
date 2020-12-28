@@ -1,6 +1,5 @@
 package com.gmail.maystruks08.data.repository
 
-import com.gmail.maystruks08.data.cache.SettingsCache
 import com.gmail.maystruks08.data.local.dao.CheckpointDAO
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.domain.NetworkUtil
@@ -12,7 +11,6 @@ import javax.inject.Inject
 class CheckpointsRepositoryImpl @Inject constructor(
     private val firestoreApi: FirestoreApi,
     private val checkpointDAO: CheckpointDAO,
-    private val settingsCache: SettingsCache,
     private val networkUtil: NetworkUtil
 ) : CheckpointsRepository {
 

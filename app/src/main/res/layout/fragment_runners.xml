@@ -45,6 +45,7 @@
         android:layout_marginStart="@dimen/margin_m"
         android:layout_marginEnd="@dimen/margin_m"
         android:layout_marginBottom="@dimen/margin_m"
+        android:elevation="@dimen/cardview_default_elevation"
         android:background="@drawable/bg_corner_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rvDistanceType" />

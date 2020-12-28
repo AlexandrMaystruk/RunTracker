@@ -21,7 +21,7 @@ class RaceAdapter(private val interaction: Interaction) : RecyclerView.Adapter<R
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindHolder(raceList[position], position, interaction)
+        holder.bindHolder(raceList[position], interaction)
     }
 
     override fun getItemCount(): Int = raceList.size
@@ -31,8 +31,9 @@ class RaceAdapter(private val interaction: Interaction) : RecyclerView.Adapter<R
         private val binding = ItemRaceBinding.bind(itemView)
 
 
-        fun bindHolder(item: RaceView, position: Int, interaction: Interaction) {
+        fun bindHolder(item: RaceView, interaction: Interaction) {
             with(binding) {
+                tvName.text = item.name
                 root.setOnClickListener {
                     interaction.onClickAtRace(item)
                 }

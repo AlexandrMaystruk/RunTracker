@@ -47,6 +47,7 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
 
     private var alertDialog: AlertDialog? = null
 
+    private var raceId: Long by argument()
     private var distanceId: Long? by argumentNullable()
 
     override fun onCreateView(
@@ -64,12 +65,15 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
         .withTitle(R.string.app_name)
         .withMenu(R.menu.menu_search_with_settings)
         .withMenuItems(
-            listOf(R.id.action_settings, R.id.action_result),
+            listOf(R.id.action_settings, R.id.action_result,  R.id.action_select_race),
             listOf(MenuItem.OnMenuItemClickListener {
                 viewModel.onOpenSettingsFragmentClicked()
                 true
             }, MenuItem.OnMenuItemClickListener {
                 viewModel.onShowResultsClicked()
+                true
+            }, MenuItem.OnMenuItemClickListener {
+                viewModel.onSelectRaceClicked()
                 true
             })
         )
@@ -131,7 +135,8 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
                 LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = distanceAdapter
         }
-        distanceId?.let { viewModel.initFragment(it) }
+
+        viewModel.initFragment(raceId, distanceId)
 
         binding.btnRegisterNewRunner.setOnClickListener {
             viewModel.onRegisterNewRunnerClicked()
@@ -233,6 +238,7 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
     companion object {
 
         fun getInstance(raceId: Long, distanceId: Long?) = RunnersFragment().apply {
+            this.raceId = raceId
             this.distanceId = distanceId
         }
     }

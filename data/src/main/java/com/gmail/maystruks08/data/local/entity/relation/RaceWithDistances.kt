@@ -5,6 +5,7 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.gmail.maystruks08.data.local.entity.tables.DistanceTable
 import com.gmail.maystruks08.data.local.entity.tables.RaceTable
+import com.gmail.maystruks08.domain.entities.Race
 
 @DatabaseView
 data class RaceWithDistances(
@@ -14,5 +15,5 @@ data class RaceWithDistances(
         entityColumn = "distanceId",
         entity = DistanceTable::class
     )
-    val runners: List<DistanceWithRunners>
+    val distancesWithRunners: List<DistanceWithRunners>
 )

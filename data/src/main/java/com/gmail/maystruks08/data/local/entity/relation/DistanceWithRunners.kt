@@ -6,6 +6,7 @@ import androidx.room.Junction
 import androidx.room.Relation
 import com.gmail.maystruks08.data.local.entity.tables.CheckpointTable
 import com.gmail.maystruks08.data.local.entity.tables.DistanceTable
+import com.gmail.maystruks08.data.local.entity.tables.ResultTable
 import com.gmail.maystruks08.data.local.entity.tables.RunnerTable
 
 @DatabaseView

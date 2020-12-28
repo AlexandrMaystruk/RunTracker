@@ -16,6 +16,7 @@ data class RunnerTable(
     val sex: Int,
     val city: String,
     val dateOfBirthday: Date,
+    val distanceIds: String, //json
     val teamName: String?,
     val totalResult: Date?,
     val isOffTrack: Boolean,

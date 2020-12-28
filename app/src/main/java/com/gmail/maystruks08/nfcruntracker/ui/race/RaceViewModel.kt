@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.interactors.RaceInteractor
+import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RaceView
@@ -14,6 +15,7 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
+import java.util.*
 
 @ObsoleteCoroutinesApi
 class RaceViewModel @ViewModelInject constructor(
@@ -30,9 +32,7 @@ class RaceViewModel @ViewModelInject constructor(
 
     fun initUI() {
         _showProgressLiveData.value = true
-
         viewModelScope.launch {
-
             when (val result = interactor.getRaceList()) {
                 is TaskResult.Value -> {
                     val raceViews = result.value.map { it.toView() }.toMutableList()
@@ -42,29 +42,46 @@ class RaceViewModel @ViewModelInject constructor(
                 is TaskResult.Error -> handleError(result.error)
             }
         }
-
     }
 
     fun onCreateNewRaceClicked() {
-
-
+        //TODO implement
     }
 
     fun onRaceClicked(raceView: RaceView) {
         viewModelScope.launch {
-            interactor.saveLastSelectedRaceId(raceView.id)
+            when (interactor.saveLastSelectedRaceId(raceView.id)) {
+                is TaskResult.Value -> router.navigateTo(
+                    Screens.RunnersScreen(
+                        raceView.id,
+                        raceView.firstDistanceId
+                    )
+                )
+                is TaskResult.Error -> router.navigateTo(
+                    Screens.RunnersScreen(
+                        raceView.id,
+                        raceView.firstDistanceId
+                    )
+                )
+            }
         }
-        router.navigateTo(Screens.RunnersScreen(raceView.id, raceView.firstDistanceId))
     }
 
     fun onSearchQueryChanged(query: String) {
-        TODO("Not yet implemented")
+        viewModelScope.launch {
+            if (query.isNotEmpty()) {
+                when (val result = interactor.getRaceList()) {
+                    is TaskResult.Value -> {
+                        val pattern = ".*${query.isolateSpecialSymbolsForRegex().toLowerCase(Locale.getDefault())}.*".toRegex()
+                        val races = result.value.filter { pattern.containsMatchIn(it.name.toLowerCase(Locale.getDefault())) }
+                        val raceViews = races.map { it.toView() }.toMutableList()
+                        _racesLiveData.postValue(raceViews)
+                    }
+                    is TaskResult.Error -> handleError(result.error)
+                }
+            } else initUI()
+        }
     }
-
-    fun onBackClicked() {
-        router.exit()
-    }
-
 
     private fun handleError(throwable: Throwable) {
         _showProgressLiveData.postValue(false)

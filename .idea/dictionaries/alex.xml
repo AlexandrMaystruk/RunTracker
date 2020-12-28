@@ -4,7 +4,9 @@
       <w>Firestore</w>
       <w>Interactor</w>
       <w>firestore</w>
+      <w>gson</w>
       <w>interactor</w>
+      <w>pojo</w>
     </words>
   </dictionary>
 </component>

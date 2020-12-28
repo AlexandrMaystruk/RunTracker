@@ -17,6 +17,7 @@ import androidx.room.Index
 data class DistanceTable(
     val distanceId: Long,
     val raceId: Long,
-    val authorId: String,
-    val name: String
+    val authorId: Long,
+    val name: String,
+    val dateOfStart: Long
 )

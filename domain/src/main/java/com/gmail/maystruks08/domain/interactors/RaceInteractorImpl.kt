@@ -2,8 +2,6 @@ package com.gmail.maystruks08.domain.interactors
 
 import com.gmail.maystruks08.domain.entities.Race
 import com.gmail.maystruks08.domain.entities.TaskResult
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
-import com.gmail.maystruks08.domain.repository.CheckpointsRepository
 import com.gmail.maystruks08.domain.repository.RaceRepository
 import javax.inject.Inject
 
@@ -11,11 +9,19 @@ class RaceInteractorImpl @Inject constructor(private val repository: RaceReposit
 
     override suspend fun getRaceList(): TaskResult<Exception, List<Race>> {
         return TaskResult.build {
-            repository.getRaceList()
+            return@build repository.getRaceList()
         }
     }
 
-    override suspend fun saveLastSelectedRaceId(raceId: Long) {
-        repository.saveLastSelectedRaceId(raceId)
+    override suspend fun saveLastSelectedRaceId(raceId: Long): TaskResult<Exception, Unit> {
+        return TaskResult.build {
+            return@build repository.saveLastSelectedRaceId(raceId)
+        }
+    }
+
+    override suspend fun getLastSelectedRaceId(): TaskResult<Exception, Long> {
+        return TaskResult.build {
+            return@build repository.getLastSelectedRaceId()
+        }
     }
 }

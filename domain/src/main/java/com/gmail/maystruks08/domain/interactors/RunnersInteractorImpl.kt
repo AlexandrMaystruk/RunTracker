@@ -18,8 +18,7 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
 
     override suspend fun getRunners(distanceId: Long, initSize: Int?): TaskResult<Exception, List<Runner>> =
         TaskResult.build {
-//            runnersRepository.getRunners(type = type, initSize = initSize)
-            listOf()
+            runnersRepository.getRunners(distanceId = distanceId, initSize = initSize)
         }
 
     override suspend fun getFinishers(distanceId: Long): TaskResult<Exception, List<Runner>> =

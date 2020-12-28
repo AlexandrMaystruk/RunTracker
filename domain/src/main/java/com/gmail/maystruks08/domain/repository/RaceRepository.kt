@@ -8,4 +8,6 @@ interface RaceRepository {
 
     suspend fun saveLastSelectedRaceId(raceId: Long)
 
+    suspend fun getLastSelectedRaceId(): Long
+
 }

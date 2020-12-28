@@ -3,9 +3,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.login
 import android.content.Intent
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
-import com.gmail.maystruks08.domain.entities.TaskResult
-import com.gmail.maystruks08.domain.repository.SettingsRepository
+import com.gmail.maystruks08.data.local.ConfigPreferences
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
@@ -14,17 +12,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 
 @ObsoleteCoroutinesApi
 class LoginViewModel @ViewModelInject constructor(
     private val router: Router,
-    private val settingsRepository: SettingsRepository,
+    private val configPreferences: ConfigPreferences
 ) : BaseViewModel() {
 
     private val auth = FirebaseAuth.getInstance()
@@ -36,7 +31,7 @@ class LoginViewModel @ViewModelInject constructor(
     private val _showProgressLiveData = SingleLiveEvent<Boolean>()
 
     fun initView() {
-        if (auth.currentUser != null) onOperationSuccess()
+        if (auth.currentUser != null) navigateToFragment()
     }
 
     fun signInWithGoogle() {
@@ -83,7 +78,7 @@ class LoginViewModel @ViewModelInject constructor(
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    onOperationSuccess()
+                    navigateToFragment()
                 } else {
                     _showProgressLiveData.postValue(false)
                     handleError(SignInWithCredentialExceptions())
@@ -95,7 +90,7 @@ class LoginViewModel @ViewModelInject constructor(
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    onOperationSuccess()
+                    navigateToFragment()
                 } else {
                     _showProgressLiveData.postValue(false)
                     handleError(SignInWithCredentialExceptions())
@@ -107,7 +102,7 @@ class LoginViewModel @ViewModelInject constructor(
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    onOperationSuccess()
+                    navigateToFragment()
                 } else {
                     _showProgressLiveData.postValue(false)
                     handleError(SignInWithCredentialExceptions())
@@ -117,31 +112,14 @@ class LoginViewModel @ViewModelInject constructor(
                 _showProgressLiveData.postValue(false)
                 handleError(it)
             }
-
     }
 
-    private fun onOperationSuccess() {
-        viewModelScope.launch(Dispatchers.IO) {
-            when (val resultOfTask = settingsRepository.updateConfig()) {
-                is TaskResult.Value -> {
-                    when (val task = settingsRepository.getCachedConfig()) {
-                        is TaskResult.Value -> withContext(Dispatchers.Main) {
-                            _showProgressLiveData.postValue(false)
-                            router.newRootScreen(Screens.RunnersScreen(0,null))
-                        }
-                        is TaskResult.Error -> {
-                            _showProgressLiveData.postValue(false)
-                            Timber.e(task.error)
-                            withContext(Dispatchers.Main) { router.newRootScreen(Screens.RunnersScreen(0, null)) }
-                        }
-                    }
-                }
-                is TaskResult.Error -> {
-                    _showProgressLiveData.postValue(false)
-                    Timber.e(resultOfTask.error)
-                    withContext(Dispatchers.Main) { router.newRootScreen(Screens.RunnersScreen(0, null)) }
-                }
-            }
+    private fun navigateToFragment() {
+        val raceId = configPreferences.getRaceId()
+        if (raceId != -1L) {
+            router.newRootScreen(Screens.RunnersScreen(raceId, null))
+        } else {
+            router.newRootScreen(Screens.RaceListScreen())
         }
     }
 

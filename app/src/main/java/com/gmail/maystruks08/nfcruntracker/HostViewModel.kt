@@ -32,14 +32,11 @@ class HostViewModel @ViewModelInject constructor(
     private val runnerChangeLiveData = MutableLiveData<RunnerChange>()
 
     init {
-        if (firebaseAuth.currentUser == null) {
-            router.newRootScreen(Screens.LoginScreen())
-        } else {
+        if (firebaseAuth.currentUser == null) router.newRootScreen(Screens.LoginScreen())
+        else {
             viewModelScope.launch {
                 when (val result = runnerDataChangeListener.getLastSavedRaceId()) {
-                    is TaskResult.Value -> router.newRootScreen(
-                        Screens.RunnersScreen(result.value, null)
-                    )
+                    is TaskResult.Value -> router.newRootScreen(Screens.RunnersScreen(result.value, null))
                     is TaskResult.Error -> router.newRootScreen(Screens.RaceListScreen())
                 }
             }

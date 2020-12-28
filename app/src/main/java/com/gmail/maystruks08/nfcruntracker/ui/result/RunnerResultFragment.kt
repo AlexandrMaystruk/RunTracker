@@ -5,9 +5,7 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.nfcruntracker.R
@@ -46,7 +44,7 @@ class RunnerResultFragment : BaseFragment() {
             resultAdapter.resultList = runnersResults.toMutableList()
         })
 
-        viewModel.error.observe(viewLifecycleOwner, Observer {
+        viewModel.error.observe(viewLifecycleOwner, {
             when(it){
                 is RunnerNotFoundException -> context?.toast(getString(R.string.error_runner_not_found))
                 is SaveRunnerDataException -> context?.toast(getString(R.string.error_save_data_to_local_db))

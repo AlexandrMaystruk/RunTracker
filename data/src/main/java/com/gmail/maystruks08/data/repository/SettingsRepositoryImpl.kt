@@ -1,7 +1,7 @@
 package com.gmail.maystruks08.data.repository
 
 import com.gmail.maystruks08.data.awaitTaskResult
-import com.gmail.maystruks08.data.cache.SettingsCache
+import com.gmail.maystruks08.data.cache.ApplicationCache
 import com.gmail.maystruks08.data.local.ConfigPreferences
 import com.gmail.maystruks08.data.local.dao.CheckpointDAO
 import com.gmail.maystruks08.data.mappers.toCheckpointTable
@@ -22,7 +22,7 @@ import kotlin.collections.ArrayList
 class SettingsRepositoryImpl @Inject constructor(
     private val firestoreApi: FirestoreApi,
     private val preferences: ConfigPreferences,
-    private val settingsCache: SettingsCache,
+    private val applicationCache: ApplicationCache,
     private val firebaseAuth: FirebaseAuth,
     private val checkpointDAO: CheckpointDAO,
     private val networkUtil: NetworkUtil
@@ -66,8 +66,8 @@ class SettingsRepositoryImpl @Inject constructor(
             val startDate = Date(preferences.getDateOfStart())
             val adminUserIds: List<String>? = Gson().fromJson(preferences.getAdminUserIds(), object : TypeToken<List<String>?>() {}.type)
 
-            settingsCache.adminUserIds.clear()
-            adminUserIds?.let { settingsCache.adminUserIds.addAll(it) }
+            applicationCache.adminUserIds.clear()
+            adminUserIds?.let { applicationCache.adminUserIds.addAll(it) }
 
 //            settingsCache.checkpoints = checkpointDAO.getCheckpointsByType(CheckpointType.NORMAL.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
 //            settingsCache.checkpointsIronPeople = checkpointDAO.getCheckpointsByType(CheckpointType.IRON.ordinal).map { it.toCheckpoint() }.sortedBy { it.id }
@@ -88,7 +88,7 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun changeCurrentCheckpoint(checkpointNumber: Int) {
-        settingsCache.currentCheckpoint = settingsCache.checkpoints[checkpointNumber]
+//        applicationCache.currentCheckpoint = settingsCache.checkpoints[checkpointNumber]
         preferences.saveCurrentCheckpointId(checkpointNumber)
         if (networkUtil.isOnline()) {
             firebaseAuth.currentUser?.uid?.let { currentUserId ->
@@ -105,7 +105,7 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun changeCurrentCheckpointForIronPeoples(checkpointNumber: Int) {
-        settingsCache.currentIronPeopleCheckpoint = settingsCache.checkpointsIronPeople[checkpointNumber]
+//        settingsCache.currentIronPeopleCheckpoint = settingsCache.checkpointsIronPeople[checkpointNumber]
         preferences.saveCurrentIronPeopleCheckpointId(checkpointNumber)
         if (networkUtil.isOnline()) {
             firebaseAuth.currentUser?.uid?.let { currentUserId ->
@@ -122,7 +122,7 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun changeStartDate(date: Date) {
-        settingsCache.dateOfStart = date
+//        settingsCache.dateOfStart = date
         preferences.saveDateOfStart(date.time)
         if (networkUtil.isOnline()) {
             try {
@@ -134,6 +134,7 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override fun getAdminUserIds(): List<String> {
-        return settingsCache.adminUserIds
+        return emptyList()
+//        return settingsCache.adminUserIds
     }
 }

@@ -1,16 +1,11 @@
 package com.gmail.maystruks08.data.repository
 
 import android.database.sqlite.SQLiteConstraintException
-import com.gmail.maystruks08.data.cache.RunnersCache
-import com.gmail.maystruks08.data.cache.SettingsCache
+import com.gmail.maystruks08.data.cache.ApplicationCache
 import com.gmail.maystruks08.data.local.dao.RunnerDao
-import com.gmail.maystruks08.data.mappers.toCheckpointsResult
-import com.gmail.maystruks08.data.mappers.toRunnerTable
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.domain.NetworkUtil
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.runner.Runner
-import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
 import com.gmail.maystruks08.domain.repository.RegisterNewRunnersRepository
 import javax.inject.Inject
@@ -18,12 +13,11 @@ import javax.inject.Inject
 class RegisterNewRunnersRepositoryImpl @Inject constructor(
     private val firestoreApi: FirestoreApi,
     private val runnerDao: RunnerDao,
-    private val settingsCache: SettingsCache,
-    private val runnersCache: RunnersCache,
+    private val applicationCache: ApplicationCache,
     private val networkUtil: NetworkUtil
 ) : RegisterNewRunnersRepository {
 
-    override suspend  fun saveNewRunners(runners: List<Runner>) {
+    override suspend fun saveNewRunners(runners: List<Runner>) {
         try {
 //            val runnersData = runners.map { it.toRunnerTable() to it.checkpoints.toCheckpointsResult(runnerNumber = it.number)  }
 //            runnerDao.insertRunners(runnersData)
@@ -34,11 +28,13 @@ class RegisterNewRunnersRepositoryImpl @Inject constructor(
         } catch (e: SQLiteConstraintException) {
             throw RunnerWithIdAlreadyExistException()
         } catch (e: Exception) {
-            runners.forEach { runnerDao.markAsNeedToSync(runnerNumber = it.number, needToSync = true) }
+            runners.forEach {
+                runnerDao.markAsNeedToSync(
+                    runnerNumber = it.number,
+                    needToSync = true
+                )
+            }
             throw e
         }
     }
-
-    override suspend fun getCheckpoints(type: RunnerType): List<CheckpointImpl> = settingsCache.getCheckpointList(type)
-
 }

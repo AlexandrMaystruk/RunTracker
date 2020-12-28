@@ -20,4 +20,21 @@
         <attr name="textNodeTitleSize" format="dimension" />
         <attr name="textNodeTitleColor" format="color" />
     </declare-styleable>
+
+    <declare-styleable name="CustomConstraintLayout">
+        <attr name="cornerLeftTop" format="dimension"/>
+        <attr name="cornerRightTop" format="dimension"/>
+        <attr name="cornerLeftBottom" format="dimension"/>
+        <attr name="cornerRightBottom" format="dimension"/>
+        <attr name="backgroundColor" format="color"/>
+        <attr name="strokeLineWidth" format="dimension"/>
+        <attr name="strokeLineColor" format="color"/>
+        <attr name="dashLineWidth" format="dimension"/>
+        <attr name="dashLineGap" format="dimension"/>
+
+        <attr name="cornerLeftSide" format="dimension"/>
+        <attr name="cornerRightSide" format="dimension"/>
+
+        <attr name="cornerAll" format="dimension"/>
+    </declare-styleable>
 </resources>

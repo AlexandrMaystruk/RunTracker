@@ -8,7 +8,8 @@ import androidx.room.PrimaryKey
 data class RaceTable(
     @PrimaryKey
     val id: Long,
-    val date: Long,
-    val authorId: String,
-    val name: String
+    val name: String,
+    val dateCreation: Long,
+    val authorId: Long,
+    val registrationIsOpen: Boolean
 )

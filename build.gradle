@@ -141,9 +141,9 @@ ext {
 
     cardViewVersion = '1.0.0'
     //https://mvnrepository.com/artifact/com.android.support.constraint/constraint-layout
-    constraintVersion = '2.1.0-alpha1'
+    constraintVersion = '2.1.0-alpha2'
     //https://mvnrepository.com/artifact/com.google.android.material/material
-    designVersion = '1.3.0-alpha04'
+    designVersion = '1.3.0-beta01'
 
     //Kotlin
     //https://github.com/Kotlin/anko
@@ -174,7 +174,7 @@ ext {
     workManagerVersion = '2.4.0'
 
     //https://developer.android.com/jetpack/androidx/releases/room
-    roomVersion = '2.2.5'
+    roomVersion = '2.2.6'
 
     //pdf
     textPDFVersion = '5.5.10'
@@ -186,7 +186,7 @@ ext {
     ciceroneVersion = '4.0.2'
 
     //fireStore version
-    firestoreVersion = '22.0.0'
+    firestoreVersion = '22.0.1'
     firebaseUiVersion = '4.3.1'
     firebaseAuthVersion = '20.0.1'
 

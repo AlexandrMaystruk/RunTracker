@@ -7,8 +7,6 @@ import com.gmail.maystruks08.domain.entities.Change
 import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
@@ -57,7 +55,9 @@ class RunnersViewModel @ViewModelInject constructor(
     private val _showTimeLiveData = SingleLiveEvent<String>()
     private val _selectCheckpointDialogLiveData = SingleLiveEvent<Array<CheckpointView>>()
 
+    private var raceId: Long = -1
     private var distanceId: Long = -1
+
     private var lastSelectedRunner: RunnerView? = null
 
     init {
@@ -68,8 +68,9 @@ class RunnersViewModel @ViewModelInject constructor(
         }
     }
 
-    fun initFragment(distanceId: Long) {
-        this.distanceId = distanceId
+    fun initFragment(raceId: Long, distanceId: Long?) {
+        this.raceId = raceId
+        this.distanceId = distanceId ?: 0
         _distanceLiveData.value = mutableListOf(DistanceView(0, "Normal"), DistanceView(1, "Iron"))
         viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
     }
@@ -178,6 +179,10 @@ class RunnersViewModel @ViewModelInject constructor(
 
     fun onShowResultsClicked() {
         router.navigateTo(Screens.RunnersResultsScreen())
+    }
+
+    fun onSelectRaceClicked() {
+        router.navigateTo(Screens.RaceListScreen())
     }
 
     fun onCurrentCheckpointTextClicked() {
