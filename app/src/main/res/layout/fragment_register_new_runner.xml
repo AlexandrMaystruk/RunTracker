@@ -6,10 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".ui.register.RegisterNewRunnerFragment">
 
-    <include
-        layout="@layout/layout_toolbar"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_collapseMode="pin"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/root_item"
@@ -57,7 +64,7 @@
         android:id="@+id/registerRunnersRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/btnAddNewRunner"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/root_item"
@@ -72,17 +79,6 @@
         android:src="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="@id/registerRunnersRecyclerView"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <Button
-        android:id="@+id/btnAddNewRunner"
-        style="@style/MainButton"
-        android:layout_margin="@dimen/margin_m"
-        android:layout_marginTop="@dimen/margin_xxl"
-        android:text="@string/button_add"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

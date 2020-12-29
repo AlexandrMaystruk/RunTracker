@@ -2,6 +2,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.register
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
@@ -35,6 +36,14 @@ class RegisterNewRunnerFragment : BaseFragment() {
         .withId(R.id.toolbar)
         .withNavigationIcon(R.drawable.ic_arrow_back) { viewModel.onBackClicked() }
         .withTitle(R.string.screen_register_new_runner)
+        .withMenu(R.menu.menu_save)
+        .withMenuItems(
+            listOf(R.id.action_save_changes),
+            listOf(MenuItem.OnMenuItemClickListener {
+                viewModel.onRegisterNewRunnerClicked(adapter.runnerRegisterData, teamName)
+                true
+            })
+        )
         .build()
 
     override fun onCreateView(
@@ -79,9 +88,6 @@ class RegisterNewRunnerFragment : BaseFragment() {
             }
             btnAddTeamMemberRunner.setOnClickListener {
                 viewModel.onCreateTeamMemberClick()
-            }
-            btnAddNewRunner.setOnClickListener {
-                viewModel.onRegisterNewRunnerClicked(adapter.runnerRegisterData, teamName)
             }
             etRunnerTeamName.addTextChangedListener {
                 teamName = it?.toString()

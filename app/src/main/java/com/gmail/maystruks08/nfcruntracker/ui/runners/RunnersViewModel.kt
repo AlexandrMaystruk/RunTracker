@@ -11,6 +11,7 @@ import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.interactors.CheckpointInteractor
+import com.gmail.maystruks08.domain.interactors.DistanceInteractor
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.domain.toTimeFormat
@@ -33,6 +34,7 @@ import java.util.*
 
 @ObsoleteCoroutinesApi
 class RunnersViewModel @ViewModelInject constructor(
+    private val distanceInteractor: DistanceInteractor,
     private val runnersInteractor: RunnersInteractor,
     private val checkpointInteractor: CheckpointInteractor,
     private val router: Router,
@@ -71,7 +73,7 @@ class RunnersViewModel @ViewModelInject constructor(
     fun initFragment(raceId: Long, distanceId: Long?) {
         this.raceId = raceId
         this.distanceId = distanceId ?: 0
-        _distanceLiveData.value = mutableListOf(DistanceView(0, "Normal"), DistanceView(1, "Iron"))
+        viewModelScope.launch(Dispatchers.IO) { showAllDistances() }
         viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
     }
 
@@ -203,19 +205,17 @@ class RunnersViewModel @ViewModelInject constructor(
         //TODO implement
     }
 
-    private fun onRunningStart(date: Date) {
-        viewModelScope.launch(Dispatchers.IO) {
-            when (val onResult = runnersInteractor.addStartCheckpointToRunners(date)) {
-                is TaskResult.Value -> viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
-                is TaskResult.Error -> Timber.e(onResult.error)
+    private suspend fun showAllDistances(){
+        _showProgressLiveData.postValue(true)
+        showSmallInitRunners()
+        when (val result = distanceInteractor.getDistances()) {
+            is TaskResult.Value -> {
+                val distanceViews = result.value.map { it.toView() }.toMutableList()
+                _distanceLiveData.postValue(distanceViews)
             }
+            is TaskResult.Error -> handleError(result.error)
         }
-    }
-
-    private fun onMarkRunnerOnCheckpointSuccess(runnerChange: RunnerChange) {
-        val lastCheckpoint = runnerChange.runner.checkpoints.maxByOrNull { it.getResult()?.time ?: 0 }
-        _showSuccessDialogLiveData.postValue(lastCheckpoint to runnerChange.runner.number)
-        handleRunnerChanges(runnerChange)
+        _showProgressLiveData.postValue(false)
     }
 
     private suspend fun showAllRunners() {
@@ -230,7 +230,6 @@ class RunnersViewModel @ViewModelInject constructor(
             is TaskResult.Error -> handleError(result.error)
         }
         _showProgressLiveData.postValue(false)
-
     }
 
 
@@ -246,6 +245,21 @@ class RunnersViewModel @ViewModelInject constructor(
         _showProgressLiveData.postValue(false)
     }
 
+    private fun onRunningStart(date: Date) {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val onResult = runnersInteractor.addStartCheckpointToRunners(date)) {
+                is TaskResult.Value -> viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
+                is TaskResult.Error -> Timber.e(onResult.error)
+            }
+        }
+    }
+
+    private fun onMarkRunnerOnCheckpointSuccess(runnerChange: RunnerChange) {
+        val lastCheckpoint = runnerChange.runner.checkpoints.maxByOrNull { it.getResult()?.time ?: 0 }
+        _showSuccessDialogLiveData.postValue(lastCheckpoint to runnerChange.runner.number)
+        handleRunnerChanges(runnerChange)
+    }
+
     private fun handleError(e: Throwable) {
         _showProgressLiveData.postValue(false)
         Timber.e(e)
@@ -256,13 +270,14 @@ class RunnersViewModel @ViewModelInject constructor(
         }
     }
 
+    private fun isRunnerOfftrack() = lastSelectedRunner?.isOffTrack == true
+
+    private fun isRunnerHasResult() = !lastSelectedRunner?.result.isNullOrEmpty()
+
+
     override fun onCleared() {
         startRunTrackerBus.unsubscribe(this.name())
         super.onCleared()
     }
-
-    private fun isRunnerOfftrack() = lastSelectedRunner?.isOffTrack == true
-
-    private fun isRunnerHasResult() = !lastSelectedRunner?.result.isNullOrEmpty()
 
 }

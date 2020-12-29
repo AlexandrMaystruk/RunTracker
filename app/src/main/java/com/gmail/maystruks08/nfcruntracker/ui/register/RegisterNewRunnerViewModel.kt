@@ -11,18 +11,17 @@ import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.interactors.RegisterNewRunnerInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
-import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
-import javax.inject.Inject
 
-class RegisterNewRunnerViewModel @ViewModelInject constructor(private val router: Router) : BaseViewModel() {
+class RegisterNewRunnerViewModel @ViewModelInject constructor(
+    private val router: Router,
+    private val interactor: RegisterNewRunnerInteractor
+) : BaseViewModel() {
 
-    @Inject
-    lateinit var interactor: RegisterNewRunnerInteractor
 
     val scannedCard get() : LiveData<String> = _cardIdLiveData
     val addNewTeamMemberItem get() : LiveData<InputDataView> = _addNewTeamMemberItem

@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
 
+import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.Race
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
@@ -64,4 +65,8 @@ fun Checkpoint.toCheckpointView(): CheckpointView {
 
 fun Race.toView(): RaceView {
     return RaceView(id, name, distanceList.firstOrNull()?.id)
+}
+
+fun Distance.toView(): DistanceView {
+    return DistanceView(id, name)
 }

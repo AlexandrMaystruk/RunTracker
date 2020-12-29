@@ -2,10 +2,7 @@ package com.gmail.maystruks08.nfcruntracker.core.di
 
 import com.gmail.maystruks08.data.repository.*
 import com.gmail.maystruks08.domain.interactors.*
-import com.gmail.maystruks08.domain.repository.RunnersRepository
-import com.gmail.maystruks08.domain.repository.SettingsRepository
-import com.gmail.maystruks08.domain.repository.CheckpointsRepository
-import com.gmail.maystruks08.domain.repository.RaceRepository
+import com.gmail.maystruks08.domain.repository.*
 import com.gmail.maystruks08.nfcruntracker.ui.login.LogOutUseCaseImpl
 import dagger.Binds
 import dagger.Module
@@ -60,8 +57,6 @@ abstract class ActivityModule {
     abstract fun bindCheckpointsRepository(impl: CheckpointsRepositoryImpl): CheckpointsRepository
 
 
-
-
     @Binds
     @ActivityScoped
     abstract fun bindRaceInteractor(impl: RaceInteractorImpl): RaceInteractor
@@ -71,7 +66,23 @@ abstract class ActivityModule {
     abstract fun bindRaceRepository(impl: RaceRepositoryImpl): RaceRepository
 
 
+    @Binds
+    @ActivityScoped
+    abstract fun bindRegisterRunnersRepository(impl: RegisterNewRunnersRepositoryImpl): RegisterNewRunnersRepository
 
+    @Binds
+    @ActivityScoped
+    abstract fun bindRegisterNewRunnerInteractor(impl: RegisterNewRunnerInteractorImpl): RegisterNewRunnerInteractor
+
+
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindDistanceInteractor(impl: DistanceInteractorImpl): DistanceInteractor
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindDistanceRepository(impl: DistanceRepositoryImpl): DistanceRepository
 
 
 }
