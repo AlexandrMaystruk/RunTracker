@@ -22,7 +22,7 @@
     <View
         android:id="@+id/view_background"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="200dp"
         android:background="@color/colorPrimary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
@@ -30,21 +30,21 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvDistanceType"
         android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_height="90dp"
+        android:layout_marginBottom="@dimen/margin_m"
         android:orientation="horizontal"
         android:scrollbarAlwaysDrawHorizontalTrack="true"
         app:layout_constraintBottom_toBottomOf="@id/view_background"
         app:layout_constraintEnd_toEndOf="@id/view_card"
         app:layout_constraintStart_toStartOf="@id/view_card"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintVertical_bias="1.0" />
 
     <View
         android:id="@+id/view_card"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/margin_m"
-        android:layout_marginEnd="@dimen/margin_m"
-        android:layout_marginBottom="@dimen/margin_m"
+        android:layout_margin="@dimen/margin_m"
         android:elevation="@dimen/cardview_default_elevation"
         android:background="@drawable/bg_corner_white"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -101,7 +101,8 @@
         android:layout_margin="@dimen/margin_m"
         android:contentDescription="@string/cd_distance_image"
         android:src="@drawable/ic_add"
+        android:elevation="@dimen/margin_m"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/rvRunners" />
 
 </androidx.constraintlayout.motion.widget.MotionLayout>

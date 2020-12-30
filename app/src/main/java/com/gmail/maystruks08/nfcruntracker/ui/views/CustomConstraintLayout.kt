@@ -20,31 +20,33 @@ import java.lang.Exception
 
 class CustomConstraintLayout : ConstraintLayout {
 
-    var path: Path? = null
+    private val gradientDrawable = GradientDrawable()
+    private val rectF = RectF()
+    private var path = Path()
 
     /** corner radius */
     var cornerLeftTop: Float = 0F
         set(value) {
             field = value
-            postInvalidate()
+            invalidate()
         }
 
     var cornerRightTop: Float = 0F
         set(value) {
             field = value
-            postInvalidate()
+            invalidate()
         }
 
     var cornerLeftBottom: Float = 0F
         set(value) {
             field = value
-            postInvalidate()
+            invalidate()
         }
 
     var cornerRightBottom: Float = 0F
         set(value) {
             field = value
-            postInvalidate()
+            invalidate()
         }
 
 
@@ -59,45 +61,39 @@ class CustomConstraintLayout : ConstraintLayout {
     var cornerLeftSide: Float = 0F
         set(value) {
             field = value
-
             if (field != 0F) {
                 cornerLeftTop = field
                 cornerLeftBottom = field
             }
-
-            postInvalidate()
+            invalidate()
         }
 
     var cornerRightSide: Float = 0F
         set(value) {
             field = value
-
             if (field != 0F) {
                 cornerRightTop = field
                 cornerRightBottom = field
             }
-
-            postInvalidate()
+            invalidate()
         }
 
 
     var cornerAll: Float = 0F
         set(value) {
             field = value
-
             if (field != 0F) {
                 cornerLeftSide = field
                 cornerRightSide = field
             }
-
-            postInvalidate()
+            invalidate()
         }
 
     /** background color */
     var backgroundColor: Int? = null
         set(@ColorInt value) {
             field = value
-            postInvalidate()
+            invalidate()
         }
 
     override fun setBackgroundColor(color: Int) {
@@ -108,25 +104,25 @@ class CustomConstraintLayout : ConstraintLayout {
     var strokeLineWidth: Float = 0F
         set(value) {
             field = value
-            postInvalidate()
+            invalidate()
         }
 
     var strokeLineColor = 0XFFFFFFFF.toInt()
         set(@ColorInt value) {
             field = value
-            postInvalidate()
+            invalidate()
         }
 
     var dashLineGap: Float = 0F
         set(value) {
             field = value
-            postInvalidate()
+            invalidate()
         }
 
     var dashLineWidth: Float = 0F
         set(value) {
             field = value
-            postInvalidate()
+            invalidate()
         }
 
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
@@ -170,7 +166,7 @@ class CustomConstraintLayout : ConstraintLayout {
                     getColor(R.styleable.CustomConstraintLayout_strokeLineColor, Color.BLACK)
                 dashLineWidth =
                     getDimensionPixelSize(R.styleable.CustomConstraintLayout_dashLineWidth, 0)
-                    .toFloat()
+                        .toFloat()
                 dashLineGap =
                     getDimensionPixelSize(R.styleable.CustomConstraintLayout_dashLineGap, 0)
                         .toFloat()
@@ -190,45 +186,35 @@ class CustomConstraintLayout : ConstraintLayout {
 
     override fun dispatchDraw(canvas: Canvas) {
         /** for outline remake whenever draw */
-        path = null
-
-        if (path == null) {
-            path = Path()
-        }
-
-        floatArrayOf(
+        path.reset()
+        clipPathCanvas(canvas, floatArrayOf(
             cornerLeftTop, cornerLeftTop, cornerRightTop, cornerRightTop, cornerRightBottom,
             cornerRightBottom, cornerLeftBottom, cornerLeftBottom
-        ).let {
-            clipPathCanvas(canvas, it)
-        }
+        ))
 
         /** set drawable resource corner & background & stroke */
-        with(GradientDrawable()) {
+        with(gradientDrawable) {
             cornerRadii = floatArrayOf(
                 cornerLeftTop, cornerLeftTop, cornerRightTop, cornerRightTop,
                 cornerRightBottom, cornerRightBottom, cornerLeftBottom, cornerLeftBottom
             )
-
-            if (strokeLineWidth != 0F)
-                setStroke(strokeLineWidth.toInt(), strokeLineColor, dashLineWidth, dashLineGap)
-
+            if (strokeLineWidth != 0F) setStroke(strokeLineWidth.toInt(), strokeLineColor, dashLineWidth, dashLineGap)
             setColor(backgroundColor ?: Color.WHITE)
-
             background = this
         }
-
         outlineProvider = outlineProvider
-
         clipChildren = false
-
         super.dispatchDraw(canvas)
     }
 
     private fun clipPathCanvas(canvas: Canvas, floatArray: FloatArray) {
-        path?.let {
+        path.let {
+            rectF.left = 0f
+            rectF.top = 0f
+            rectF.right = canvas.width.toFloat()
+            rectF.bottom = canvas.height.toFloat()
             it.addRoundRect(
-                RectF(0F, 0F, canvas.width.toFloat(), canvas.height.toFloat()),
+                rectF,
                 floatArray,
                 Path.Direction.CW
             )
@@ -255,12 +241,8 @@ class CustomConstraintLayout : ConstraintLayout {
     override fun getOutlineProvider(): ViewOutlineProvider {
         return object : ViewOutlineProvider() {
             override fun getOutline(view: View, outline: Outline) {
-                path?.let {
-                    outline.setConvexPath(it)
-                } ?: throw Exception()
+                outline.setConvexPath(path)
             }
         }
     }
-
-
 }

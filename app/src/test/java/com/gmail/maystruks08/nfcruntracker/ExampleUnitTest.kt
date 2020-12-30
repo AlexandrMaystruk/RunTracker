@@ -1,8 +1,8 @@
 package com.gmail.maystruks08.nfcruntracker
 
+import com.gmail.maystruks08.nfcruntracker.ui.views.ChartItem
+import com.gmail.maystruks08.nfcruntracker.ui.views.ChartView
 import org.junit.Test
-
-import org.junit.Assert.*
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -12,6 +12,16 @@ import org.junit.Assert.*
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+
+        val chart = ChartView.Chart()
+            .apply {
+                chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorPrimary, 33))
+                chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorGreen, 33))
+                chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorRed, 34))
+            }
+
+        println(chart.chartItems.toTypedArray().contentToString())
+        val result = chart.getRecalculatedChartItems()
+        println(result.toTypedArray().contentToString())
     }
 }

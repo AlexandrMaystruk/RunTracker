@@ -24,7 +24,9 @@ class DistanceRepositoryImpl @Inject constructor(
     override suspend fun getDistanceList(): List<Distance> {
         return mutableListOf(
             Distance(0, "Normal", 0, Date(), mutableListOf(), mutableSetOf()),
-            Distance(1, "Iron", 0, Date(), mutableListOf(), mutableSetOf())
+            Distance(1, "Iron", 1, Date(), mutableListOf(), mutableSetOf()),
+            Distance(2, "Walking", 2, Date(), mutableListOf(), mutableSetOf()),
+            Distance(2, "Walking 2", 2, Date(), mutableListOf(), mutableSetOf())
         )
     }
 }

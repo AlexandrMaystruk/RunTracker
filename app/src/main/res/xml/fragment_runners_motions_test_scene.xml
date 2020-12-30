@@ -29,7 +29,8 @@
             android:layout_marginEnd="@dimen/margin_m"
             motion:layout_constraintBottom_toBottomOf="parent"
             motion:layout_constraintTop_toBottomOf="@+id/rvDistanceType"
-            android:layout_marginBottom="0dp" />
+            android:layout_marginBottom="0dp"
+            android:layout_marginTop="@dimen/margin_l" />
         <Constraint
             android:id="@+id/tvRunnersTitle"
             android:layout_width="wrap_content"
@@ -57,16 +58,16 @@
             motion:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
         <Constraint
             android:id="@+id/rvDistanceType"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
             android:alpha="1"
-            android:layout_marginStart="@dimen/margin_m"
-            android:layout_marginEnd="@dimen/margin_m"
+            android:layout_marginBottom="@dimen/margin_m"
             motion:layout_constraintBottom_toBottomOf="@id/view_background"
             motion:layout_constraintEnd_toEndOf="@id/view_card"
             motion:layout_constraintStart_toStartOf="@id/view_card"
             motion:layout_constraintTop_toBottomOf="@id/toolbar"
-            android:layout_marginTop="@dimen/margin_s" />
+            android:layout_marginTop="@dimen/margin_s"
+            motion:layout_constraintVertical_bias="0.0" />
         <Constraint
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -77,7 +78,8 @@
         <Constraint
             android:id="@+id/view_background"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="150dp"
+            android:layout_margin="@dimen/margin_m"
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintTop_toBottomOf="@id/toolbar" />
     </ConstraintSet>
@@ -98,10 +100,11 @@
             motion:layout_constraintTop_toBottomOf="@id/toolbar" />
         <Constraint
             android:id="@+id/rvDistanceType"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="50dp"
             android:alpha="0"
             android:layout_marginTop="@dimen/margin_xs"
+            android:layout_marginBottom="@dimen/margin_m"
             motion:layout_constraintBottom_toBottomOf="@id/view_background"
             motion:layout_constraintEnd_toEndOf="@id/view_card"
             motion:layout_constraintStart_toStartOf="@id/view_card"

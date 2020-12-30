@@ -5,6 +5,5 @@
         android:id="@+id/action_save_changes"
         android:icon="@drawable/ic_save"
         android:title="@string/search"
-        app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom|collapseActionView" />
 </menu>

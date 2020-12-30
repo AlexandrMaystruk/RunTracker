@@ -184,7 +184,7 @@ class RunnersViewModel @ViewModelInject constructor(
     }
 
     fun onSelectRaceClicked() {
-        router.navigateTo(Screens.RaceListScreen())
+        router.newRootScreen(Screens.RaceListScreen())
     }
 
     fun onCurrentCheckpointTextClicked() {

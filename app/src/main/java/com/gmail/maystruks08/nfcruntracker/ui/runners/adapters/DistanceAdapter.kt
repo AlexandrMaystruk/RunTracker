@@ -65,11 +65,11 @@ class DistanceAdapter(private val interaction: Interaction) : RecyclerView.Adapt
         fun bindHolder(runner: DistanceView) {
             with(binding){
                 tvDistanceName.text = runner.name
-                if(selectedPosition == adapterPosition){
+                if (selectedPosition == adapterPosition) {
                     selectedBindingView = this
-                    tvDistanceName.setBackgroundResource(R.drawable.bg_corner_border_selected)
+                    distanceCard.strokeLineWidth = 3f
                 } else {
-                    tvDistanceName.setBackgroundResource(R.drawable.bg_corner_border)
+                    distanceCard.strokeLineWidth = 1f
                 }
                 itemView.setOnClickListener {
                     deselectView()
@@ -82,11 +82,11 @@ class DistanceAdapter(private val interaction: Interaction) : RecyclerView.Adapt
         private fun selectView(){
             selectedPosition = adapterPosition
             selectedBindingView = binding
-            binding.tvDistanceName.setBackgroundResource(R.drawable.bg_corner_border_selected)
+            binding.distanceCard.strokeLineWidth = 6f
         }
 
         private fun deselectView(){
-            selectedBindingView?.tvDistanceName?.setBackgroundResource(R.drawable.bg_corner_border)
+            selectedBindingView?.distanceCard?.strokeLineWidth = 1f
         }
     }
 
