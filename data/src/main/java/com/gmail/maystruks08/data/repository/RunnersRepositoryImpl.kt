@@ -15,6 +15,7 @@ import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.RunnerSex
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 
@@ -105,7 +107,233 @@ class RunnersRepositoryImpl @Inject constructor(
 //            } else it.toMutableList()
 //        }
 
-        return emptyList()
+
+        return mutableListOf(
+            Runner(
+                1,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+            Runner(
+                1,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+            Runner(
+                2,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+            Runner(
+                3,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+            Runner(
+                1,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+            Runner(
+                4,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+            Runner(
+                5,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+            Runner(
+                6,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+            Runner(
+                7,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+            Runner(
+                7,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+            Runner(
+                8,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+            Runner(
+                9,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+            Runner(
+                10,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+            Runner(
+                11,
+                "q12e",
+                "Full name",
+                "Short name",
+                "34r5345",
+                RunnerSex.MALE,
+                "Odessa",
+                Date(),
+                0,
+                listOf(0),
+                mutableListOf(),
+                false,
+                null,
+                null
+            ),
+        )
     }
 
     override suspend fun getRunnerByCardId(cardId: String): Runner? {
@@ -160,8 +388,9 @@ class RunnersRepositoryImpl @Inject constructor(
     @FlowPreview
     @ExperimentalCoroutinesApi
     override suspend fun observeRunnerData(): Flow<RunnerChange> {
-        return firestoreApi.subscribeToRunnerDataRealtimeUpdates().flatMapConcat { runnerChangeList ->
-            runnerChangeList.forEach {
+        return firestoreApi.subscribeToRunnerDataRealtimeUpdates()
+            .flatMapConcat { runnerChangeList ->
+                runnerChangeList.forEach {
 //                val canRewriteLocalCache = checkIsDataUploaded(it.runner.number)
 //                val canRewriteLocalCache = checkIsDataUploaded(it.runner.number)
 //
@@ -172,9 +401,9 @@ class RunnersRepositoryImpl @Inject constructor(
 //                        Change.REMOVE -> deleteRunner(it.runner)
 //                    }
 //                }
+                }
+                return@flatMapConcat channelFlow { runnerChangeList.forEach { offer(it) } }
             }
-            return@flatMapConcat channelFlow { runnerChangeList.forEach { offer(it) } }
-        }
     }
 
 

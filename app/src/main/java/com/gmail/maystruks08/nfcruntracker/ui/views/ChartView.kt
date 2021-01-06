@@ -1,10 +1,7 @@
 package com.gmail.maystruks08.nfcruntracker.ui.views
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.ColorRes
@@ -14,20 +11,74 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-class ChartView(context: Context, attrs: AttributeSet) : View(context, attrs) {
+class ChartView : View {
 
-    private val chart: Chart = Chart().apply {
-        chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorPrimary, 50))
-        chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorGreen, 25))
-        chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorRed, 25))
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        render(attrs)
     }
 
-    private var minDiameter: Int = 30
-    private var radius = 40f
-    private var paintColor = Color.TRANSPARENT
-    private var rectF: RectF = RectF()
-    private var paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private var strokeWidth = 15f
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+        render(attrs)
+    }
+
+    constructor(context: Context) : super(context) {
+        render(null)
+    }
+
+    private fun render(attrs: AttributeSet?) {
+        attrs?.let {
+            with(context.obtainStyledAttributes(it, R.styleable.ChartView)) {
+                strokeWidth = getDimensionPixelSize(R.styleable.ChartView_strokeWidth, 3).toFloat()
+                paintColor = getColor(R.styleable.ChartView_paintColor, Color.WHITE)
+                circlePadding = getDimensionPixelSize(R.styleable.ChartView_circlePadding, 10).toFloat()
+                textPadding= getDimensionPixelSize(R.styleable.ChartView_textPadding, 10).toFloat()
+                textSize = getDimensionPixelSize(R.styleable.ChartView_textSize, 14).toFloat()
+                recycle()
+            }
+        }
+    }
+
+    private val chart: Chart = Chart().apply {
+        chartItems.add(ChartItem("12", R.color.colorWhite, R.color.colorGreen, 12))
+        chartItems.add(ChartItem("28", R.color.colorWhite, R.color.colorRed, 28))
+        chartItems.add(ChartItem("34", R.color.colorWhite, R.color.design_default_color_primary, 34))
+    }
+
+    var strokeWidth: Float = 15f
+        set(value) {
+            field = value
+            _paint.strokeWidth = strokeWidth
+            invalidate()
+        }
+
+    var paintColor = Color.TRANSPARENT
+        set(value) {
+            field = value
+            _paint.color = value
+            invalidate()
+        }
+
+    var circlePadding = 30f
+        set(value) {
+            field = value
+            requestLayout()
+        }
+
+    var textPadding = 0f
+        set(value) {
+            field = value
+            requestLayout()
+        }
+
+    var textSize = 30f
+        set(value) {
+            field = value
+            invalidate()
+        }
 
     fun setChartItems(chartItems: List<ChartItem>) {
         chart.chartItems.clear()
@@ -35,45 +86,39 @@ class ChartView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         invalidate()
     }
 
-    fun setStrokeWidth(strokeWidth: Float) {
-        this.strokeWidth = strokeWidth
-        paint.strokeWidth = strokeWidth
-        requestLayout()
-    }
+    private var _startAngle = 90f
+    private var _minDiameter: Int = 30
+    private var _radius = 40f
+    private val _textBounds = Rect()
+    private var _rectF: RectF = RectF()
+    private var _paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    fun setColor(color: Int) {
-        this.paintColor = color
-        paint.color = color
-        requestLayout()
-    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        rectF.set(
-            0f + strokeWidth / 2,
-            0f + strokeWidth / 2,
-            minDiameter.toFloat() - strokeWidth / 2,
-            minDiameter.toFloat() - strokeWidth / 2
-        )
-
         chart.getRecalculatedChartItems().forEach {
             drawSegment(canvas, it.startAngle, it.endAngle, it.backgroundColor, strokeWidth)
+            drawText(
+                canvas,
+                it.text,
+                textSize,
+                it.textColor,
+                it.startAngle + (it.endAngle - it.startAngle) / 2
+            )
         }
-
-        drawText(canvas, "97%", 16f, R.color.colorBlack, 0f)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val height = getDefaultSize(suggestedMinimumHeight, heightMeasureSpec)
         val width = getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
-        minDiameter = width.coerceAtMost(height)
-        setMeasuredDimension(minDiameter, minDiameter)
-        radius = (minDiameter / 2).toFloat()
-        rectF.set(
-            0f + strokeWidth / 2,
-            0f + strokeWidth / 2,
-            minDiameter.toFloat() / 2,
-            minDiameter.toFloat() / 2
+        _minDiameter = width.coerceAtMost(height)
+        setMeasuredDimension(_minDiameter, _minDiameter)
+        _radius = (_minDiameter / 2).toFloat()
+        _rectF.set(
+            0f + circlePadding,
+            0f + circlePadding,
+            _minDiameter.toFloat() - circlePadding,
+            _minDiameter.toFloat() - circlePadding
         )
     }
 
@@ -84,10 +129,10 @@ class ChartView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         @ColorRes colorRes: Int,
         strokeWidth: Float
     ) {
-        paint.color = ContextCompat.getColor(context, colorRes)
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = strokeWidth
-        canvas.drawArc(rectF, startAngle, endAngle, false, paint)
+        _paint.color = ContextCompat.getColor(context, colorRes)
+        _paint.style = Paint.Style.STROKE
+        _paint.strokeWidth = strokeWidth
+        canvas.drawArc(_rectF, startAngle, endAngle - startAngle, false, _paint)
     }
 
 
@@ -98,14 +143,21 @@ class ChartView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         @ColorRes colorRes: Int,
         angle: Float
     ) {
-        paint.color = ContextCompat.getColor(context, colorRes)
-        paint.style = Paint.Style.FILL
-        paint.isAntiAlias = true
-        paint.textSize = textSize
+        _paint.color = ContextCompat.getColor(context, colorRes)
+        _paint.style = Paint.Style.FILL
+        _paint.isAntiAlias = true
+        _paint.textSize = textSize
+        _paint.getTextBounds(text, 0, text.length, _textBounds)
 
-        canvas.rotate(angle, (minDiameter / 2).toFloat(), (minDiameter / 2).toFloat())
-        canvas.drawText(text, (minDiameter / 2).toFloat(), (minDiameter / 2).toFloat(), paint)
-        canvas.rotate(-angle, (minDiameter / 2).toFloat(), (minDiameter / 2).toFloat())
+        val textWidth = _textBounds.width()
+        val textHeight = _textBounds.height()
+
+        val x = width.toFloat() / 2
+        val y = height.toFloat() / 2
+
+        canvas.rotate(_startAngle + angle, x, y)
+        canvas.drawText(text, x - textWidth / 2, (textHeight / 2 + circlePadding + textPadding), _paint)
+        canvas.rotate(-_startAngle - angle, x, y)
     }
 
     private fun findPointInCircle(radius: Float, angle: Float): Pair<Float, Float> {
@@ -120,8 +172,8 @@ class ChartView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             val progressSum = chartItems.sumBy { it.progress }.toFloat()
             var startAngleInDegrease = 0f
             return chartItems.map {
-                val progressInPercent = it.progress / progressSum * 100f
-                val endAngleInDegrease = (progressInPercent / 100f * 360)
+                val progressInPercent = it.progress / progressSum * 100
+                val endAngleInDegrease = startAngleInDegrease + (progressInPercent / 100 * 360)
                 val item = ChartItemInternal(
                     it.text,
                     it.textColor,
@@ -129,7 +181,7 @@ class ChartView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                     startAngleInDegrease,
                     endAngleInDegrease
                 )
-                startAngleInDegrease += endAngleInDegrease
+                startAngleInDegrease = endAngleInDegrease
                 return@map item
             }
         }

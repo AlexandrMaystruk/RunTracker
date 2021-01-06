@@ -10,6 +10,7 @@ object RunnerDiffCallback : DiffUtil.ItemCallback<RunnerView?>() {
     }
 
     override fun areContentsTheSame(oldRunner: RunnerView, newRunner: RunnerView): Boolean {
-        return oldRunner.number == newRunner.number
+        //TODO implement
+        return false
     }
 }

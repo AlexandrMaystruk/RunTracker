@@ -1,10 +1,11 @@
-package com.gmail.maystruks08.nfcruntracker.ui.views.stepview
+package com.gmail.maystruks08.nfcruntracker.ui.views
 
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.TransitionDrawable
+import android.graphics.drawable.*
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
+import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -18,8 +19,6 @@ import androidx.core.view.*
 import com.gmail.maystruks08.nfcruntracker.R
 
 class StepProgressView : ViewGroup {
-
-    private val drawableHelper = DrawableHelper()
 
     private lateinit var arcActiveDrawable: ColorDrawable
     private lateinit var arcInactiveDrawable: ColorDrawable
@@ -49,16 +48,22 @@ class StepProgressView : ViewGroup {
     @ColorInt
     private var colorInactive = ContextCompat.getColor(context, R.color.colorAccent)
 
-    private var beansList = listOf(Bean("C", StepState.CURRENT), Bean("Ф", StepState.UNDONE))
+    private var beansList = listOf(
+        Bean("C", StepState.CURRENT),
+        Bean("15", StepState.UNDONE),
+        Bean("40", StepState.UNDONE),
+        Bean("70", StepState.UNDONE),
+        Bean("Ф", StepState.UNDONE)
+    )
     private var currentStep = 0
     private var stepsCount = 0
 
     private var nodeHeight = -1f
     private var textNodeTitleSize = resources.getDimension(R.dimen.text_m).toInt()
     private var textNodeSize = resources.getDimension(R.dimen.size_s).toInt()
-    private var textTitlePadding = SViewUtils.toPx(5f, context)
-    private var arcHeight = SViewUtils.toPx(2f, context)
-    private val minSpacingLength = SViewUtils.toPx(5, context)
+    private var textTitlePadding = toPx(5f, context)
+    private var arcHeight = toPx(2f, context)
+    private val minSpacingLength = toPx(5, context)
     private val nodeDefaultRatio = 0.1
     private val arcsMaxRatio = 0.60
     private val arcTransitionDuration = 200
@@ -94,10 +99,10 @@ class StepProgressView : ViewGroup {
     }
 
     private fun init() {
-        doneDrawable = ContextCompat.getDrawable(context, doneDrawableId) ?: drawableHelper.createStrokeOvalDrawable(context, textNodeTitleColor)
-        doneWarningDrawable = ContextCompat.getDrawable(context, doneWarningDrawableId) ?: drawableHelper.createStrokeOvalDrawable(context, textNodeTitleColor)
-        undoneDrawable = ContextCompat.getDrawable(context, undoneDrawableId) ?: drawableHelper.createStrokeOvalDrawable(context, textNodeTitleColor)
-        currentDrawable = ContextCompat.getDrawable(context, currentDrawableId) ?: drawableHelper.createStrokeOvalDrawable(context, textNodeTitleColor)
+        doneDrawable = ContextCompat.getDrawable(context, doneDrawableId) ?: createStrokeOvalDrawable(context, textNodeTitleColor)
+        doneWarningDrawable = ContextCompat.getDrawable(context, doneWarningDrawableId) ?: createStrokeOvalDrawable(context, textNodeTitleColor)
+        undoneDrawable = ContextCompat.getDrawable(context, undoneDrawableId) ?: createStrokeOvalDrawable(context, textNodeTitleColor)
+        currentDrawable = ContextCompat.getDrawable(context, currentDrawableId) ?: createStrokeOvalDrawable(context, textNodeTitleColor)
         arcActiveDrawable = ColorDrawable(connectionLineColor)
         arcInactiveDrawable = ColorDrawable(colorInactive)
         createViews()
@@ -171,7 +176,7 @@ class StepProgressView : ViewGroup {
                     val arcHSpec =
                         MeasureSpec.makeMeasureSpec(arcHeight.toInt(), MeasureSpec.EXACTLY)
                     if (!hasNodeOverflow) {
-                        (it.layoutParams as LinearLayout.LayoutParams).setMargins(0, 0,0, 0)
+                        (it.layoutParams as LinearLayout.LayoutParams).setMargins(0, 0, 0, 0)
                     } else {
                         //remove margin if view is in overflow mode to escape case when arc is smaller than its margins
                         (it.layoutParams as LinearLayout.LayoutParams).setMargins(0)
@@ -255,7 +260,7 @@ class StepProgressView : ViewGroup {
     //to respect optimal proportions for nodes and arcs
     private fun getArcWidth(widthMeasureSpec: Int, width: Int, nodeSize: Int): Int {
         //include padding for titles
-        val sCount =  stepsCount + 1
+        val sCount = stepsCount + 1
         val wMode = MeasureSpec.getMode(widthMeasureSpec)
         val arcsCount = stepsCount - 1
         val allArcsWidth = (width - sCount * nodeSize)
@@ -269,13 +274,13 @@ class StepProgressView : ViewGroup {
 
     private fun nodeSizeFits(width: Int, desiredSize: Int): Boolean {
         //include padding for titles
-        val sCount =  stepsCount + 1
+        val sCount = stepsCount + 1
         return (width - desiredSize * sCount) >= minSpacingLength * (stepsCount - 1)
     }
 
     private fun maximalNodeSize(width: Int): Int {
         //include padding for titles
-        val sCount =  stepsCount + 1
+        val sCount = stepsCount + 1
         return (width - minSpacingLength * (stepsCount - 1)) / sCount
     }
 
@@ -397,18 +402,48 @@ class StepProgressView : ViewGroup {
                 currentStep = index
             }
             changeStepStateView(index, bean.state)
-            if(index < beansList.lastIndex - 1){
+            if (index < beansList.lastIndex - 1) {
                 animateProgressArc(index, isAllPreviousDone(index))
             }
         }
     }
 
-    private fun isAllPreviousDone(index: Int): Boolean{
+    private fun isAllPreviousDone(index: Int): Boolean {
         for (i in 0..index + 1) {
             val state = beansList[i].state
-            if(!(state == StepState.CURRENT || state == StepState.DONE)) return false
+            if (!(state == StepState.CURRENT || state == StepState.DONE)) return false
         }
         return true
+    }
+
+
+    private fun toPx(dp: Int, context: Context) =
+        dp * (context.resources.displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT)
+
+    private fun toPx(dp: Float, context: Context) =
+        dp * (context.resources.displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT)
+
+    private fun createStrokeOvalDrawable(context: Context, color: Int): Drawable {
+        val strokeWidth = toPx(2, context)
+        return GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setStroke(strokeWidth, color)
+        }
+    }
+
+    private fun createCheckDrawable(context: Context, color: Int): Drawable {
+        val checkDrawable = ContextCompat.getDrawable(context, R.drawable.ic_check)
+        return LayerDrawable(arrayOf(createOvalDrawable(color), checkDrawable)).apply {
+            val ins = toPx(5, context)
+            setLayerInset(1, ins, ins, ins, ins)
+        }
+    }
+
+    private fun createOvalDrawable(color: Int): Drawable {
+        return GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(color)
+        }
     }
 
     companion object {
@@ -421,4 +456,42 @@ class StepProgressView : ViewGroup {
 
     }
 
+
+}
+
+data class Bean(val title: String, var state: StepState) : Parcelable {
+
+    constructor(parcel: Parcel) : this(
+        parcel.readString().orEmpty(),
+        StepState.fromOrdinal(parcel.readInt())
+    )
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(title)
+        parcel.writeInt(state.ordinal)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Bean> {
+        override fun createFromParcel(parcel: Parcel): Bean {
+            return Bean(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Bean?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
+
+enum class StepState {
+
+    UNDONE, DONE, CURRENT, DONE_WARNING;
+
+    companion object {
+
+        fun fromOrdinal(ordinal: Int) = values().firstOrNull { it.ordinal == ordinal } ?: UNDONE
+    }
 }

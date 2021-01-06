@@ -3,13 +3,11 @@ package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
 import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.Race
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.toDateFormat
 import com.gmail.maystruks08.domain.toTimeUTCFormat
-import com.gmail.maystruks08.nfcruntracker.ui.views.stepview.Bean
-import com.gmail.maystruks08.nfcruntracker.ui.views.stepview.StepState
+import com.gmail.maystruks08.nfcruntracker.ui.views.Bean
+import com.gmail.maystruks08.nfcruntracker.ui.views.StepState
 
 fun toRunnerViews(runners: List<Runner>): MutableList<RunnerView> {
     return mutableListOf<RunnerView>().apply {

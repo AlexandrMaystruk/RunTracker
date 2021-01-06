@@ -37,4 +37,12 @@
 
         <attr name="cornerAll" format="dimension"/>
     </declare-styleable>
+
+    <declare-styleable name="ChartView">
+        <attr name="strokeWidth" format="dimension"/>
+        <attr name="paintColor" format="color"/>
+        <attr name="circlePadding" format="dimension"/>
+        <attr name="textPadding" format="dimension"/>
+        <attr name="textSize" format="dimension"/>
+    </declare-styleable>
 </resources>

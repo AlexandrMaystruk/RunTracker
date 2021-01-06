@@ -15,9 +15,9 @@ class ExampleUnitTest {
 
         val chart = ChartView.Chart()
             .apply {
-                chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorPrimary, 33))
-                chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorGreen, 33))
-                chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorRed, 34))
+                chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorPrimary, 10))
+                chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorGreen, 10))
+                chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorRed, 10))
             }
 
         println(chart.chartItems.toTypedArray().contentToString())

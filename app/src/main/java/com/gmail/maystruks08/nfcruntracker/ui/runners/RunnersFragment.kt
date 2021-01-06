@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,12 +20,11 @@ import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.argumentNullable
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
+import com.gmail.maystruks08.nfcruntracker.core.ext.toPx
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnersBinding
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.DistanceAdapter
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.RunnerListAdapter
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.SwipeActionHelper
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.*
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SelectCheckpointDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SuccessDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.DistanceView
@@ -65,7 +65,7 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
         .withTitle(R.string.app_name)
         .withMenu(R.menu.menu_search_with_settings)
         .withMenuItems(
-            listOf(R.id.action_settings, R.id.action_result,  R.id.action_select_race),
+            listOf(R.id.action_settings, R.id.action_result, R.id.action_select_race),
             listOf(MenuItem.OnMenuItemClickListener {
                 viewModel.onOpenSettingsFragmentClicked()
                 true
@@ -114,7 +114,7 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
         })
 
         viewModel.showProgress.observe(viewLifecycleOwner, {
-           //TODO fix progress
+            //TODO fix progress
         })
 
         viewModel.showTime.observe(viewLifecycleOwner, {
@@ -124,27 +124,23 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
 
     @ExperimentalCoroutinesApi
     override fun initViews() {
-        runnerAdapter = RunnerListAdapter(this)
-        binding.rvRunners.apply {
-            layoutManager = LinearLayoutManager(binding.rvRunners.context)
-            adapter = runnerAdapter
+        with(binding) {
+            rvRunners.apply {
+                runnerAdapter = RunnerListAdapter(this@RunnersFragment)
+                addItemDecoration(DividerVerticalItemDecoration(resources.getDimensionPixelSize(R.dimen.margin_s)))
+                layoutManager = LinearLayoutManager(binding.rvRunners.context)
+                adapter = runnerAdapter
+            }
+            rvDistanceType.apply {
+                distanceAdapter = DistanceAdapter(this@RunnersFragment)
+                addItemDecoration(DividerItemDecoration(resources.getDimensionPixelSize(R.dimen.margin_s)))
+                layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                adapter = distanceAdapter
+            }
+            viewModel.initFragment(raceId, distanceId)
+            btnRegisterNewRunner.setOnClickListener { viewModel.onRegisterNewRunnerClicked() }
+            tvCurrentCheckpoint.setOnClickListener { viewModel.onCurrentCheckpointTextClicked() }
         }
-        distanceAdapter = DistanceAdapter(this)
-        binding.rvDistanceType.apply {
-            layoutManager =
-                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-            adapter = distanceAdapter
-        }
-
-        viewModel.initFragment(raceId, distanceId)
-
-        binding.btnRegisterNewRunner.setOnClickListener {
-            viewModel.onRegisterNewRunnerClicked()
-        }
-        binding.tvCurrentCheckpoint.setOnClickListener {
-            viewModel.onCurrentCheckpointTextClicked()
-        }
-
         setUpItemTouchHelper()
     }
 
@@ -152,10 +148,10 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
         val orderSwipeActionHelper = object : SwipeActionHelper(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                val swipedRunner =  runnerAdapter.currentList[position]
+                val swipedRunner = runnerAdapter.currentList[position]
                 if (direction == ItemTouchHelper.LEFT) {
                     viewModel.onRunnerSwipedLeft(position, swipedRunner)
-                } else if (direction == ItemTouchHelper.RIGHT ) {
+                } else if (direction == ItemTouchHelper.RIGHT) {
                     viewModel.onRunnerSwipedRight(position, swipedRunner)
                 }
             }

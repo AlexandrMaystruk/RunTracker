@@ -2,7 +2,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.gmail.maystruks08.nfcruntracker.ui.views.stepview.Bean
+import com.gmail.maystruks08.nfcruntracker.ui.views.Bean
 import java.util.*
 
 data class CheckpointView(

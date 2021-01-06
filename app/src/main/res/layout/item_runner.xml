@@ -4,9 +4,8 @@
     android:id="@+id/root_item"
     android:layout_width="match_parent"
     android:layout_height="@dimen/runnerItemSmallHeight"
-    android:layout_marginStart="@dimen/margin_min"
-    android:layout_marginTop="@dimen/margin_s"
-    android:layout_marginEnd="@dimen/margin_min"
+    android:layout_marginStart="@dimen/margin_s"
+    android:layout_marginEnd="@dimen/margin_s"
     app:cardCornerRadius="@dimen/margin_xs"
     app:cardElevation="@dimen/margin_xs"
     app:contentPadding="0dp">
@@ -52,7 +51,7 @@
             app:layout_constraintStart_toEndOf="@+id/tvRunnerNumber"
             app:layout_constraintTop_toTopOf="@+id/tvRunnerNumber" />
 
-        <com.gmail.maystruks08.nfcruntracker.ui.views.stepview.StepProgressView
+        <com.gmail.maystruks08.nfcruntracker.ui.views.StepProgressView
             android:id="@+id/runnerProgress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

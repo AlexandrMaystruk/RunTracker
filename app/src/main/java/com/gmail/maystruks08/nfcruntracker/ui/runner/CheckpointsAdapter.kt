@@ -13,7 +13,7 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.hide
 import com.gmail.maystruks08.nfcruntracker.core.ext.show
 import com.gmail.maystruks08.nfcruntracker.databinding.ItemCheckpointBinding
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
-import com.gmail.maystruks08.nfcruntracker.ui.views.stepview.StepState
+import com.gmail.maystruks08.nfcruntracker.ui.views.StepState
 import kotlin.properties.Delegates
 
 class CheckpointsAdapter(
