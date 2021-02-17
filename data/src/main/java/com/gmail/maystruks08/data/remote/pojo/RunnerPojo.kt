@@ -11,9 +11,11 @@ data class RunnerPojo(
     var sex: Int = 0,
     var city: String = "",
     var dateOfBirthday: Date = Date(),
-    var type: Int = 0,
+    val actualDistanceId: Long = 0,
     val teamName: String? = null,
     var totalResult: Date? = null,
+    val distanceIds: List<Long> = listOf(),
+    val raceIds: List<Long> = listOf(),
     var completeCheckpoints: List<CheckpointResultPojo> = listOf(),
     var uncompletedCheckpoints: List<CheckpointPojo> = listOf(),
     var isOffTrack: Boolean = false

@@ -10,18 +10,21 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 @Module
 @InstallIn(ActivityComponent::class)
 abstract class ActivityModule {
 
     @Binds
     @ActivityScoped
-    abstract fun provideLogoutUseCase(logOutUseCase: LogOutUseCaseImpl): LogOutUseCase
-
+    abstract fun bindLogoutUseCase(impl: LogOutUseCaseImpl): LogOutUseCase
 
 
     @Binds
@@ -38,14 +41,9 @@ abstract class ActivityModule {
     abstract fun bindRunnerDataChangeListener(viewModel: RunnersRepositoryImpl): RunnerDataChangeListener
 
 
-
-
     @Binds
     @ActivityScoped
     abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
-
-
-
 
 
     @Binds
@@ -65,6 +63,10 @@ abstract class ActivityModule {
     @ActivityScoped
     abstract fun bindRaceRepository(impl: RaceRepositoryImpl): RaceRepository
 
+    @Binds
+    @ActivityScoped
+    abstract fun bindCreateRaceUseCase(impl: CreateRaceUseCaseImpl): CreateRaceUseCase
+
 
     @Binds
     @ActivityScoped
@@ -73,7 +75,6 @@ abstract class ActivityModule {
     @Binds
     @ActivityScoped
     abstract fun bindRegisterNewRunnerInteractor(impl: RegisterNewRunnerInteractorImpl): RegisterNewRunnerInteractor
-
 
 
     @Binds

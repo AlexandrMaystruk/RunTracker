@@ -9,9 +9,11 @@ import com.gmail.maystruks08.data.local.dao.DistanceDAO
 import com.gmail.maystruks08.data.local.dao.RaceDAO
 import com.gmail.maystruks08.data.local.dao.RunnerDao
 import com.gmail.maystruks08.data.mappers.*
+import com.gmail.maystruks08.data.remote.Api
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.domain.NetworkUtil
-import com.gmail.maystruks08.domain.entities.RunnerChange
+import com.gmail.maystruks08.domain.entities.Change
+import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.runner.Runner
@@ -33,6 +35,7 @@ import javax.inject.Inject
 class RunnersRepositoryImpl @Inject constructor(
     private val networkUtil: NetworkUtil,
     private val firestoreApi: FirestoreApi,
+    private val api: Api,
     private val raceDAO: RaceDAO,
     private val distanceDAO: DistanceDAO,
     private val runnerDao: RunnerDao,
@@ -119,7 +122,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -135,7 +139,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -151,7 +156,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -167,7 +173,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -183,7 +190,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -199,7 +207,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -215,7 +224,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -231,7 +241,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -247,7 +258,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -263,7 +275,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -279,7 +292,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -295,7 +309,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -311,7 +326,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -327,7 +343,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 "Odessa",
                 Date(),
                 0,
-                listOf(0),
+                mutableListOf(),
+                mutableListOf(),
                 mutableListOf(),
                 false,
                 null,
@@ -387,22 +404,24 @@ class RunnersRepositoryImpl @Inject constructor(
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    override suspend fun observeRunnerData(): Flow<RunnerChange> {
-        return firestoreApi.subscribeToRunnerDataRealtimeUpdates()
+    override suspend fun observeRunnerData(): Flow<Change<Runner>> {
+        return api
+            .subscribeToRunnerCollectionChange()
             .flatMapConcat { runnerChangeList ->
-                runnerChangeList.forEach {
-//                val canRewriteLocalCache = checkIsDataUploaded(it.runner.number)
-//                val canRewriteLocalCache = checkIsDataUploaded(it.runner.number)
-//
-//                if (canRewriteLocalCache) {
-//                    when (it.changeType) {
-//                        Change.ADD -> insertRunner(it.runner)
-//                        Change.UPDATE -> updateRunner(it.runner)
-//                        Change.REMOVE -> deleteRunner(it.runner)
-//                    }
-//                }
+                return@flatMapConcat channelFlow {
+                    runnerChangeList.forEach {
+                        val runner = it.entity.fromFirestoreRunner()
+                        val canRewriteLocalCache = checkIsDataUploaded(runner.number)
+                        if (canRewriteLocalCache) {
+                            when (it.modifierType) {
+                                ModifierType.ADD -> insertRunner(runner)
+                                ModifierType.UPDATE -> updateRunner(runner)
+                                ModifierType.REMOVE -> deleteRunner(runner)
+                            }
+                        }
+                        offer(Change(runner, it.modifierType))
+                    }
                 }
-                return@flatMapConcat channelFlow { runnerChangeList.forEach { offer(it) } }
             }
     }
 

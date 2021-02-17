@@ -25,7 +25,8 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(
                     totalResult = null,
                     checkpoints = mutableListOf(),
                     isOffTrack = false,
-                    distanceIds = emptyList(),
+                    distanceIds = mutableListOf(),
+                    raceIds = mutableListOf(),
                     actualDistanceId = 0
                 )
             }

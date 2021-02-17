@@ -4,9 +4,10 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.Change
-import com.gmail.maystruks08.domain.entities.RunnerChange
+import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
@@ -106,7 +107,7 @@ class RunnersViewModel @ViewModelInject constructor(
             val runnerNumber = lastSelectedRunner?.number ?: return@launch
             if (lastSelectedRunner?.isOffTrack == true) return@launch
             when (val onResult = runnersInteractor.markRunnerGotOffTheRoute(runnerNumber)) {
-                is TaskResult.Value -> handleRunnerChanges(onResult.value)
+                is TaskResult.Value -> handleRunnerChanges(Change(onResult.value, ModifierType.UPDATE))
                 is TaskResult.Error -> handleError(onResult.error)
             }
             lastSelectedRunner = null
@@ -125,18 +126,18 @@ class RunnersViewModel @ViewModelInject constructor(
         }
     }
 
-    fun handleRunnerChanges(runnerChange: RunnerChange) {
-        val runnerView = runnerChange.runner.toRunnerView()
-        if(distanceId == runnerChange.runner.actualDistanceId) {
-            when (runnerChange.changeType) {
-                Change.ADD -> {
+    fun handleRunnerChanges(runnerChange: Change<Runner>) {
+        val runnerView = runnerChange.entity.toRunnerView()
+        if (distanceId == runnerChange.entity.actualDistanceId) {
+            when (runnerChange.modifierType) {
+                ModifierType.ADD -> {
                     _runnersLiveData.value?.add(runnerView)
                 }
-                Change.UPDATE -> {
+                ModifierType.UPDATE -> {
                     _runnersLiveData.value?.removeAll { it.number == runnerView.number }
                     _runnersLiveData.value?.add(runnerView)
                 }
-                Change.REMOVE -> {
+                ModifierType.REMOVE -> {
                     _runnersLiveData.value?.removeAll { it.number == runnerView.number }
                 }
             }
@@ -205,7 +206,7 @@ class RunnersViewModel @ViewModelInject constructor(
         //TODO implement
     }
 
-    private suspend fun showAllDistances(){
+    private suspend fun showAllDistances() {
         _showProgressLiveData.postValue(true)
         showSmallInitRunners()
         when (val result = distanceInteractor.getDistances()) {
@@ -254,16 +255,16 @@ class RunnersViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun onMarkRunnerOnCheckpointSuccess(runnerChange: RunnerChange) {
-        val lastCheckpoint = runnerChange.runner.checkpoints.maxByOrNull { it.getResult()?.time ?: 0 }
-        _showSuccessDialogLiveData.postValue(lastCheckpoint to runnerChange.runner.number)
-        handleRunnerChanges(runnerChange)
+    private fun onMarkRunnerOnCheckpointSuccess(updatedRunner: Runner) {
+        val lastCheckpoint = updatedRunner.checkpoints.maxByOrNull { it.getResult()?.time ?: 0 }
+        _showSuccessDialogLiveData.postValue(lastCheckpoint to updatedRunner.number)
+        handleRunnerChanges(Change(updatedRunner, ModifierType.UPDATE))
     }
 
     private fun handleError(e: Throwable) {
         _showProgressLiveData.postValue(false)
         Timber.e(e)
-        when(e){
+        when (e) {
             is SaveRunnerDataException -> toastLiveData.postValue("Не удалось сохранить данные участника:" + e.message)
             is RunnerNotFoundException -> toastLiveData.postValue("Участник не найден")
             is SyncWithServerException -> toastLiveData.postValue("Данные не сохранились на сервер")

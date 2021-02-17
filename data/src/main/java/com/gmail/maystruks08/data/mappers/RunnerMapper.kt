@@ -17,9 +17,10 @@ fun RunnerPojo.fromFirestoreRunner(): Runner {
         RunnerSex.fromOrdinal(sex),
         city,
         dateOfBirthday,
-        0,
-        listOf(),
-        mutableListOf(),
+        actualDistanceId,
+        raceIds.toMutableList(),
+        distanceIds.toMutableList(),
+        mutableListOf(), //TODO
         isOffTrack,
         teamName,
         totalResult

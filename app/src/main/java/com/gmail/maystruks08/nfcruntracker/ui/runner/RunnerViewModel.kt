@@ -2,11 +2,8 @@ package com.gmail.maystruks08.nfcruntracker.ui.runner
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
-import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
@@ -57,7 +54,7 @@ class RunnerViewModel @ViewModelInject constructor(
             val runnerNumber = runner.value?.number ?: return@launch
             if (isRunnerOfftrack()) return@launch
             when (val onResult = runnersInteractor.markRunnerGotOffTheRoute(runnerNumber)) {
-                is TaskResult.Value -> handleRunnerData(onResult.value.runner)
+                is TaskResult.Value -> handleRunnerData(onResult.value)
                 is TaskResult.Error -> handleError(onResult.error)
             }
         }
@@ -77,7 +74,7 @@ class RunnerViewModel @ViewModelInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             when (val onResult =
                 runnersInteractor.removeCheckpointForRunner(runnerNumber, checkpointId.id)) {
-                is TaskResult.Value -> handleRunnerData(onResult.value.runner)
+                is TaskResult.Value -> handleRunnerData(onResult.value.entity)
                 is TaskResult.Error -> handleError(onResult.error)
             }
         }
@@ -101,7 +98,7 @@ class RunnerViewModel @ViewModelInject constructor(
                 viewModelScope.launch(Dispatchers.IO) {
                     when (val onResult = runnersInteractor.changeRunnerCardId(it.number, cardId)) {
                         is TaskResult.Value -> {
-                            handleRunnerData(onResult.value.runner)
+                            handleRunnerData(onResult.value.entity)
                             toastLiveData.postValue("Карта успешно изменена")
                             linkCardModeEnable.postValue(false)
                         }
@@ -116,10 +113,10 @@ class RunnerViewModel @ViewModelInject constructor(
         router.exit()
     }
 
-    private fun onMarkRunnerOnCheckpointSuccess(runnerChange: RunnerChange) {
-        val lastCheckpoint = runnerChange.runner.checkpoints.maxByOrNull { it.getResult()?.time ?: 0 }
-        _showSuccessDialogLiveData.postValue(lastCheckpoint to runnerChange.runner.number)
-        handleRunnerData(runnerChange.runner)
+    private fun onMarkRunnerOnCheckpointSuccess(updatedRunner: Runner) {
+        val lastCheckpoint = updatedRunner.checkpoints.maxByOrNull { it.getResult()?.time ?: 0 }
+        _showSuccessDialogLiveData.postValue(lastCheckpoint to updatedRunner.number)
+        handleRunnerData(updatedRunner)
     }
 
     private fun handleRunnerData(runner: Runner) {

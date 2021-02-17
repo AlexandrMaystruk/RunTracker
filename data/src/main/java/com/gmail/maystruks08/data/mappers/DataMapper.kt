@@ -1,12 +1,15 @@
 package com.gmail.maystruks08.data.mappers
 
 import com.gmail.maystruks08.data.fromJson
+import com.gmail.maystruks08.data.fromJsonOrNull
 import com.gmail.maystruks08.data.local.entity.relation.DistanceWithRunners
 import com.gmail.maystruks08.data.local.entity.relation.RaceWithDistances
 import com.gmail.maystruks08.data.local.entity.tables.CheckpointTable
+import com.gmail.maystruks08.data.local.entity.tables.RaceTable
 import com.gmail.maystruks08.data.local.entity.tables.ResultTable
 import com.gmail.maystruks08.data.local.entity.tables.RunnerTable
 import com.gmail.maystruks08.data.remote.pojo.CheckpointPojo
+import com.gmail.maystruks08.data.remote.pojo.RacePojo
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.Race
@@ -29,7 +32,8 @@ fun RaceWithDistances.toRaceEntity(gson: Gson): Race {
         dateCreation = Date(raceTable.dateCreation),
         registrationIsOpen = raceTable.registrationIsOpen,
         authorId = raceTable.authorId,
-        distanceList = distances
+        distanceList = distances,
+        adminListIds = gson.fromJsonOrNull(raceTable.adminListIds) ?: mutableListOf()
     )
 }
 
@@ -64,6 +68,7 @@ fun RunnerTable.toRunner(gson: Gson): Runner {
         checkpoints = mutableListOf(),
         isOffTrack = isOffTrack,
         distanceIds = gson.fromJson(distanceIds),
+        raceIds = gson.fromJson(raceIds),
         actualDistanceId = 0
     )
 }
@@ -77,12 +82,24 @@ fun CheckpointTable.toCheckpoint(): Checkpoint {
 }
 
 
-
-
 /**
  * Convert entity to database table
  */
-fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
+
+fun Race.toRaceTable(gson: Gson): RaceTable {
+    return RaceTable(
+        id,
+        name,
+        dateCreation.time,
+        authorId,
+        registrationIsOpen,
+        gson.toJson(adminListIds),
+        gson.toJson(distanceList.map { it.id })
+    )
+}
+
+
+fun Runner.toRunnerTable(gson: Gson, needToSync: Boolean = true): RunnerTable {
     return RunnerTable(
         cardId = this.cardId,
         runnerNumber = this.number,
@@ -95,7 +112,8 @@ fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
         teamName = this.teamName,
         totalResult = this.totalResult,
         isOffTrack = this.isOffTrack,
-        distanceIds = "",
+        distanceIds = gson.toJson(this.distanceIds),
+        raceIds = gson.toJson(this.raceIds),
         needToSync = needToSync
     )
 }
@@ -123,6 +141,20 @@ fun CheckpointResultIml.toResultTable(runnerNumber: Int): ResultTable {
 /**
  * Convert entity to firestore pojo
  */
+
+fun Race.toFirestoreRace(gson: Gson): RacePojo {
+    return RacePojo(
+        id,
+        name,
+        dateCreation,
+        registrationIsOpen,
+        authorId,
+        adminListIds,
+        distanceList.map { it.id.toString() }
+    )
+}
+
+
 fun Runner.toFirestoreRunner(): RunnerPojo {
     return RunnerPojo(
         number,
@@ -133,12 +165,30 @@ fun Runner.toFirestoreRunner(): RunnerPojo {
         sex.ordinal,
         city,
         dateOfBirthday,
-        0,
+        actualDistanceId,
         teamName,
         totalResult,
-        mutableListOf(),
-        mutableListOf(),
+        distanceIds,
+        raceIds,
+        mutableListOf(), //TODO
+        mutableListOf(),//TODO
         isOffTrack
+    )
+}
+
+/**
+ * Convert firestore pojo to table
+ */
+
+fun RacePojo.toTable(gson: Gson): RaceTable {
+    return RaceTable(
+        id = id,
+        name = name,
+        dateCreation = dateCreation.time,
+        authorId = authorId,
+        registrationIsOpen = registrationIsOpen,
+        adminListIds = gson.toJson(adminListIds),
+        distanceListIds = gson.toJson(distanceListIds)
     )
 }
 

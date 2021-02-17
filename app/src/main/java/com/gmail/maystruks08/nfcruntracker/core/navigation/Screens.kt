@@ -4,6 +4,7 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.ui.checkpoint_editor.CheckpointEditorFragment
 import com.gmail.maystruks08.nfcruntracker.ui.login.LoginFragment
 import com.gmail.maystruks08.nfcruntracker.ui.race.RaceFragment
+import com.gmail.maystruks08.nfcruntracker.ui.race.create.CreateRaceBottomShitFragment
 import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.result.RunnerResultFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
@@ -20,6 +21,15 @@ object Screens {
 
         companion object {
             fun tag() = RunnersFragment.name()
+        }
+    }
+
+    class CreateRaceScreen : AppScreen() {
+
+        override fun getFragment() = CreateRaceBottomShitFragment.getInstance()
+
+        companion object {
+            fun tag() = CreateRaceBottomShitFragment.name()
         }
     }
 

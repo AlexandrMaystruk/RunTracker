@@ -10,6 +10,7 @@ data class Race(
     val dateCreation: Date,
     val registrationIsOpen: Boolean,
     val authorId: Long,
+    val adminListIds: MutableList<String>,
     val distanceList: MutableList<Distance>
 ) {
 

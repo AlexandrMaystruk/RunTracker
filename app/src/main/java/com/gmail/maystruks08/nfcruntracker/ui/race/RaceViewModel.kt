@@ -8,10 +8,13 @@ import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.interactors.RaceInteractor
 import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
+import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RaceView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toView
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
@@ -24,15 +27,36 @@ class RaceViewModel @ViewModelInject constructor(
 ) : BaseViewModel() {
 
     val races: LiveData<MutableList<RaceView>> get() = _racesLiveData
-    val showProgress: LiveData<Boolean> get() = _showProgressLiveData
+    val showProgress: SingleLiveEvent<Boolean> get() = _showProgressLiveData
+    val showCreateRaceDialog: SingleLiveEvent<Boolean> get() = _showCreateRaceDialogLiveData
 
     private val _racesLiveData = MutableLiveData<MutableList<RaceView>>()
-    private val _showProgressLiveData = MutableLiveData<Boolean>()
+    private val _showProgressLiveData = SingleLiveEvent<Boolean>()
+    private val _showCreateRaceDialogLiveData = SingleLiveEvent<Boolean>()
+
+
+    init {
+        _showProgressLiveData.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                interactor
+                    .subscribeToUpdates()
+                    .collect { updatedRaceList ->
+                        _racesLiveData.postValue(updatedRaceList.map { it.toView() }
+                            .toMutableList())
+                        _showProgressLiveData.postValue(false)
+                    }
+            } catch (e: Exception) {
+                _showProgressLiveData.postValue(false)
+                Timber.e(e)
+            }
+        }
+    }
 
 
     fun initUI() {
         _showProgressLiveData.value = true
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             when (val result = interactor.getRaceList()) {
                 is TaskResult.Value -> {
                     val raceViews = result.value.map { it.toView() }.toMutableList()
@@ -45,7 +69,7 @@ class RaceViewModel @ViewModelInject constructor(
     }
 
     fun onCreateNewRaceClicked() {
-        //TODO implement
+        _showCreateRaceDialogLiveData.postValue(true)
     }
 
     fun onRaceClicked(raceView: RaceView) {

@@ -11,5 +11,7 @@ data class RaceTable(
     val name: String,
     val dateCreation: Long,
     val authorId: Long,
-    val registrationIsOpen: Boolean
+    val registrationIsOpen: Boolean,
+    val adminListIds: String, //json
+    val distanceListIds: String //json
 )

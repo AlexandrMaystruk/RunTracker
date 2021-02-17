@@ -35,6 +35,8 @@
     <string name="mark_at_current_checkpoint">Mark on current CP</string>
     <string name="fill_in_required_fields">Fill in required fields!</string>
     <string name="card">Card %1$s</string>
+    <string name="save_new_race">Save race</string>
+
 
     <string name="error_member_already_exist">A participant with such a card already exists</string>
     <string name="error_sync_with_server">Sync with server error</string>

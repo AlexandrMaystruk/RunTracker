@@ -3,8 +3,8 @@ package com.gmail.maystruks08.domain.interactors
 import com.gmail.maystruks08.domain.INFO
 import com.gmail.maystruks08.domain.LogHelper
 import com.gmail.maystruks08.domain.entities.Change
+import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.TaskResult
-import com.gmail.maystruks08.domain.entities.RunnerChange
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
@@ -40,26 +40,26 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
         }
     }
 
-    override suspend fun changeRunnerCardId(runnerNumber: Long, newCardId: String): TaskResult<Exception, RunnerChange> {
+    override suspend fun changeRunnerCardId(runnerNumber: Long, newCardId: String): TaskResult<Exception,  Change<Runner>> {
         return TaskResult.build {
             val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
             val oldRunnerCardId = runner.cardId
             runner.updateCardId(newCardId)
             logHelper.log(INFO, "Attach new card with id $newCardId to runner ${runner.fullName}. Old card id = $oldRunnerCardId")
-            RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
+            Change(runnersRepository.updateRunnerData(runner), ModifierType.UPDATE)
         }
     }
 
-    override suspend fun markRunnerGotOffTheRoute(runnerNumber: Long): TaskResult<Exception, RunnerChange> {
+    override suspend fun markRunnerGotOffTheRoute(runnerNumber: Long): TaskResult<Exception, Runner> {
         return TaskResult.build {
             val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
             runner.markThatRunnerIsOffTrack()
             logHelper.log(INFO, "Runner ${runner.number} ${runner.fullName} is off track")
-            RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
+            runnersRepository.updateRunnerData(runner)
         }
     }
 
-    override suspend fun addCurrentCheckpointToRunner(cardId: String ): TaskResult<Exception, RunnerChange> {
+    override suspend fun addCurrentCheckpointToRunner(cardId: String ): TaskResult<Exception, Runner> {
         return TaskResult.build {
             val runner = runnersRepository.getRunnerByCardId(cardId) ?: throw RunnerNotFoundException()
 //            val currentCheckpoint = runnersRepository.getCurrentCheckpoint(runner.type)
@@ -74,11 +74,11 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
 //                }
 //            }
 //            logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.id} to runner ${runner.number}  ${runner.type}  ${runner.fullName}")
-            RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
+            runnersRepository.updateRunnerData(runner)
         }
     }
 
-    override suspend fun addCurrentCheckpointToRunner(runnerNumber: Long): TaskResult<Exception, RunnerChange> {
+    override suspend fun addCurrentCheckpointToRunner(runnerNumber: Long): TaskResult<Exception, Runner>{
         return TaskResult.build {
             val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
 //            val currentCheckpoint = runnersRepository.getCurrentCheckpoint(runner.type)
@@ -93,11 +93,11 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
 //                }
 //            }
 //            logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.id} to runner ${runner.number} ${runner.fullName}")
-            RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
+            runnersRepository.updateRunnerData(runner)
         }
     }
 
-    override suspend fun removeCheckpointForRunner(runnerNumber: Long, checkpointId: Long): TaskResult<Exception, RunnerChange> {
+    override suspend fun removeCheckpointForRunner(runnerNumber: Long, checkpointId: Long): TaskResult<Exception, Change<Runner>> {
         return TaskResult.build {
             val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
 //            logHelper.log(INFO, "Remove checkpoint: $checkpointId for runner ${runner.number}  ${runner.type}  ${runner.fullName}")
@@ -109,7 +109,7 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
 //                    runnersRepository.updateRunnerData(teamRunner)
 //                }
 //            }
-            RunnerChange(runnersRepository.updateRunnerData(runner), Change.UPDATE)
+            Change(runnersRepository.updateRunnerData(runner), ModifierType.UPDATE)
         }
     }
 }

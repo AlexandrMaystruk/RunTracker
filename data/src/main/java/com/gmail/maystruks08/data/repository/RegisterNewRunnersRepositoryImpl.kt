@@ -3,6 +3,7 @@ package com.gmail.maystruks08.data.repository
 import android.database.sqlite.SQLiteConstraintException
 import com.gmail.maystruks08.data.cache.ApplicationCache
 import com.gmail.maystruks08.data.local.dao.RunnerDao
+import com.gmail.maystruks08.data.mappers.toRunnerTable
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.entities.runner.Runner

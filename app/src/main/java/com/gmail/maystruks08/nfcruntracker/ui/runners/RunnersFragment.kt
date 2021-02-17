@@ -8,19 +8,18 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.gmail.maystruks08.domain.entities.RunnerChange
+import com.gmail.maystruks08.domain.entities.Change
+import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.argumentNullable
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
-import com.gmail.maystruks08.nfcruntracker.core.ext.toPx
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnersBinding
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
@@ -168,7 +167,7 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
         viewModel.changeDistance(distance.id)
     }
 
-    fun receiveRunnerUpdateFromServer(runnerChange: RunnerChange) {
+    fun receiveRunnerUpdateFromServer(runnerChange: Change<Runner>) {
         if (isVisible) {
             viewModel.handleRunnerChanges(runnerChange)
         }

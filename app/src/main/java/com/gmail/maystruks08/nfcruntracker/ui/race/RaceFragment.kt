@@ -6,13 +6,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
+import com.gmail.maystruks08.nfcruntracker.core.ext.findFragmentByTag
+import com.gmail.maystruks08.nfcruntracker.core.ext.setVisibility
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRaceBinding
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.SwipeActionHelper
+import com.gmail.maystruks08.nfcruntracker.ui.race.create.CreateRaceBottomShitFragment
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RaceView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -46,9 +46,18 @@ class RaceFragment : BaseFragment(), RaceAdapter.Interaction {
         viewModel.races.observe(viewLifecycleOwner, {
             adapter.raceList = it
         })
+        viewModel.showCreateRaceDialog.observe(viewLifecycleOwner, { needToShow ->
+            if (needToShow) {
+                CreateRaceBottomShitFragment
+                    .getInstance()
+                    .show(childFragmentManager, CREATE_RACE_DIALOG)
+            } else {
+                findFragmentByTag<CreateRaceBottomShitFragment>(CREATE_RACE_DIALOG)?.dismiss()
+            }
+        })
 
         viewModel.showProgress.observe(viewLifecycleOwner, {
-            //TODO fix progress
+            binding.progress.setVisibility(it)
         })
     }
 
@@ -62,28 +71,14 @@ class RaceFragment : BaseFragment(), RaceAdapter.Interaction {
 
             btnCreateNewRace.setOnClickListener {
                 viewModel.onCreateNewRaceClicked()
+
             }
         }
-        initStaticCardSwipe()
-
         viewModel.initUI()
     }
 
     override fun onClickAtRace(raceView: RaceView) {
         viewModel.onRaceClicked(raceView)
-    }
-
-    private fun initStaticCardSwipe() {
-        val swipeHelper = object : SwipeActionHelper(requireContext()) {
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                if (direction == ItemTouchHelper.LEFT) {
-
-
-                }
-            }
-        }
-        ItemTouchHelper(swipeHelper).attachToRecyclerView(binding.raceRecyclerView)
     }
 
     override fun onPause() {
@@ -96,9 +91,11 @@ class RaceFragment : BaseFragment(), RaceAdapter.Interaction {
         super.onDestroyView()
     }
 
-    companion object{
+    companion object {
 
-        fun getInstance() =  RaceFragment()
+        const val CREATE_RACE_DIALOG = "CREATE_RACE_DIALOG"
+
+        fun getInstance() = RaceFragment()
 
     }
 
