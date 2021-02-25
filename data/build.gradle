@@ -45,9 +45,7 @@ dependencies {
     api dataDependencies.room
     api dataDependencies.firestore
     api dataDependencies.firebaseAuth
-
-    api 'com.google.android.gms:play-services-auth:19.0.0'
-
+    api dataDependencies.playServicesAuth
 
     api dataDependencies.workManager
 

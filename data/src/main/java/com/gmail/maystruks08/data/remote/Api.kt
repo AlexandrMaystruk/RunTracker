@@ -19,29 +19,29 @@ interface Api{
 
 
     //RACE
-    suspend fun saveRace(racePojo: RacePojo): Task<Void>
+    suspend fun saveRace(racePojo: RacePojo)
 
 
     //DISTANCE
-    suspend fun saveDistance(distancePojo: DistancePojo): Task<Void>
+    suspend fun saveDistance(distancePojo: DistancePojo)
 
 
     //RUNNER
-    suspend fun saveRunner(runnerPojo: RunnerPojo): Task<Void>
+    suspend fun saveRunner(runnerPojo: RunnerPojo)
 
 
     //CHECKPOINTS
-    suspend fun getCheckpoints(raceId: String, distanceId: String): Task<DocumentSnapshot>
+    suspend fun getCheckpoints(raceId: String, distanceId: String): DocumentSnapshot
 
-    suspend fun saveCheckpoints(raceId: String, distanceId: String, checkpoints: List<Checkpoint>): Task<Void>
+    suspend fun saveCheckpoints(raceId: String, distanceId: String, checkpoints: List<Checkpoint>)
 
 
-    suspend fun getCheckpointsSelectionState(userId: String): Task<DocumentSnapshot>
+    suspend fun getCheckpointsSelectionState(userId: String): DocumentSnapshot
 
     /**
      * Document id is userId, field name is distanceId, value is selectedCheckpointId
      */
-    suspend fun saveCheckpointsSelectionState(userId: String, distanceId: String, selectedCheckpointId: String): Task<Void>
+    suspend fun saveCheckpointsSelectionState(userId: String, distanceId: String, selectedCheckpointId: String)
 
 
 }

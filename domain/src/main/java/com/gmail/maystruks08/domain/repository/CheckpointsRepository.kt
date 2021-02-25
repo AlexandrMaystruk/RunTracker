@@ -1,13 +1,17 @@
 package com.gmail.maystruks08.domain.repository
 
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
+import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 
 interface CheckpointsRepository {
 
-    suspend fun getCheckpoints(distanceId: Long): List<CheckpointImpl>
+    suspend fun getCheckpoints(raceId: Long, distanceId: Long): List<Checkpoint>
 
-    suspend fun getCurrentCheckpoint(distanceId: Long): CheckpointImpl
+    suspend fun getCurrentCheckpoint(raceId: Long, distanceId: Long): Checkpoint?
 
-    suspend fun saveCurrentSelectedCheckpoint(checkpoint: CheckpointImpl)
+    suspend fun saveCurrentSelectedCheckpointId(
+        raceId: Long,
+        distanceId: Long,
+        checkpointId: Long
+    )
 
 }

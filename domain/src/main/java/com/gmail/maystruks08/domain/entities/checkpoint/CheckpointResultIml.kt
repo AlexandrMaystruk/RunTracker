@@ -20,7 +20,11 @@ data class CheckpointResultIml(
         return checkpoint.getDistanceId()
     }
 
-    override fun getResult(): Date? {
+    override fun getRaceId(): Long {
+        return checkpoint.getRaceId()
+    }
+
+    override fun getResult(): Date {
         return date
     }
 

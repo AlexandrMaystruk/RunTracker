@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import java.util.*
+import kotlin.collections.ArrayList
 
 @ObsoleteCoroutinesApi
 class RunnersViewModel @ViewModelInject constructor(
@@ -49,6 +50,8 @@ class RunnersViewModel @ViewModelInject constructor(
     val showProgress get() = _showProgressLiveData
     val showTime get() = _showTimeLiveData
     val showSelectCheckpointDialog get() = _selectCheckpointDialogLiveData
+    val closeSelectCheckpointDialog get() = _closeCheckpointDialogLiveData
+
 
     private val _distanceLiveData = MutableLiveData<MutableList<DistanceView>>()
     private val _runnersLiveData = MutableLiveData<MutableList<RunnerView>>()
@@ -56,7 +59,8 @@ class RunnersViewModel @ViewModelInject constructor(
     private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
     private val _showProgressLiveData = SingleLiveEvent<Boolean>()
     private val _showTimeLiveData = SingleLiveEvent<String>()
-    private val _selectCheckpointDialogLiveData = SingleLiveEvent<Array<CheckpointView>>()
+    private val _selectCheckpointDialogLiveData = SingleLiveEvent<ArrayList<CheckpointView>>()
+    private val _closeCheckpointDialogLiveData = SingleLiveEvent<String>()
 
     private var raceId: Long = -1
     private var distanceId: Long = -1
@@ -76,6 +80,7 @@ class RunnersViewModel @ViewModelInject constructor(
         this.distanceId = distanceId ?: 0
         viewModelScope.launch(Dispatchers.IO) { showAllDistances() }
         viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
+        viewModelScope.launch(Dispatchers.IO) { showCurrentCheckpoint() }
     }
 
     fun changeDistance(distanceId: Long) {
@@ -190,10 +195,13 @@ class RunnersViewModel @ViewModelInject constructor(
 
     fun onCurrentCheckpointTextClicked() {
         viewModelScope.launch(Dispatchers.IO) {
-            val hardcodeDistanceId = 0L
-            when (val result = checkpointInteractor.getCheckpoints(hardcodeDistanceId)) {
+            when (val result = checkpointInteractor.getCheckpoints(raceId, distanceId)) {
                 is TaskResult.Value -> {
-                    val checkpoints = result.value.map { it.toCheckpointView() }.toTypedArray()
+                    val currentCheckpoint = (checkpointInteractor.getCurrentSelectedCheckpoint(
+                        raceId,
+                        distanceId
+                    ) as? TaskResult.Value)?.value
+                    val checkpoints = ArrayList(result.value.map { it.toCheckpointView(currentCheckpoint?.getId()) })
                     _selectCheckpointDialogLiveData.postValue(checkpoints)
                 }
                 is TaskResult.Error -> handleError(result.error)
@@ -202,8 +210,16 @@ class RunnersViewModel @ViewModelInject constructor(
     }
 
     fun onNewCurrentCheckpointSelected(checkpointView: CheckpointView) {
-        checkpointView.bean
-        //TODO implement
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = checkpointInteractor.saveCurrentSelectedCheckpointId(
+                raceId,
+                distanceId,
+                checkpointView.id
+            )) {
+                is TaskResult.Value -> _closeCheckpointDialogLiveData.postValue(checkpointView.bean.title)
+                is TaskResult.Error -> handleError(result.error)
+            }
+        }
     }
 
     private suspend fun showAllDistances() {
@@ -217,6 +233,13 @@ class RunnersViewModel @ViewModelInject constructor(
             is TaskResult.Error -> handleError(result.error)
         }
         _showProgressLiveData.postValue(false)
+    }
+
+    private suspend fun showCurrentCheckpoint() {
+        when (val result = checkpointInteractor.getCurrentSelectedCheckpoint(raceId, distanceId)) {
+            is TaskResult.Value -> _closeCheckpointDialogLiveData.postValue(result.value.getName())
+            is TaskResult.Error -> handleError(result.error)
+        }
     }
 
     private suspend fun showAllRunners() {

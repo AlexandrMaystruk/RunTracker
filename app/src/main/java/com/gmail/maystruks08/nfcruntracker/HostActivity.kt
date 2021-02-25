@@ -166,7 +166,6 @@ class HostActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        toast?.cancel()
         networkUtil.unsubscribe(this)
         toast?.cancel()
         toast = null

@@ -19,10 +19,9 @@ import timber.log.Timber
 @ObsoleteCoroutinesApi
 class LoginViewModel @ViewModelInject constructor(
     private val router: Router,
-    private val configPreferences: ConfigPreferences
+    private val configPreferences: ConfigPreferences,
+    private val auth: FirebaseAuth
 ) : BaseViewModel() {
-
-    private val auth = FirebaseAuth.getInstance()
 
     val startAuthFlow: LiveData<AuthState> get() = _startAuthFlowLiveData
     private val _startAuthFlowLiveData = SingleLiveEvent<AuthState>()

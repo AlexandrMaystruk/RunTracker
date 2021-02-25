@@ -3,10 +3,7 @@ package com.gmail.maystruks08.data.local
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.gmail.maystruks08.data.local.dao.CheckpointDAO
-import com.gmail.maystruks08.data.local.dao.DistanceDAO
-import com.gmail.maystruks08.data.local.dao.RaceDAO
-import com.gmail.maystruks08.data.local.dao.RunnerDao
+import com.gmail.maystruks08.data.local.dao.*
 import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
 import com.gmail.maystruks08.data.local.entity.relation.RunnerResultCrossRef
 import com.gmail.maystruks08.data.local.entity.tables.*
@@ -19,7 +16,8 @@ import com.gmail.maystruks08.data.local.entity.tables.*
         CheckpointTable::class,
         ResultTable::class,
         DistanceRunnerCrossRef::class,
-        RunnerResultCrossRef::class
+        RunnerResultCrossRef::class,
+        UserSettingsTable::class,
     ],
     version = 1,
     exportSchema = false
@@ -34,5 +32,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun runnerDao(): RunnerDao
 
     abstract fun checkpointDao(): CheckpointDAO
+
+    abstract fun userSettingsDAO(): UserSettingsDAO
 
 }

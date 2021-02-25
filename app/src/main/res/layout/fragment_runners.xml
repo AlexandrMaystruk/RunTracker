@@ -65,13 +65,16 @@
 
     <TextView
         android:id="@+id/tvCurrentCheckpoint"
-        style="@style/TextM"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        style="@style/MainButton.Green"
+        android:background="@drawable/bg_main_btn_green"
         android:layout_marginTop="@dimen/margin_xs"
         android:layout_marginEnd="@dimen/margin_xs"
+        android:gravity="center"
         android:elevation="@dimen/cardview_default_elevation"
-        android:text="Текущее кп 15"
+        android:minWidth="@dimen/button_width_s"
+        android:padding="@dimen/margin_xs"
+        android:text="Выбрать кп"
+        android:textColor="@color/colorWhite"
         app:layout_constraintStart_toStartOf="@id/tvRunnersTitle"
         app:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
 
@@ -81,12 +84,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_xs"
-        android:layout_marginTop="@dimen/margin_xs"
         android:layout_marginEnd="@dimen/margin_m"
         android:gravity="end"
         android:elevation="@dimen/cardview_default_elevation"
         app:layout_constraintEnd_toEndOf="@id/view_card"
-        app:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
+        app:layout_constraintBottom_toBottomOf="@+id/tvRunnersTitle"
+        app:layout_constraintTop_toTopOf="@+id/tvRunnersTitle" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRunners"

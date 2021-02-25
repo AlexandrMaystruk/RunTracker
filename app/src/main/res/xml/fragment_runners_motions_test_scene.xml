@@ -52,10 +52,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_xs"
-            android:layout_marginTop="@dimen/margin_xs"
             android:layout_marginEnd="@dimen/margin_m"
+            motion:layout_constraintBottom_toBottomOf="@+id/tvRunnersTitle"
             motion:layout_constraintEnd_toEndOf="@id/view_card"
-            motion:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
+            motion:layout_constraintTop_toTopOf="@+id/tvRunnersTitle" />
         <Constraint
             android:id="@+id/rvDistanceType"
             android:layout_width="0dp"
@@ -151,11 +151,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_xs"
-            android:layout_marginTop="@dimen/margin_xs"
             android:layout_marginEnd="@dimen/margin_m"
             android:alpha="0"
+            motion:layout_constraintBottom_toBottomOf="@+id/tvRunnersTitle"
             motion:layout_constraintEnd_toEndOf="@id/view_card"
-            motion:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
+            motion:layout_constraintTop_toTopOf="@+id/tvRunnersTitle" />
         <Constraint
             android:id="@+id/rvRunners"
             android:layout_width="0dp"

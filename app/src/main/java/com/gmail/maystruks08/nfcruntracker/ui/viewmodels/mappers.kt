@@ -56,8 +56,10 @@ fun List<Checkpoint>.toCheckpointViews(): List<CheckpointView> {
 //    }
 }
 
-fun Checkpoint.toCheckpointView(): CheckpointView {
-    return CheckpointView(getId(), Bean(getName(), StepState.UNDONE))
+fun Checkpoint.toCheckpointView(selectedId: Long?): CheckpointView {
+    val id = getId()
+    val stepState = if(id == selectedId) StepState.CURRENT else StepState.UNDONE
+    return CheckpointView(id, Bean(getName(), stepState))
 }
 
 

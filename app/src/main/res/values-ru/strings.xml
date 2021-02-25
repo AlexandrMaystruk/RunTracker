@@ -63,5 +63,6 @@
     <string name="signIn">Логин</string>
     <string name="signUp">Выйти</string>
     <string name="competition_time">Время: %1$s</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

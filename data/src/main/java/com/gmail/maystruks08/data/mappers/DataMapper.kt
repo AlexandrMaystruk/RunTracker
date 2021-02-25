@@ -75,9 +75,10 @@ fun RunnerTable.toRunner(gson: Gson): Runner {
 
 fun CheckpointTable.toCheckpoint(): Checkpoint {
     return CheckpointImpl(
-        this.checkpointId.toLong(),
-        this.name,
-        distanceId.toLong()
+        this.checkpointId,
+        this.distanceId,
+        this.raceId,
+        this.name
     )
 }
 
@@ -120,8 +121,9 @@ fun Runner.toRunnerTable(gson: Gson, needToSync: Boolean = true): RunnerTable {
 
 fun Checkpoint.toCheckpointTable(): CheckpointTable {
     return CheckpointTable(
-        getId().toInt(),
-        getDistanceId().toInt(),
+        getId(),
+        getDistanceId(),
+        getRaceId(),
         getName(),
     )
 }
@@ -194,8 +196,10 @@ fun RacePojo.toTable(gson: Gson): RaceTable {
 
 fun CheckpointPojo.toCheckpointTable(): CheckpointTable {
     return CheckpointTable(
-        this.id.toInt(),
-        this.distanceId.toInt(),
+        this.id,
+        this.distanceId,
+        this.raceId,
         this.name,
+
     )
 }

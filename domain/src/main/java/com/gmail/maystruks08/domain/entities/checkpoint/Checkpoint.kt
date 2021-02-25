@@ -10,6 +10,8 @@ interface Checkpoint {
 
     fun getDistanceId(): Long
 
+    fun getRaceId(): Long
+
     fun getResult(): Date?
 
     fun hasPrevious(): Boolean

@@ -47,18 +47,18 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/margin_l"
-        app:layout_constraintBottom_toTopOf="@+id/buttonOk"
+        app:layout_constraintBottom_toTopOf="@+id/btnClose"
         app:layout_constraintEnd_toEndOf="@+id/cornerView"
         app:layout_constraintStart_toStartOf="@+id/cornerView"
         app:layout_constraintTop_toBottomOf="@+id/tvSuccess" />
 
     <Button
-        android:id="@+id/buttonOk"
-        style="@style/MainButton.Green"
+        android:id="@+id/btnClose"
+        style="@style/MainButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_m"
-        android:text="@string/ok"
+        android:text="@string/cancel"
         android:translationZ="@dimen/transition_s"
         app:layout_constraintBottom_toBottomOf="@+id/cornerView"
         app:layout_constraintEnd_toEndOf="@+id/cornerView"

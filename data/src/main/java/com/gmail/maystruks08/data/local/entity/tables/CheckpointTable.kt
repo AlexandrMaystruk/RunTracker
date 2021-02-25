@@ -9,7 +9,8 @@ import androidx.room.Index
     indices = [Index(value = arrayOf("checkpointId"))]
 )
 data class CheckpointTable(
-    val checkpointId: Int,
-    val distanceId: Int,
+    val checkpointId: Long,
+    val distanceId: Long,
+    val raceId: Long,
     val name: String
 )

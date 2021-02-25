@@ -3,8 +3,9 @@ package com.gmail.maystruks08.domain.entities.checkpoint
 import java.util.*
 
 data class CheckpointImpl(private val _id: Long,
+                          private val _distanceId: Long,
+                          private val _raceId: Long,
                           private val _name: String,
-                          private val _distanceId: Long
 ) : Checkpoint {
 
     override fun getId(): Long {
@@ -17,6 +18,10 @@ data class CheckpointImpl(private val _id: Long,
 
     override fun getDistanceId(): Long {
         return _distanceId
+    }
+
+    override fun getRaceId(): Long {
+        return _raceId
     }
 
     override fun getResult(): Date? {

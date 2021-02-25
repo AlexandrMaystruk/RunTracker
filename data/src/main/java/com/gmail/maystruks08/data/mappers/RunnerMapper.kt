@@ -27,6 +27,6 @@ fun RunnerPojo.fromFirestoreRunner(): Runner {
     )
 }
 
-fun Checkpoint.toFirestoreCheckpoint() = CheckpointPojo(getId(), getName(), getDistanceId())
+fun Checkpoint.toFirestoreCheckpoint() = CheckpointPojo(getId(), getDistanceId(), getRaceId(), getName())
 
 

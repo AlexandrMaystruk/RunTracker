@@ -2,9 +2,7 @@ package com.gmail.maystruks08.domain.entities.runner
 
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
-import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import java.util.*
-import kotlin.collections.ArrayList
 
 data class Runner(
     val number: Long,
@@ -64,14 +62,22 @@ data class Runner(
             val oldCheckpoint = checkpoints[index]
             checkpoints[index] = CheckpointImpl(
                 oldCheckpoint.getId(),
+                oldCheckpoint.getDistanceId(),
+                oldCheckpoint.getRaceId(),
                 oldCheckpoint.getName(),
-                oldCheckpoint.getDistanceId()
             )
         }
     }
 
     private fun addStartCheckpoint(checkpoint: Checkpoint) {
-        val mappedCheckpoints = checkpoints.map { CheckpointImpl(it.getId(), it.getName(), it.getDistanceId()) }
+        val mappedCheckpoints = checkpoints.map {
+            CheckpointImpl(
+                it.getId(),
+                it.getDistanceId(),
+                it.getRaceId(),
+                it.getName()
+            )
+        }
         totalResult = null
         checkpoints.clear()
         checkpoints.add(checkpoint)

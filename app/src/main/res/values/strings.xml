@@ -73,6 +73,7 @@
     <string name="signIn">Login</string>
     <string name="signUp">Sign Up</string>
     <string name="competition_time">Time: %1$s</string>
+    <string name="cancel">Cancel</string>
 
 
 </resources>

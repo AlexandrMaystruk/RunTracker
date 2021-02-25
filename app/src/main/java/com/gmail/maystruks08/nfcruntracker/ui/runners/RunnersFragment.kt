@@ -19,6 +19,7 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.argumentNullable
+import com.gmail.maystruks08.nfcruntracker.core.ext.findFragmentByTag
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnersBinding
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
@@ -82,43 +83,53 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
         .build()
 
     override fun bindViewModel() {
-        viewModel.distance.observe(viewLifecycleOwner, {
-            distanceAdapter.items = it
-        })
+        with(viewModel) {
+            distance.observe(viewLifecycleOwner, {
+                distanceAdapter.items = it
+            })
 
-        viewModel.runners.observe(viewLifecycleOwner, {
-            runnerAdapter.submitList(it)
-        })
+            runners.observe(viewLifecycleOwner, {
+                runnerAdapter.submitList(it)
+            })
 
-        viewModel.showConfirmationDialog.observe(viewLifecycleOwner) {
-            alertDialog?.dismiss()
-            when (it) {
-                is AlertTypeConfirmOfftrack -> showConfirmOffTrackDialog(it.position)
-                is AlertTypeMarkRunnerAtCheckpoint -> showConfirmMarkRunnerAtCheckpointDialog(it.position)
-                else -> Unit
+            showConfirmationDialog.observe(viewLifecycleOwner) {
+                alertDialog?.dismiss()
+                when (it) {
+                    is AlertTypeConfirmOfftrack -> showConfirmOffTrackDialog(it.position)
+                    is AlertTypeMarkRunnerAtCheckpoint -> showConfirmMarkRunnerAtCheckpointDialog(it.position)
+                    else -> Unit
+                }
             }
+
+            showSuccessDialog.observe(viewLifecycleOwner, {
+                val checkpointName = it?.first?.getName() ?: ""
+                val message = getString(R.string.success_message, checkpointName, "#${it.second}")
+                SuccessDialogFragment.getInstance(message)
+                    .show(childFragmentManager, SuccessDialogFragment.name())
+            })
+
+            showSelectCheckpointDialog.observe(viewLifecycleOwner, { arrayOfCheckpointViews ->
+                val dialog = findFragmentByTag<SelectCheckpointDialogFragment>(SelectCheckpointDialogFragment.name())
+                if(dialog == null){
+                    SelectCheckpointDialogFragment.getInstance(arrayOfCheckpointViews) {
+                        viewModel.onNewCurrentCheckpointSelected(it)
+                    }.show(childFragmentManager, SelectCheckpointDialogFragment.name())
+                }
+            })
+
+            closeSelectCheckpointDialog.observe(viewLifecycleOwner, { selectedCheckpoint ->
+                findFragmentByTag<SelectCheckpointDialogFragment>(SelectCheckpointDialogFragment.name())?.dismiss()
+                binding.tvCurrentCheckpoint.text = selectedCheckpoint
+            })
+
+            showProgress.observe(viewLifecycleOwner, {
+                //TODO fix progress
+            })
+
+            showTime.observe(viewLifecycleOwner, {
+                binding.tvTime.text = getString(R.string.competition_time, it)
+            })
         }
-
-        viewModel.showSuccessDialog.observe(viewLifecycleOwner, {
-            val checkpointName = it?.first?.getName() ?: ""
-            val message = getString(R.string.success_message, checkpointName, "#${it.second}")
-            SuccessDialogFragment.getInstance(message)
-                .show(childFragmentManager, SuccessDialogFragment.name())
-        })
-
-        viewModel.showSelectCheckpointDialog.observe(viewLifecycleOwner, { arrayOfCheckpointViews ->
-            SelectCheckpointDialogFragment.getInstance(arrayOfCheckpointViews) {
-                viewModel.onNewCurrentCheckpointSelected(it)
-            }.show(childFragmentManager, SelectCheckpointDialogFragment.name())
-        })
-
-        viewModel.showProgress.observe(viewLifecycleOwner, {
-            //TODO fix progress
-        })
-
-        viewModel.showTime.observe(viewLifecycleOwner, {
-            binding.tvTime.text = getString(R.string.competition_time, it)
-        })
     }
 
     @ExperimentalCoroutinesApi

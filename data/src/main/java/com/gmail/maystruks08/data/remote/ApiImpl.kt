@@ -1,5 +1,7 @@
 package com.gmail.maystruks08.data.remote
 
+import com.gmail.maystruks08.data.awaitTaskCompletable
+import com.gmail.maystruks08.data.awaitTaskResult
 import com.gmail.maystruks08.data.mappers.toFirestoreCheckpoint
 import com.gmail.maystruks08.data.remote.pojo.DistancePojo
 import com.gmail.maystruks08.data.remote.pojo.RacePojo
@@ -84,27 +86,27 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
         }
     }
 
-    override suspend fun saveRace(racePojo: RacePojo): Task<Void> {
+    override suspend fun saveRace(racePojo: RacePojo) {
         val raceDocument = db.collection(RACES_COLLECTION).document(racePojo.id.toString())
-        return raceDocument.set(racePojo)
+        return awaitTaskCompletable(raceDocument.set(racePojo))
     }
 
-    override suspend fun saveDistance(distancePojo: DistancePojo): Task<Void> {
+    override suspend fun saveDistance(distancePojo: DistancePojo) {
         val distanceDocument =
             db.collection(DISTANCES_COLLECTION).document(distancePojo.id.toString())
-        return distanceDocument.set(distancePojo)
+        return awaitTaskCompletable(distanceDocument.set(distancePojo))
     }
 
-    override suspend fun saveRunner(runnerPojo: RunnerPojo): Task<Void> {
+    override suspend fun saveRunner(runnerPojo: RunnerPojo) {
         val runnerDocument = db.collection(RUNNER_COLLECTION).document(runnerPojo.number.toString())
-        return runnerDocument.set(runnerPojo)
+        return awaitTaskCompletable(runnerDocument.set(runnerPojo))
     }
 
     override suspend fun saveCheckpoints(
         raceId: String,
         distanceId: String,
         checkpoints: List<Checkpoint>
-    ): Task<Void> {
+    ) {
         val checkpointDocumentName = "${raceId}_$distanceId"
         val document = db.collection(CHECKPOINTS_COLLECTION).document(checkpointDocumentName)
         val map = hashMapOf<String, Any>()
@@ -112,22 +114,25 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
                 checkpoints.forEach { this[it.getId().toString()] = it.toFirestoreCheckpoint() }
             }
         return try {
-            document.update(map)
+            awaitTaskCompletable(document.update(map))
         } catch (e: FirebaseFirestoreException) {
-            document.set(map)
+            awaitTaskCompletable(document.set(map))
+        } catch (e: Exception){
+            Timber.e(e)
+            throw e
         }
     }
 
     override suspend fun getCheckpoints(
         raceId: String,
         distanceId: String
-    ): Task<DocumentSnapshot> {
+    ): DocumentSnapshot {
         val checkpointDocumentName = "${raceId}_$distanceId"
-        return db.collection(CHECKPOINTS_COLLECTION).document(checkpointDocumentName).get()
+        return awaitTaskResult(db.collection(CHECKPOINTS_COLLECTION).document(checkpointDocumentName).get())
     }
 
-    override suspend fun getCheckpointsSelectionState(userId: String): Task<DocumentSnapshot> {
-        return db.collection(SETTINGS_COLLECTION).document(userId).get()
+    override suspend fun getCheckpointsSelectionState(userId: String): DocumentSnapshot {
+        return awaitTaskResult(db.collection(SETTINGS_COLLECTION).document(userId).get())
     }
 
 
@@ -135,9 +140,9 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
         userId: String,
         distanceId: String,
         selectedCheckpointId: String
-    ): Task<Void> {
+    ) {
         val document = db.collection(SETTINGS_COLLECTION).document(userId)
-        return document.update(distanceId, selectedCheckpointId)
+        return awaitTaskCompletable(document.update(distanceId, selectedCheckpointId))
     }
 
     private fun DocumentChange.getChangeType(): ModifierType = when (type) {
