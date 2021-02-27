@@ -1,13 +1,14 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.Change
+import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.exception.CheckpointNotFoundException
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
@@ -21,19 +22,24 @@ import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.core.bus.StartRunTrackerBus
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.core.ext.startCoroutineTimer
+import com.gmail.maystruks08.nfcruntracker.core.ext.updateElement
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertType
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
 
+@ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
 class RunnersViewModel @ViewModelInject constructor(
     private val distanceInteractor: DistanceInteractor,
@@ -53,8 +59,8 @@ class RunnersViewModel @ViewModelInject constructor(
     val closeSelectCheckpointDialog get() = _closeCheckpointDialogLiveData
 
 
-    private val _distanceLiveData = MutableLiveData<MutableList<DistanceView>>()
-    private val _runnersLiveData = MutableLiveData<MutableList<RunnerView>>()
+    private val _distanceLiveData = MutableStateFlow<MutableList<DistanceView>>(mutableListOf())
+    private val _runnersLiveData = MutableStateFlow<MutableList<RunnerView>>(mutableListOf())
     private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, Long>>()
     private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
     private val _showProgressLiveData = SingleLiveEvent<Boolean>()
@@ -81,11 +87,15 @@ class RunnersViewModel @ViewModelInject constructor(
         viewModelScope.launch(Dispatchers.IO) { showAllDistances() }
         viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
         viewModelScope.launch(Dispatchers.IO) { showCurrentCheckpoint() }
+        viewModelScope.launch(Dispatchers.IO) { observeDistanceChanges() }
     }
 
     fun changeDistance(distanceId: Long) {
         this.distanceId = distanceId
+        val updatedDistance = ArrayList(_distanceLiveData.value.map { DistanceView(it.id, it.name, it.id == distanceId) })
+        _distanceLiveData.value = updatedDistance
         viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
+        viewModelScope.launch(Dispatchers.IO) { showCurrentCheckpoint() }
     }
 
     fun onNfcCardScanned(cardId: String) {
@@ -134,18 +144,38 @@ class RunnersViewModel @ViewModelInject constructor(
     fun handleRunnerChanges(runnerChange: Change<Runner>) {
         val runnerView = runnerChange.entity.toRunnerView()
         if (distanceId == runnerChange.entity.actualDistanceId) {
+            val runners = ArrayList(_runnersLiveData.value)
             when (runnerChange.modifierType) {
                 ModifierType.ADD -> {
-                    _runnersLiveData.value?.add(runnerView)
+                    runners.add(runnerView)
                 }
                 ModifierType.UPDATE -> {
-                    _runnersLiveData.value?.removeAll { it.number == runnerView.number }
-                    _runnersLiveData.value?.add(runnerView)
+                    runners.updateElement(runnerView, { it.number == runnerView.number })
                 }
                 ModifierType.REMOVE -> {
-                    _runnersLiveData.value?.removeAll { it.number == runnerView.number }
+                    runners.removeAll { it.number == runnerView.number }
                 }
             }
+            _runnersLiveData.value = runners
+        }
+    }
+
+    private fun handleDistanceChanges(distanceChange: Change<Distance>) {
+        val distanceView = distanceChange.entity.toView()
+        if (raceId == distanceChange.entity.raceId) {
+            val distances = ArrayList(_distanceLiveData.value)
+            when (distanceChange.modifierType) {
+                ModifierType.ADD -> {
+                    distances.add(distanceView)
+                }
+                ModifierType.UPDATE -> {
+                    distances.updateElement(distanceView, { it.id == distanceView.id })
+                }
+                ModifierType.REMOVE -> {
+                    distances.removeAll { it.id == distanceView.id }
+                }
+            }
+            _distanceLiveData.value = distances
         }
     }
 
@@ -162,7 +192,7 @@ class RunnersViewModel @ViewModelInject constructor(
                             )
                         }
                         val runnerViews = runners.map { it.toRunnerView() }.toMutableList()
-                        _runnersLiveData.postValue(runnerViews)
+                        _runnersLiveData.value = runnerViews
                     }
                     is TaskResult.Error -> handleError(result.error)
                 }
@@ -222,13 +252,25 @@ class RunnersViewModel @ViewModelInject constructor(
         }
     }
 
+    private suspend fun observeDistanceChanges() {
+        try {
+            distanceInteractor
+                .observeDistanceData(raceId)
+                .collect {
+                    handleDistanceChanges(it)
+                }
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+    }
+
     private suspend fun showAllDistances() {
         _showProgressLiveData.postValue(true)
         showSmallInitRunners()
-        when (val result = distanceInteractor.getDistances()) {
+        when (val result = distanceInteractor.getDistances(raceId)) {
             is TaskResult.Value -> {
                 val distanceViews = result.value.map { it.toView() }.toMutableList()
-                _distanceLiveData.postValue(distanceViews)
+                _distanceLiveData.value = distanceViews
             }
             is TaskResult.Error -> handleError(result.error)
         }
@@ -249,7 +291,7 @@ class RunnersViewModel @ViewModelInject constructor(
             is TaskResult.Value -> {
                 Timber.w("showAllRunners")
                 val runners = toRunnerViews(result.value)
-                _runnersLiveData.postValue(runners)
+                _runnersLiveData.value = runners
             }
             is TaskResult.Error -> handleError(result.error)
         }
@@ -262,7 +304,7 @@ class RunnersViewModel @ViewModelInject constructor(
             is TaskResult.Value -> {
                 Timber.w("showAllRunners  showSmallInitRunners")
                 val runners = toRunnerViews(result.value)
-                _runnersLiveData.postValue(runners)
+                _runnersLiveData.value = runners
             }
             is TaskResult.Error -> handleError(result.error)
         }
@@ -291,6 +333,7 @@ class RunnersViewModel @ViewModelInject constructor(
             is SaveRunnerDataException -> toastLiveData.postValue("Не удалось сохранить данные участника:" + e.message)
             is RunnerNotFoundException -> toastLiveData.postValue("Участник не найден")
             is SyncWithServerException -> toastLiveData.postValue("Данные не сохранились на сервер")
+            is CheckpointNotFoundException -> toastLiveData.postValue("КП не выбрано для дистанции")
         }
     }
 

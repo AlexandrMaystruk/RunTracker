@@ -6,6 +6,7 @@ import java.util.*
 
 data class Distance(
     val id: Long,
+    val raceId: Long,
     val name: String,
     val authorId: Long,
     val dateOfStart: Date,

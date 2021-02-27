@@ -8,3 +8,18 @@ fun <T, K> LiveData<T>.switchMap(function: (T) -> LiveData<K>): LiveData<K> {
         function(value)
     }
 }
+
+
+fun <T> MutableList<T>.updateElement(element: T, predicate: (T) -> Boolean) {
+    val iterator = iterator()
+    var index = 0
+    while (iterator.hasNext()) {
+        val item = iterator.next()
+        if (predicate(item)) {
+            iterator.remove()
+            add(index, element)
+            return
+        }
+        index++
+    }
+}

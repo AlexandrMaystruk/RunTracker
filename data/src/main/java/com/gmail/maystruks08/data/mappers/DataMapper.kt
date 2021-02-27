@@ -2,13 +2,12 @@ package com.gmail.maystruks08.data.mappers
 
 import com.gmail.maystruks08.data.fromJson
 import com.gmail.maystruks08.data.fromJsonOrNull
+import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
 import com.gmail.maystruks08.data.local.entity.relation.DistanceWithRunners
 import com.gmail.maystruks08.data.local.entity.relation.RaceWithDistances
-import com.gmail.maystruks08.data.local.entity.tables.CheckpointTable
-import com.gmail.maystruks08.data.local.entity.tables.RaceTable
-import com.gmail.maystruks08.data.local.entity.tables.ResultTable
-import com.gmail.maystruks08.data.local.entity.tables.RunnerTable
+import com.gmail.maystruks08.data.local.entity.tables.*
 import com.gmail.maystruks08.data.remote.pojo.CheckpointPojo
+import com.gmail.maystruks08.data.remote.pojo.DistancePojo
 import com.gmail.maystruks08.data.remote.pojo.RacePojo
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.domain.entities.Distance
@@ -45,11 +44,24 @@ fun DistanceWithRunners.toDistanceEntity(gson: Gson): Distance {
             .thenBy { runner -> runner.checkpoints.count { it.getResult() != null } })
     return Distance(
         id = distance.distanceId,
+        raceId = distance.raceId,
         name = distance.name,
         authorId = distance.authorId,
         dateOfStart = Date(distance.dateOfStart),
         checkpoints = checkpointList,
         runners = runners
+    )
+}
+
+fun DistanceTable.toDistanceEntity(): Distance {
+    return Distance(
+        id = distanceId,
+        raceId = raceId,
+        name = name,
+        authorId = authorId,
+        dateOfStart = Date(dateOfStart),
+        checkpoints = mutableListOf(),
+        runners = mutableSetOf()
     )
 }
 
@@ -72,6 +84,7 @@ fun RunnerTable.toRunner(gson: Gson): Runner {
         actualDistanceId = 0
     )
 }
+
 
 fun CheckpointTable.toCheckpoint(): Checkpoint {
     return CheckpointImpl(
@@ -157,6 +170,19 @@ fun Race.toFirestoreRace(gson: Gson): RacePojo {
 }
 
 
+fun Distance.toFirestoreDistance(raceId: Long): DistancePojo {
+    return DistancePojo(
+        id = id,
+        raceId = raceId,
+        name = name,
+        authorId = authorId,
+        dateOfStart = dateOfStart,
+        checkpointsIds = checkpoints.map { it.getId() },
+        runnerIds = runners.map { it.number }
+    )
+}
+
+
 fun Runner.toFirestoreRunner(): RunnerPojo {
     return RunnerPojo(
         number,
@@ -192,6 +218,16 @@ fun RacePojo.toTable(gson: Gson): RaceTable {
         adminListIds = gson.toJson(adminListIds),
         distanceListIds = gson.toJson(distanceListIds)
     )
+}
+
+fun DistancePojo.toTable(): Pair<DistanceTable, List<DistanceRunnerCrossRef>> {
+    return DistanceTable(
+        distanceId = id,
+        raceId = raceId,
+        name = name,
+        authorId = authorId,
+        dateOfStart = dateOfStart.time,
+    ) to runnerIds.map { DistanceRunnerCrossRef(id, it) }
 }
 
 fun CheckpointPojo.toCheckpointTable(): CheckpointTable {

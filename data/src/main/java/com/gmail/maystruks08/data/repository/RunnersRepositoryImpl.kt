@@ -405,8 +405,10 @@ class RunnersRepositoryImpl @Inject constructor(
     @FlowPreview
     @ExperimentalCoroutinesApi
     override suspend fun observeRunnerData(): Flow<Change<Runner>> {
+        //TODO remove hardcode
+        val currentRaceId = "0"
         return api
-            .subscribeToRunnerCollectionChange()
+            .subscribeToRunnerCollectionChange(currentRaceId)
             .flatMapConcat { runnerChangeList ->
                 return@flatMapConcat channelFlow {
                     runnerChangeList.forEach {

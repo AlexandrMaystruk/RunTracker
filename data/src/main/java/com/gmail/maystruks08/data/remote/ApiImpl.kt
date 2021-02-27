@@ -50,10 +50,10 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
         }
     }
 
-    override suspend fun subscribeToDistanceCollectionChange(): Flow<List<Change<DistancePojo>>> {
+    override suspend fun subscribeToDistanceCollectionChange(raceId: String): Flow<List<Change<DistancePojo>>> {
         return channelFlow {
             val eventDocument = db.collection(DISTANCES_COLLECTION)
-            val subscription = eventDocument.addSnapshotListener { snapshots, _ ->
+            val subscription = eventDocument.whereEqualTo("raceId", 0).addSnapshotListener { snapshots, _ ->
                 Timber.i("Snapshot size = ${snapshots?.documentChanges?.size}")
                 val distancesChanges = snapshots?.documentChanges?.map {
                     Change(it.document.toObject(DistancePojo::class.java), it.getChangeType())
@@ -69,7 +69,7 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
 
 
     @ExperimentalCoroutinesApi
-    override suspend fun subscribeToRunnerCollectionChange(): Flow<List<Change<RunnerPojo>>> {
+    override suspend fun subscribeToRunnerCollectionChange(raceId: String): Flow<List<Change<RunnerPojo>>> {
         return channelFlow {
             val eventDocument = db.collection(RUNNER_COLLECTION).whereEqualTo("capital", true)
             val subscription = eventDocument.addSnapshotListener { snapshots, _ ->

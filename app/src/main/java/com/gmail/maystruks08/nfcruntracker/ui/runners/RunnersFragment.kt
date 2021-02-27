@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,18 +33,19 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.flow.collect
 
 
 @ObsoleteCoroutinesApi
 @AndroidEntryPoint
 class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
-    DistanceAdapter.Interaction {
+    DistanceListAdapter.Interaction {
 
     private val viewModel: RunnersViewModel by viewModels()
 
     private lateinit var binding: FragmentRunnersBinding
     private lateinit var runnerAdapter: RunnerListAdapter
-    private lateinit var distanceAdapter: DistanceAdapter
+    private lateinit var distanceAdapter: DistanceListAdapter
 
     private var alertDialog: AlertDialog? = null
 
@@ -84,13 +86,17 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
 
     override fun bindViewModel() {
         with(viewModel) {
-            distance.observe(viewLifecycleOwner, {
-                distanceAdapter.items = it
-            })
+            lifecycleScope.launchWhenStarted {
+                distance.collect {
+                    distanceAdapter.submitList(it)
+                }
+            }
 
-            runners.observe(viewLifecycleOwner, {
-                runnerAdapter.submitList(it)
-            })
+            lifecycleScope.launchWhenStarted {
+                runners.collect{
+                    runnerAdapter.submitList(it)
+                }
+            }
 
             showConfirmationDialog.observe(viewLifecycleOwner) {
                 alertDialog?.dismiss()
@@ -142,7 +148,7 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
                 adapter = runnerAdapter
             }
             rvDistanceType.apply {
-                distanceAdapter = DistanceAdapter(this@RunnersFragment)
+                distanceAdapter = DistanceListAdapter(this@RunnersFragment)
                 addItemDecoration(DividerItemDecoration(resources.getDimensionPixelSize(R.dimen.margin_s)))
                 layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
                 adapter = distanceAdapter

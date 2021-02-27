@@ -36,16 +36,23 @@ data class Race(
 
     fun createNewDistance(
         id: Long,
+        raceId: Long,
         name: String,
         authorId: Long,
         dateOrStart: Date,
         checkpoints: MutableList<Checkpoint>? = null,
     ) {
-        val newDistance = Distance(id, name, authorId, dateOrStart, checkpoints ?: mutableListOf(), sortedSetOf(
-            compareBy<Runner> { it.totalResult }
-                .thenBy { it.isOffTrack }
-                .thenBy { runner -> runner.checkpoints.count { it.getResult() != null } }
-        ))
+        val newDistance = Distance(id,
+            raceId,
+            name,
+            authorId,
+            dateOrStart,
+            checkpoints ?: mutableListOf(),
+            sortedSetOf(
+                compareBy<Runner> { it.totalResult }
+                    .thenBy { it.isOffTrack }
+                    .thenBy { runner -> runner.checkpoints.count { it.getResult() != null } }
+            ))
         distanceList.add(newDistance)
     }
 

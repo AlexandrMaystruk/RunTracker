@@ -13,9 +13,9 @@ interface Api{
 
     suspend fun subscribeToRaceCollectionChange(): Flow<List<Change<RacePojo>>>
 
-    suspend fun subscribeToDistanceCollectionChange (): Flow<List<Change<DistancePojo>>>
+    suspend fun subscribeToDistanceCollectionChange (raceId: String): Flow<List<Change<DistancePojo>>>
 
-    suspend fun subscribeToRunnerCollectionChange(): Flow<List<Change<RunnerPojo>>>
+    suspend fun subscribeToRunnerCollectionChange(raceId: String): Flow<List<Change<RunnerPojo>>>
 
 
     //RACE
