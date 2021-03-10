@@ -10,6 +10,7 @@ import com.gmail.maystruks08.nfcruntracker.ui.result.RunnerResultFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
 import com.gmail.maystruks08.nfcruntracker.ui.settings.SettingsFragment
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 
 @ObsoleteCoroutinesApi
@@ -33,7 +34,8 @@ object Screens {
         }
     }
 
-    class RunnersScreen(private val raceId: Long, private val firstDistanceId: Long?) : AppScreen() {
+    @ExperimentalCoroutinesApi
+    class RunnersScreen(private val raceId: String, private val firstDistanceId: String?) : AppScreen() {
 
         override fun getFragment() = RunnersFragment.getInstance(raceId, firstDistanceId)
 
@@ -42,7 +44,7 @@ object Screens {
         }
     }
 
-    class RunnerScreen(private val runnerNumber: Long, private val distanceId: Long) : AppScreen() {
+    class RunnerScreen(private val runnerNumber: Long, private val distanceId: String) : AppScreen() {
         override fun getFragment() = RunnerFragment.getInstance(runnerNumber, distanceId)
 
         companion object {
@@ -83,8 +85,8 @@ object Screens {
         }
     }
 
-    class RegisterNewRunnerScreen : AppScreen() {
-        override fun getFragment() = RegisterNewRunnerFragment()
+    class RegisterNewRunnerScreen(private val raceId: String, private val distanceId: String) : AppScreen() {
+        override fun getFragment() = RegisterNewRunnerFragment.getInstance(raceId, distanceId)
 
         companion object {
             fun tag() = RegisterNewRunnerScreen.name()

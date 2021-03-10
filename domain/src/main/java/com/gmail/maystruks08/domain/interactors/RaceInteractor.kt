@@ -10,8 +10,8 @@ interface RaceInteractor {
 
     suspend fun getRaceList(): TaskResult<Exception, List<Race>>
 
-    suspend fun saveLastSelectedRaceId(raceId: Long): TaskResult<Exception, Unit>
+    suspend fun saveLastSelectedRaceId(raceId: String): TaskResult<Exception, Unit>
 
-    suspend fun getLastSelectedRaceId(): TaskResult<Exception, Long>
+    suspend fun getLastSelectedRaceId(): TaskResult<Exception, String>
 
 }

@@ -6,13 +6,11 @@ import android.os.Parcelable
 class RunnerResultView(
     val runnerId: String,
     val runnerFullName: String,
-    val runnerNumber: String,
     val runnerResultTime: String,
     val position: Int
 ) : Parcelable {
 
     constructor(source: Parcel) : this(
-        source.readString().orEmpty(),
         source.readString().orEmpty(),
         source.readString().orEmpty(),
         source.readString().orEmpty(),
@@ -24,7 +22,6 @@ class RunnerResultView(
     override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
         writeString(runnerId)
         writeString(runnerFullName)
-        writeString(runnerNumber)
         writeString(runnerResultTime)
         writeInt(position)
     }

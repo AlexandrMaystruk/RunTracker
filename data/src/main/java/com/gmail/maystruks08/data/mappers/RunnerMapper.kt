@@ -17,16 +17,17 @@ fun RunnerPojo.fromFirestoreRunner(): Runner {
         RunnerSex.fromOrdinal(sex),
         city,
         dateOfBirthday,
+        actualRaceId,
         actualDistanceId,
-        raceIds.toMutableList(),
-        distanceIds.toMutableList(),
-        mutableListOf(), //TODO
+        raceIds,
+        distanceIds,
+        checkpoints,
         isOffTrack,
-        teamName,
-        totalResult
+        teamNames,
+        totalResults
     )
 }
 
-fun Checkpoint.toFirestoreCheckpoint() = CheckpointPojo(getId(), getDistanceId(), getRaceId(), getName())
+fun Checkpoint.toFirestoreCheckpoint() = CheckpointPojo(getId(), getDistanceId(), getName())
 
 

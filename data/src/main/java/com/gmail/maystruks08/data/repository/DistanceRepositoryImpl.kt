@@ -1,6 +1,5 @@
 package com.gmail.maystruks08.data.repository
 
-import com.gmail.maystruks08.data.cache.ApplicationCache
 import com.gmail.maystruks08.data.local.ConfigPreferences
 import com.gmail.maystruks08.data.local.dao.DistanceDAO
 import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
@@ -25,16 +24,15 @@ import javax.inject.Inject
 class DistanceRepositoryImpl @Inject constructor(
     private val firestoreApi: Api,
     private val distanceDAO: DistanceDAO,
-    private val applicationCache: ApplicationCache,
     private val networkUtil: NetworkUtil,
     private val configPreferences: ConfigPreferences,
     private val gson: Gson
 ) : DistanceRepository {
 
     @FlowPreview
-    override suspend fun observeDistanceData(raceId: Long): Flow<Change<Distance>> {
+    override suspend fun observeDistanceData(raceId: String): Flow<Change<Distance>> {
         return firestoreApi
-            .subscribeToDistanceCollectionChange(raceId.toString())
+            .subscribeToDistanceCollectionChange(raceId)
             .flatMapConcat { distanceChangeList ->
                 return@flatMapConcat channelFlow {
                     distanceChangeList.forEach {
@@ -55,43 +53,37 @@ class DistanceRepositoryImpl @Inject constructor(
             }
     }
 
-    private fun checkIsDataUploaded(distanceId: Long): Boolean {
+    private fun checkIsDataUploaded(distanceId: String): Boolean {
         //TODO implement
         return true
     }
 
-    override suspend fun getDistanceList(raceId: Long): List<Distance> {
+    override suspend fun getDistanceList(raceId: String): List<Distance> {
         val distanceTableList = distanceDAO.getDistanceByRaceId(raceId)
         return distanceTableList.map { it.toDistanceEntity() }
     }
 
 
-    private suspend fun insertDistance(distance: Pair<DistanceTable, List<DistanceRunnerCrossRef>>) {
-//        val runnerTable = runner.toRunnerTable(false)
-//        val resultTables = runner.checkpoints.toCheckpointsResult(runner.number)
-//        val index = runnersCache.getRunnerList(runner.type).indexOfFirst { it.number == runner.number }
-//        if (index != -1) {
-//            runnerDao.updateRunner(runnerTable, resultTables)
-//            runnersCache.getRunnerList(runner.type).removeAt(index)
-//            runnersCache.getRunnerList(runner.type).add(index, runner)
-//        } else {
-//            runnerDao.insertOrReplaceRunner(runnerTable, resultTables)
-//            runnersCache.getRunnerList(runner.type).add(runner)
-//        }
+    private fun insertDistance(distance: Pair<DistanceTable, List<DistanceRunnerCrossRef>>) {
+        val distanceTable = distance.first
+        val distanceWithRunnerJoin = distance.second
+        distanceDAO.insertOrReplace(distanceTable)
+        distanceDAO.insertJoin(distanceWithRunnerJoin)
     }
 
-    private suspend fun updateDistance(distance: Pair<DistanceTable, List<DistanceRunnerCrossRef>>) {
-//        val index = runnersCache.getRunnerList(runner.type).indexOfFirst { it.number == runner.number }
-//        if (index != -1) {
-//            runnerDao.updateRunner(runner.toRunnerTable(false), runner.checkpoints.toCheckpointsResult(runner.number))
-//            runnersCache.getRunnerList(runner.type).removeAt(index)
-//            runnersCache.getRunnerList(runner.type).add(index, runner)
-//        }
+    private fun updateDistance(distance: Pair<DistanceTable, List<DistanceRunnerCrossRef>>) {
+        deleteDistance(distance)
+        insertDistance(distance)
     }
 
-    private suspend fun deleteDistance(distance: Pair<DistanceTable, List<DistanceRunnerCrossRef>>) {
-//        val count = runnerDao.delete(runner.number)
-//        val isRemoved = runnersCache.getRunnerList(runner.type).removeAll { it.number == runner.number }
+    private fun deleteDistance(distance: Pair<DistanceTable, List<DistanceRunnerCrossRef>>) {
+        //TODO implement
+        val distanceTable = distance.first
+        val distanceWithRunnerJoin = distance.second
+        distanceDAO.getDistanceById(distanceTable.distanceId)
+        distanceWithRunnerJoin.forEach {
+            distanceDAO.deleteDistanceJoin(it.distanceId)
+        }
 //        Timber.i("Removed runner from DB count: $count, from cache removed: $isRemoved")
     }
 }

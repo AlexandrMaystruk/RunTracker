@@ -11,8 +11,8 @@ interface RaceRepository {
 
     suspend fun saveRace(race: Race)
 
-    suspend fun saveLastSelectedRaceId(raceId: Long)
+    suspend fun saveLastSelectedRaceId(raceId: String)
 
-    suspend fun getLastSelectedRaceId(): Long
+    suspend fun getLastSelectedRaceId(): String
 
 }

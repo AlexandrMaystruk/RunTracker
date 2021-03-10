@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.collect
 
 @ObsoleteCoroutinesApi
 @AndroidEntryPoint
+@ExperimentalCoroutinesApi
 class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
     DistanceListAdapter.Interaction {
 
@@ -49,8 +50,8 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
 
     private var alertDialog: AlertDialog? = null
 
-    private var raceId: Long by argument()
-    private var distanceId: Long? by argumentNullable()
+    private var raceId: String by argument()
+    private var distanceId: String? by argumentNullable()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -138,7 +139,6 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun initViews() {
         with(binding) {
             rvRunners.apply {
@@ -249,7 +249,7 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
 
     companion object {
 
-        fun getInstance(raceId: Long, distanceId: Long?) = RunnersFragment().apply {
+        fun getInstance(raceId: String, distanceId: String?) = RunnersFragment().apply {
             this.raceId = raceId
             this.distanceId = distanceId
         }

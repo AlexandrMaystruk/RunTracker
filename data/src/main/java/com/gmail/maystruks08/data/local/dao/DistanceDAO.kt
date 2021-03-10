@@ -12,13 +12,17 @@ import com.gmail.maystruks08.data.local.entity.tables.DistanceTable
 interface DistanceDAO : BaseDao<DistanceTable> {
 
     @Query("SELECT * FROM distances WHERE raceId =:raceId")
-    fun getDistanceByRaceId(raceId: Long): List<DistanceTable>
+    fun getDistanceByRaceId(raceId: String): List<DistanceTable>
 
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId")
-    fun getDistanceById(distanceId: Long): List<DistanceTable>
+    fun getDistanceById(distanceId: String): List<DistanceTable>
 
-    @Query("SELECT * FROM distances WHERE distanceId =:distanceId")
-    fun getDistanceByIdWithRunners(distanceId: Long): List<DistanceWithRunners>
+    @Query("SELECT * FROM distances WHERE distanceId =:distanceId AND raceId =:raceId")
+    fun getDistanceByIdWithRunners(raceId: String, distanceId: String): DistanceWithRunners
+
+
+    @Query("SELECT runnerNumber FROM DistanceRunnerCrossRef LE WHERE distanceId =:distanceId")
+    fun getDistanceRunnersIds(distanceId: String): List<Long>
 
     @Query("DELETE FROM distances")
     fun deleteDistances()
@@ -27,6 +31,12 @@ interface DistanceDAO : BaseDao<DistanceTable> {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertJoin(join: DistanceRunnerCrossRef)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertJoin(join: List<DistanceRunnerCrossRef>)
+
+    @Query("DELETE FROM DistanceRunnerCrossRef WHERE distanceId =:distanceId")
+    fun deleteDistanceJoin(distanceId: String)
 
 }
 

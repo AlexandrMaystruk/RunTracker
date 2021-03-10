@@ -6,19 +6,18 @@ import androidx.room.PrimaryKey
 import java.util.*
 
 @Entity(
-    tableName = "result",
+    tableName = "teams",
     foreignKeys = [ForeignKey(
         entity = RunnerTable::class,
         parentColumns = ["runnerNumber"],
-        childColumns = ["runnerNumber"],
+        childColumns = ["runnerId"],
         onDelete = ForeignKey.CASCADE
     )]
 )
-data class ResultTable(
+data class TeamNameTable(
     @PrimaryKey(autoGenerate = true)
-    val resultId: Long = 0,
-    val checkpointId: Long,
-    val runnerNumber: Long,
-    val time: Date?,
-    var hasPrevious: Boolean
+    val id: Long = 0,
+    val distanceId: String,
+    val runnerId: Long,
+    var name: String
 )

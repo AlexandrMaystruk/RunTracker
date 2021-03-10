@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface DistanceInteractor {
 
-    suspend fun observeDistanceData(raceId: Long): Flow<Change<Distance>>
+    suspend fun observeDistanceData(raceId: String): Flow<Change<Distance>>
 
-    suspend fun getDistances(raceId: Long): TaskResult<Exception, List<Distance>>
+    suspend fun getDistances(raceId: String): TaskResult<Exception, List<Distance>>
 
 }

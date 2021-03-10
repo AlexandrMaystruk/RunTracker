@@ -10,8 +10,8 @@ import androidx.room.PrimaryKey
 )
 data class UserSettingsTable(
     val userId: String,
-    val raceId: Long,
-    val distanceId: Long,
+    val raceId: String,
+    val distanceId: String,
 
     val currentCheckpointId: Long?,
 )

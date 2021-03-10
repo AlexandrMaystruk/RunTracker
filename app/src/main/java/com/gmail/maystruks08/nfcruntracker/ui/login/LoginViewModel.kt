@@ -115,7 +115,7 @@ class LoginViewModel @ViewModelInject constructor(
 
     private fun navigateToFragment() {
         val raceId = configPreferences.getRaceId()
-        if (raceId != -1L) {
+        if (raceId != "-1") {
             router.newRootScreen(Screens.RunnersScreen(raceId, null))
         } else {
             router.newRootScreen(Screens.RaceListScreen())

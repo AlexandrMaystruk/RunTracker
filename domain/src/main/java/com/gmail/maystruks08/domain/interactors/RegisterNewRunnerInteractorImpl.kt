@@ -9,7 +9,11 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(
     private val runnersRepository: RegisterNewRunnersRepository
 ) : RegisterNewRunnerInteractor {
 
-    override suspend fun registerNewRunners(registerInputData: List<RegisterNewRunnerInteractor.RegisterInputData>): TaskResult<Exception, Unit> {
+    override suspend fun registerNewRunners(
+        raceId: String,
+        distanceId: String,
+        registerInputData: List<RegisterNewRunnerInteractor.RegisterInputData>
+    ): TaskResult<Exception, Unit> {
         return TaskResult.build {
             val runners = registerInputData.map {
                 Runner(
@@ -21,16 +25,17 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(
                     sex = it.runnerSex,
                     city = it.city,
                     dateOfBirthday = it.dateOfBirthday,
-                    teamName = it.teamName,
-                    totalResult = null,
-                    checkpoints = mutableListOf(),
-                    isOffTrack = false,
-                    distanceIds = mutableListOf(),
-                    raceIds = mutableListOf(),
-                    actualDistanceId = 0
+                    teamNames = mutableMapOf(),
+                    totalResults = mutableMapOf(),
+                    checkpoints = mutableMapOf(),
+                    isOffTrack = mutableMapOf(),
+                    distanceIds = mutableListOf(distanceId.toString()),
+                    raceIds = mutableListOf(raceId.toString()),
+                    actualDistanceId = distanceId.toString(),
+                    actualRaceId = raceId.toString(),
                 )
             }
-            runnersRepository.saveNewRunners(runners)
+            runnersRepository.saveNewRunners(raceId, distanceId, runners)
         }
     }
 }

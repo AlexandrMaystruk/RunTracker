@@ -16,13 +16,13 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
     override suspend fun getRunner(runnerNumber: Long): TaskResult<Exception, Runner> =
          TaskResult.build { runnersRepository.getRunnerByNumber(runnerNumber) ?: throw  RunnerNotFoundException()}
 
-    override suspend fun getRunners(distanceId: Long, initSize: Int?): TaskResult<Exception, List<Runner>> =
+    override suspend fun getRunners(distanceId: String, initSize: Int?): TaskResult<Exception, List<Runner>> =
         TaskResult.build {
             runnersRepository.getRunners(distanceId = distanceId, initSize = initSize)
         }
 
-    override suspend fun getFinishers(distanceId: Long): TaskResult<Exception, List<Runner>> =
-        TaskResult.build { runnersRepository.getRunners(distanceId, true).sortedBy { it.totalResult } }
+    override suspend fun getFinishers(distanceId: String): TaskResult<Exception, List<Runner>> =
+        TaskResult.build { runnersRepository.getRunners(distanceId, true)}/*.sortedBy { it.totalResult } }*/
 
     override suspend fun addStartCheckpointToRunners(date: Date): TaskResult<Exception, Unit>{
        return TaskResult.build {

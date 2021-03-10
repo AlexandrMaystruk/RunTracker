@@ -31,9 +31,9 @@ class RunnerResultViewModel @ViewModelInject constructor(
     private val _runnerResultsLiveData = MutableLiveData<List<RunnerResultView>>()
     private val _errorLiveData = SingleLiveEvent<Throwable>()
 
-    private var distanceId: Long = -1
+    private var distanceId: String = "-1"
 
-    fun provideFinishers(distanceId: Long){
+    fun provideFinishers(distanceId: String){
         this.distanceId = distanceId
         viewModelScope.launch(Dispatchers.IO) {
             when (val onResult = interactor.getFinishers(distanceId)) {

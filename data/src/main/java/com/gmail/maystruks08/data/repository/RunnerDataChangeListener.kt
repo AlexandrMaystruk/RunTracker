@@ -9,6 +9,6 @@ interface RunnerDataChangeListener {
 
     suspend fun observeRunnerData(): Flow<Change<Runner>>
 
-    suspend fun getLastSavedRaceId(): TaskResult<Exception, Long>
+    suspend fun getLastSavedRaceId(): TaskResult<Exception, String>
 
 }

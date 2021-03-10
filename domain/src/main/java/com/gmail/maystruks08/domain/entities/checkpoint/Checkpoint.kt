@@ -8,9 +8,7 @@ interface Checkpoint {
 
     fun getName(): String
 
-    fun getDistanceId(): Long
-
-    fun getRaceId(): Long
+    fun getDistanceId(): String
 
     fun getResult(): Date?
 

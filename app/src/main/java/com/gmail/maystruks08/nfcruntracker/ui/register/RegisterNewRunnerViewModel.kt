@@ -39,7 +39,7 @@ class RegisterNewRunnerViewModel @ViewModelInject constructor(
         router.exit()
     }
 
-    fun onRegisterNewRunnerClicked(runnerRegisterData: List<InputDataView>, teamName: String?) {
+    fun onRegisterNewRunnerClicked(runnerRegisterData: List<InputDataView>, raceId: String, distanceId: String, teamName: String?) {
         val isEmptyInputField = runnerRegisterData.any { it.isEmpty() }
         if (isEmptyInputField || (runnerRegisterData.size > 1 && teamName.isNullOrEmpty())) {
             _errorLiveData.postValue(EmptyRegistrationRunnerDataException())
@@ -59,11 +59,11 @@ class RegisterNewRunnerViewModel @ViewModelInject constructor(
                         dateOfBirthday = it.dateOfBirthday!!,
                         city = it.city!!,
                         runnerNumber = it.runnerNumber!!,
-                        runnerCardId = it.runnerCardId!!,
-                        teamName = teamName
+                        runnerCardId = it.runnerCardId,
+                        teamName = teamName,
                     )
                 }
-                when (val result = interactor.registerNewRunners(inputData)) {
+                when (val result = interactor.registerNewRunners(raceId, distanceId, inputData)) {
                     is TaskResult.Value -> withContext(Dispatchers.Main) { onBackClicked() }
                     is TaskResult.Error -> handleError(result.error)
                 }

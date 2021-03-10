@@ -10,7 +10,6 @@ import androidx.room.Index
 )
 data class CheckpointTable(
     val checkpointId: Long,
-    val distanceId: Long,
-    val raceId: Long,
+    val distanceId: String,
     val name: String
 )

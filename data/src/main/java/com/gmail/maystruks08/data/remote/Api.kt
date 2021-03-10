@@ -5,7 +5,6 @@ import com.gmail.maystruks08.data.remote.pojo.RacePojo
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.domain.entities.Change
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.flow.Flow
 
@@ -13,7 +12,7 @@ interface Api{
 
     suspend fun subscribeToRaceCollectionChange(): Flow<List<Change<RacePojo>>>
 
-    suspend fun subscribeToDistanceCollectionChange (raceId: String): Flow<List<Change<DistancePojo>>>
+    suspend fun subscribeToDistanceCollectionChange(raceId: String): Flow<List<Change<DistancePojo>>>
 
     suspend fun subscribeToRunnerCollectionChange(raceId: String): Flow<List<Change<RunnerPojo>>>
 
@@ -24,6 +23,8 @@ interface Api{
 
     //DISTANCE
     suspend fun saveDistance(distancePojo: DistancePojo)
+
+    suspend fun updateDistanceRunners(distanceId: String, runnerIds: List<Long>)
 
 
     //RUNNER

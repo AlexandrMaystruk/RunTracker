@@ -6,24 +6,25 @@ import java.util.*
 
 data class Runner(
     val number: Long,
-    var cardId: String,
+    var cardId: String?,
     val fullName: String,
     val shortName: String,
     val phone: String,
     val sex: RunnerSex,
     val city: String,
     val dateOfBirthday: Date,
-    val actualDistanceId: Long,
-    val raceIds: MutableList<Long>,
-    val distanceIds: MutableList<Long>,
-    val checkpoints: MutableList<Checkpoint>,
-    var isOffTrack: Boolean,
-    val teamName: String?,
-    var totalResult: Date?,
+    val actualRaceId: String,
+    val actualDistanceId: String,
+    val raceIds: MutableList<String>,
+    val distanceIds: MutableList<String>,
+    val checkpoints: MutableMap<String, MutableList<Checkpoint>>, //key distance id value checkpoints
+    val isOffTrack: MutableMap<String, Boolean>, //key distance id
+    val teamNames: MutableMap<String, String?>, //key distance id
+    val totalResults: MutableMap<String, Date?>, //key distance id
 ) {
 
     fun markThatRunnerIsOffTrack(){
-        isOffTrack = true
+        isOffTrack[actualDistanceId] = true
     }
 
     fun updateCardId(newCardId: String){
@@ -41,47 +42,47 @@ data class Runner(
         isRestart: Boolean = false
     ) {
        check(checkpoint.getResult() != null)
-        val indexOfExistingElement = checkpoints.indexOfFirst { it.getId() == checkpoint.getId() && it.getDistanceId() == checkpoint.getDistanceId() }
+        val actualCheckpoints = checkpoints[actualDistanceId]?: mutableListOf()
+        val indexOfExistingElement = actualCheckpoints.indexOfFirst { it.getId() == checkpoint.getId() && it.getDistanceId() == checkpoint.getDistanceId() }
         if (indexOfExistingElement != -1) {
-            checkpoints.removeAt(indexOfExistingElement)
+            actualCheckpoints.removeAt(indexOfExistingElement)
             if (!isRestart) addCheckpoint(checkpoint, checkpointsCount) else addStartCheckpoint(checkpoint)
-            checkpoints.sortBy { it.getId() }
-            for (index in 1 until checkpoints.lastIndex) {
-                val current = checkpoints[index]
+            actualCheckpoints.sortBy { it.getId() }
+            for (index in 1 until actualCheckpoints.lastIndex) {
+                val current = actualCheckpoints[index]
                 if (!hasNotPassedPreviously(current)) {
-                    checkpoints[index].setHasPrevious(true)
+                    actualCheckpoints[index].setHasPrevious(true)
                 }
             }
         }
     }
 
     fun removeCheckpoint(checkpointId: Long) {
-        val index = checkpoints.indexOfFirst { it.getId() == checkpointId }
+        val actualCheckpoints = checkpoints[actualDistanceId]?: mutableListOf<Checkpoint>()
+        val index = actualCheckpoints.indexOfFirst { it.getId() == checkpointId }
         if (index != -1) {
-            totalResult = null
-            val oldCheckpoint = checkpoints[index]
-            checkpoints[index] = CheckpointImpl(
+            totalResults[actualDistanceId] = null
+            val oldCheckpoint = actualCheckpoints[index]
+            actualCheckpoints[index] = CheckpointImpl(
                 oldCheckpoint.getId(),
                 oldCheckpoint.getDistanceId(),
-                oldCheckpoint.getRaceId(),
                 oldCheckpoint.getName(),
             )
         }
     }
 
     private fun addStartCheckpoint(checkpoint: Checkpoint) {
-        val mappedCheckpoints = checkpoints.map {
+        val mappedCheckpoints = checkpoints[actualDistanceId]?.map {
             CheckpointImpl(
                 it.getId(),
                 it.getDistanceId(),
-                it.getRaceId(),
                 it.getName()
             )
-        }
-        totalResult = null
+        }.orEmpty()
+        totalResults[actualDistanceId] = null
         checkpoints.clear()
-        checkpoints.add(checkpoint)
-        checkpoints.addAll(mappedCheckpoints)
+        checkpoints[actualDistanceId]?.add(checkpoint)
+        checkpoints[actualDistanceId]?.addAll(mappedCheckpoints)
     }
 
     /**
@@ -91,15 +92,17 @@ data class Runner(
         if (hasNotPassedPreviously(checkpoint)) {
             checkpoint.setHasPrevious(false)
         }
-        checkpoints.add(checkpoint.getId().toInt(), checkpoint)
+        val actualCheckpoints = checkpoints[actualDistanceId]?: mutableListOf()
+        actualCheckpoints.add(checkpoint.getId().toInt(), checkpoint)
         if (checkpoints.size == checkpointsCount) {
-            totalResult = calculateTotalResult()
+            totalResults[actualDistanceId] = calculateTotalResult()
         }
     }
 
     private fun hasNotPassedPreviously(checkpoint: Checkpoint): Boolean {
+        val actualCheckpoints = checkpoints[actualDistanceId]?: mutableListOf()
         for (x in 0 until checkpoint.getId()) {
-            val item = checkpoints[x.toInt()]
+            val item = actualCheckpoints[x.toInt()]
             if (item.getResult() == null || !item.hasPrevious()) return true
         }
         return false
@@ -109,8 +112,9 @@ data class Runner(
      * Need to add logic. Is it possible to change the order of passage of checkpoints?
      */
     private fun calculateTotalResult(): Date? {
-        val first = checkpoints.firstOrNull()?.getResult()
-        val last = checkpoints.lastOrNull()?.getResult()
+        val actualCheckpoints = checkpoints[actualDistanceId]?: mutableListOf()
+        val first = actualCheckpoints.firstOrNull()?.getResult()
+        val last = actualCheckpoints.lastOrNull()?.getResult()
         return if (first != null && last != null) Date(last.time - first.time) else null
     }
 }

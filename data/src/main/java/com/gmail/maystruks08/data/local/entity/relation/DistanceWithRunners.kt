@@ -17,7 +17,7 @@ class DistanceWithRunners(
         entityColumn = "runnerNumber",
         associateBy = Junction(DistanceRunnerCrossRef::class)
     )
-    val runners: List<RunnerTable>,
+    val runners: List<RunnerTable>?,
 
     @Relation(
         parentColumn = "distanceId",

@@ -5,7 +5,6 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.gmail.maystruks08.data.local.entity.tables.DistanceTable
 import com.gmail.maystruks08.data.local.entity.tables.RaceTable
-import com.gmail.maystruks08.domain.entities.Race
 
 @DatabaseView
 data class RaceWithDistances(

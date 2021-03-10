@@ -10,11 +10,11 @@ import javax.inject.Inject
 class DistanceInteractorImpl @Inject constructor(private val distanceRepository: DistanceRepository) :
     DistanceInteractor {
 
-    override suspend fun observeDistanceData(raceId: Long): Flow<Change<Distance>> {
+    override suspend fun observeDistanceData(raceId: String): Flow<Change<Distance>> {
         return distanceRepository.observeDistanceData(raceId)
     }
 
-    override suspend fun getDistances(raceId: Long): TaskResult<Exception, List<Distance>> {
+    override suspend fun getDistances(raceId: String): TaskResult<Exception, List<Distance>> {
         return TaskResult.build {
             distanceRepository.getDistanceList(raceId)
         }

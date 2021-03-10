@@ -5,29 +5,29 @@ import com.gmail.maystruks08.domain.entities.runner.Runner
 import java.util.*
 
 data class Race(
-    val id: Long,
+    val id: String,
     val name: String,
     val dateCreation: Date,
     val registrationIsOpen: Boolean,
-    val authorId: Long,
+    val authorId: String,
     val adminListIds: MutableList<String>,
     val distanceList: MutableList<Distance>
 ) {
 
-    fun findDistance(distanceId: Long): Distance? {
+    fun findDistance(distanceId: String): Distance? {
         return distanceList.firstOrNull { it.id == distanceId }
     }
 
-    fun findRunner(distanceId: Long, runnerId: Long): Runner? {
+    fun findRunner(distanceId: String, runnerId: Long): Runner? {
         return findDistance(distanceId)?.findRunnerById(runnerId)
     }
 
-    fun findRunnerByCardId(distanceId: Long, cardId: String): Runner? {
+    fun findRunnerByCardId(distanceId: String, cardId: String): Runner? {
         return findDistance(distanceId)?.findRunnerByCardId(cardId)
     }
 
     fun findRunnerTeamMembers(
-        distanceId: Long,
+        distanceId: String,
         currentRunnerNumber: Long,
         teamName: String
     ): List<Runner>? {
@@ -35,10 +35,10 @@ data class Race(
     }
 
     fun createNewDistance(
-        id: Long,
-        raceId: Long,
+        id: String,
+        raceId: String,
         name: String,
-        authorId: Long,
+        authorId: String,
         dateOrStart: Date,
         checkpoints: MutableList<Checkpoint>? = null,
     ) {
@@ -49,9 +49,9 @@ data class Race(
             dateOrStart,
             checkpoints ?: mutableListOf(),
             sortedSetOf(
-                compareBy<Runner> { it.totalResult }
-                    .thenBy { it.isOffTrack }
-                    .thenBy { runner -> runner.checkpoints.count { it.getResult() != null } }
+                compareBy<Runner> { it.totalResults[id] }
+                    .thenBy { it.isOffTrack[id] }
+                    .thenBy { runner -> runner.checkpoints[id]?.count { it.getResult() != null } }
             ))
         distanceList.add(newDistance)
     }

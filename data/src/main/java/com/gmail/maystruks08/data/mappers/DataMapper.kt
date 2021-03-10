@@ -1,6 +1,5 @@
 package com.gmail.maystruks08.data.mappers
 
-import com.gmail.maystruks08.data.fromJson
 import com.gmail.maystruks08.data.fromJsonOrNull
 import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
 import com.gmail.maystruks08.data.local.entity.relation.DistanceWithRunners
@@ -24,7 +23,7 @@ import java.util.*
  * Convert database table to entity
  */
 fun RaceWithDistances.toRaceEntity(gson: Gson): Race {
-    val distances = distancesWithRunners.map { it.toDistanceEntity(gson) }.toMutableList()
+    val distances = distancesWithRunners.map { it.toDistanceEntity() }.toMutableList()
     return Race(
         id = raceTable.id,
         name = raceTable.name,
@@ -36,12 +35,12 @@ fun RaceWithDistances.toRaceEntity(gson: Gson): Race {
     )
 }
 
-fun DistanceWithRunners.toDistanceEntity(gson: Gson): Distance {
+fun DistanceWithRunners.toDistanceEntity(): Distance {
     val checkpointList = checkpoints.map { it.toCheckpoint() }.toMutableList()
-    val runners = runners.map { it.toRunner(gson) }
-        .toSortedSet(compareBy<Runner> { it.totalResult }
-            .thenBy { it.isOffTrack }
-            .thenBy { runner -> runner.checkpoints.count { it.getResult() != null } })
+    val runners = runners?.map { it.toRunner() }
+        ?.toSortedSet(compareBy<Runner> { it.totalResults[it.actualDistanceId] }
+            .thenBy { it.isOffTrack[it.actualDistanceId] }
+            .thenBy { it.checkpoints[it.actualDistanceId]?.count { it.getResult() != null } })
     return Distance(
         id = distance.distanceId,
         raceId = distance.raceId,
@@ -49,7 +48,7 @@ fun DistanceWithRunners.toDistanceEntity(gson: Gson): Distance {
         authorId = distance.authorId,
         dateOfStart = Date(distance.dateOfStart),
         checkpoints = checkpointList,
-        runners = runners
+        runners = runners?: mutableSetOf()
     )
 }
 
@@ -65,7 +64,7 @@ fun DistanceTable.toDistanceEntity(): Distance {
     )
 }
 
-fun RunnerTable.toRunner(gson: Gson): Runner {
+fun RunnerTable.toRunner(): Runner {
     return Runner(
         cardId = cardId,
         number = runnerNumber,
@@ -75,23 +74,23 @@ fun RunnerTable.toRunner(gson: Gson): Runner {
         city = city,
         sex = RunnerSex.fromOrdinal(sex),
         dateOfBirthday = dateOfBirthday,
-        teamName = teamName,
-        totalResult = totalResult,
-        checkpoints = mutableListOf(),
-        isOffTrack = isOffTrack,
-        distanceIds = gson.fromJson(distanceIds),
-        raceIds = gson.fromJson(raceIds),
-        actualDistanceId = 0
+        teamNames = mutableMapOf(),
+        totalResults = mutableMapOf(),
+        checkpoints = mutableMapOf(),
+        isOffTrack = mutableMapOf(),
+        distanceIds = mutableListOf(),
+        raceIds = mutableListOf(),
+        actualDistanceId = "-1",
+        actualRaceId = "-1"
     )
 }
 
 
 fun CheckpointTable.toCheckpoint(): Checkpoint {
     return CheckpointImpl(
-        this.checkpointId,
-        this.distanceId,
-        this.raceId,
-        this.name
+        _id = this.checkpointId,
+        _distanceId = this.distanceId,
+        _name = this.name
     )
 }
 
@@ -113,7 +112,7 @@ fun Race.toRaceTable(gson: Gson): RaceTable {
 }
 
 
-fun Runner.toRunnerTable(gson: Gson, needToSync: Boolean = true): RunnerTable {
+fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
     return RunnerTable(
         cardId = this.cardId,
         runnerNumber = this.number,
@@ -123,28 +122,22 @@ fun Runner.toRunnerTable(gson: Gson, needToSync: Boolean = true): RunnerTable {
         city = this.city,
         sex = this.sex.ordinal,
         dateOfBirthday = this.dateOfBirthday,
-        teamName = this.teamName,
-        totalResult = this.totalResult,
-        isOffTrack = this.isOffTrack,
-        distanceIds = gson.toJson(this.distanceIds),
-        raceIds = gson.toJson(this.raceIds),
         needToSync = needToSync
     )
 }
 
 fun Checkpoint.toCheckpointTable(): CheckpointTable {
     return CheckpointTable(
-        getId(),
-        getDistanceId(),
-        getRaceId(),
-        getName(),
+        checkpointId = getId(),
+        distanceId = getDistanceId(),
+        name = getName(),
     )
 }
 
-fun CheckpointResultIml.toResultTable(runnerNumber: Int): ResultTable {
+fun CheckpointResultIml.toResultTable(runnerNumber: Long): ResultTable {
     return ResultTable(
-        resultId = 0,
-        checkpointId = 0,
+        runnerNumber = runnerNumber,
+        checkpointId = getId(),
         time = this.getResult(),
         hasPrevious = this.hasPrevious()
     )
@@ -170,7 +163,7 @@ fun Race.toFirestoreRace(gson: Gson): RacePojo {
 }
 
 
-fun Distance.toFirestoreDistance(raceId: Long): DistancePojo {
+fun Distance.toFirestoreDistance(raceId: String): DistancePojo {
     return DistancePojo(
         id = id,
         raceId = raceId,
@@ -185,22 +178,22 @@ fun Distance.toFirestoreDistance(raceId: Long): DistancePojo {
 
 fun Runner.toFirestoreRunner(): RunnerPojo {
     return RunnerPojo(
-        number,
-        cardId,
-        fullName,
-        shortName,
-        phone,
-        sex.ordinal,
-        city,
-        dateOfBirthday,
-        actualDistanceId,
-        teamName,
-        totalResult,
-        distanceIds,
-        raceIds,
-        mutableListOf(), //TODO
-        mutableListOf(),//TODO
-        isOffTrack
+        number = number,
+        cardId = cardId,
+        fullName = fullName,
+        shortName = shortName,
+        phone = phone,
+        sex = sex.ordinal,
+        city = city,
+        dateOfBirthday = dateOfBirthday,
+        actualRaceId = actualRaceId,
+        actualDistanceId = actualDistanceId,
+        raceIds = raceIds,
+        distanceIds = distanceIds,
+        checkpoints = checkpoints,
+        isOffTrack = isOffTrack,
+        teamNames = teamNames,
+        totalResults = totalResults
     )
 }
 
@@ -232,10 +225,8 @@ fun DistancePojo.toTable(): Pair<DistanceTable, List<DistanceRunnerCrossRef>> {
 
 fun CheckpointPojo.toCheckpointTable(): CheckpointTable {
     return CheckpointTable(
-        this.id,
-        this.distanceId,
-        this.raceId,
-        this.name,
-
+        checkpointId = this.id,
+        distanceId = this.distanceId,
+        name = this.name,
     )
 }

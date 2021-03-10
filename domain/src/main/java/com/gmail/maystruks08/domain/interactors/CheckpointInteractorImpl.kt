@@ -9,8 +9,8 @@ import javax.inject.Inject
 class CheckpointInteractorImpl @Inject constructor(private val checkpointsRepository: CheckpointsRepository): CheckpointInteractor {
 
     override suspend fun getCheckpoints(
-        raceId: Long,
-        distanceId: Long
+        raceId: String,
+        distanceId: String
     ): TaskResult<Exception, List<Checkpoint>> {
         return TaskResult.build {
             checkpointsRepository.getCheckpoints(raceId, distanceId)
@@ -18,8 +18,8 @@ class CheckpointInteractorImpl @Inject constructor(private val checkpointsReposi
     }
 
     override suspend fun getCurrentSelectedCheckpoint(
-        raceId: Long,
-        distanceId: Long
+        raceId: String,
+        distanceId: String
     ): TaskResult<Exception, Checkpoint> {
         return TaskResult.build {
             checkpointsRepository.getCurrentCheckpoint(raceId, distanceId) ?: throw CheckpointNotFoundException()
@@ -27,8 +27,8 @@ class CheckpointInteractorImpl @Inject constructor(private val checkpointsReposi
     }
 
     override suspend fun saveCurrentSelectedCheckpointId(
-        raceId: Long,
-        distanceId: Long,
+        raceId: String,
+        distanceId: String,
         checkpointId: Long
     ): TaskResult<Exception, Unit> {
         return TaskResult.build {

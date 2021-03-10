@@ -17,6 +17,7 @@ import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
+import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRegisterNewRunnerBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,6 +26,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class RegisterNewRunnerFragment : BaseFragment() {
 
     private val viewModel: RegisterNewRunnerViewModel by viewModels()
+
+    private var raceId: String by argument()
+    private var distanceId: String by argument()
 
     private lateinit var binding: FragmentRegisterNewRunnerBinding
     private lateinit var adapter: RegisterRunnerAdapter
@@ -40,7 +44,12 @@ class RegisterNewRunnerFragment : BaseFragment() {
         .withMenuItems(
             listOf(R.id.action_save_changes),
             listOf(MenuItem.OnMenuItemClickListener {
-                viewModel.onRegisterNewRunnerClicked(adapter.runnerRegisterData, teamName)
+                viewModel.onRegisterNewRunnerClicked(
+                    adapter.runnerRegisterData,
+                    raceId,
+                    distanceId,
+                    teamName
+                )
                 true
             })
         )
@@ -125,6 +134,14 @@ class RegisterNewRunnerFragment : BaseFragment() {
     override fun onPause() {
         super.onPause()
         hideSoftKeyboard()
+    }
+
+    companion object {
+
+        fun getInstance(raceId: String, distanceId: String) = RegisterNewRunnerFragment().apply {
+            this.raceId = raceId
+            this.distanceId = distanceId
+        }
     }
 
 }

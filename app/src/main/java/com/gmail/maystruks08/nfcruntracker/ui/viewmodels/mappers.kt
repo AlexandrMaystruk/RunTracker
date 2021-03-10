@@ -24,18 +24,17 @@ fun Runner.toRunnerView() = RunnerView(
     this.number,
     this.fullName,
     this.city,
-    this.totalResult?.toTimeUTCFormat(),
+    this.totalResults[actualDistanceId]?.toTimeUTCFormat(),
     this.dateOfBirthday.toDateFormat(),
     this.actualDistanceId,
-    this.checkpoints.toCheckpointViews(),
-    this.isOffTrack
+    this.checkpoints[actualDistanceId]?.toCheckpointViews().orEmpty(),
+    this.isOffTrack[actualDistanceId]?:false
 )
 
 fun Runner.toRunnerResultView(position: Int) = RunnerResultView(
-    this.cardId,
-    this.fullName,
     this.number.toString(),
-    this.totalResult!!.toTimeUTCFormat(),
+    this.fullName,
+    this.totalResults[actualDistanceId]!!.toTimeUTCFormat(),
     position
 )
 

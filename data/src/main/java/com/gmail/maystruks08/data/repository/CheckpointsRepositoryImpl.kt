@@ -25,28 +25,27 @@ class CheckpointsRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : CheckpointsRepository {
 
-    override suspend fun getCheckpoints(raceId: Long, distanceId: Long): List<Checkpoint> {
+    override suspend fun getCheckpoints(raceId: String, distanceId: String): List<Checkpoint> {
         if (networkUtil.isOnline()) {
             val checkpointsDocument = firestoreApi.getCheckpoints(raceId.toString(), distanceId.toString())
             checkpointsDocument.data?.toDataClass<HashMap<String, CheckpointPojo>?>()
                 ?.let { hashMap ->
                     val checkpoints = hashMap.values
-                    checkpointDAO.deleteCheckpointsByRaceAndDistanceId(raceId, distanceId)
+                    checkpointDAO.deleteCheckpointsByRaceAndDistanceId(distanceId)
                     checkpointDAO.insertAllOrReplace(checkpoints.map { it.toCheckpointTable() })
                 }
         }
-        val checkpointsTable = checkpointDAO.getCheckpointsByRaceAndDistanceId(raceId, distanceId)
+        val checkpointsTable = checkpointDAO.getCheckpointsByRaceAndDistanceId( distanceId)
         return checkpointsTable.map {
             CheckpointImpl(
                 it.checkpointId,
                 it.distanceId,
-                it.raceId,
                 it.name
             )
         }
     }
 
-    override suspend fun getCurrentCheckpoint(raceId: Long, distanceId: Long): Checkpoint? {
+    override suspend fun getCurrentCheckpoint(raceId: String, distanceId: String): Checkpoint? {
         return auth.currentUser?.uid?.let { currentUserId ->
             userSettingsDAO.getUserSettings(currentUserId, raceId, distanceId)
                 ?.let { currentUserSettings ->
@@ -59,8 +58,8 @@ class CheckpointsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveCurrentSelectedCheckpointId(
-        raceId: Long,
-        distanceId: Long,
+        raceId: String,
+        distanceId: String,
         checkpointId: Long
     ) {
         auth.currentUser?.uid?.let { currentUserId ->

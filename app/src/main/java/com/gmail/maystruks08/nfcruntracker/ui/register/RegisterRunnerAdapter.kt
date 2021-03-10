@@ -33,8 +33,7 @@ data class InputDataView(
             dateOfBirthday == null ||
             city.isNullOrEmpty() ||
             runnerType == null ||
-            runnerNumber == null ||
-            runnerCardId.isNullOrEmpty()
+            runnerNumber == null
 }
 
 class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHolder>() {

@@ -16,12 +16,8 @@ data class CheckpointResultIml(
         return checkpoint.getName()
     }
 
-    override fun getDistanceId(): Long {
+    override fun getDistanceId(): String {
         return checkpoint.getDistanceId()
-    }
-
-    override fun getRaceId(): Long {
-        return checkpoint.getRaceId()
     }
 
     override fun getResult(): Date {

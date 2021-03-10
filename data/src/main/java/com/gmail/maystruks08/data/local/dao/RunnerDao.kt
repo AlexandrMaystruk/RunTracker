@@ -2,9 +2,11 @@ package com.gmail.maystruks08.data.local.dao
 
 import androidx.room.*
 import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
+import com.gmail.maystruks08.data.local.entity.relation.RunnerResultCrossRef
 import com.gmail.maystruks08.data.local.entity.relation.RunnerWithResult
 import com.gmail.maystruks08.data.local.entity.tables.ResultTable
 import com.gmail.maystruks08.data.local.entity.tables.RunnerTable
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 
 @Dao
 @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
@@ -14,20 +16,15 @@ interface RunnerDao : BaseDao<RunnerTable> {
     /** INSERT */
     @Transaction
     suspend fun insertOrReplaceRunner(
-        distanceId: Long,
         runner: RunnerTable,
-        results: List<ResultTable>
+        results: List<ResultTable>,
+        runnerResultCrossRefTables: List<RunnerResultCrossRef>,
+        distanceRunnerCrossRefTables: List<DistanceRunnerCrossRef>
     ) {
         insertOrReplace(runner)
         insertAllOrReplaceResults(results)
-        insertOrReplaceJoin(DistanceRunnerCrossRef(distanceId, runner.runnerNumber))
-    }
-
-    @Transaction
-    suspend fun insertRunner(distanceId: Long, runner: RunnerTable, results: List<ResultTable>) {
-        insert(runner)
-        insertAllResult(results)
-        insertJoin(DistanceRunnerCrossRef(distanceId, runner.runnerNumber))
+        insertOrReplaceRunnerResultJoin(runnerResultCrossRefTables)
+        insertOrReplaceDistanceRunnerJoin(distanceRunnerCrossRefTables)
     }
 
 
@@ -85,10 +82,20 @@ interface RunnerDao : BaseDao<RunnerTable> {
 
     /** JOIN */
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertJoin(join: DistanceRunnerCrossRef)
+    fun insertDistanceRunnerJoin(join: DistanceRunnerCrossRef)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertOrReplaceJoin(join: DistanceRunnerCrossRef)
+    fun insertOrReplaceDistanceRunnerJoin(join: DistanceRunnerCrossRef)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertOrReplaceDistanceRunnerJoin(join: List<DistanceRunnerCrossRef>)
+
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertOrReplaceRunnerResultJoin(join: RunnerResultCrossRef)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertOrReplaceRunnerResultJoin(join: List<RunnerResultCrossRef>)
 
 }
 

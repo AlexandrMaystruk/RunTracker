@@ -68,8 +68,8 @@ class RunnersViewModel @ViewModelInject constructor(
     private val _selectCheckpointDialogLiveData = SingleLiveEvent<ArrayList<CheckpointView>>()
     private val _closeCheckpointDialogLiveData = SingleLiveEvent<String>()
 
-    private var raceId: Long = -1
-    private var distanceId: Long = -1
+    private var raceId: String = "0"
+    private var distanceId: String = "0"
 
     private var lastSelectedRunner: RunnerView? = null
 
@@ -81,16 +81,16 @@ class RunnersViewModel @ViewModelInject constructor(
         }
     }
 
-    fun initFragment(raceId: Long, distanceId: Long?) {
+    fun initFragment(raceId: String, distanceId: String?) {
         this.raceId = raceId
-        this.distanceId = distanceId ?: 0
+        this.distanceId = distanceId ?: "0"
         viewModelScope.launch(Dispatchers.IO) { showAllDistances() }
         viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
         viewModelScope.launch(Dispatchers.IO) { showCurrentCheckpoint() }
         viewModelScope.launch(Dispatchers.IO) { observeDistanceChanges() }
     }
 
-    fun changeDistance(distanceId: Long) {
+    fun changeDistance(distanceId: String) {
         this.distanceId = distanceId
         val updatedDistance = ArrayList(_distanceLiveData.value.map { DistanceView(it.id, it.name, it.id == distanceId) })
         _distanceLiveData.value = updatedDistance
@@ -146,10 +146,7 @@ class RunnersViewModel @ViewModelInject constructor(
         if (distanceId == runnerChange.entity.actualDistanceId) {
             val runners = ArrayList(_runnersLiveData.value)
             when (runnerChange.modifierType) {
-                ModifierType.ADD -> {
-                    runners.add(runnerView)
-                }
-                ModifierType.UPDATE -> {
+                ModifierType.ADD, ModifierType.UPDATE -> {
                     runners.updateElement(runnerView, { it.number == runnerView.number })
                 }
                 ModifierType.REMOVE -> {
@@ -165,10 +162,7 @@ class RunnersViewModel @ViewModelInject constructor(
         if (raceId == distanceChange.entity.raceId) {
             val distances = ArrayList(_distanceLiveData.value)
             when (distanceChange.modifierType) {
-                ModifierType.ADD -> {
-                    distances.add(distanceView)
-                }
-                ModifierType.UPDATE -> {
+                ModifierType.ADD, ModifierType.UPDATE -> {
                     distances.updateElement(distanceView, { it.id == distanceView.id })
                 }
                 ModifierType.REMOVE -> {
@@ -208,10 +202,10 @@ class RunnersViewModel @ViewModelInject constructor(
     }
 
     fun onRegisterNewRunnerClicked() {
-        router.navigateTo(Screens.RegisterNewRunnerScreen())
+        router.navigateTo(Screens.RegisterNewRunnerScreen(raceId, distanceId))
     }
 
-    fun onClickedAtRunner(runnerNumber: Long, distanceId: Long) {
+    fun onClickedAtRunner(runnerNumber: Long, distanceId: String) {
         router.navigateTo(Screens.RunnerScreen(runnerNumber, distanceId))
     }
 
@@ -280,7 +274,12 @@ class RunnersViewModel @ViewModelInject constructor(
     private suspend fun showCurrentCheckpoint() {
         when (val result = checkpointInteractor.getCurrentSelectedCheckpoint(raceId, distanceId)) {
             is TaskResult.Value -> _closeCheckpointDialogLiveData.postValue(result.value.getName())
-            is TaskResult.Error -> handleError(result.error)
+            is TaskResult.Error -> {
+                if(result.error is CheckpointNotFoundException){
+                    _closeCheckpointDialogLiveData.postValue("Выбрать кп")
+                }
+                handleError(result.error)
+            }
         }
     }
 
@@ -321,19 +320,28 @@ class RunnersViewModel @ViewModelInject constructor(
     }
 
     private fun onMarkRunnerOnCheckpointSuccess(updatedRunner: Runner) {
-        val lastCheckpoint = updatedRunner.checkpoints.maxByOrNull { it.getResult()?.time ?: 0 }
+        val lastCheckpoint = updatedRunner.checkpoints[updatedRunner.actualDistanceId]?.maxByOrNull { it.getResult()?.time ?: 0 }
         _showSuccessDialogLiveData.postValue(lastCheckpoint to updatedRunner.number)
         handleRunnerChanges(Change(updatedRunner, ModifierType.UPDATE))
     }
 
     private fun handleError(e: Throwable) {
         _showProgressLiveData.postValue(false)
-        Timber.e(e)
         when (e) {
-            is SaveRunnerDataException -> toastLiveData.postValue("Не удалось сохранить данные участника:" + e.message)
-            is RunnerNotFoundException -> toastLiveData.postValue("Участник не найден")
-            is SyncWithServerException -> toastLiveData.postValue("Данные не сохранились на сервер")
+            is SaveRunnerDataException -> {
+                Timber.e(e)
+                toastLiveData.postValue("Не удалось сохранить данные участника:" + e.message)
+            }
+            is RunnerNotFoundException -> {
+                Timber.e(e)
+                toastLiveData.postValue("Участник не найден")
+            }
+            is SyncWithServerException -> {
+                Timber.e(e)
+                toastLiveData.postValue("Данные не сохранились на сервер")
+            }
             is CheckpointNotFoundException -> toastLiveData.postValue("КП не выбрано для дистанции")
+            else -> Timber.e(e)
         }
     }
 

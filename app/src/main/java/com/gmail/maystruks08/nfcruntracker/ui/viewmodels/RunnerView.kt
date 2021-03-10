@@ -4,13 +4,13 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class RunnerView(
-    val cardId: String,
+    val cardId: String?,
     val number: Long,
     val fullName: String,
     val city: String,
     val result: String?,
     val dateOfBirthday: String,
-    val actualDistanceId: Long,
+    val actualDistanceId: String,
     val progress: List<CheckpointView>,
     val isOffTrack: Boolean,
     val placeholder: Boolean = false
@@ -23,7 +23,7 @@ data class RunnerView(
         source.readString().orEmpty(),
         source.readString(),
         source.readString().orEmpty(),
-        source.readLong(),
+        source.readString().orEmpty(),
         listOf<CheckpointView>().apply { source.readList(this, CheckpointView::class.java.classLoader) },
         1 == source.readInt(),
         1 == source.readInt()
@@ -38,7 +38,7 @@ data class RunnerView(
         writeString(city)
         writeString(result)
         writeString(dateOfBirthday)
-        writeLong(actualDistanceId)
+        writeString(actualDistanceId)
         writeList(progress)
         writeInt((if (isOffTrack) 1 else 0))
         writeInt((if (placeholder) 1 else 0))
@@ -46,12 +46,12 @@ data class RunnerView(
 
     companion object{
         fun getPlaceholder() =  arrayListOf(
-            RunnerView("",  0, "", "", null, "", 1, emptyList(), isOffTrack = false, placeholder = true),
-            RunnerView("",  0, "", "", null, "", 1, emptyList(), isOffTrack = false, placeholder = true),
-            RunnerView("",  0, "", "", null, "", 1, emptyList(), isOffTrack = false, placeholder = true),
-            RunnerView("",  0, "", "", null, "", 1, emptyList(), isOffTrack = false, placeholder = true),
-            RunnerView("",  0, "", "", null, "", 1, emptyList(), isOffTrack = false, placeholder = true),
-            RunnerView("",  0, "", "", null, "", 1, emptyList(), isOffTrack = false, placeholder = true),
+            RunnerView("",  0, "", "", null, "", "0", emptyList(), isOffTrack = false, placeholder = true),
+            RunnerView("",  0, "", "", null, "", "0", emptyList(), isOffTrack = false, placeholder = true),
+            RunnerView("",  0, "", "", null, "", "0", emptyList(), isOffTrack = false, placeholder = true),
+            RunnerView("",  0, "", "", null, "", "0", emptyList(), isOffTrack = false, placeholder = true),
+            RunnerView("",  0, "", "", null, "", "0", emptyList(), isOffTrack = false, placeholder = true),
+            RunnerView("",  0, "", "", null, "", "0", emptyList(), isOffTrack = false, placeholder = true),
         )
 
         @JvmField

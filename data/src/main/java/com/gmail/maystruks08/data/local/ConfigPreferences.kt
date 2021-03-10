@@ -69,15 +69,15 @@ class ConfigPreferences @Inject constructor(context: Context) {
         return sp.getString(ADMIN_USER_IDS, "")
     }
 
-    fun saveRaceId(raceId: Long) {
+    fun saveRaceId(raceId: String) {
         sp.edit().apply {
-            putLong(CURRENT_RACE_ID, raceId)
+            putString(CURRENT_RACE_ID, raceId)
             apply()
         }
     }
 
-    fun getRaceId(): Long {
-        return sp.getLong(CURRENT_RACE_ID, -1)
+    fun getRaceId(): String {
+        return sp.getString(CURRENT_RACE_ID, null) ?: "-1"
     }
 
 }

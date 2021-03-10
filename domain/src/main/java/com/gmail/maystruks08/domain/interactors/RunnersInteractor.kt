@@ -10,11 +10,11 @@ interface RunnersInteractor {
     suspend fun getRunner(runnerNumber: Long): TaskResult<Exception, Runner>
 
     suspend fun getRunners(
-        distanceId: Long,
+        distanceId: String,
         initSize: Int? = null
     ): TaskResult<Exception, List<Runner>>
 
-    suspend fun getFinishers(distanceId: Long): TaskResult<Exception, List<Runner>>
+    suspend fun getFinishers(distanceId: String): TaskResult<Exception, List<Runner>>
 
     suspend fun addCurrentCheckpointToRunner(cardId: String): TaskResult<Exception, Runner>
 

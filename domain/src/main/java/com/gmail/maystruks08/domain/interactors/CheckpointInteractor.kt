@@ -6,18 +6,18 @@ import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 interface CheckpointInteractor {
 
     suspend fun getCheckpoints(
-        raceId: Long,
-        distanceId: Long
+        raceId: String,
+        distanceId: String
     ): TaskResult<Exception, List<Checkpoint>>
 
     suspend fun getCurrentSelectedCheckpoint(
-        raceId: Long,
-        distanceId: Long
+        raceId: String,
+        distanceId: String
     ): TaskResult<Exception, Checkpoint>
 
     suspend fun saveCurrentSelectedCheckpointId(
-        raceId: Long,
-        distanceId: Long,
+        raceId: String,
+        distanceId: String,
         checkpointId: Long
     ): TaskResult<Exception, Unit>
 

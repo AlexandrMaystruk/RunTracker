@@ -12,10 +12,10 @@ interface RaceDAO : BaseDao<RaceTable> {
     fun getRaceList(): List<RaceWithDistances>
 
     @Query("SELECT * FROM race_table WHERE id =:raceId")
-    fun getRace(raceId: Long): RaceWithDistances
+    fun getRace(raceId: String): RaceWithDistances
 
     @Query("DELETE FROM race_table WHERE id =:raceId")
-    fun deleteAllRaceById(raceId: Long)
+    fun deleteAllRaceById(raceId: String)
 
     @Query("DELETE FROM race_table")
     fun deleteAllRaces()

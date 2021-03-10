@@ -5,16 +5,16 @@ import com.gmail.maystruks08.domain.entities.runner.Runner
 import java.util.*
 
 data class Distance(
-    val id: Long,
-    val raceId: Long,
+    val id: String,
+    val raceId: String,
     val name: String,
-    val authorId: Long,
+    val authorId: String,
     val dateOfStart: Date,
     val checkpoints: MutableList<Checkpoint>,
     val runners: MutableSet<Runner> = sortedSetOf(
-        compareBy<Runner> { it.totalResult }
-            .thenBy { it.isOffTrack }
-            .thenBy { runner -> runner.checkpoints.count { it.getResult() != null } }
+        compareBy<Runner> { it.totalResults[id] }
+            .thenBy { it.isOffTrack[id] }
+            .thenBy { runner -> runner.checkpoints[id]?.count { it.getResult() != null } }
     )
 ) {
 
@@ -35,8 +35,9 @@ data class Distance(
     }
 
     fun findRunnerTeamMembers(currentRunnerNumber: Long, teamName: String): List<Runner>? {
-        val result = runners.filter { it.teamName == teamName && it.number != currentRunnerNumber }
-        if (result.any { it.isOffTrack }) return null
-        return result
+        return runners.filter {
+            if (it.isOffTrack[id] == true) return null
+            it.teamNames[id] == teamName && it.number != currentRunnerNumber
+        }
     }
 }

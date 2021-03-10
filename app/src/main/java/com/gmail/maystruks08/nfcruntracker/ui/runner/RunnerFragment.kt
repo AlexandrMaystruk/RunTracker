@@ -29,7 +29,7 @@ class RunnerFragment : BaseFragment(), CheckpointsAdapter.Interaction {
 
     private var alertDialog: AlertDialog? = null
     private var runnerNumber: Long by argument()
-    private var distanceId: Long by argument()
+    private var distanceId: String by argument()
 
 
     override fun onCreateView(
@@ -193,7 +193,7 @@ class RunnerFragment : BaseFragment(), CheckpointsAdapter.Interaction {
 
     companion object {
 
-        fun getInstance(runnerNumber: Long, distanceId: Long) = RunnerFragment().apply {
+        fun getInstance(runnerNumber: Long, distanceId: String) = RunnerFragment().apply {
             this.runnerNumber = runnerNumber
             this.distanceId = distanceId
         }

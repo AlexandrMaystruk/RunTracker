@@ -1,23 +1,15 @@
 package com.gmail.maystruks08.data.local.entity.tables
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
 
 @Entity(
     tableName = "distances",
-    primaryKeys = ["distanceId", "raceId"],
-    foreignKeys = [ForeignKey(
-        entity = RaceTable::class,
-        parentColumns = ["id"],
-        childColumns = ["raceId"],
-        onDelete = ForeignKey.CASCADE
-    )], indices = [Index(value = arrayOf("distanceId"))]
+    primaryKeys = ["distanceId", "raceId"]
 )
 data class DistanceTable(
-    val distanceId: Long,
-    val raceId: Long,
-    val authorId: Long,
+    val distanceId: String,
+    val raceId: String,
+    val authorId: String,
     val name: String,
     val dateOfStart: Long
 )

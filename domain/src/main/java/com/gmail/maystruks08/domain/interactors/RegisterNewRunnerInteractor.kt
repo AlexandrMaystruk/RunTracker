@@ -7,7 +7,11 @@ import java.util.*
 
 interface RegisterNewRunnerInteractor {
 
-    suspend fun registerNewRunners(registerInputData: List<RegisterInputData>): TaskResult<Exception, Unit>
+    suspend fun registerNewRunners(
+        raceId: String,
+        distanceId: String,
+        registerInputData: List<RegisterInputData>
+    ): TaskResult<Exception, Unit>
 
     data class RegisterInputData(
         var fullName: String,
@@ -17,7 +21,7 @@ interface RegisterNewRunnerInteractor {
         var dateOfBirthday: Date,
         var city: String,
         var runnerNumber: Long,
-        var runnerCardId: String,
+        var runnerCardId: String?,
         var teamName: String?
     )
 }

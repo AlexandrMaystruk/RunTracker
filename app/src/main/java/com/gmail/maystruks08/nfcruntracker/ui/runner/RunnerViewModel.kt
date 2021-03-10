@@ -36,7 +36,7 @@ class RunnerViewModel @ViewModelInject constructor(
     private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, Long>>()
     private val _linkCardModeEnableLiveData = SingleLiveEvent<Boolean>()
 
-    fun onShowRunnerClicked(distanceId: Long, runnerNumber: Long) {
+    fun onShowRunnerClicked(distanceId: String, runnerNumber: Long) {
         viewModelScope.launch {
             when (val onResult = runnersInteractor.getRunner(runnerNumber)) {
                 is TaskResult.Value -> handleRunnerData(onResult.value)
@@ -114,7 +114,7 @@ class RunnerViewModel @ViewModelInject constructor(
     }
 
     private fun onMarkRunnerOnCheckpointSuccess(updatedRunner: Runner) {
-        val lastCheckpoint = updatedRunner.checkpoints.maxByOrNull { it.getResult()?.time ?: 0 }
+        val lastCheckpoint = updatedRunner.checkpoints[updatedRunner.actualDistanceId]?.maxByOrNull { it.getResult()?.time ?: 0 }
         _showSuccessDialogLiveData.postValue(lastCheckpoint to updatedRunner.number)
         handleRunnerData(updatedRunner)
     }

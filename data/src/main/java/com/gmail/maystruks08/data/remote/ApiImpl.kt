@@ -6,6 +6,7 @@ import com.gmail.maystruks08.data.mappers.toFirestoreCheckpoint
 import com.gmail.maystruks08.data.remote.pojo.DistancePojo
 import com.gmail.maystruks08.data.remote.pojo.RacePojo
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
+import com.gmail.maystruks08.data.serializeToMap
 import com.gmail.maystruks08.domain.entities.Change
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
@@ -28,7 +29,7 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
     companion object {
         private const val RACES_COLLECTION = "races"
         private const val DISTANCES_COLLECTION = "distances"
-        private const val RUNNER_COLLECTION = "runners"
+        private const val RUNNER_COLLECTION = "runner_ref"
         private const val CHECKPOINTS_COLLECTION = "checkpoints"
         private const val SETTINGS_COLLECTION = "settings"
     }
@@ -53,7 +54,7 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
     override suspend fun subscribeToDistanceCollectionChange(raceId: String): Flow<List<Change<DistancePojo>>> {
         return channelFlow {
             val eventDocument = db.collection(DISTANCES_COLLECTION)
-            val subscription = eventDocument.whereEqualTo("raceId", 0).addSnapshotListener { snapshots, _ ->
+            val subscription = eventDocument.whereEqualTo("raceId", raceId).addSnapshotListener { snapshots, _ ->
                 Timber.i("Snapshot size = ${snapshots?.documentChanges?.size}")
                 val distancesChanges = snapshots?.documentChanges?.map {
                     Change(it.document.toObject(DistancePojo::class.java), it.getChangeType())
@@ -71,7 +72,7 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
     @ExperimentalCoroutinesApi
     override suspend fun subscribeToRunnerCollectionChange(raceId: String): Flow<List<Change<RunnerPojo>>> {
         return channelFlow {
-            val eventDocument = db.collection(RUNNER_COLLECTION).whereEqualTo("capital", true)
+            val eventDocument = db.collection(RUNNER_COLLECTION).whereArrayContains("raceIds", raceId)
             val subscription = eventDocument.addSnapshotListener { snapshots, _ ->
                 Timber.i("Snapshot size = ${snapshots?.documentChanges?.size}")
                 val runnersChanges = snapshots?.documentChanges?.map {
@@ -88,18 +89,29 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
 
     override suspend fun saveRace(racePojo: RacePojo) {
         val raceDocument = db.collection(RACES_COLLECTION).document(racePojo.id.toString())
-        return awaitTaskCompletable(raceDocument.set(racePojo))
+        awaitTaskCompletable(raceDocument.set(racePojo))
     }
 
     override suspend fun saveDistance(distancePojo: DistancePojo) {
-        val distanceDocument =
-            db.collection(DISTANCES_COLLECTION).document(distancePojo.id.toString())
-        return awaitTaskCompletable(distanceDocument.set(distancePojo))
+        val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distancePojo.id.toString())
+        awaitTaskCompletable(distanceDocument.set(distancePojo))
+    }
+
+    override suspend fun updateDistanceRunners(distanceId: String, runnerIds: List<Long>) {
+        val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distanceId)
+        awaitTaskCompletable(distanceDocument.update("runnerIds", runnerIds))
     }
 
     override suspend fun saveRunner(runnerPojo: RunnerPojo) {
         val runnerDocument = db.collection(RUNNER_COLLECTION).document(runnerPojo.number.toString())
-        return awaitTaskCompletable(runnerDocument.set(runnerPojo))
+        return try {
+            awaitTaskCompletable(runnerDocument.update(runnerPojo.serializeToMap()))
+        } catch (e: FirebaseFirestoreException) {
+            awaitTaskCompletable(runnerDocument.set(runnerPojo))
+        } catch (e: Exception){
+            Timber.e(e)
+            throw e
+        }
     }
 
     override suspend fun saveCheckpoints(

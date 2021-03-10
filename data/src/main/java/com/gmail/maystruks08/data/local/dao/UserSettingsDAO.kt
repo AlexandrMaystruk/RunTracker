@@ -9,7 +9,7 @@ import com.gmail.maystruks08.data.local.entity.tables.UserSettingsTable
 interface UserSettingsDAO : BaseDao<UserSettingsTable> {
 
     @Query("SELECT * FROM user_settings WHERE userId =:userId AND raceId =:raceId AND distanceId =:distanceId ")
-    fun getUserSettings(userId: String, raceId: Long, distanceId: Long): UserSettingsTable?
+    fun getUserSettings(userId: String, raceId: String, distanceId: String): UserSettingsTable?
 
     @Query("DELETE FROM user_settings WHERE userId =:userId")
     fun deleteUserSettingById(userId: String)
