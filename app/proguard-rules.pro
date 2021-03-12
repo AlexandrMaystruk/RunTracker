@@ -17,3 +17,8 @@
     -keep class * implements com.google.gson.TypeAdapterFactory
     -keep class * implements com.google.gson.JsonSerializer
     -keep class * implements com.google.gson.JsonDeserializer
+
+    -keep class * implements androidx.viewbinding.ViewBinding {
+        public static *** bind(android.view.View);
+        public static *** inflate(android.view.LayoutInflater);
+    }

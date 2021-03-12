@@ -3,7 +3,6 @@ package com.gmail.maystruks08.nfcruntracker.ui.runners
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.Change
-import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
@@ -32,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
@@ -157,26 +157,10 @@ class RunnersViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun handleDistanceChanges(distanceChange: Change<Distance>) {
-        val distanceView = distanceChange.entity.toView()
-        if (raceId == distanceChange.entity.raceId) {
-            val distances = ArrayList(_distanceLiveData.value)
-            when (distanceChange.modifierType) {
-                ModifierType.ADD, ModifierType.UPDATE -> {
-                    distances.updateElement(distanceView, { it.id == distanceView.id })
-                }
-                ModifierType.REMOVE -> {
-                    distances.removeAll { it.id == distanceView.id }
-                }
-            }
-            _distanceLiveData.value = distances
-        }
-    }
-
     fun onSearchQueryChanged(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
             if (query.isNotEmpty()) {
-                when (val result = runnersInteractor.getRunners(distanceId)) {
+                when (val result = runnersInteractor.getRunners(distanceId, query)) {
                     is TaskResult.Value -> {
                         val pattern =
                             ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
@@ -248,11 +232,7 @@ class RunnersViewModel @ViewModelInject constructor(
 
     private suspend fun observeDistanceChanges() {
         try {
-            distanceInteractor
-                .observeDistanceData(raceId)
-                .collect {
-                    handleDistanceChanges(it)
-                }
+            distanceInteractor.observeDistanceDataFlow(raceId)
         } catch (e: Exception) {
             Timber.e(e)
         }
@@ -260,15 +240,15 @@ class RunnersViewModel @ViewModelInject constructor(
 
     private suspend fun showAllDistances() {
         _showProgressLiveData.postValue(true)
-        showSmallInitRunners()
-        when (val result = distanceInteractor.getDistances(raceId)) {
-            is TaskResult.Value -> {
-                val distanceViews = result.value.map { it.toView() }.toMutableList()
-                _distanceLiveData.value = distanceViews
+        distanceInteractor.getDistancesFlow(raceId)
+            .catch { error ->
+                handleError(error)
             }
-            is TaskResult.Error -> handleError(result.error)
-        }
-        _showProgressLiveData.postValue(false)
+            .collect { distanceList ->
+                val distanceViews = distanceList.map { it.toView() }.toMutableList()
+                _distanceLiveData.value = distanceViews
+                _showProgressLiveData.postValue(false)
+            }
     }
 
     private suspend fun showCurrentCheckpoint() {
@@ -285,28 +265,16 @@ class RunnersViewModel @ViewModelInject constructor(
 
     private suspend fun showAllRunners() {
         _showProgressLiveData.postValue(true)
-        showSmallInitRunners()
-        when (val result = runnersInteractor.getRunners(distanceId, null)) {
-            is TaskResult.Value -> {
+        runnersInteractor
+            .getRunnersFlow(distanceId)
+            .catch { error ->
+                handleError(error)
+            }
+            .collect {
                 Timber.w("showAllRunners")
-                val runners = toRunnerViews(result.value)
+                val runners = toRunnerViews(it)
                 _runnersLiveData.value = runners
             }
-            is TaskResult.Error -> handleError(result.error)
-        }
-        _showProgressLiveData.postValue(false)
-    }
-
-
-    private suspend fun showSmallInitRunners() {
-        when (val result = runnersInteractor.getRunners(distanceId, 20)) {
-            is TaskResult.Value -> {
-                Timber.w("showAllRunners  showSmallInitRunners")
-                val runners = toRunnerViews(result.value)
-                _runnersLiveData.value = runners
-            }
-            is TaskResult.Error -> handleError(result.error)
-        }
         _showProgressLiveData.postValue(false)
     }
 

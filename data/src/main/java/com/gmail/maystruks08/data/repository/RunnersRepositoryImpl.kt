@@ -28,14 +28,14 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.gson.Gson
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class RunnersRepositoryImpl @Inject constructor(
     private val networkUtil: NetworkUtil,
     private val firestoreApi: FirestoreApi,
@@ -73,126 +73,41 @@ class RunnersRepositoryImpl @Inject constructor(
 
     override suspend fun getRunners(
         distanceId: String,
-        onlyFinishers: Boolean,
-        initSize: Int?
+        query: String,
+        onlyFinishers: Boolean
     ): List<Runner> {
-        val currentRaceId = configPreferences.getRaceId()
-        val distanceWithRunners =
-            distanceDAO.getDistanceByIdWithRunners(currentRaceId, distanceId).let {
-
-
-                val runners = it.runners?.map { it.toRunner() }
-                    ?.toSortedSet(compareBy<Runner> { it.totalResults[it.actualDistanceId] }
-                        .thenBy { it.isOffTrack[it.actualDistanceId] }
-                        .thenBy { it.checkpoints[it.actualDistanceId]?.count { it.getResult() != null } })
-
+        return runnerDao.getRunnerWithResultsQuery(distanceId, query).mapNotNull {
+            when {
+                !onlyFinishers -> {
+                    it.runnerTable.toRunner()
+                }
+                onlyFinishers -> {
+                    if (it.results.isEmpty()) return@mapNotNull null else it.runnerTable.toRunner()
+                }
+                else -> return@mapNotNull null
             }
+        }
+    }
 
-//        if (applicationCache.race == null) {
-//            val currentRaceId = configPreferences.getRaceId()
-//            val race = raceDAO.getRace(currentRaceId)
-//            applicationCache.race = race.toRaceEntity()
-//
-//
-//            val runners = runnerDao.getRunnersWithResults(RunnerType.NORMAL.ordinal)
-//            if (settingsCache.getCheckpointList(RunnerType.NORMAL).isEmpty()) {
-//                settingsCache.checkpoints =
-//                    runnerDao.getCheckpoints(CheckpointType.NORMAL.ordinal).toCheckpoints()
-//            }
-//            runners.forEach {
-//                val runner = it.toRunner(settingsCache.checkpoints)
-//                applicationCache.normalRunnersList.add(runner)
-//            }
-//        }
-//        val result = applicationCache.normalRunnersList.run { if (onlyFinishers) filter { it.totalResult != null && !it.isOffTrack } else this }
-//        return result.let {
-//            if (initSize != null) {
-//                try {
-//                    it.take(initSize)
-//                } catch (e: IllegalArgumentException) {
-//                    it.toMutableList()
-//                }
-//            } else it.toMutableList()
-//        }
+    override suspend fun getRunnersFlow(
+        distanceId: String,
+        onlyFinishers: Boolean
+    ): Flow<List<Runner>> {
+        return flowOf(runnersListHardcode)
 
-
-        val raceId = "0L"
-        val distanceId = "0L"
-
-        return mutableListOf(
-            Runner(
-                1,
-                "q12e",
-                "Full name",
-                "Short name",
-                "34r5345",
-                RunnerSex.MALE,
-                "Odessa",
-                Date(),
-                raceId,
-                distanceId,
-                mutableListOf(raceId),
-                mutableListOf(distanceId),
-                mutableMapOf(distanceId to mutableListOf()),
-                mutableMapOf(),
-                mutableMapOf(),
-                mutableMapOf(),
-            ),
-            Runner(
-                1,
-                "q12e",
-                "Full name",
-                "Short name",
-                "34r5345",
-                RunnerSex.MALE,
-                "Odessa",
-                Date(),
-                raceId,
-                distanceId,
-                mutableListOf(raceId),
-                mutableListOf(distanceId),
-                mutableMapOf(distanceId to mutableListOf<Checkpoint>()),
-                mutableMapOf(),
-                mutableMapOf(),
-                mutableMapOf(),
-            ),
-            Runner(
-                2,
-                "q12e",
-                "Full name",
-                "Short name",
-                "34r5345",
-                RunnerSex.MALE,
-                "Odessa",
-                Date(),
-                raceId,
-                distanceId,
-                mutableListOf(raceId),
-                mutableListOf(distanceId),
-                mutableMapOf(distanceId to mutableListOf<Checkpoint>()),
-                mutableMapOf(),
-                mutableMapOf(),
-                mutableMapOf(),
-            ),
-            Runner(
-                3,
-                "q12e",
-                "Full name",
-                "Short name",
-                "34r5345",
-                RunnerSex.MALE,
-                "Odessa",
-                Date(),
-                raceId,
-                distanceId,
-                mutableListOf(raceId),
-                mutableListOf(distanceId),
-                mutableMapOf(distanceId to mutableListOf<Checkpoint>()),
-                mutableMapOf(),
-                mutableMapOf(),
-                mutableMapOf(),
-            )
-        )
+        /*       return runnerDao.getRunnerWithResultsFlow(distanceId).map { runnersWithResults ->
+                   runnersWithResults.mapNotNull {
+                       when {
+                           !onlyFinishers -> {
+                               it.runnerTable.toRunner()
+                           }
+                           onlyFinishers -> {
+                               if (it.results.isEmpty()) return@mapNotNull null else it.runnerTable.toRunner()
+                           }
+                           else -> return@mapNotNull null
+                       }
+                   }
+               }*/
     }
 
     override suspend fun getRunnerByCardId(cardId: String): Runner? {
@@ -210,8 +125,6 @@ class RunnersRepositoryImpl @Inject constructor(
         return null
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     override suspend fun observeRunnerData(): Flow<Change<Runner>> {
         //TODO remove hardcode
         val currentRaceId = "0"
@@ -234,7 +147,6 @@ class RunnersRepositoryImpl @Inject constructor(
                 }
             }
     }
-
 
     override suspend fun getLastSavedRaceId(): TaskResult<Exception, String> {
         return TaskResult.build {
@@ -282,4 +194,82 @@ class RunnersRepositoryImpl @Inject constructor(
         val count = runnerDao.delete(runner.number)
         Timber.i("Removed runner from DB count: $count")
     }
+
+    val raceId = "0L"
+    val distanceId = "0L"
+
+    private val runnersListHardcode = listOf(
+        Runner(
+            1,
+            "q12e",
+            "Full name",
+            "Short name",
+            "34r5345",
+            RunnerSex.MALE,
+            "Odessa",
+            Date(),
+            raceId,
+            distanceId,
+            mutableListOf(raceId),
+            mutableListOf(distanceId),
+            mutableMapOf(distanceId to mutableListOf()),
+            mutableMapOf(),
+            mutableMapOf(),
+            mutableMapOf(),
+        ),
+        Runner(
+            1,
+            "q12e",
+            "Full name",
+            "Short name",
+            "34r5345",
+            RunnerSex.MALE,
+            "Odessa",
+            Date(),
+            raceId,
+            distanceId,
+            mutableListOf(raceId),
+            mutableListOf(distanceId),
+            mutableMapOf(distanceId to mutableListOf<Checkpoint>()),
+            mutableMapOf(),
+            mutableMapOf(),
+            mutableMapOf(),
+        ),
+        Runner(
+            2,
+            "q12e",
+            "Full name",
+            "Short name",
+            "34r5345",
+            RunnerSex.MALE,
+            "Odessa",
+            Date(),
+            raceId,
+            distanceId,
+            mutableListOf(raceId),
+            mutableListOf(distanceId),
+            mutableMapOf(distanceId to mutableListOf<Checkpoint>()),
+            mutableMapOf(),
+            mutableMapOf(),
+            mutableMapOf(),
+        ),
+        Runner(
+            3,
+            "q12e",
+            "Full name",
+            "Short name",
+            "34r5345",
+            RunnerSex.MALE,
+            "Odessa",
+            Date(),
+            raceId,
+            distanceId,
+            mutableListOf(raceId),
+            mutableListOf(distanceId),
+            mutableMapOf(distanceId to mutableListOf<Checkpoint>()),
+            mutableMapOf(),
+            mutableMapOf(),
+            mutableMapOf(),
+        )
+    )
 }

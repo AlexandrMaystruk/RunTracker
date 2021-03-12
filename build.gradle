@@ -151,6 +151,7 @@ ext {
     ankoVersion = '0.10.8'
     ktxVersion = '1.0.1'
 
+    lifecycleCommonVersion = '2.3.0-rc01'
     lifecycleVersion = '2.2.0'
     livedataVersion = '2.2.0'
 
@@ -239,6 +240,7 @@ ext {
             lifecycleExtensions      : "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion",
             lifecycleLivedata        : "androidx.lifecycle:lifecycle-livedata-ktx:$livedataVersion",
             lifecycleViewmodel       : "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion",
+            lifecycleCommon          : "androidx.lifecycle:lifecycle-common-java8:${lifecycleCommonVersion}",
 
             numberPicker             : "com.shawnlin:number-picker:${numberPickerVersion}",
 

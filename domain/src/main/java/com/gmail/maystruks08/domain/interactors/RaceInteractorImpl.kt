@@ -3,23 +3,25 @@ package com.gmail.maystruks08.domain.interactors
 import com.gmail.maystruks08.domain.entities.Race
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.repository.RaceRepository
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import java.util.*
 import javax.inject.Inject
 
-class RaceInteractorImpl @Inject constructor(private val repository: RaceRepository): RaceInteractor {
+class RaceInteractorImpl @Inject constructor(
+    private val repository: RaceRepository
+) : RaceInteractor {
 
-    @FlowPreview
-    override suspend fun subscribeToUpdates(): Flow<List<Race>> {
-        return repository
-            .subscribeToUpdates()
-            .map { repository.getRaceList() }
+    override suspend fun subscribeToUpdates() {
+        return repository.subscribeToUpdates()
     }
 
-    override suspend fun getRaceList(): TaskResult<Exception, List<Race>> {
+    override suspend fun getRaceList(): Flow<List<Race>> {
+        return repository.getRaceList()
+    }
+
+    override suspend fun getRaceList(query: String): TaskResult<Exception, List<Race>> {
         return TaskResult.build {
-            return@build repository.getRaceList()
+            return@build repository.getRaceList(query)
         }
     }
 

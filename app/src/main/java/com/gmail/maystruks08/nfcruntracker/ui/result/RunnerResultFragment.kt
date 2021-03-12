@@ -1,10 +1,8 @@
 package com.gmail.maystruks08.nfcruntracker.ui.result
 
-import android.os.Bundle
 import android.text.InputType
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
@@ -12,14 +10,20 @@ import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
+import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnersResultsBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class RunnerResultFragment : BaseFragment() {
+class RunnerResultFragment : BaseFragment(R.layout.fragment_runners_results) {
 
     private val viewModel: RunnerResultViewModel by viewModels()
-    private lateinit var binding: FragmentRunnersResultsBinding
+    private val binding: FragmentRunnersResultsBinding by viewBinding {
+        runnersResultsRecyclerView.adapter = null
+    }
     private lateinit var resultAdapter: ResultItemsAdapter
 
     override fun initToolbar() = FragmentToolbar.Builder()
@@ -30,26 +34,22 @@ class RunnerResultFragment : BaseFragment() {
         .withTitle(R.string.screen_runners_results)
         .build()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = FragmentRunnersResultsBinding.inflate(inflater, container, false).let {
-        binding = it
-        it.root
-    }
-
     override fun bindViewModel() {
-        viewModel.runnerResults.observe(viewLifecycleOwner, { runnersResults ->
-            resultAdapter.resultList = runnersResults.toMutableList()
-        })
-
-        viewModel.error.observe(viewLifecycleOwner, {
-            when(it){
-                is RunnerNotFoundException -> context?.toast(getString(R.string.error_runner_not_found))
-                is SaveRunnerDataException -> context?.toast(getString(R.string.error_save_data_to_local_db))
+        with(viewModel) {
+            lifecycleScope.launchWhenStarted {
+                runnerResults.collect { runnersResults ->
+                    resultAdapter.resultList = runnersResults.toMutableList()
+                }
             }
-        })
+            lifecycleScope.launchWhenResumed {
+                error.collect {
+                    when (it) {
+                        is RunnerNotFoundException -> context?.toast(getString(R.string.error_runner_not_found))
+                        is SaveRunnerDataException -> context?.toast(getString(R.string.error_save_data_to_local_db))
+                    }
+                }
+            }
+        }
     }
 
     override fun initViews() {
@@ -72,8 +72,4 @@ class RunnerResultFragment : BaseFragment() {
         }
     }
 
-    override fun onDestroyView() {
-        binding.runnersResultsRecyclerView.adapter = null
-        super.onDestroyView()
-    }
 }

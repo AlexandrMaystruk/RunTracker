@@ -3,10 +3,20 @@ package com.gmail.maystruks08.domain.repository
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
+import kotlinx.coroutines.flow.Flow
 
 interface RunnersRepository {
 
-    suspend fun getRunners(distanceId: String, onlyFinishers: Boolean = false, initSize: Int? = null): List<Runner>
+    suspend fun getRunners(
+        distanceId: String,
+        query: String,
+        onlyFinishers: Boolean = false
+    ): List<Runner>
+
+    suspend fun getRunnersFlow(
+        distanceId: String,
+        onlyFinishers: Boolean = false
+    ): Flow<List<Runner>>
 
     suspend fun getRunnerByCardId(cardId: String): Runner?
 

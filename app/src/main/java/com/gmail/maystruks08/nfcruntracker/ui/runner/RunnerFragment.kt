@@ -1,10 +1,7 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runner
 
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -14,32 +11,24 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
+import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnerBinding
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SuccessDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class RunnerFragment : BaseFragment(), CheckpointsAdapter.Interaction {
+class RunnerFragment : BaseFragment(R.layout.fragment_runner), CheckpointsAdapter.Interaction {
 
     private val viewModel: RunnerViewModel by viewModels()
-
-    private lateinit var binding: FragmentRunnerBinding
+    private val binding: FragmentRunnerBinding by viewBinding {
+        runnerCheckpointsRecyclerView.adapter = null
+    }
     private lateinit var checkpointsAdapter: CheckpointsAdapter
 
     private var alertDialog: AlertDialog? = null
     private var runnerNumber: Long by argument()
     private var distanceId: String by argument()
-
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = FragmentRunnerBinding.inflate(inflater, container, false).let {
-        binding = it
-        it.root
-    }
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
@@ -186,10 +175,8 @@ class RunnerFragment : BaseFragment(), CheckpointsAdapter.Interaction {
     override fun onDestroyView() {
         alertDialog?.dismiss()
         alertDialog = null
-        binding.runnerCheckpointsRecyclerView.adapter = null
         super.onDestroyView()
     }
-
 
     companion object {
 

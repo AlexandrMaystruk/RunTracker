@@ -3,18 +3,21 @@ package com.gmail.maystruks08.domain.interactors
 import com.gmail.maystruks08.domain.entities.Change
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.runner.Runner
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 interface RunnersInteractor {
 
     suspend fun getRunner(runnerNumber: Long): TaskResult<Exception, Runner>
 
-    suspend fun getRunners(
-        distanceId: String,
-        initSize: Int? = null
-    ): TaskResult<Exception, List<Runner>>
+    suspend fun getRunnersFlow(distanceId: String): Flow<List<Runner>>
 
-    suspend fun getFinishers(distanceId: String): TaskResult<Exception, List<Runner>>
+    suspend fun getFinishersFlow(distanceId: String): Flow<List<Runner>>
+
+    suspend fun getRunners(distanceId: String, query: String): TaskResult<Exception, List<Runner>>
+
+    suspend fun getFinishers(distanceId: String, query: String): TaskResult<Exception, List<Runner>>
+
 
     suspend fun addCurrentCheckpointToRunner(cardId: String): TaskResult<Exception, Runner>
 

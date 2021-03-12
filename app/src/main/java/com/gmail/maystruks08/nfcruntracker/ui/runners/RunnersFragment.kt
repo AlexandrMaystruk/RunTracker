@@ -1,11 +1,8 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
 import android.content.Context
-import android.os.Bundle
 import android.text.InputType
-import android.view.LayoutInflater
 import android.view.MenuItem
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
@@ -22,6 +19,7 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.argumentNullable
 import com.gmail.maystruks08.nfcruntracker.core.ext.findFragmentByTag
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
+import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnersBinding
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
@@ -39,12 +37,16 @@ import kotlinx.coroutines.flow.collect
 @ObsoleteCoroutinesApi
 @AndroidEntryPoint
 @ExperimentalCoroutinesApi
-class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
+class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapter.Interaction,
     DistanceListAdapter.Interaction {
 
     private val viewModel: RunnersViewModel by viewModels()
 
-    private lateinit var binding: FragmentRunnersBinding
+    private val binding: FragmentRunnersBinding by viewBinding {
+        runnerAdapter.interaction = null
+        rvRunners.adapter = null
+        rvDistanceType.adapter = null
+    }
     private lateinit var runnerAdapter: RunnerListAdapter
     private lateinit var distanceAdapter: DistanceListAdapter
 
@@ -52,16 +54,6 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
 
     private var raceId: String by argument()
     private var distanceId: String? by argumentNullable()
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = FragmentRunnersBinding.inflate(inflater, container, false)
-        .let { runnersBinding ->
-            binding = runnersBinding
-            return@let runnersBinding.root
-        }
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
@@ -239,12 +231,6 @@ class RunnersFragment : BaseFragment(), RunnerListAdapter.Interaction,
     override fun onStop() {
         super.onStop()
         hideSoftKeyboard(inputManager)
-    }
-
-    override fun onDestroyView() {
-        runnerAdapter.interaction = null
-        binding.rvRunners.adapter = null
-        super.onDestroyView()
     }
 
     companion object {

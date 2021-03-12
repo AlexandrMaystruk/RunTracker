@@ -6,9 +6,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface RaceInteractor {
 
-    suspend fun subscribeToUpdates(): Flow<List<Race>>
+    suspend fun subscribeToUpdates()
 
-    suspend fun getRaceList(): TaskResult<Exception, List<Race>>
+    suspend fun getRaceList(): Flow<List<Race>>
+
+    suspend fun getRaceList(query: String): TaskResult<Exception, List<Race>>
 
     suspend fun saveLastSelectedRaceId(raceId: String): TaskResult<Exception, Unit>
 

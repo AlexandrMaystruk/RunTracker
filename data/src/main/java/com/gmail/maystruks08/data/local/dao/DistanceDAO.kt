@@ -7,21 +7,25 @@ import androidx.room.Query
 import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
 import com.gmail.maystruks08.data.local.entity.relation.DistanceWithRunners
 import com.gmail.maystruks08.data.local.entity.tables.DistanceTable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Dao
 interface DistanceDAO : BaseDao<DistanceTable> {
 
     @Query("SELECT * FROM distances WHERE raceId =:raceId")
-    fun getDistanceByRaceId(raceId: String): List<DistanceTable>
+    fun getDistanceByRaceIdFlow(raceId: String): Flow<List<DistanceTable>>
+
+    fun getDistanceDistinctUntilChanged(raceId: String) = getDistanceByRaceIdFlow(raceId).distinctUntilChanged()
 
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId")
-    fun getDistanceById(distanceId: String): List<DistanceTable>
+    fun getDistanceById(distanceId: String): DistanceTable
 
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId AND raceId =:raceId")
     fun getDistanceByIdWithRunners(raceId: String, distanceId: String): DistanceWithRunners
 
 
-    @Query("SELECT runnerNumber FROM DistanceRunnerCrossRef LE WHERE distanceId =:distanceId")
+    @Query("SELECT runnerNumber FROM distance_runner_cross_ref LE WHERE distanceId =:distanceId")
     fun getDistanceRunnersIds(distanceId: String): List<Long>
 
     @Query("DELETE FROM distances")
@@ -35,7 +39,7 @@ interface DistanceDAO : BaseDao<DistanceTable> {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertJoin(join: List<DistanceRunnerCrossRef>)
 
-    @Query("DELETE FROM DistanceRunnerCrossRef WHERE distanceId =:distanceId")
+    @Query("DELETE FROM distance_runner_cross_ref WHERE distanceId =:distanceId")
     fun deleteDistanceJoin(distanceId: String)
 
 }

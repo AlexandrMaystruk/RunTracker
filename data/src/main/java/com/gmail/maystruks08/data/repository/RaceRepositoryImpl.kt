@@ -15,6 +15,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -28,10 +29,10 @@ class RaceRepositoryImpl @Inject constructor(
     private val gson: Gson
 ) : RaceRepository {
 
-    override suspend fun subscribeToUpdates(): Flow<Unit> {
-        return api
+    override suspend fun subscribeToUpdates() {
+        api
             .subscribeToRaceCollectionChange()
-            .map { list ->
+            .collect { list ->
                 list.forEach {
                     //TODO resolve conflict with local database
                     when (it.modifierType) {
@@ -49,8 +50,16 @@ class RaceRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun getRaceList(): List<Race> {
-        return raceDAO.getRaceList().map { it.toRaceEntity(gson) }
+    override suspend fun getRaceList(): Flow<List<Race>> {
+        return raceDAO.getRaceList().map { raceWithDistances ->
+            raceWithDistances.map { it.toRaceEntity(gson) }
+        }
+    }
+
+    override suspend fun getRaceList(query: String): List<Race> {
+        return raceDAO
+            .getRaceList("'%$query%'")
+            .map { it.toRaceEntity(gson) }
     }
 
     override suspend fun saveRace(race: Race) {

@@ -1,27 +1,19 @@
 package com.gmail.maystruks08.nfcruntracker.ui.checkpoint_editor
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
+import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentCheckpointsBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class CheckpointEditorFragment : BaseFragment() {
+class CheckpointEditorFragment : BaseFragment(R.layout.fragment_checkpoints) {
 
     private val viewModel: CheckpointEditorViewModel by viewModels()
-    private lateinit var binding: FragmentCheckpointsBinding
+    private val binding: FragmentCheckpointsBinding by viewBinding {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = FragmentCheckpointsBinding.inflate(inflater, container, false).let {
-        binding = it
-        it.root
     }
 
     override fun initToolbar() = FragmentToolbar.Builder().build()

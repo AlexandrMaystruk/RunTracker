@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.interactors.RaceInteractor
-import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
@@ -14,11 +13,11 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RaceView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
-import java.util.*
 
 @ObsoleteCoroutinesApi
 class RaceViewModel @ViewModelInject constructor(
@@ -36,35 +35,28 @@ class RaceViewModel @ViewModelInject constructor(
 
 
     init {
-        _showProgressLiveData.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                interactor
-                    .subscribeToUpdates()
-                    .collect { updatedRaceList ->
-                        _racesLiveData.postValue(updatedRaceList.map { it.toView() }
-                            .toMutableList())
-                        _showProgressLiveData.postValue(false)
-                    }
+                interactor.subscribeToUpdates()
             } catch (e: Exception) {
-                _showProgressLiveData.postValue(false)
                 Timber.e(e)
             }
         }
     }
 
-
     fun initUI() {
-        _showProgressLiveData.value = true
+        _showProgressLiveData.postValue(true)
         viewModelScope.launch(Dispatchers.IO) {
-            when (val result = interactor.getRaceList()) {
-                is TaskResult.Value -> {
-                    val raceViews = result.value.map { it.toView() }.toMutableList()
+            interactor
+                .getRaceList()
+                .catch { error ->
+                    handleError(error)
+                }
+                .collect {
+                    val raceViews = it.map { it.toView() }.toMutableList()
                     _racesLiveData.postValue(raceViews)
                     _showProgressLiveData.postValue(false)
                 }
-                is TaskResult.Error -> handleError(result.error)
-            }
         }
     }
 
@@ -92,12 +84,11 @@ class RaceViewModel @ViewModelInject constructor(
     }
 
     fun onSearchQueryChanged(query: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (query.isNotEmpty()) {
-                when (val result = interactor.getRaceList()) {
+                when (val result = interactor.getRaceList(query)) {
                     is TaskResult.Value -> {
-                        val pattern = ".*${query.isolateSpecialSymbolsForRegex().toLowerCase(Locale.getDefault())}.*".toRegex()
-                        val races = result.value.filter { pattern.containsMatchIn(it.name.toLowerCase(Locale.getDefault())) }
+                        val races = result.value
                         val raceViews = races.map { it.toView() }.toMutableList()
                         _racesLiveData.postValue(raceViews)
                     }

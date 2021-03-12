@@ -7,6 +7,7 @@ import com.gmail.maystruks08.data.local.entity.relation.RunnerWithResult
 import com.gmail.maystruks08.data.local.entity.tables.ResultTable
 import com.gmail.maystruks08.data.local.entity.tables.RunnerTable
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
@@ -29,6 +30,15 @@ interface RunnerDao : BaseDao<RunnerTable> {
 
 
     /** GET */
+
+    @Query("SELECT * FROM runners LEFT JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId")
+    fun getRunnerWithResultsFlow(distanceId: String): Flow<List<RunnerWithResult>>
+
+    @Query("SELECT * FROM runners LEFT JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId AND runners.runnerNumber LIKE :query")
+    fun getRunnerWithResultsQueryFlow(distanceId: String, query: String): Flow<List<RunnerWithResult>>
+
+    @Query("SELECT * FROM runners LEFT JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId AND runners.runnerNumber LIKE :query")
+    fun getRunnerWithResultsQuery(distanceId: String, query: String): List<RunnerWithResult>
 
     @Transaction
     @Query("SELECT * FROM runners WHERE runners.runnerNumber =:runnerNumber")

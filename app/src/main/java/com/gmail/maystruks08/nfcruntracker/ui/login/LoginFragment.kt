@@ -12,6 +12,7 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.setVisibility
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
+import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentLoginBinding
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,22 +21,13 @@ import javax.inject.Inject
 
 @ObsoleteCoroutinesApi
 @AndroidEntryPoint
-class LoginFragment : BaseFragment() {
+class LoginFragment : BaseFragment(R.layout.fragment_login) {
 
     private val viewModel: LoginViewModel by viewModels()
-    private lateinit var binding: FragmentLoginBinding
+    private val binding: FragmentLoginBinding by viewBinding()
 
     @Inject
     lateinit var googleSignInClient: GoogleSignInClient
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = FragmentLoginBinding.inflate(inflater, container, false).let {
-        binding = it
-        it.root
-    }
 
     override fun initToolbar() = FragmentToolbar.Builder().build()
 

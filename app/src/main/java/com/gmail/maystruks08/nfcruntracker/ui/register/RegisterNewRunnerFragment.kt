@@ -19,18 +19,19 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
+import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRegisterNewRunnerBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class RegisterNewRunnerFragment : BaseFragment() {
+class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_runner) {
 
     private val viewModel: RegisterNewRunnerViewModel by viewModels()
+    private val binding: FragmentRegisterNewRunnerBinding by viewBinding()
 
     private var raceId: String by argument()
     private var distanceId: String by argument()
 
-    private lateinit var binding: FragmentRegisterNewRunnerBinding
     private lateinit var adapter: RegisterRunnerAdapter
 
     private var teamName: String? = null
@@ -54,15 +55,6 @@ class RegisterNewRunnerFragment : BaseFragment() {
             })
         )
         .build()
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = FragmentRegisterNewRunnerBinding.inflate(inflater, container, false).let {
-        binding = it
-        it.root
-    }
 
     override fun bindViewModel() {
         viewModel.scannedCard.observe(viewLifecycleOwner, {

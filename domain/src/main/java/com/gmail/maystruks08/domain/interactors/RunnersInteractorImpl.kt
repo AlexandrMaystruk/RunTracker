@@ -8,24 +8,52 @@ import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 import javax.inject.Inject
 
 class RunnersInteractorImpl @Inject constructor(private val runnersRepository: RunnersRepository, private val logHelper: LogHelper) : RunnersInteractor {
 
     override suspend fun getRunner(runnerNumber: Long): TaskResult<Exception, Runner> =
-         TaskResult.build { runnersRepository.getRunnerByNumber(runnerNumber) ?: throw  RunnerNotFoundException()}
-
-    override suspend fun getRunners(distanceId: String, initSize: Int?): TaskResult<Exception, List<Runner>> =
         TaskResult.build {
-            runnersRepository.getRunners(distanceId = distanceId, initSize = initSize)
+            runnersRepository.getRunnerByNumber(runnerNumber) ?: throw  RunnerNotFoundException()
         }
 
-    override suspend fun getFinishers(distanceId: String): TaskResult<Exception, List<Runner>> =
-        TaskResult.build { runnersRepository.getRunners(distanceId, true)}/*.sortedBy { it.totalResult } }*/
+    override suspend fun getRunnersFlow(distanceId: String): Flow<List<Runner>> {
+        return runnersRepository.getRunnersFlow(distanceId = distanceId)
+    }
 
-    override suspend fun addStartCheckpointToRunners(date: Date): TaskResult<Exception, Unit>{
-       return TaskResult.build {
+    override suspend fun getRunners(
+        distanceId: String,
+        query: String
+    ): TaskResult<Exception, List<Runner>> {
+        return TaskResult.build {
+            runnersRepository.getRunners(distanceId = distanceId, query = query)
+        }
+    }
+
+    override suspend fun getFinishersFlow(distanceId: String): Flow<List<Runner>> {
+        return runnersRepository.getRunnersFlow(
+            distanceId = distanceId,
+            onlyFinishers = true
+        )/*.sortedBy { it.totalResult } }*/
+    }
+
+    override suspend fun getFinishers(
+        distanceId: String,
+        query: String
+    ): TaskResult<Exception, List<Runner>> {
+        return TaskResult.build {
+            runnersRepository.getRunners(
+                distanceId = distanceId,
+                query = query,
+                onlyFinishers = true
+            )
+        }
+    }
+
+    override suspend fun addStartCheckpointToRunners(date: Date): TaskResult<Exception, Unit> {
+        return TaskResult.build {
 //            val checkpoints = runnersRepository.getCheckpoints(RunnerType.NORMAL)
 //            logHelper.log(INFO, "Add start checkpoint to all runners at: ${date.toDateTimeShortFormat()}")
 //            mutableListOf<Runner>()

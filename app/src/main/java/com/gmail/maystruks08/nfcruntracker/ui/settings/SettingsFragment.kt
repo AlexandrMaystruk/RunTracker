@@ -1,9 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.ui.settings
 
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.viewModels
@@ -12,6 +9,7 @@ import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
+import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentSettingsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -19,21 +17,11 @@ import java.util.*
 
 @ObsoleteCoroutinesApi
 @AndroidEntryPoint
-class SettingsFragment : BaseFragment() {
+class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
 
     private val viewModel: SettingsViewModel by viewModels()
 
-    private lateinit var binding: FragmentSettingsBinding
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = FragmentSettingsBinding.inflate(inflater, container, false)
-        .let {
-            binding = it
-            return@let binding.root
-        }
+    private val binding: FragmentSettingsBinding by viewBinding()
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)

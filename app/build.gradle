@@ -72,6 +72,7 @@ dependencies {
     implementation presentationDependencies.lifecycleExtensions
     implementation presentationDependencies.lifecycleLivedata
     implementation presentationDependencies.lifecycleViewmodel
+    implementation presentationDependencies.lifecycleCommon
 
     implementation presentationDependencies.fragmentX
     implementation presentationDependencies.daggerHiltAndroid

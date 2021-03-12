@@ -1,9 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.ui.race
 
-import android.os.Bundle
 import android.text.InputType
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.gmail.maystruks08.nfcruntracker.R
@@ -11,6 +8,7 @@ import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.findFragmentByTag
 import com.gmail.maystruks08.nfcruntracker.core.ext.setVisibility
+import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRaceBinding
 import com.gmail.maystruks08.nfcruntracker.ui.race.create.CreateRaceBottomShitFragment
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RaceView
@@ -19,11 +17,12 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 
 @ObsoleteCoroutinesApi
 @AndroidEntryPoint
-class RaceFragment : BaseFragment(), RaceAdapter.Interaction {
+class RaceFragment : BaseFragment(R.layout.fragment_race), RaceAdapter.Interaction {
 
     private val viewModel: RaceViewModel by viewModels()
-
-    private lateinit var binding: FragmentRaceBinding
+    private val binding: FragmentRaceBinding by viewBinding {
+        raceRecyclerView.adapter = null
+    }
     private lateinit var adapter: RaceAdapter
 
     override fun initToolbar() = FragmentToolbar.Builder()
@@ -32,15 +31,6 @@ class RaceFragment : BaseFragment(), RaceAdapter.Interaction {
         .withMenuSearch(InputType.TYPE_CLASS_NUMBER) { viewModel.onSearchQueryChanged(it) }
         .withTitle(R.string.screen_race_list)
         .build()
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = FragmentRaceBinding.inflate(inflater, container, false).let {
-        binding = it
-        it.root
-    }
 
     override fun bindViewModel() {
         viewModel.races.observe(viewLifecycleOwner, {
@@ -84,11 +74,6 @@ class RaceFragment : BaseFragment(), RaceAdapter.Interaction {
     override fun onPause() {
         super.onPause()
         hideSoftKeyboard()
-    }
-
-    override fun onDestroyView() {
-        binding.raceRecyclerView.adapter = null
-        super.onDestroyView()
     }
 
     companion object {
