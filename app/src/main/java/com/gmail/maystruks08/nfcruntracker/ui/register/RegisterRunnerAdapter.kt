@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.domain.entities.runner.RunnerSex
-import com.gmail.maystruks08.domain.entities.runner.RunnerType
 import com.gmail.maystruks08.domain.toDateFormat
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.databinding.ItemRegisterNewRunnerBinding
@@ -24,7 +23,6 @@ data class InputDataView(
     var dateOfBirthday: Date? = Date(),
     var city: String? = null,
     var runnerNumber: Long? = null,
-    var runnerType: RunnerType? = null,
     var runnerCardId: String? = null
 ) {
     fun isEmpty(): Boolean = fullName.isNullOrEmpty() ||
@@ -32,7 +30,6 @@ data class InputDataView(
             runnerSex == null ||
             dateOfBirthday == null ||
             city.isNullOrEmpty() ||
-            runnerType == null ||
             runnerNumber == null
 }
 
@@ -125,12 +122,6 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
                     RunnerSex.FEMALE -> radioGroupSex.check(R.id.rbFemale)
                     else -> radioGroupSex.clearCheck()
                 }
-                when (item.runnerType) {
-                    RunnerType.NORMAL -> radioGroupRunnerType.check(R.id.rbRunner)
-                    RunnerType.IRON -> radioGroupRunnerType.check(R.id.rbIronRunner)
-                    else -> radioGroupRunnerType.clearCheck()
-                }
-
                 val focusChange = View.OnFocusChangeListener { _, hasFocus ->
                     if (hasFocus) onItemViewClick(adapterPosition)
                 }
@@ -164,15 +155,6 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
                         else -> null
                     }
                     runnerRegisterData[adapterPosition].runnerSex = runnerSex
-                }
-                radioGroupRunnerType.setOnCheckedChangeListener { _, checkedId ->
-                    onItemViewClick(adapterPosition)
-                    val runnerType = when (checkedId) {
-                        R.id.rbRunner -> RunnerType.NORMAL
-                        R.id.rbIronRunner -> RunnerType.IRON
-                        else -> null
-                    }
-                    runnerRegisterData[adapterPosition].runnerType = runnerType
                 }
                 rootItem.setOnClickListener { onItemViewClick(adapterPosition) }
             }

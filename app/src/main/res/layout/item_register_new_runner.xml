@@ -115,62 +115,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/radioGroupSex" />
 
-        <RadioGroup
-            android:id="@+id/radioGroupRunnerType"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_s"
-            android:gravity="center"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view2">
-
-            <RadioButton
-                android:id="@+id/rbRunner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_l"
-                android:layout_marginEnd="@dimen/margin_l"
-                android:layout_weight="1"
-                android:background="@drawable/custom_radio_button"
-                android:button="@android:color/transparent"
-                android:drawablePadding="@dimen/margin_xs"
-                android:gravity="center"
-                android:paddingTop="@dimen/margin_min"
-                android:paddingBottom="@dimen/margin_min"
-                android:text="@string/runner" />
-
-            <RadioButton
-                android:id="@+id/rbIronRunner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_l"
-                android:layout_marginEnd="@dimen/margin_l"
-                android:layout_weight="1"
-                android:background="@drawable/custom_radio_button"
-                android:button="@android:color/transparent"
-                android:gravity="center"
-                android:paddingTop="@dimen/margin_min"
-                android:paddingBottom="@dimen/margin_min"
-                android:text="@string/iron" />
-        </RadioGroup>
-
-
-        <View
-            android:id="@+id/view3"
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_marginStart="@dimen/margin_m"
-            android:layout_marginTop="@dimen/margin_s"
-            android:layout_marginEnd="@dimen/margin_m"
-            android:background="@color/colorPrimary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radioGroupRunnerType" />
-
-
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputLayoutCity"
             android:layout_width="0dp"
@@ -180,7 +124,7 @@
             android:layout_marginEnd="@dimen/margin_m"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view3">
+            app:layout_constraintTop_toBottomOf="@+id/view2">
 
             <EditText
                 android:id="@+id/etRunnerCity"
