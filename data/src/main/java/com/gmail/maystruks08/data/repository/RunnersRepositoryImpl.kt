@@ -13,6 +13,7 @@ import com.gmail.maystruks08.data.local.entity.relation.RunnerResultCrossRef
 import com.gmail.maystruks08.data.mappers.*
 import com.gmail.maystruks08.data.remote.Api
 import com.gmail.maystruks08.data.remote.FirestoreApi
+import com.gmail.maystruks08.domain.DEF_STRING_VALUE
 import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.TaskResult
@@ -109,7 +110,8 @@ class RunnersRepositoryImpl @Inject constructor(
         distanceId: String,
         onlyFinishers: Boolean
     ): Flow<List<Runner>> {
-        return runnerDao.getRunnerWithResultsFlow(distanceId).map { runnersWithResults ->
+        val actualDistanceId = if (distanceId == DEF_STRING_VALUE) distanceDAO.getFirstDistanceId() else distanceId
+        return runnerDao.getRunnerWithResultsFlow(actualDistanceId).map { runnersWithResults ->
             runnersWithResults.mapNotNull {
                 when {
                     !onlyFinishers -> {

@@ -13,13 +13,16 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 @Dao
 interface DistanceDAO : BaseDao<DistanceTable> {
 
-    @Query("SELECT * FROM distances WHERE raceId =:raceId")
+    @Query("SELECT * FROM distances WHERE raceId =:raceId ORDER BY name")
     fun getDistanceByRaceIdFlow(raceId: String): Flow<List<DistanceTable>>
 
     fun getDistanceDistinctUntilChanged(raceId: String) = getDistanceByRaceIdFlow(raceId).distinctUntilChanged()
 
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId")
     fun getDistanceById(distanceId: String): DistanceTable
+
+    @Query("SELECT distanceId FROM distances ORDER BY name LIMIT 1")
+    fun getFirstDistanceId(): String
 
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId AND raceId =:raceId")
     fun getDistanceByIdWithRunners(raceId: String, distanceId: String): DistanceWithRunners

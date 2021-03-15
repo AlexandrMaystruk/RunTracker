@@ -66,6 +66,6 @@ fun Race.toView(): RaceView {
     return RaceView(id, name, distanceList.firstOrNull()?.id)
 }
 
-fun Distance.toView(): DistanceView {
-    return DistanceView(id, name)
+fun Distance.toView(isSelected: Boolean = false): DistanceView {
+    return DistanceView(id, name, isSelected)
 }

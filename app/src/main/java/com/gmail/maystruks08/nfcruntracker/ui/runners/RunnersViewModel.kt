@@ -2,6 +2,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.runners
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
+import com.gmail.maystruks08.domain.DEF_STRING_VALUE
 import com.gmail.maystruks08.domain.entities.Change
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.TaskResult
@@ -69,7 +70,7 @@ class RunnersViewModel @ViewModelInject constructor(
     private val _closeCheckpointDialogLiveData = SingleLiveEvent<String>()
 
     private lateinit var raceId: String
-    private var distanceId: String = "-1"
+    private var distanceId: String = DEF_STRING_VALUE
 
     private var lastSelectedRunner: RunnerView? = null
 
@@ -83,7 +84,7 @@ class RunnersViewModel @ViewModelInject constructor(
 
     fun initFragment(raceId: String, distanceId: String?) {
         this.raceId = raceId
-        this.distanceId = distanceId ?: "-1"
+        this.distanceId = distanceId ?: DEF_STRING_VALUE
         viewModelScope.launch(Dispatchers.IO) { showAllDistances() }
         viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
         viewModelScope.launch(Dispatchers.IO) { showCurrentCheckpoint() }
@@ -254,7 +255,13 @@ class RunnersViewModel @ViewModelInject constructor(
                 handleError(error)
             }
             .collect { distanceList ->
-                val distanceViews = distanceList.map { it.toView() }.toMutableList()
+                val distanceViews = if (distanceId == DEF_STRING_VALUE) {
+                    distanceList.mapIndexed { index, distance ->
+                        distance.toView(index == 0)
+                    }
+                } else {
+                    distanceList.map { it.toView() }
+                }.toMutableList()
                 _distanceFlow.value = distanceViews
                 _showProgressLiveData.postValue(false)
             }
