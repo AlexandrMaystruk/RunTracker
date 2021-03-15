@@ -8,6 +8,8 @@ import java.util.*
 
 interface RunnersInteractor {
 
+    suspend fun observeRunnerDataFlow(currentRaceId: String)
+
     suspend fun getRunner(runnerNumber: Long): TaskResult<Exception, Runner>
 
     suspend fun getRunnersFlow(distanceId: String): Flow<List<Runner>>

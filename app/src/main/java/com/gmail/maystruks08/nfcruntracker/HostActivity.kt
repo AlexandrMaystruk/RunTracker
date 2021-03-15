@@ -26,6 +26,7 @@ import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
 import com.gmail.maystruks08.nfcruntracker.utils.NfcAdapter
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
@@ -36,6 +37,7 @@ import javax.inject.Inject
 
 const val PRESS_TWICE_INTERVAL = 2000
 
+@ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
 @AndroidEntryPoint
 class HostActivity : AppCompatActivity() {
@@ -73,9 +75,7 @@ class HostActivity : AppCompatActivity() {
         binding = ActivityHostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel.runnerChange.observe(this, {
-            getFragment<RunnersFragment>(Screens.RunnerScreen.tag())?.receiveRunnerUpdateFromServer(it)
-        })
+        viewModel.toast.observe(this, { toast(it) })
 
         networkUtil.subscribeToConnectionChange(this) { isConnected ->
             if (!isConnected) {

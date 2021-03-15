@@ -14,6 +14,10 @@ import javax.inject.Inject
 
 class RunnersInteractorImpl @Inject constructor(private val runnersRepository: RunnersRepository, private val logHelper: LogHelper) : RunnersInteractor {
 
+    override suspend fun observeRunnerDataFlow(currentRaceId: String) {
+        runnersRepository.observeRunnerData(currentRaceId)
+    }
+
     override suspend fun getRunner(runnerNumber: Long): TaskResult<Exception, Runner> =
         TaskResult.build {
             runnersRepository.getRunnerByNumber(runnerNumber) ?: throw  RunnerNotFoundException()

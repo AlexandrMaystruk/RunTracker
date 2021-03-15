@@ -14,7 +14,6 @@ import com.gmail.maystruks08.data.mappers.*
 import com.gmail.maystruks08.data.remote.Api
 import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.domain.NetworkUtil
-import com.gmail.maystruks08.domain.entities.Change
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
@@ -55,7 +54,6 @@ class RunnersRepositoryImpl @Inject constructor(
             updateRunner(runner)
         } catch (e: SQLiteException) {
             Timber.e(e, "Saving runner ${runner.number} ${runner.fullName} to room error")
-            e.printStackTrace()
             throw SaveRunnerDataException(runner.fullName)
         }
         if (networkUtil.isOnline()) {
@@ -69,6 +67,24 @@ class RunnersRepositoryImpl @Inject constructor(
             }
         }
         return runner
+    }
+
+    override suspend fun observeRunnerData(raceId: String) {
+        api
+            .subscribeToRunnerCollectionChange(raceId)
+            .collect { runnerChangeList ->
+                runnerChangeList.forEach {
+                    val runner = it.entity.fromFirestoreRunner()
+                    val canRewriteLocalCache = checkIsDataUploaded(runner.number)
+                    if (canRewriteLocalCache) {
+                        when (it.modifierType) {
+                            ModifierType.ADD -> insertRunner(runner)
+                            ModifierType.UPDATE -> updateRunner(runner)
+                            ModifierType.REMOVE -> deleteRunner(runner)
+                        }
+                    }
+                }
+            }
     }
 
     override suspend fun getRunners(
@@ -93,21 +109,19 @@ class RunnersRepositoryImpl @Inject constructor(
         distanceId: String,
         onlyFinishers: Boolean
     ): Flow<List<Runner>> {
-        return flowOf(runnersListHardcode)
-
-        /*       return runnerDao.getRunnerWithResultsFlow(distanceId).map { runnersWithResults ->
-                   runnersWithResults.mapNotNull {
-                       when {
-                           !onlyFinishers -> {
-                               it.runnerTable.toRunner()
-                           }
-                           onlyFinishers -> {
-                               if (it.results.isEmpty()) return@mapNotNull null else it.runnerTable.toRunner()
-                           }
-                           else -> return@mapNotNull null
-                       }
-                   }
-               }*/
+        return runnerDao.getRunnerWithResultsFlow(distanceId).map { runnersWithResults ->
+            runnersWithResults.mapNotNull {
+                when {
+                    !onlyFinishers -> {
+                        it.runnerTable.toRunner()
+                    }
+                    onlyFinishers -> {
+                        if (it.results.isEmpty()) return@mapNotNull null else it.runnerTable.toRunner()
+                    }
+                    else -> return@mapNotNull null
+                }
+            }
+        }
     }
 
     override suspend fun getRunnerByCardId(cardId: String): Runner? {
@@ -123,29 +137,6 @@ class RunnersRepositoryImpl @Inject constructor(
         teamName: String
     ): List<Runner>? {
         return null
-    }
-
-    override suspend fun observeRunnerData(): Flow<Change<Runner>> {
-        //TODO remove hardcode
-        val currentRaceId = "0"
-        return api
-            .subscribeToRunnerCollectionChange(currentRaceId)
-            .flatMapConcat { runnerChangeList ->
-                return@flatMapConcat channelFlow {
-                    runnerChangeList.forEach {
-                        val runner = it.entity.fromFirestoreRunner()
-                        val canRewriteLocalCache = checkIsDataUploaded(runner.number)
-                        if (canRewriteLocalCache) {
-                            when (it.modifierType) {
-                                ModifierType.ADD -> insertRunner(runner)
-                                ModifierType.UPDATE -> updateRunner(runner)
-                                ModifierType.REMOVE -> deleteRunner(runner)
-                            }
-                        }
-                        offer(Change(runner, it.modifierType))
-                    }
-                }
-            }
     }
 
     override suspend fun getLastSavedRaceId(): TaskResult<Exception, String> {
@@ -197,7 +188,6 @@ class RunnersRepositoryImpl @Inject constructor(
 
     val raceId = "0L"
     val distanceId = "0L"
-
     private val runnersListHardcode = listOf(
         Runner(
             1,

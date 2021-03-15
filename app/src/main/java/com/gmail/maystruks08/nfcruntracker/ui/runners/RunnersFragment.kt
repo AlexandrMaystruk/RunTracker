@@ -10,8 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.gmail.maystruks08.domain.entities.Change
-import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
@@ -174,12 +172,6 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
     override fun onItemSelected(distance: DistanceView) {
         binding.tvRunnersTitle.text = distance.name
         viewModel.changeDistance(distance.id)
-    }
-
-    fun receiveRunnerUpdateFromServer(runnerChange: Change<Runner>) {
-        if (isVisible) {
-            viewModel.handleRunnerChanges(runnerChange)
-        }
     }
 
     fun onNfcCardScanned(cardId: String) {

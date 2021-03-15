@@ -49,8 +49,8 @@ class RunnersViewModel @ViewModelInject constructor(
     private val startRunTrackerBus: StartRunTrackerBus
 ) : BaseViewModel() {
 
-    val distance get() = _distanceLiveData
-    val runners get() = _runnersLiveData
+    val distance get() = _distanceFlow
+    val runners get() = _runnersFlow
     val showSuccessDialog get() = _showSuccessDialogLiveData
     val showConfirmationDialog get() = _showAlertDialogLiveData
     val showProgress get() = _showProgressLiveData
@@ -59,8 +59,8 @@ class RunnersViewModel @ViewModelInject constructor(
     val closeSelectCheckpointDialog get() = _closeCheckpointDialogLiveData
 
 
-    private val _distanceLiveData = MutableStateFlow<MutableList<DistanceView>>(mutableListOf())
-    private val _runnersLiveData = MutableStateFlow<MutableList<RunnerView>>(mutableListOf())
+    private val _distanceFlow = MutableStateFlow<MutableList<DistanceView>>(mutableListOf())
+    private val _runnersFlow = MutableStateFlow<MutableList<RunnerView>>(mutableListOf())
     private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, Long>>()
     private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
     private val _showProgressLiveData = SingleLiveEvent<Boolean>()
@@ -68,8 +68,8 @@ class RunnersViewModel @ViewModelInject constructor(
     private val _selectCheckpointDialogLiveData = SingleLiveEvent<ArrayList<CheckpointView>>()
     private val _closeCheckpointDialogLiveData = SingleLiveEvent<String>()
 
-    private var raceId: String = "0"
-    private var distanceId: String = "0"
+    private lateinit var raceId: String
+    private var distanceId: String = "-1"
 
     private var lastSelectedRunner: RunnerView? = null
 
@@ -83,17 +83,18 @@ class RunnersViewModel @ViewModelInject constructor(
 
     fun initFragment(raceId: String, distanceId: String?) {
         this.raceId = raceId
-        this.distanceId = distanceId ?: "0"
+        this.distanceId = distanceId ?: "-1"
         viewModelScope.launch(Dispatchers.IO) { showAllDistances() }
         viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
         viewModelScope.launch(Dispatchers.IO) { showCurrentCheckpoint() }
+        viewModelScope.launch(Dispatchers.IO) { observeRunnerChanges() }
         viewModelScope.launch(Dispatchers.IO) { observeDistanceChanges() }
     }
 
     fun changeDistance(distanceId: String) {
         this.distanceId = distanceId
-        val updatedDistance = ArrayList(_distanceLiveData.value.map { DistanceView(it.id, it.name, it.id == distanceId) })
-        _distanceLiveData.value = updatedDistance
+        val updatedDistance = ArrayList(_distanceFlow.value.map { DistanceView(it.id, it.name, it.id == distanceId) })
+        _distanceFlow.value = updatedDistance
         viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
         viewModelScope.launch(Dispatchers.IO) { showCurrentCheckpoint() }
     }
@@ -141,22 +142,6 @@ class RunnersViewModel @ViewModelInject constructor(
         }
     }
 
-    fun handleRunnerChanges(runnerChange: Change<Runner>) {
-        val runnerView = runnerChange.entity.toRunnerView()
-        if (distanceId == runnerChange.entity.actualDistanceId) {
-            val runners = ArrayList(_runnersLiveData.value)
-            when (runnerChange.modifierType) {
-                ModifierType.ADD, ModifierType.UPDATE -> {
-                    runners.updateElement(runnerView, { it.number == runnerView.number })
-                }
-                ModifierType.REMOVE -> {
-                    runners.removeAll { it.number == runnerView.number }
-                }
-            }
-            _runnersLiveData.value = runners
-        }
-    }
-
     fun onSearchQueryChanged(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
             if (query.isNotEmpty()) {
@@ -170,12 +155,12 @@ class RunnersViewModel @ViewModelInject constructor(
                             )
                         }
                         val runnerViews = runners.map { it.toRunnerView() }.toMutableList()
-                        _runnersLiveData.value = runnerViews
+                        _runnersFlow.value = runnerViews
                     }
                     is TaskResult.Error -> handleError(result.error)
                 }
             } else {
-                Timber.w("showAllRunners  onSearchQueryChanged")
+                Timber.v("showAllRunners  onSearchQueryChanged")
                 showAllRunners()
             }
         }
@@ -238,6 +223,30 @@ class RunnersViewModel @ViewModelInject constructor(
         }
     }
 
+    private suspend fun observeRunnerChanges() {
+        try {
+            runnersInteractor.observeRunnerDataFlow(raceId)
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+    }
+
+    private fun handleRunnerChanges(runnerChange: Change<Runner>) {
+        val runnerView = runnerChange.entity.toRunnerView()
+        if (distanceId == runnerChange.entity.actualDistanceId) {
+            val runners = ArrayList(_runnersFlow.value)
+            when (runnerChange.modifierType) {
+                ModifierType.ADD, ModifierType.UPDATE -> {
+                    runners.updateElement(runnerView, { it.number == runnerView.number })
+                }
+                ModifierType.REMOVE -> {
+                    runners.removeAll { it.number == runnerView.number }
+                }
+            }
+            _runnersFlow.value = runners
+        }
+    }
+
     private suspend fun showAllDistances() {
         _showProgressLiveData.postValue(true)
         distanceInteractor.getDistancesFlow(raceId)
@@ -246,7 +255,7 @@ class RunnersViewModel @ViewModelInject constructor(
             }
             .collect { distanceList ->
                 val distanceViews = distanceList.map { it.toView() }.toMutableList()
-                _distanceLiveData.value = distanceViews
+                _distanceFlow.value = distanceViews
                 _showProgressLiveData.postValue(false)
             }
     }
@@ -273,7 +282,7 @@ class RunnersViewModel @ViewModelInject constructor(
             .collect {
                 Timber.w("showAllRunners")
                 val runners = toRunnerViews(it)
-                _runnersLiveData.value = runners
+                _runnersFlow.value = runners
             }
         _showProgressLiveData.postValue(false)
     }
