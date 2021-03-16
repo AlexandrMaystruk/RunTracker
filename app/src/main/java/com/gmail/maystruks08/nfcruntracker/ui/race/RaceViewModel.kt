@@ -12,6 +12,7 @@ import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RaceView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 
+@ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
 class RaceViewModel @ViewModelInject constructor(
     private val router: Router,
@@ -66,16 +68,18 @@ class RaceViewModel @ViewModelInject constructor(
 
     fun onRaceClicked(raceView: RaceView) {
         viewModelScope.launch {
-            when (interactor.saveLastSelectedRaceId(raceView.id)) {
+            when (interactor.saveLastSelectedRace(raceView.id, raceView.name)) {
                 is TaskResult.Value -> router.navigateTo(
                     Screens.RunnersScreen(
                         raceView.id,
+                        raceView.name,
                         raceView.firstDistanceId
                     )
                 )
                 is TaskResult.Error -> router.navigateTo(
                     Screens.RunnersScreen(
                         raceView.id,
+                        raceView.name,
                         raceView.firstDistanceId
                     )
                 )

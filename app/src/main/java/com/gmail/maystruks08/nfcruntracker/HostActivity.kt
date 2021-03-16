@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.gmail.maystruks08.domain.NetworkUtil
@@ -20,6 +22,7 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.core.navigation.AppNavigator
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.databinding.ActivityHostBinding
+import com.gmail.maystruks08.nfcruntracker.ui.login.LoginFragment
 import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
@@ -62,8 +65,13 @@ class HostActivity : AppCompatActivity() {
 
     private var toast: Toast? = null
 
+    private var isFirstLaunch = true
+
+    private var isCorrectFragment = false
+
     private val navigator: Navigator = object : AppNavigator(this, supportFragmentManager, R.id.nav_host_container) {
         override fun setupFragmentTransaction(command: Command?, currentFragment: Fragment?, nextFragment: Fragment?, fragmentTransaction: FragmentTransaction) {
+            isCorrectFragment = nextFragment !is LoginFragment
             fragmentTransaction.setReorderingAllowed(true)
         }
     }
@@ -94,6 +102,7 @@ class HostActivity : AppCompatActivity() {
                 snackBar?.dismiss()
             }
         }
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE)
     }
 
     override fun onBackPressed() {
@@ -128,7 +137,7 @@ class HostActivity : AppCompatActivity() {
         super.onResume()
         navigatorHolder.setNavigator(navigator)
         nfcAdapter.startListening(this)
-        if (!nfcAdapter.isEnabled()) {
+        if (!nfcAdapter.isEnabled() && isFirstLaunch && isCorrectFragment) {
             val builder = AlertDialog.Builder(this)
                 .setTitle(getString(R.string.nfc_disabled))
                 .setMessage(getString(R.string.is_enable_nfc))
@@ -143,6 +152,7 @@ class HostActivity : AppCompatActivity() {
                 }
             alertDialog = builder.show()
         } else alertDialog?.dismiss()
+        isFirstLaunch = false
     }
 
     @ObsoleteCoroutinesApi
@@ -172,5 +182,11 @@ class HostActivity : AppCompatActivity() {
         snackBar?.dismiss()
         snackBar = null
         super.onStop()
+    }
+
+    companion object{
+
+        private const val CAMERA_REQUEST_CODE = 1111
+
     }
 }

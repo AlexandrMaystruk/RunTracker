@@ -4,6 +4,6 @@ import com.gmail.maystruks08.domain.entities.TaskResult
 
 interface RunnerDataChangeListener {
 
-    suspend fun getLastSavedRaceId(): TaskResult<Exception, String>
+    suspend fun getLastSavedRace(): TaskResult<Exception, Pair<String, String>>
 
 }

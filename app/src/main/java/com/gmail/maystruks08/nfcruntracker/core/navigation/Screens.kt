@@ -3,6 +3,7 @@ package com.gmail.maystruks08.nfcruntracker.core.navigation
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.ui.checkpoint_editor.CheckpointEditorFragment
 import com.gmail.maystruks08.nfcruntracker.ui.login.LoginFragment
+import com.gmail.maystruks08.nfcruntracker.ui.qr_code.ScanCodeFragment
 import com.gmail.maystruks08.nfcruntracker.ui.race.RaceFragment
 import com.gmail.maystruks08.nfcruntracker.ui.race.create.CreateRaceBottomShitFragment
 import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
@@ -13,6 +14,7 @@ import com.gmail.maystruks08.nfcruntracker.ui.settings.SettingsFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
 object Screens {
 
@@ -35,9 +37,13 @@ object Screens {
     }
 
     @ExperimentalCoroutinesApi
-    class RunnersScreen(private val raceId: String, private val firstDistanceId: String?) : AppScreen() {
+    class RunnersScreen(
+        private val raceId: String,
+        private val raceName: String,
+        private val firstDistanceId: String?
+    ) : AppScreen() {
 
-        override fun getFragment() = RunnersFragment.getInstance(raceId, firstDistanceId)
+        override fun getFragment() = RunnersFragment.getInstance(raceId, raceName, firstDistanceId)
 
         companion object {
             fun tag() = RunnersFragment.name()
@@ -56,7 +62,7 @@ object Screens {
         override fun getFragment() = RunnerResultFragment()
 
         companion object {
-            fun tag() = RunnersResultsScreen.name()
+            fun tag() = RunnerResultFragment::class.java.simpleName
         }
     }
 
@@ -65,7 +71,7 @@ object Screens {
         override fun getFragment() = CheckpointEditorFragment.getInstance()
 
         companion object {
-            fun tag() = CheckpointEditorScreen.name()
+            fun tag() = CheckpointEditorFragment.name()
         }
     }
 
@@ -73,7 +79,7 @@ object Screens {
         override fun getFragment() = SettingsFragment()
 
         companion object {
-            fun tag() = SettingsScreen.name()
+            fun tag() = SettingsFragment::class.java.simpleName
         }
     }
 
@@ -81,15 +87,24 @@ object Screens {
         override fun getFragment() = LoginFragment.getInstance()
 
         companion object {
-            fun tag() = LoginScreen.name()
+            fun tag() = LoginFragment.name()
         }
     }
 
-    class RegisterNewRunnerScreen(private val raceId: String, private val distanceId: String) : AppScreen() {
+    class RegisterNewRunnerScreen(private val raceId: String, private val distanceId: String) :
+        AppScreen() {
         override fun getFragment() = RegisterNewRunnerFragment.getInstance(raceId, distanceId)
 
         companion object {
-            fun tag() = RegisterNewRunnerScreen.name()
+            fun tag() = RegisterNewRunnerFragment.name()
+        }
+    }
+
+    class ScanCodeScreen(private val callback: (scannedCode: String) -> Unit) : AppScreen() {
+        override fun getFragment() = ScanCodeFragment.getInstance(callback)
+
+        companion object {
+            fun tag() = ScanCodeFragment.name()
         }
     }
 }

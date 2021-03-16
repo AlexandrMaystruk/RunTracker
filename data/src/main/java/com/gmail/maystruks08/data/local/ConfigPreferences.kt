@@ -17,6 +17,7 @@ class ConfigPreferences @Inject constructor(context: Context) {
         private const val DATE_OF_START = "DATE_OF_START"
 
         private const val CURRENT_RACE_ID = "CURRENT_RACE_ID"
+        private const val CURRENT_RACE_NAME = "CURRENT_RACE_NAME"
 
 
         private const val ADMIN_USER_IDS = "ADMIN_USER_IDS"
@@ -76,8 +77,19 @@ class ConfigPreferences @Inject constructor(context: Context) {
         }
     }
 
+    fun saveRaceName(raceName: String) {
+        sp.edit().apply {
+            putString(CURRENT_RACE_NAME, raceName)
+            apply()
+        }
+    }
+
     fun getRaceId(): String {
         return sp.getString(CURRENT_RACE_ID, null) ?: "-1"
+    }
+
+    fun getRaceName(): String {
+        return sp.getString(CURRENT_RACE_NAME, null) ?: "-1"
     }
 
 }

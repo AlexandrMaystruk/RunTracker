@@ -14,12 +14,15 @@ class ToolbarManager constructor(private var builder: FragmentToolbar, private v
     fun prepareToolbar() {
         if (builder.resId != FragmentToolbar.NO_TOOLBAR) {
             fragmentToolbar = container.findViewById(builder.resId) as Toolbar
-
-            if (builder.title != -1) {
-                fragmentToolbar?.setTitle(builder.title)
-                fragmentToolbar?.setTitleTextColor(ContextCompat.getColor(container.context, R.color.colorAccent))
+            if (builder.title != -1 || builder.titleText != null) {
+                if(builder.title != -1){
+                    fragmentToolbar?.setTitle(builder.title)
+                    fragmentToolbar?.setTitleTextColor(ContextCompat.getColor(container.context, R.color.colorAccent))
+                } else if( builder.titleText != null){
+                    fragmentToolbar?.title = builder.titleText
+                    fragmentToolbar?.setTitleTextColor(ContextCompat.getColor(container.context, R.color.colorAccent))
+                }
             }
-
             if(builder.navigationIcon != -1){
                 fragmentToolbar?.setNavigationIcon(builder.navigationIcon)
                 builder.navigationIconClickListener?.let { listener ->

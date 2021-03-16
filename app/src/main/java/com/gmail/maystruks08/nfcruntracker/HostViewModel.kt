@@ -27,9 +27,13 @@ class HostViewModel @ViewModelInject constructor(
         if (firebaseAuth.currentUser == null) router.newRootScreen(Screens.LoginScreen())
         else {
             viewModelScope.launch {
-                when (val result = runnerDataChangeListener.getLastSavedRaceId()) {
+                when (val result = runnerDataChangeListener.getLastSavedRace()) {
                     is TaskResult.Value -> router.newRootScreen(
-                        Screens.RunnersScreen(result.value, null)
+                        Screens.RunnersScreen(
+                            raceId = result.value.first,
+                            raceName = result.value.second,
+                            firstDistanceId = null
+                        )
                     )
                     is TaskResult.Error -> router.newRootScreen(Screens.RaceListScreen())
                 }

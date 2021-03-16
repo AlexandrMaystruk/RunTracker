@@ -25,15 +25,15 @@ class RaceInteractorImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveLastSelectedRaceId(raceId: String): TaskResult<Exception, Unit> {
+    override suspend fun saveLastSelectedRace(raceId: String, raceName: String): TaskResult<Exception, Unit> {
         return TaskResult.build {
-            return@build repository.saveLastSelectedRaceId(raceId)
+            return@build repository.saveLastSelectedRaceId(raceId, raceName)
         }
     }
 
-    override suspend fun getLastSelectedRaceId(): TaskResult<Exception, String> {
+    override suspend fun getLastSelectedRace(): TaskResult<Exception, Pair<String, String>> {
         return TaskResult.build {
-            return@build repository.getLastSelectedRaceId()
+            return@build repository.getLastSelectedRace()
         }
     }
 }

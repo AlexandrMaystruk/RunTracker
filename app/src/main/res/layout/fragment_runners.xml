@@ -101,15 +101,12 @@
         app:layout_constraintRight_toRightOf="@id/view_card"
         app:layout_constraintTop_toBottomOf="@+id/tvCurrentCheckpoint" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnRegisterNewRunner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_m"
-        android:contentDescription="@string/cd_distance_image"
-        android:elevation="@dimen/margin_m"
-        android:src="@drawable/ic_add"
+    <include
+        android:id="@+id/circleMenu"
+        layout="@layout/circle_menu_layout"
+        android:elevation="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/rvRunners" />
+
 
 </androidx.constraintlayout.motion.widget.MotionLayout>

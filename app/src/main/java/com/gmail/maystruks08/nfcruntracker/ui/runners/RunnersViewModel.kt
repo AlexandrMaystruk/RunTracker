@@ -58,6 +58,7 @@ class RunnersViewModel @ViewModelInject constructor(
     val showTime get() = _showTimeLiveData
     val showSelectCheckpointDialog get() = _selectCheckpointDialogLiveData
     val closeSelectCheckpointDialog get() = _closeCheckpointDialogLiveData
+    val showRunnersTitle get() = _showRunnersTitleFlow
 
 
     private val _distanceFlow = MutableStateFlow<MutableList<DistanceView>>(mutableListOf())
@@ -68,6 +69,8 @@ class RunnersViewModel @ViewModelInject constructor(
     private val _showTimeLiveData = SingleLiveEvent<String>()
     private val _selectCheckpointDialogLiveData = SingleLiveEvent<ArrayList<CheckpointView>>()
     private val _closeCheckpointDialogLiveData = SingleLiveEvent<String>()
+    private val _showRunnersTitleFlow = MutableStateFlow("")
+
 
     private lateinit var raceId: String
     private var distanceId: String = DEF_STRING_VALUE
@@ -94,7 +97,11 @@ class RunnersViewModel @ViewModelInject constructor(
 
     fun changeDistance(distanceId: String) {
         this.distanceId = distanceId
-        val updatedDistance = ArrayList(_distanceFlow.value.map { DistanceView(it.id, it.name, it.id == distanceId) })
+        val updatedDistance = ArrayList(_distanceFlow.value.map {
+            val isSelected = it.id == distanceId
+            if (isSelected) _showRunnersTitleFlow.value = it.name
+            DistanceView(it.id, it.name, isSelected)
+        })
         _distanceFlow.value = updatedDistance
         viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
         viewModelScope.launch(Dispatchers.IO) { showCurrentCheckpoint() }
@@ -175,6 +182,13 @@ class RunnersViewModel @ViewModelInject constructor(
         router.navigateTo(Screens.RegisterNewRunnerScreen(raceId, distanceId))
     }
 
+    fun onScanQRCodeClicked() {
+        router.navigateTo(Screens.ScanCodeScreen { scannedCode ->
+            handleScannedQrCode(scannedCode)
+            router.exit()
+        })
+    }
+
     fun onClickedAtRunner(runnerNumber: Long, distanceId: String) {
         router.navigateTo(Screens.RunnerScreen(runnerNumber, distanceId))
     }
@@ -232,6 +246,17 @@ class RunnersViewModel @ViewModelInject constructor(
         }
     }
 
+    private fun handleScannedQrCode(code: String) {
+        Timber.d("QR CODE: $code")
+        val runnerNumber = code.toLongOrNull() ?: -1L
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(runnerNumber)) {
+                is TaskResult.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
+                is TaskResult.Error -> handleError(onResult.error)
+            }
+        }
+    }
+
     private fun handleRunnerChanges(runnerChange: Change<Runner>) {
         val runnerView = runnerChange.entity.toRunnerView()
         if (distanceId == runnerChange.entity.actualDistanceId) {
@@ -257,7 +282,9 @@ class RunnersViewModel @ViewModelInject constructor(
             .collect { distanceList ->
                 val distanceViews = if (distanceId == DEF_STRING_VALUE) {
                     distanceList.mapIndexed { index, distance ->
-                        distance.toView(index == 0)
+                        val isSelected = index == 0
+                        if (isSelected) _showRunnersTitleFlow.value = distance.name
+                        distance.toView(isSelected)
                     }
                 } else {
                     distanceList.map { it.toView() }

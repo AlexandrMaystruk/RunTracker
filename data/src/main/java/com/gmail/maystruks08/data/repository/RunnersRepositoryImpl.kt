@@ -141,13 +141,14 @@ class RunnersRepositoryImpl @Inject constructor(
         return null
     }
 
-    override suspend fun getLastSavedRaceId(): TaskResult<Exception, String> {
+    override suspend fun getLastSavedRace(): TaskResult<Exception, Pair<String, String>> {
         return TaskResult.build {
             val lastSelectedRaceId = configPreferences.getRaceId()
+            val lastSelectedRaceName = configPreferences.getRaceName()
             if (lastSelectedRaceId == "-1") {
                 throw Exception("First start. Race not selected yet")
             } else {
-                lastSelectedRaceId
+                lastSelectedRaceId to lastSelectedRaceName
             }
         }
     }

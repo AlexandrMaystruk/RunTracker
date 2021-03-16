@@ -12,10 +12,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 
+@ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
 class LoginViewModel @ViewModelInject constructor(
     private val router: Router,
@@ -115,8 +117,9 @@ class LoginViewModel @ViewModelInject constructor(
 
     private fun navigateToFragment() {
         val raceId = configPreferences.getRaceId()
+        val raceName = configPreferences.getRaceId()
         if (raceId != "-1") {
-            router.newRootScreen(Screens.RunnersScreen(raceId, null))
+            router.newRootScreen(Screens.RunnersScreen(raceId, raceName, null))
         } else {
             router.newRootScreen(Screens.RaceListScreen())
         }

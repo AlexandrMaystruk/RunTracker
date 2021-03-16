@@ -8,6 +8,8 @@
     <string name="screen_register_new_runner">Регистрация участника</string>
     <string name="screen_runners_results">Результаты</string>
     <string name="screen_runner">Информация об участнике</string>
+    <string name="screen_scan_qr_code">Сканировать QR код</string>
+    <string name="screen_race_list">Забеги</string>
 
     <string name="tab_runner_result">Бегуны</string>
     <string name="tab_iron_runner_result">Железные</string>

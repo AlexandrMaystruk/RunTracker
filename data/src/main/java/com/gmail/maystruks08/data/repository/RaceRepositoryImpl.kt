@@ -69,11 +69,12 @@ class RaceRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveLastSelectedRaceId(raceId: String) {
+    override suspend fun saveLastSelectedRaceId(raceId: String, raceName: String) {
         configPreferences.saveRaceId(raceId)
+        configPreferences.saveRaceName(raceName)
     }
 
-    override suspend fun getLastSelectedRaceId(): String {
-        return configPreferences.getRaceId()
+    override suspend fun getLastSelectedRace(): Pair<String, String> {
+        return configPreferences.getRaceId() to configPreferences.getRaceName()
     }
 }

@@ -208,6 +208,9 @@ ext {
     testingSupportLibVersion = '1.3.0'
 
     fragmentXVersion = "1.2.5"
+
+    qrCodeScannerVersion = '2.1.0'
+
     presentationDependencies = [
             kotlinKtx                : "androidx.core:core-ktx:${androidCoreKTXVersion}",
             kotlin                   : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin_version}",
@@ -244,7 +247,9 @@ ext {
 
             numberPicker             : "com.shawnlin:number-picker:${numberPickerVersion}",
 
-            timber                   : "com.jakewharton.timber:timber:${timberVersion}"
+            timber                   : "com.jakewharton.timber:timber:${timberVersion}",
+
+            qrCodeScanner            : "com.budiyev.android:code-scanner:${qrCodeScannerVersion}"
     ]
 
     presentationTestDependencies = [

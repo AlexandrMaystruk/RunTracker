@@ -44,18 +44,22 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
         runnerAdapter.interaction = null
         rvRunners.adapter = null
         rvDistanceType.adapter = null
+        circleMenuLayoutManager = null
     }
     private lateinit var runnerAdapter: RunnerListAdapter
     private lateinit var distanceAdapter: DistanceListAdapter
+    private var circleMenuLayoutManager: CircleMenuManager? = null
+
 
     private var alertDialog: AlertDialog? = null
 
     private var raceId: String by argument()
+    private var raceName: String by argument()
     private var distanceId: String? by argumentNullable()
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
-        .withTitle(R.string.app_name)
+        .withTitle(raceName)
         .withMenu(R.menu.menu_search_with_settings)
         .withMenuItems(
             listOf(R.id.action_settings, R.id.action_result, R.id.action_select_race),
@@ -86,6 +90,12 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
             lifecycleScope.launchWhenStarted {
                 runners.collect{
                     runnerAdapter.submitList(it)
+                }
+            }
+
+            lifecycleScope.launchWhenStarted {
+                showRunnersTitle.collect{
+                    binding.tvRunnersTitle.text = it
                 }
             }
 
@@ -144,8 +154,14 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
                 adapter = distanceAdapter
             }
             viewModel.initFragment(raceId, distanceId)
-            btnRegisterNewRunner.setOnClickListener { viewModel.onRegisterNewRunnerClicked() }
+
             tvCurrentCheckpoint.setOnClickListener { viewModel.onCurrentCheckpointTextClicked() }
+            circleMenuLayoutManager = CircleMenuManager(binding.circleMenu) {
+                when (it) {
+                    CircleMenuEvent.CLICKED_REGISTER_NEW_RUNNER -> viewModel.onRegisterNewRunnerClicked()
+                    CircleMenuEvent.CLICKED_SCAN_QR_CODE -> viewModel.onScanQRCodeClicked()
+                }
+            }
         }
         setUpItemTouchHelper()
     }
@@ -170,7 +186,6 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
     }
 
     override fun onItemSelected(distance: DistanceView) {
-        binding.tvRunnersTitle.text = distance.name
         viewModel.changeDistance(distance.id)
     }
 
@@ -227,8 +242,9 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
 
     companion object {
 
-        fun getInstance(raceId: String, distanceId: String?) = RunnersFragment().apply {
+        fun getInstance(raceId: String, raceName: String,  distanceId: String?) = RunnersFragment().apply {
             this.raceId = raceId
+            this.raceName = raceName
             this.distanceId = distanceId
         }
     }

@@ -12,8 +12,8 @@ interface RaceInteractor {
 
     suspend fun getRaceList(query: String): TaskResult<Exception, List<Race>>
 
-    suspend fun saveLastSelectedRaceId(raceId: String): TaskResult<Exception, Unit>
+    suspend fun saveLastSelectedRace(raceId: String, raceName: String): TaskResult<Exception, Unit>
 
-    suspend fun getLastSelectedRaceId(): TaskResult<Exception, String>
+    suspend fun getLastSelectedRace(): TaskResult<Exception, Pair<String, String>>
 
 }

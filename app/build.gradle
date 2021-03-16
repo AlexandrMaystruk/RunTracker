@@ -91,6 +91,7 @@ dependencies {
     implementation presentationDependencies.cardView
     implementation presentationDependencies.recyclerView
     implementation presentationDependencies.constraintLayout
+    implementation presentationDependencies.qrCodeScanner
 
     debugImplementation presentationDependencies.leakcanary
 
