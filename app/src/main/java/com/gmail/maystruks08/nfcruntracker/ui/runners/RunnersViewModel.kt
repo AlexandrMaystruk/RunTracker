@@ -85,9 +85,12 @@ class RunnersViewModel @ViewModelInject constructor(
         }
     }
 
-    fun initFragment(raceId: String, distanceId: String?) {
+    fun init(raceId: String, distanceId: String?) {
         this.raceId = raceId
         this.distanceId = distanceId ?: DEF_STRING_VALUE
+    }
+
+    fun renderUI(){
         viewModelScope.launch(Dispatchers.IO) { showAllDistances() }
         viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
         viewModelScope.launch(Dispatchers.IO) { showCurrentCheckpoint() }
@@ -287,7 +290,7 @@ class RunnersViewModel @ViewModelInject constructor(
                         distance.toView(isSelected)
                     }
                 } else {
-                    distanceList.map { it.toView() }
+                    distanceList.map { it.toView(distanceId == it.id) }
                 }.toMutableList()
                 _distanceFlow.value = distanceViews
                 _showProgressLiveData.postValue(false)

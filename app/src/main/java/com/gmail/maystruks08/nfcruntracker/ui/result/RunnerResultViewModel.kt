@@ -2,6 +2,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.result
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
+import com.gmail.maystruks08.domain.DEF_STRING_VALUE
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
@@ -31,7 +32,7 @@ class RunnerResultViewModel @ViewModelInject constructor(
     private val _runnerResultsStateFlow = MutableStateFlow<List<RunnerResultView>>(mutableListOf())
     private val _errorStateFlow = MutableStateFlow<Throwable?>(null)
 
-    private var distanceId: String = "-1"
+    private var distanceId: String = DEF_STRING_VALUE
 
     fun provideFinishers(distanceId: String) {
         this.distanceId = distanceId

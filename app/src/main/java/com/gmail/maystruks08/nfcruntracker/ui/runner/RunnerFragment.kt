@@ -5,7 +5,6 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
@@ -28,7 +27,6 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner), CheckpointsAdapte
 
     private var alertDialog: AlertDialog? = null
     private var runnerNumber: Long by argument()
-    private var distanceId: String by argument()
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
@@ -48,7 +46,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner), CheckpointsAdapte
         .build()
 
     override fun bindViewModel() {
-        viewModel.onShowRunnerClicked(distanceId, runnerNumber)
+        viewModel.onShowRunnerClicked(runnerNumber)
 
         viewModel.runner.observe(viewLifecycleOwner, { runner ->
             with(binding) {
@@ -181,7 +179,6 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner), CheckpointsAdapte
 
         fun getInstance(runnerNumber: Long, distanceId: String) = RunnerFragment().apply {
             this.runnerNumber = runnerNumber
-            this.distanceId = distanceId
         }
     }
 }

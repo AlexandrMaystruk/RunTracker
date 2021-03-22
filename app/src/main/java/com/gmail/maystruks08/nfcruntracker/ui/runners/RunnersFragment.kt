@@ -1,6 +1,7 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runners
 
 import android.content.Context
+import android.os.Bundle
 import android.text.InputType
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
@@ -41,7 +42,6 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
     private val viewModel: RunnersViewModel by viewModels()
 
     private val binding: FragmentRunnersBinding by viewBinding {
-        runnerAdapter.interaction = null
         rvRunners.adapter = null
         rvDistanceType.adapter = null
         circleMenuLayoutManager = null
@@ -78,6 +78,13 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
             viewModel.onSearchQueryChanged(it)
         }
         .build()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.init(raceId, distanceId)
+        runnerAdapter = RunnerListAdapter(this)
+        distanceAdapter = DistanceListAdapter(this)
+    }
 
     override fun bindViewModel() {
         with(viewModel) {
@@ -142,16 +149,15 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
     override fun initViews() {
         with(binding) {
             rvRunners.apply {
-                runnerAdapter = RunnerListAdapter(this@RunnersFragment)
                 addItemDecoration(DividerVerticalItemDecoration(resources.getDimensionPixelSize(R.dimen.margin_s)))
                 adapter = runnerAdapter
             }
             rvDistanceType.apply {
-                distanceAdapter = DistanceListAdapter(this@RunnersFragment)
                 addItemDecoration(DividerItemDecoration(resources.getDimensionPixelSize(R.dimen.margin_s)))
                 adapter = distanceAdapter
             }
-            viewModel.initFragment(raceId, distanceId)
+
+            viewModel.renderUI()
 
             tvCurrentCheckpoint.setOnClickListener { viewModel.onCurrentCheckpointTextClicked() }
             circleMenuLayoutManager = CircleMenuManager(binding.circleMenu) {
@@ -236,6 +242,12 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
     override fun onStop() {
         super.onStop()
         hideSoftKeyboard(inputManager)
+    }
+
+    override fun onDestroy() {
+        distanceAdapter.interaction = null
+        runnerAdapter.interaction = null
+        super.onDestroy()
     }
 
     companion object {

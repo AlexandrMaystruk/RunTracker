@@ -16,6 +16,7 @@ import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
+import timber.log.Timber
 
 sealed class AlertType(val position: Int)
 class AlertTypeConfirmOfftrack(position: Int): AlertType(position)
@@ -36,8 +37,8 @@ class RunnerViewModel @ViewModelInject constructor(
     private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, Long>>()
     private val _linkCardModeEnableLiveData = SingleLiveEvent<Boolean>()
 
-    fun onShowRunnerClicked(distanceId: String, runnerNumber: Long) {
-        viewModelScope.launch {
+    fun onShowRunnerClicked(runnerNumber: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
             when (val onResult = runnersInteractor.getRunner(runnerNumber)) {
                 is TaskResult.Value -> handleRunnerData(onResult.value)
                 is TaskResult.Error -> handleError(onResult.error)
@@ -125,7 +126,7 @@ class RunnerViewModel @ViewModelInject constructor(
     }
 
     private fun handleError(e: Exception) {
-        e.printStackTrace()
+        Timber.e(e)
         when (e) {
             is RunnerNotFoundException -> toastLiveData.postValue("Участник не найден =(")
             is SaveRunnerDataException -> toastLiveData.postValue("Ошибка сохранения данных участника =(")

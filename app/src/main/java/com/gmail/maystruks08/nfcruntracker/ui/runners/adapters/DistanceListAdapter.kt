@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.DistanceView
 
-class DistanceListAdapter(private val interaction: Interaction) :
+class DistanceListAdapter(var interaction: Interaction? = null) :
     ListAdapter<DistanceView, DistanceViewHolder>(DistanceDiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DistanceViewHolder {
