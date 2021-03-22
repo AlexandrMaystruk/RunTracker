@@ -57,8 +57,8 @@ data class Runner(
         }
     }
 
-    fun removeCheckpoint(checkpointId: Long) {
-        val actualCheckpoints = checkpoints[actualDistanceId]?: mutableListOf<Checkpoint>()
+    fun removeCheckpoint(checkpointId: String) {
+        val actualCheckpoints = checkpoints[actualDistanceId] ?: mutableListOf<Checkpoint>()
         val index = actualCheckpoints.indexOfFirst { it.getId() == checkpointId }
         if (index != -1) {
             totalResults[actualDistanceId] = null
@@ -100,9 +100,11 @@ data class Runner(
     }
 
     private fun hasNotPassedPreviously(checkpoint: Checkpoint): Boolean {
-        val actualCheckpoints = checkpoints[actualDistanceId]?: mutableListOf()
-        for (x in 0 until checkpoint.getId()) {
-            val item = actualCheckpoints[x.toInt()]
+        val actualCheckpoints = checkpoints[actualDistanceId] ?: mutableListOf()
+        val index = actualCheckpoints.indexOfFirst { it.getId() == checkpoint.getId() }
+        if (index == -1) return true
+        for (x in 0 until index) {
+            val item = actualCheckpoints[x]
             if (item.getResult() == null || !item.hasPrevious()) return true
         }
         return false

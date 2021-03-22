@@ -144,13 +144,11 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
             rvRunners.apply {
                 runnerAdapter = RunnerListAdapter(this@RunnersFragment)
                 addItemDecoration(DividerVerticalItemDecoration(resources.getDimensionPixelSize(R.dimen.margin_s)))
-                layoutManager = LinearLayoutManager(binding.rvRunners.context)
                 adapter = runnerAdapter
             }
             rvDistanceType.apply {
                 distanceAdapter = DistanceListAdapter(this@RunnersFragment)
                 addItemDecoration(DividerItemDecoration(resources.getDimensionPixelSize(R.dimen.margin_s)))
-                layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
                 adapter = distanceAdapter
             }
             viewModel.initFragment(raceId, distanceId)

@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
+import com.gmail.maystruks08.data.local.entity.relation.DistanceWithCheckpoints
 import com.gmail.maystruks08.data.local.entity.relation.DistanceWithRunners
 import com.gmail.maystruks08.data.local.entity.tables.DistanceTable
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +21,9 @@ interface DistanceDAO : BaseDao<DistanceTable> {
 
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId")
     fun getDistanceById(distanceId: String): DistanceTable
+
+    @Query("SELECT * FROM distances WHERE distanceId =:distanceId")
+    fun getDistance(distanceId: String): DistanceWithCheckpoints
 
     @Query("SELECT distanceId FROM distances ORDER BY name LIMIT 1")
     fun getFirstDistanceId(): String

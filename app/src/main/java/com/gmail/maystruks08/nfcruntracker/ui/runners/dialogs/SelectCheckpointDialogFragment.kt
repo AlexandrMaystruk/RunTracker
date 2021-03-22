@@ -55,7 +55,6 @@ class SelectCheckpointDialogFragment : BaseDialogFragment(), CheckpointAdapter.I
     override fun initViews() {
         with(binding){
             rvCheckpoints.adapter = checkpointAdapter
-            rvCheckpoints.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             checkpointAdapter?.checkpoints = checkpoints
             btnClose.setOnClickListener { dismiss() }
         }

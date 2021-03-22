@@ -17,8 +17,8 @@ import java.util.*
 data class ResultTable(
     @PrimaryKey(autoGenerate = true)
     val resultId: Long = 0,
-    val checkpointId: Long,
+    val checkpointId: String,
     val runnerNumber: Long,
-    val time: Date?,
+    val time: Date,
     var hasPrevious: Boolean
 )

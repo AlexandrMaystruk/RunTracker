@@ -4,7 +4,7 @@ import java.util.*
 
 interface Checkpoint {
 
-    fun getId(): Long
+    fun getId(): String
 
     fun getName(): String
 

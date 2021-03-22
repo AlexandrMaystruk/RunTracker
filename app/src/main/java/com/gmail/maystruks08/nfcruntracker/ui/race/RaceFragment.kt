@@ -13,8 +13,10 @@ import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRaceBinding
 import com.gmail.maystruks08.nfcruntracker.ui.race.create.CreateRaceBottomShitFragment
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RaceView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
 @AndroidEntryPoint
 class RaceFragment : BaseFragment(R.layout.fragment_race), RaceAdapter.Interaction {
@@ -54,14 +56,10 @@ class RaceFragment : BaseFragment(R.layout.fragment_race), RaceAdapter.Interacti
     override fun initViews() {
         adapter = RaceAdapter(this)
         with(binding) {
-            raceRecyclerView.apply {
-                layoutManager = GridLayoutManager(requireContext(), 2)
-                adapter = this@RaceFragment.adapter
-            }
+            raceRecyclerView.adapter = this@RaceFragment.adapter
 
             btnCreateNewRace.setOnClickListener {
                 viewModel.onCreateNewRaceClicked()
-
             }
         }
         viewModel.initUI()

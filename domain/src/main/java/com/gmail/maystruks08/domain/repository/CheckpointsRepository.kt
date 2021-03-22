@@ -11,7 +11,7 @@ interface CheckpointsRepository {
     suspend fun saveCurrentSelectedCheckpointId(
         raceId: String,
         distanceId: String,
-        checkpointId: Long
+        checkpointId: String
     )
 
 }

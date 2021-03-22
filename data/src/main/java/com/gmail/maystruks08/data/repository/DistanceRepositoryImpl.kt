@@ -10,6 +10,7 @@ import com.gmail.maystruks08.data.remote.Api
 import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.ModifierType
+import com.gmail.maystruks08.domain.repository.CheckpointsRepository
 import com.gmail.maystruks08.domain.repository.DistanceRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,7 +25,8 @@ class DistanceRepositoryImpl @Inject constructor(
     private val distanceDAO: DistanceDAO,
     private val networkUtil: NetworkUtil,
     private val configPreferences: ConfigPreferences,
-    private val gson: Gson
+    private val gson: Gson,
+    private val checkpointsRepository: CheckpointsRepository
 ) : DistanceRepository {
 
     override suspend fun observeDistanceDataFlow(raceId: String) {
@@ -35,6 +37,7 @@ class DistanceRepositoryImpl @Inject constructor(
                     val distanceWithRunnersIds = it.entity.toTable()
                     val canRewriteLocalCache = checkIsDataUploaded(distanceWithRunnersIds.first.distanceId)
                     if (canRewriteLocalCache) {
+                        checkpointsRepository.getCheckpoints(raceId, it.entity.id)
                         when (it.modifierType) {
                             ModifierType.ADD -> insertDistance(distanceWithRunnersIds)
                             ModifierType.UPDATE -> updateDistance(distanceWithRunnersIds)

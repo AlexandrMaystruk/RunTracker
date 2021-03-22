@@ -8,6 +8,6 @@ data class DistancePojo(
     val name: String = "",
     val authorId: String = "",
     val dateOfStart: Date = Date(),
-    val checkpointsIds: List<Long> = emptyList(),
+    val checkpointsIds: List<String> = emptyList(),
     val runnerIds: List<Long> = emptyList()
 )

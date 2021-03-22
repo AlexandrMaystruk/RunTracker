@@ -19,8 +19,7 @@ class RunnerViewHolder(itemView: View, private val interaction: RunnerListAdapte
         if (!runner.placeholder) {
             with(binding) {
                 tvRunnerNumber.text = "#${runner.number}"
-                tvRunnerFullName.text =
-                    if (runner.fullName.length > 26) runner.fullName.take(25) + ".." else runner.fullName
+                tvRunnerFullName.text = if (runner.fullName.length > 26) runner.fullName.take(25) + ".." else runner.fullName
                 runnerProgress.visibility = View.VISIBLE
                 runnerProgress.setStepBean(runner.progress.map { it.bean })
             }
@@ -31,6 +30,7 @@ class RunnerViewHolder(itemView: View, private val interaction: RunnerListAdapte
             }
         } else {
             binding.runnerProgress.visibility = View.GONE
+            binding.runnerProgress.setStepBean(listOf())
         }
         itemView.setOnClickListener {
             interaction?.onItemSelected(runner)

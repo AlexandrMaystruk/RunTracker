@@ -2,12 +2,12 @@ package com.gmail.maystruks08.domain.entities.checkpoint
 
 import java.util.*
 
-data class CheckpointImpl(private val _id: Long,
+data class CheckpointImpl(private val _id: String,
                           private val _distanceId: String,
                           private val _name: String,
 ) : Checkpoint {
 
-    override fun getId(): Long {
+    override fun getId(): String {
         return _id
     }
 

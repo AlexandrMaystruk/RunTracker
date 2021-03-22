@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     app:layoutDescription="@xml/fragment_runners_motions_test_scene"
     tools:context="com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment">
 
@@ -22,6 +22,7 @@
         android:layout_marginBottom="@dimen/margin_m"
         android:orientation="horizontal"
         android:scrollbarAlwaysDrawHorizontalTrack="true"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="@id/view_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,8 +46,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="@dimen/margin_s"
-        android:elevation="@dimen/cardview_default_elevation"
         android:background="@drawable/bg_corner_white"
+        android:elevation="@dimen/cardview_default_elevation"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rvDistanceType" />
 
@@ -57,20 +58,20 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_m"
         android:layout_marginTop="@dimen/margin_m"
+        android:elevation="@dimen/cardview_default_elevation"
         android:text="Бегуны"
         android:textStyle="bold"
-        android:elevation="@dimen/cardview_default_elevation"
         app:layout_constraintStart_toStartOf="@id/view_card"
         app:layout_constraintTop_toTopOf="@id/view_card" />
 
     <TextView
         android:id="@+id/tvCurrentCheckpoint"
         style="@style/MainButton.Green"
-        android:background="@drawable/bg_main_btn_green"
         android:layout_marginTop="@dimen/margin_xs"
         android:layout_marginEnd="@dimen/margin_xs"
-        android:gravity="center"
+        android:background="@drawable/bg_main_btn_green"
         android:elevation="@dimen/cardview_default_elevation"
+        android:gravity="center"
         android:minWidth="@dimen/button_width_s"
         android:padding="@dimen/margin_xs"
         android:text="Выбрать кп"
@@ -85,10 +86,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_xs"
         android:layout_marginEnd="@dimen/margin_m"
-        android:gravity="end"
         android:elevation="@dimen/cardview_default_elevation"
-        app:layout_constraintEnd_toEndOf="@id/view_card"
+        android:gravity="end"
         app:layout_constraintBottom_toBottomOf="@+id/tvRunnersTitle"
+        app:layout_constraintEnd_toEndOf="@id/view_card"
         app:layout_constraintTop_toTopOf="@+id/tvRunnersTitle" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -96,6 +97,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:elevation="@dimen/cardview_default_elevation"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="@id/view_card"
         app:layout_constraintLeft_toLeftOf="@id/view_card"
         app:layout_constraintRight_toRightOf="@id/view_card"

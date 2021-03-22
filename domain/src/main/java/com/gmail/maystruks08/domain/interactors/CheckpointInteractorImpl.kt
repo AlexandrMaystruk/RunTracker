@@ -29,7 +29,7 @@ class CheckpointInteractorImpl @Inject constructor(private val checkpointsReposi
     override suspend fun saveCurrentSelectedCheckpointId(
         raceId: String,
         distanceId: String,
-        checkpointId: Long
+        checkpointId: String
     ): TaskResult<Exception, Unit> {
         return TaskResult.build {
             checkpointsRepository.saveCurrentSelectedCheckpointId(raceId, distanceId, checkpointId)

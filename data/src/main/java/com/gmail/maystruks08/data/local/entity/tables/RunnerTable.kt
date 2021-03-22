@@ -16,6 +16,8 @@ data class RunnerTable(
     val sex: Int,
     val city: String,
     val dateOfBirthday: Date,
+    val actualRaceId: String,
+    val actualDistanceId: String,
     val needToSync: Boolean = true
 )
 

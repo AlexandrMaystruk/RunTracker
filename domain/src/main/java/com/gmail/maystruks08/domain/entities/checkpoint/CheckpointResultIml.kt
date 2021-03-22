@@ -8,7 +8,7 @@ data class CheckpointResultIml(
     private var hasPrevious: Boolean = true
 ) : Checkpoint {
 
-    override fun getId(): Long {
+    override fun getId(): String {
         return checkpoint.getId()
     }
 

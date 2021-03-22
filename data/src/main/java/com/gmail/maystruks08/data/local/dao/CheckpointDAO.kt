@@ -11,7 +11,7 @@ interface CheckpointDAO : BaseDao<CheckpointTable> {
     fun getCheckpointsByRaceAndDistanceId(distanceId: String): List<CheckpointTable>
 
     @Query("SELECT * FROM checkpoints WHERE checkpointId =:checkpointId AND distanceId =:distanceId")
-    fun getCheckpoint(distanceId: String, checkpointId: Long): CheckpointTable?
+    fun getCheckpoint(distanceId: String, checkpointId: String): CheckpointTable?
 
     @Query("DELETE FROM checkpoints WHERE checkpointId =:checkpointId")
     fun deleteCheckpointById(checkpointId: Long)

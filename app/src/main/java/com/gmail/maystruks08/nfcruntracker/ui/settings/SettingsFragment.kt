@@ -32,10 +32,8 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
     override fun bindViewModel() {
         with(binding) {
             viewModel.config.observe(viewLifecycleOwner, {
-                val adapterRunner =
-                    ArrayAdapter(requireContext(), R.layout.spinner_item, it.checkpointsName)
-                val adapterIron =
-                    ArrayAdapter(requireContext(), R.layout.spinner_item, it.ironCheckpointsName)
+                val adapterRunner = ArrayAdapter(requireContext(), R.layout.spinner_item, it.checkpointsName)
+                val adapterIron = ArrayAdapter(requireContext(), R.layout.spinner_item, it.ironCheckpointsName)
                 adapterRunner.setDropDownViewResource(R.layout.spinner_drop_down)
                 adapterIron.setDropDownViewResource(R.layout.spinner_drop_down)
 

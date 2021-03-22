@@ -36,7 +36,7 @@ interface RunnersInteractor {
 
     suspend fun removeCheckpointForRunner(
         runnerNumber: Long,
-        checkpointId: Long
+        checkpointId: String
     ): TaskResult<Exception, Change<Runner>>
 
 }

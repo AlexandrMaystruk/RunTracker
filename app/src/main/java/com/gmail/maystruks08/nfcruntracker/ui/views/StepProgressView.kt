@@ -111,6 +111,7 @@ class StepProgressView : ViewGroup {
     private fun createViews() {
         stepsCount = beansList.size
         if (stepsCount == 0) {
+            removeAllViews()
             return
         }
         removeAllViews()

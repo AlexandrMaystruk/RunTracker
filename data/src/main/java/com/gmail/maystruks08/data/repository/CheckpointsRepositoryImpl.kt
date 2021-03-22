@@ -27,7 +27,7 @@ class CheckpointsRepositoryImpl @Inject constructor(
 
     override suspend fun getCheckpoints(raceId: String, distanceId: String): List<Checkpoint> {
         if (networkUtil.isOnline()) {
-            val checkpointsDocument = firestoreApi.getCheckpoints(raceId.toString(), distanceId.toString())
+            val checkpointsDocument = firestoreApi.getCheckpoints(raceId, distanceId)
             checkpointsDocument.data?.toDataClass<HashMap<String, CheckpointPojo>?>()
                 ?.let { hashMap ->
                     val checkpoints = hashMap.values
@@ -60,7 +60,7 @@ class CheckpointsRepositoryImpl @Inject constructor(
     override suspend fun saveCurrentSelectedCheckpointId(
         raceId: String,
         distanceId: String,
-        checkpointId: Long
+        checkpointId: String
     ) {
         auth.currentUser?.uid?.let { currentUserId ->
             var currentUserSettings =
@@ -69,8 +69,7 @@ class CheckpointsRepositoryImpl @Inject constructor(
                 val updatedSettings = currentUserSettings.copy(currentCheckpointId = checkpointId)
                 userSettingsDAO.updateUserSettings(updatedSettings)
             } else {
-                currentUserSettings =
-                    UserSettingsTable(currentUserId, raceId, distanceId, checkpointId)
+                currentUserSettings = UserSettingsTable(currentUserId, raceId, distanceId, checkpointId)
                 userSettingsDAO.insertOrReplace(currentUserSettings)
             }
         }

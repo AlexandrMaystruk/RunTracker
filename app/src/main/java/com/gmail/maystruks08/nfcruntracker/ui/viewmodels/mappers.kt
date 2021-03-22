@@ -39,25 +39,24 @@ fun Runner.toRunnerResultView(position: Int) = RunnerResultView(
 )
 
 fun List<Checkpoint>.toCheckpointViews(): List<CheckpointView> {
-    return emptyList()
-//    val current = this.findLast { it is CheckpointResultIml }
-//    return this.map {
-//        if (it is CheckpointResultIml) {
-//            val state = if (current?.id == it.id) {
-//                StepState.CURRENT
-//            } else {
-//                if (it.hasPrevious) StepState.DONE else StepState.DONE_WARNING
-//            }
-//            CheckpointView(it.id, Bean(it.name, state), it.date)
-//        } else {
-//            CheckpointView(it.id, Bean(it.name, StepState.UNDONE))
-//        }
-//    }
+    val current = this.findLast { it.getResult() != null }
+    return map {
+        if (it.getResult() != null) {
+            val state = if (current?.getId() == it.getId()) {
+                StepState.CURRENT
+            } else {
+                if (it.hasPrevious()) StepState.DONE else StepState.DONE_WARNING
+            }
+            CheckpointView(it.getId(), Bean(it.getName(), state), it.getResult())
+        } else {
+            CheckpointView(it.getId(), Bean(it.getName(), StepState.UNDONE))
+        }
+    }
 }
 
-fun Checkpoint.toCheckpointView(selectedId: Long?): CheckpointView {
+fun Checkpoint.toCheckpointView(selectedId: String?): CheckpointView {
     val id = getId()
-    val stepState = if(id == selectedId) StepState.CURRENT else StepState.UNDONE
+    val stepState = if (id == selectedId) StepState.CURRENT else StepState.UNDONE
     return CheckpointView(id, Bean(getName(), stepState))
 }
 

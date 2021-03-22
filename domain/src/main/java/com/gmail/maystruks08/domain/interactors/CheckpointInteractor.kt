@@ -18,7 +18,7 @@ interface CheckpointInteractor {
     suspend fun saveCurrentSelectedCheckpointId(
         raceId: String,
         distanceId: String,
-        checkpointId: Long
+        checkpointId: String
     ): TaskResult<Exception, Unit>
 
 }

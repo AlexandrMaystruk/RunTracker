@@ -42,11 +42,11 @@ interface RunnerDao : BaseDao<RunnerTable> {
 
     @Transaction
     @Query("SELECT * FROM runners WHERE runners.runnerNumber =:runnerNumber")
-    fun getRunnerWithResults(runnerNumber: Int): RunnerWithResult
+    fun getRunnerWithResultsByNumber(runnerNumber: Int): RunnerWithResult
 
     @Transaction
     @Query("SELECT * FROM runners WHERE runners.cardId =:cardUUID")
-    fun getRunnerWithResults(cardUUID: String): RunnerWithResult
+    fun getRunnerWithResultsByNumber(cardUUID: String): RunnerWithResult
 
 
     @Query("SELECT * FROM runners WHERE runners.cardId =:cardUUID")
@@ -54,8 +54,12 @@ interface RunnerDao : BaseDao<RunnerTable> {
 
 
     @Transaction
-    @Query("SELECT * FROM runners WHERE runners.runnerNumber =:runnerNumber")
-    fun getRunnerResults(runnerNumber: Long): List<RunnerWithResult>
+    @Query("SELECT * FROM runners WHERE runners.runnerNumber =:runnerNumber LIMIT 1")
+    fun getRunnerWithResultsByNumber(runnerNumber: Long): RunnerWithResult?
+
+    @Transaction
+    @Query("SELECT * FROM runners WHERE runners.cardId =:cardId LIMIT 1")
+    fun getRunnerWithResultsByCardId(cardId: String): RunnerWithResult?
 
     @Transaction
     @Query("SELECT * FROM runners WHERE needToSync = 1")

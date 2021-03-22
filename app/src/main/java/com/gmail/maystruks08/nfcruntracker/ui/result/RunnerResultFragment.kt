@@ -55,10 +55,7 @@ class RunnerResultFragment : BaseFragment(R.layout.fragment_runners_results) {
     override fun initViews() {
         resultAdapter = ResultItemsAdapter()
         with(binding) {
-            runnersResultsRecyclerView.apply {
-                layoutManager = LinearLayoutManager(runnersResultsRecyclerView.context)
-                adapter = resultAdapter
-            }
+            runnersResultsRecyclerView.adapter = resultAdapter
 
             //TODO refactor
             navigation.setOnNavigationItemSelectedListener {

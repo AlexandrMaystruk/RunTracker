@@ -146,7 +146,6 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner), CheckpointsAdapte
                 viewModel.btnMarkCheckpointAsPassedInManualClicked()
             }
             runnerCheckpointsRecyclerView.apply {
-                layoutManager = LinearLayoutManager(runnerCheckpointsRecyclerView.context)
                 checkpointsAdapter = CheckpointsAdapter(this@RunnerFragment)
                 adapter = checkpointsAdapter
             }

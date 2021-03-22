@@ -80,8 +80,8 @@ fun RunnerTable.toRunner(): Runner {
         isOffTrack = mutableMapOf(),
         distanceIds = mutableListOf(),
         raceIds = mutableListOf(),
-        actualDistanceId = "-1",
-        actualRaceId = "-1"
+        actualDistanceId = actualDistanceId,
+        actualRaceId = actualRaceId
     )
 }
 
@@ -122,6 +122,8 @@ fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
         city = this.city,
         sex = this.sex.ordinal,
         dateOfBirthday = this.dateOfBirthday,
+        actualDistanceId = this.actualDistanceId,
+        actualRaceId =  this.actualRaceId,
         needToSync = needToSync
     )
 }

@@ -12,7 +12,10 @@ import kotlinx.coroutines.flow.Flow
 import java.util.*
 import javax.inject.Inject
 
-class RunnersInteractorImpl @Inject constructor(private val runnersRepository: RunnersRepository, private val logHelper: LogHelper) : RunnersInteractor {
+class RunnersInteractorImpl @Inject constructor(
+    private val runnersRepository: RunnersRepository,
+    private val logHelper: LogHelper
+) : RunnersInteractor {
 
     override suspend fun observeRunnerDataFlow(currentRaceId: String) {
         runnersRepository.observeRunnerData(currentRaceId)
@@ -129,7 +132,7 @@ class RunnersInteractorImpl @Inject constructor(private val runnersRepository: R
         }
     }
 
-    override suspend fun removeCheckpointForRunner(runnerNumber: Long, checkpointId: Long): TaskResult<Exception, Change<Runner>> {
+    override suspend fun removeCheckpointForRunner(runnerNumber: Long, checkpointId: String): TaskResult<Exception, Change<Runner>> {
         return TaskResult.build {
             val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
 //            logHelper.log(INFO, "Remove checkpoint: $checkpointId for runner ${runner.number}  ${runner.type}  ${runner.fullName}")

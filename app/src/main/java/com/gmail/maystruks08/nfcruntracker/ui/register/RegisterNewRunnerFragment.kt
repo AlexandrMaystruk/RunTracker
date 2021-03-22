@@ -83,10 +83,7 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
     override fun initViews() {
         adapter = RegisterRunnerAdapter()
         with(binding){
-            registerRunnersRecyclerView.apply {
-                layoutManager = LinearLayoutManager(requireContext())
-                adapter = this@RegisterNewRunnerFragment.adapter
-            }
+            registerRunnersRecyclerView.adapter = this@RegisterNewRunnerFragment.adapter
             btnAddTeamMemberRunner.setOnClickListener {
                 viewModel.onCreateTeamMemberClick()
             }
