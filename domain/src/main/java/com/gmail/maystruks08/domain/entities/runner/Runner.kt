@@ -38,7 +38,6 @@ data class Runner(
      */
     fun addPassedCheckpoint(
         checkpoint: Checkpoint,
-        checkpointsCount: Int,
         isRestart: Boolean = false
     ) {
        check(checkpoint.getResult() != null)
@@ -46,7 +45,7 @@ data class Runner(
         val indexOfExistingElement = actualCheckpoints.indexOfFirst { it.getId() == checkpoint.getId() && it.getDistanceId() == checkpoint.getDistanceId() }
         if (indexOfExistingElement != -1) {
             actualCheckpoints.removeAt(indexOfExistingElement)
-            if (!isRestart) addCheckpoint(checkpoint, checkpointsCount) else addStartCheckpoint(checkpoint)
+            if (!isRestart) addCheckpoint(checkpoint, actualCheckpoints.size) else addStartCheckpoint(checkpoint)
             actualCheckpoints.sortBy { it.getId() }
             for (index in 1 until actualCheckpoints.lastIndex) {
                 val current = actualCheckpoints[index]

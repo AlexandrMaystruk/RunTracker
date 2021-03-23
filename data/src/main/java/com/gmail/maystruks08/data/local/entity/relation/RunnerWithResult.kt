@@ -12,7 +12,7 @@ data class RunnerWithResult(
     @Embedded val runnerTable: RunnerTable,
     @Relation(
         parentColumn = "runnerNumber",
-        entityColumn = "resultId",
+        entityColumn = "runnerNumber",
         associateBy = Junction(RunnerResultCrossRef::class)
     )
     val results: List<ResultTable>

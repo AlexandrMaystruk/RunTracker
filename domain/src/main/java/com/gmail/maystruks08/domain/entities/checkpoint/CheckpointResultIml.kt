@@ -3,7 +3,7 @@ package com.gmail.maystruks08.domain.entities.checkpoint
 import java.util.*
 
 data class CheckpointResultIml(
-    private val checkpoint: CheckpointImpl,
+    private val checkpoint: Checkpoint,
     private var date: Date,
     private var hasPrevious: Boolean = true
 ) : Checkpoint {

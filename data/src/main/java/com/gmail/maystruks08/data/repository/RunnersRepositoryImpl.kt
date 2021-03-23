@@ -1,18 +1,18 @@
 package com.gmail.maystruks08.data.repository
 
 import android.database.sqlite.SQLiteException
-import com.gmail.maystruks08.data.awaitTaskCompletable
 import com.gmail.maystruks08.data.local.ConfigPreferences
 import com.gmail.maystruks08.data.local.dao.DistanceDAO
 import com.gmail.maystruks08.data.local.dao.RunnerDao
 import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
 import com.gmail.maystruks08.data.local.entity.relation.RunnerResultCrossRef
 import com.gmail.maystruks08.data.local.entity.relation.RunnerWithResult
+import com.gmail.maystruks08.data.local.entity.tables.ResultTable
 import com.gmail.maystruks08.data.mappers.*
 import com.gmail.maystruks08.data.remote.Api
-import com.gmail.maystruks08.data.remote.FirestoreApi
 import com.gmail.maystruks08.domain.DEF_STRING_VALUE
 import com.gmail.maystruks08.domain.NetworkUtil
+import com.gmail.maystruks08.domain.clearAndAddAll
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
@@ -35,7 +35,6 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 class RunnersRepositoryImpl @Inject constructor(
     private val networkUtil: NetworkUtil,
-    private val firestoreApi: FirestoreApi,
     private val api: Api,
     private val distanceDAO: DistanceDAO,
     private val runnerDao: RunnerDao,
@@ -53,7 +52,7 @@ class RunnersRepositoryImpl @Inject constructor(
         if (networkUtil.isOnline()) {
             try {
                 runnerDao.markAsNeedToSync(runner.number, false)
-                awaitTaskCompletable(firestoreApi.updateRunner(runner))
+                api.saveRunner(runner.toFirestoreRunner())
             } catch (e: FirebaseFirestoreException) {
                 Timber.e(e, "Saving runner ${runner.number} data to firestore error")
                 runnerDao.markAsNeedToSync(runner.number, true)
@@ -130,24 +129,24 @@ class RunnersRepositoryImpl @Inject constructor(
 
     override suspend fun getRunnerByCardId(cardId: String): Runner? {
         val runnerWithResultsTable = runnerDao.getRunnerWithResultsByCardId(cardId)
-        return runnerWithResultsTable?.runnerTable?.actualDistanceId?.let { actualDistanceId ->
-            runnerWithResultsTable.runnerTable.toRunner().apply {
-                this.checkpoints[actualDistanceId] = runnerWithResultsTable.getCheckpoints()
-            }
-        }
+        return runnerWithResultsTable?.toRunner()
     }
 
     override suspend fun getRunnerByNumber(runnerNumber: Long): Runner? {
-        return runnerDao.getRunnerWithResultsByNumber(runnerNumber)?.let { runnerWithResultsTable ->
-            runnerWithResultsTable.runnerTable.toRunner().apply {
-                this.checkpoints[actualDistanceId] = runnerWithResultsTable.getCheckpoints()
-            }
+        return runnerDao.getRunnerWithResultsByNumber(runnerNumber)?.toRunner()
+    }
+
+    private fun RunnerWithResult.toRunner(): Runner {
+        return runnerTable.toRunner().apply {
+            this.raceIds.clearAndAddAll(runnerDao.getRunnerRaceIds(number))
+            this.distanceIds.clearAndAddAll(runnerDao.getRunnerDistanceIds(number))
+            this.checkpoints[actualDistanceId] = getCheckpoints()
         }
     }
 
     private fun RunnerWithResult.getCheckpoints(onlyFinishers: Boolean = false): MutableList<Checkpoint> {
         val distanceWithCheckpoints = distanceDAO.getDistance(runnerTable.actualDistanceId)
-        if(onlyFinishers && results.size != distanceWithCheckpoints.checkpoints.size) return mutableListOf()
+        if (onlyFinishers && results.size != distanceWithCheckpoints.checkpoints.size) return mutableListOf()
         return distanceWithCheckpoints.checkpoints.map { checkpointTable ->
             val checkpointResult =
                 results.firstOrNull { it.checkpointId == checkpointTable.checkpointId }
@@ -191,31 +190,36 @@ class RunnersRepositoryImpl @Inject constructor(
 
     private suspend fun insertRunner(runner: Runner) {
         val runnerTable = runner.toRunnerTable(false)
-        val resultTables = runner.checkpoints
-            .map { it.value }
-            .filterIsInstance<CheckpointResultIml>()
-            .map { it.toResultTable(runnerTable.runnerNumber) }
-
-        val runnerResultCrossRefTables =
-            resultTables.map { RunnerResultCrossRef(runner.number, it.checkpointId) }
-        val distanceRunnerCrossRefTables =
-            runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }
-
+        val resultTables = mutableListOf<ResultTable>()
+        val runnerResultCrossRefTables = mutableListOf<RunnerResultCrossRef>()
+        val distanceRunnerCrossRefTables = runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }
+        runner.checkpoints.forEach { (_, checkpoints) ->
+            checkpoints.forEach {
+                if (it is CheckpointResultIml) {
+                    val result = it.toResultTable(runner.number)
+                    val runnerResult = RunnerResultCrossRef(runner.number, it.getId())
+                    resultTables.add(result)
+                    runnerResultCrossRefTables.add(runnerResult)
+                }
+            }
+        }
         runnerDao.insertOrReplaceRunner(
             runnerTable,
             resultTables,
             runnerResultCrossRefTables,
             distanceRunnerCrossRefTables
         )
+        Timber.i("Insert runner ${runner.shortName}")
     }
 
     private suspend fun updateRunner(runner: Runner) {
         deleteRunner(runner)
         insertRunner(runner)
+        Timber.i("Update runner ${runner.shortName}")
     }
 
     private suspend fun deleteRunner(runner: Runner) {
         val count = runnerDao.delete(runner.number)
-        Timber.i("Removed runner from DB count: $count")
+        Timber.i("Removed runner ${runner.shortName} from DB count: $count")
     }
 }

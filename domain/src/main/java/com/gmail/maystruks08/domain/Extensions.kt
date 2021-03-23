@@ -2,6 +2,8 @@ package com.gmail.maystruks08.domain
 
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.logging.Level
+import java.util.logging.Logger
 
 
 fun String.isolateSpecialSymbolsForRegex(): String =
@@ -36,6 +38,20 @@ fun Date.toDateTimeShortFormat(): String = SimpleDateFormat(DATA_TIME_SHORT_FORM
 fun Date.toServerFormat(): String = SimpleDateFormat(SERVER_FORMAT, Locale.getDefault()).format(this)
 
 
+fun String.parseServerTime(): Date {
+    return try {
+        val simpleDateFormat = SimpleDateFormat(SERVER_FORMAT, Locale.getDefault())
+        simpleDateFormat.parse(this)
+    } catch (e: Exception) {
+        Logger.getGlobal().log(Level.INFO, "ParseTime error", e)
+        Date()
+    }
+}
+
+fun <E> MutableList<E>.clearAndAddAll(list: List<E>) {
+    clear()
+    addAll(list)
+}
 
 
 

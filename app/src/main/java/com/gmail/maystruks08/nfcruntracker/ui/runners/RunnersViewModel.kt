@@ -326,7 +326,7 @@ class RunnersViewModel @ViewModelInject constructor(
 
     private fun onRunningStart(date: Date) {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val onResult = runnersInteractor.addStartCheckpointToRunners(date)) {
+            when (val onResult = runnersInteractor.addStartCheckpointToRunners(raceId, distanceId, date)) {
                 is TaskResult.Value -> viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
                 is TaskResult.Error -> Timber.e(onResult.error)
             }

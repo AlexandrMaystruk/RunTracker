@@ -297,7 +297,6 @@ class StepProgressView : ViewGroup {
                 it is TextView && it.tag as String != STEP_TITLE_TAG
             }
         } catch (e: NoSuchElementException) {
-            e.printStackTrace()
             return
         }
         //Width of a node view

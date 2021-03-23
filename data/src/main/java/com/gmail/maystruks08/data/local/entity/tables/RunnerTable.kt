@@ -5,7 +5,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.util.*
 
-@Entity(tableName = "runners", indices = [Index(value = arrayOf("runnerNumber"), unique = true)])
+@Entity(tableName = "runners")
 data class RunnerTable(
     @PrimaryKey
     val runnerNumber: Long,

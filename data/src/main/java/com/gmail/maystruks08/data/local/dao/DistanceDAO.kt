@@ -1,9 +1,6 @@
 package com.gmail.maystruks08.data.local.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
 import com.gmail.maystruks08.data.local.entity.relation.DistanceWithCheckpoints
 import com.gmail.maystruks08.data.local.entity.relation.DistanceWithRunners
@@ -22,12 +19,14 @@ interface DistanceDAO : BaseDao<DistanceTable> {
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId")
     fun getDistanceById(distanceId: String): DistanceTable
 
+    @Transaction
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId")
     fun getDistance(distanceId: String): DistanceWithCheckpoints
 
     @Query("SELECT distanceId FROM distances ORDER BY name LIMIT 1")
     fun getFirstDistanceId(): String
 
+    @Transaction
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId AND raceId =:raceId")
     fun getDistanceByIdWithRunners(raceId: String, distanceId: String): DistanceWithRunners
 

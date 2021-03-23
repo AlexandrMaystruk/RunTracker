@@ -76,6 +76,7 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
             val subscription = eventDocument.addSnapshotListener { snapshots, _ ->
                 Timber.i("Snapshot size = ${snapshots?.documentChanges?.size}")
                 val runnersChanges = snapshots?.documentChanges?.map {
+                    Timber.e(it.document.data.toString())
                     Change(it.document.toObject(RunnerPojo::class.java), it.getChangeType())
                 }.orEmpty()
                 channel.offer(runnersChanges)
@@ -88,12 +89,12 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
     }
 
     override suspend fun saveRace(racePojo: RacePojo) {
-        val raceDocument = db.collection(RACES_COLLECTION).document(racePojo.id.toString())
+        val raceDocument = db.collection(RACES_COLLECTION).document(racePojo.id)
         awaitTaskCompletable(raceDocument.set(racePojo))
     }
 
     override suspend fun saveDistance(distancePojo: DistancePojo) {
-        val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distancePojo.id.toString())
+        val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distancePojo.id)
         awaitTaskCompletable(distanceDocument.set(distancePojo))
     }
 
@@ -123,7 +124,7 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
         val document = db.collection(CHECKPOINTS_COLLECTION).document(checkpointDocumentName)
         val map = hashMapOf<String, Any>()
             .apply {
-                checkpoints.forEach { this[it.getId().toString()] = it.toFirestoreCheckpoint() }
+                checkpoints.forEach { this[it.getId()] = it.toFirestoreCheckpoint() }
             }
         return try {
             awaitTaskCompletable(document.update(map))

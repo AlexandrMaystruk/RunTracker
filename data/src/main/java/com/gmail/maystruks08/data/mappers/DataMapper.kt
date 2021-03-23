@@ -16,6 +16,7 @@ import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.RunnerSex
+import com.gmail.maystruks08.domain.toServerFormat
 import com.google.gson.Gson
 import java.util.*
 
@@ -179,6 +180,18 @@ fun Distance.toFirestoreDistance(raceId: String): DistancePojo {
 
 
 fun Runner.toFirestoreRunner(): RunnerPojo {
+    val checkpointsResult = mutableMapOf<String, List<CheckpointPojo>>().apply {
+        checkpoints.forEach { (distanceId, checkpoints) ->
+            this[distanceId] = checkpoints.mapNotNull {
+                if (it is CheckpointResultIml) CheckpointPojo(
+                    it.getId(),
+                    it.getDistanceId(),
+                    it.getName(),
+                    it.getResult().toServerFormat()
+                ) else null
+            }
+        }
+    }
     return RunnerPojo(
         number = number,
         cardId = cardId,
@@ -187,12 +200,12 @@ fun Runner.toFirestoreRunner(): RunnerPojo {
         phone = phone,
         sex = sex.ordinal,
         city = city,
-        dateOfBirthday = dateOfBirthday,
+        dateOfBirthday = dateOfBirthday.toServerFormat(),
         actualRaceId = actualRaceId,
         actualDistanceId = actualDistanceId,
         raceIds = raceIds,
         distanceIds = distanceIds,
-        checkpoints = checkpoints,
+        checkpoints = checkpointsResult,
         isOffTrack = isOffTrack,
         teamNames = teamNames,
         totalResults = totalResults

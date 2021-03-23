@@ -25,7 +25,7 @@ interface RunnersInteractor {
 
     suspend fun addCurrentCheckpointToRunner(runnerNumber: Long): TaskResult<Exception, Runner>
 
-    suspend fun addStartCheckpointToRunners(date: Date): TaskResult<Exception, Unit>
+    suspend fun addStartCheckpointToRunners(raceId: String, distanceId: String, date: Date): TaskResult<Exception, Unit>
 
     suspend fun changeRunnerCardId(
         runnerNumber: Long,

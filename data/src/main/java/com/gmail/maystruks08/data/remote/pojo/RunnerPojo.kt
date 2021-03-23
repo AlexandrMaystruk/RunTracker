@@ -1,6 +1,5 @@
 package com.gmail.maystruks08.data.remote.pojo
 
-import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import java.util.*
 
 data class RunnerPojo(
@@ -11,12 +10,12 @@ data class RunnerPojo(
     val phone: String = "",
     var sex: Int = 0,
     var city: String = "",
-    var dateOfBirthday: Date = Date(),
+    var dateOfBirthday: String = "",
     val actualRaceId: String = "",
     val actualDistanceId: String = "",
     val raceIds: MutableList<String> = mutableListOf(),
     val distanceIds: MutableList<String> = mutableListOf(),
-    val checkpoints: MutableMap<String, MutableList<Checkpoint>> = mutableMapOf(), //key distance id value checkpoints
+    val checkpoints: MutableMap<String, List<CheckpointPojo>> = mutableMapOf(), //key distance id value checkpoints
     val isOffTrack: MutableMap<String, Boolean> = mutableMapOf(), //key distance id
     val teamNames: MutableMap<String, String?> = mutableMapOf(), //key distance id
     val totalResults: MutableMap<String, Date?> = mutableMapOf(), //key distance id
