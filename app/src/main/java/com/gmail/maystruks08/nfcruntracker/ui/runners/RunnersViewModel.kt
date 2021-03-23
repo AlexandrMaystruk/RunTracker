@@ -2,6 +2,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.runners
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
+import com.gmail.maystruks08.domain.CurrentRaceDistance
 import com.gmail.maystruks08.domain.DEF_STRING_VALUE
 import com.gmail.maystruks08.domain.entities.Change
 import com.gmail.maystruks08.domain.entities.ModifierType
@@ -67,7 +68,7 @@ class RunnersViewModel @ViewModelInject constructor(
     private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
     private val _showProgressLiveData = SingleLiveEvent<Boolean>()
     private val _showTimeLiveData = SingleLiveEvent<String>()
-    private val _selectCheckpointDialogLiveData = SingleLiveEvent<ArrayList<CheckpointView>>()
+    private val _selectCheckpointDialogLiveData = SingleLiveEvent<CurrentRaceDistance>()
     private val _closeCheckpointDialogLiveData = SingleLiveEvent<String>()
     private val _showRunnersTitleFlow = MutableStateFlow("")
 
@@ -205,19 +206,7 @@ class RunnersViewModel @ViewModelInject constructor(
     }
 
     fun onCurrentCheckpointTextClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
-            when (val result = checkpointInteractor.getCheckpoints(raceId, distanceId)) {
-                is TaskResult.Value -> {
-                    val currentCheckpoint = (checkpointInteractor.getCurrentSelectedCheckpoint(
-                        raceId,
-                        distanceId
-                    ) as? TaskResult.Value)?.value
-                    val checkpoints = ArrayList(result.value.map { it.toCheckpointView(currentCheckpoint?.getId()) })
-                    _selectCheckpointDialogLiveData.postValue(checkpoints)
-                }
-                is TaskResult.Error -> handleError(result.error)
-            }
-        }
+        _selectCheckpointDialogLiveData.postValue(CurrentRaceDistance(raceId, distanceId))
     }
 
     fun onNewCurrentCheckpointSelected(checkpointView: CheckpointView) {

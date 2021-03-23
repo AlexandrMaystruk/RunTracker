@@ -9,7 +9,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
@@ -122,12 +121,14 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
                     .show(childFragmentManager, SuccessDialogFragment.name())
             })
 
-            showSelectCheckpointDialog.observe(viewLifecycleOwner, { arrayOfCheckpointViews ->
+            showSelectCheckpointDialog.observe(viewLifecycleOwner, { raceDistanceIds ->
                 val dialog = findFragmentByTag<SelectCheckpointDialogFragment>(SelectCheckpointDialogFragment.name())
-                if(dialog == null){
-                    SelectCheckpointDialogFragment.getInstance(arrayOfCheckpointViews) {
-                        viewModel.onNewCurrentCheckpointSelected(it)
-                    }.show(childFragmentManager, SelectCheckpointDialogFragment.name())
+                if (dialog == null) {
+                    SelectCheckpointDialogFragment
+                        .getInstance(raceDistanceIds.first, raceDistanceIds.second) {
+                            viewModel.onNewCurrentCheckpointSelected(it)
+                        }
+                        .show(childFragmentManager, SelectCheckpointDialogFragment.name())
                 }
             })
 

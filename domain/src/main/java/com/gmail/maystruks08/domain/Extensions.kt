@@ -53,5 +53,7 @@ fun <E> MutableList<E>.clearAndAddAll(list: List<E>) {
     addAll(list)
 }
 
+typealias CurrentRaceDistance =  Pair<String, String>
+
 
 
