@@ -7,7 +7,6 @@ import com.gmail.maystruks08.nfcruntracker.ui.qr_code.ScanCodeFragment
 import com.gmail.maystruks08.nfcruntracker.ui.race.RaceFragment
 import com.gmail.maystruks08.nfcruntracker.ui.race.create.CreateRaceBottomShitFragment
 import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
-import com.gmail.maystruks08.nfcruntracker.ui.result.RunnerResultFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
 import com.gmail.maystruks08.nfcruntracker.ui.settings.SettingsFragment
@@ -57,15 +56,6 @@ object Screens {
             fun tag() = RunnerScreen.name()
         }
     }
-
-    class RunnersResultsScreen : AppScreen() {
-        override fun getFragment() = RunnerResultFragment()
-
-        companion object {
-            fun tag() = RunnerResultFragment::class.java.simpleName
-        }
-    }
-
 
     class CheckpointEditorScreen() : AppScreen() {
         override fun getFragment() = CheckpointEditorFragment.getInstance()

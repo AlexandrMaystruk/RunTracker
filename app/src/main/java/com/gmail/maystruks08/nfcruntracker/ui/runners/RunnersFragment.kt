@@ -21,11 +21,16 @@ import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBind
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnersBinding
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.*
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.distance.DistanceListAdapter
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.DividerItemDecoration
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.DividerVerticalItemDecoration
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.SwipeActionHelper
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.Interaction
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.RunnerListAdapter
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SelectCheckpointDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SuccessDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.DistanceView
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -35,7 +40,8 @@ import kotlinx.coroutines.flow.collect
 @ObsoleteCoroutinesApi
 @AndroidEntryPoint
 @ExperimentalCoroutinesApi
-class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapter.Interaction,
+class RunnersFragment : BaseFragment(R.layout.fragment_runners),
+    Interaction,
     DistanceListAdapter.Interaction {
 
     private val viewModel: RunnersViewModel by viewModels()
@@ -66,7 +72,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
                 viewModel.onOpenSettingsFragmentClicked()
                 true
             }, MenuItem.OnMenuItemClickListener {
-                viewModel.onShowResultsClicked()
+                viewModel.changeMode()
                 true
             }, MenuItem.OnMenuItemClickListener {
                 viewModel.onSelectRaceClicked()
@@ -175,7 +181,8 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners), RunnerListAdapt
         val orderSwipeActionHelper = object : SwipeActionHelper(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                val swipedRunner = runnerAdapter.currentList[position]
+                val swipedRunner = runnerAdapter.currentList[position] as? RunnerView
+                swipedRunner ?: return
                 if (direction == ItemTouchHelper.LEFT) {
                     viewModel.onRunnerSwipedLeft(position, swipedRunner)
                 } else if (direction == ItemTouchHelper.RIGHT) {

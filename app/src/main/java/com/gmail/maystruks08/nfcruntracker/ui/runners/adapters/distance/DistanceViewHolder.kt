@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.nfcruntracker.ui.runners.adapters
+package com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.distance
 
 import android.annotation.SuppressLint
 import android.view.View

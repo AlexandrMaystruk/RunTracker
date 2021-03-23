@@ -16,7 +16,6 @@ import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.interactors.CheckpointInteractor
 import com.gmail.maystruks08.domain.interactors.DistanceInteractor
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
-import com.gmail.maystruks08.domain.isolateSpecialSymbolsForRegex
 import com.gmail.maystruks08.domain.toTimeFormat
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
@@ -28,14 +27,13 @@ import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertType
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.BaseRunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import java.util.*
@@ -63,7 +61,7 @@ class RunnersViewModel @ViewModelInject constructor(
 
 
     private val _distanceFlow = MutableStateFlow<MutableList<DistanceView>>(mutableListOf())
-    private val _runnersFlow = MutableStateFlow<MutableList<RunnerView>>(mutableListOf())
+    private val _runnersFlow = MutableStateFlow<List<BaseRunnerView>>(mutableListOf())
     private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, Long>>()
     private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
     private val _showProgressLiveData = SingleLiveEvent<Boolean>()
@@ -72,10 +70,14 @@ class RunnersViewModel @ViewModelInject constructor(
     private val _closeCheckpointDialogLiveData = SingleLiveEvent<String>()
     private val _showRunnersTitleFlow = MutableStateFlow("")
 
+    private var jobShowRunner: Job? = null
+    private var jobShowAllDistances: Job? = null
+    private var jobShowCurrentCheckpoint: Job? = null
 
     private lateinit var raceId: String
-    private var distanceId: String = DEF_STRING_VALUE
 
+    private var distanceId: String = DEF_STRING_VALUE
+    private var isResultMode: Boolean = false
     private var lastSelectedRunner: RunnerView? = null
 
     init {
@@ -91,12 +93,17 @@ class RunnersViewModel @ViewModelInject constructor(
         this.distanceId = distanceId ?: DEF_STRING_VALUE
     }
 
-    fun renderUI(){
-        viewModelScope.launch(Dispatchers.IO) { showAllDistances() }
-        viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
-        viewModelScope.launch(Dispatchers.IO) { showCurrentCheckpoint() }
-        viewModelScope.launch(Dispatchers.IO) { observeRunnerChanges() }
-        viewModelScope.launch(Dispatchers.IO) { observeDistanceChanges() }
+    fun renderUI() {
+        showDistances()
+        showRunners()
+        showCurrentCheckpoint()
+        observeRunnerChanges()
+        observeDistanceChanges()
+    }
+
+    fun changeMode() {
+        isResultMode = !isResultMode
+        showRunners()
     }
 
     fun changeDistance(distanceId: String) {
@@ -107,7 +114,8 @@ class RunnersViewModel @ViewModelInject constructor(
             DistanceView(it.id, it.name, isSelected)
         })
         _distanceFlow.value = updatedDistance
-        viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
+
+        showRunners()
         viewModelScope.launch(Dispatchers.IO) { showCurrentCheckpoint() }
     }
 
@@ -135,7 +143,12 @@ class RunnersViewModel @ViewModelInject constructor(
             val runnerNumber = lastSelectedRunner?.number ?: return@launch
             if (lastSelectedRunner?.isOffTrack == true) return@launch
             when (val onResult = runnersInteractor.markRunnerGotOffTheRoute(runnerNumber)) {
-                is TaskResult.Value -> handleRunnerChanges(Change(onResult.value, ModifierType.UPDATE))
+                is TaskResult.Value -> handleRunnerChanges(
+                    Change(
+                        onResult.value,
+                        ModifierType.UPDATE
+                    )
+                )
                 is TaskResult.Error -> handleError(onResult.error)
             }
             lastSelectedRunner = null
@@ -159,23 +172,33 @@ class RunnersViewModel @ViewModelInject constructor(
             if (query.isNotEmpty()) {
                 when (val result = runnersInteractor.getRunners(distanceId, query)) {
                     is TaskResult.Value -> {
-                        val pattern =
-                            ".*${query.isolateSpecialSymbolsForRegex().toLowerCase()}.*".toRegex()
-                        val runners = result.value.filter {
-                            pattern.containsMatchIn(
-                                it.number.toString().toLowerCase()
-                            )
-                        }
-                        val runnerViews = runners.map { it.toRunnerView() }.toMutableList()
+                        val runnerViews = result.value.map { it.toRunnerView() }.toMutableList()
                         _runnersFlow.value = runnerViews
                     }
                     is TaskResult.Error -> handleError(result.error)
                 }
             } else {
                 Timber.v("showAllRunners  onSearchQueryChanged")
-                showAllRunners()
+                showRunners()
             }
         }
+    }
+
+    fun onNewCurrentCheckpointSelected(checkpointView: CheckpointView) {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = checkpointInteractor.saveCurrentSelectedCheckpointId(
+                raceId,
+                distanceId,
+                checkpointView.id
+            )) {
+                is TaskResult.Value -> _closeCheckpointDialogLiveData.postValue(checkpointView.bean.title)
+                is TaskResult.Error -> handleError(result.error)
+            }
+        }
+    }
+
+    fun onCurrentCheckpointTextClicked() {
+        _selectCheckpointDialogLiveData.postValue(CurrentRaceDistance(raceId, distanceId))
     }
 
     fun onOpenSettingsFragmentClicked() {
@@ -197,44 +220,56 @@ class RunnersViewModel @ViewModelInject constructor(
         router.navigateTo(Screens.RunnerScreen(runnerNumber, distanceId))
     }
 
-    fun onShowResultsClicked() {
-        router.navigateTo(Screens.RunnersResultsScreen())
-    }
-
     fun onSelectRaceClicked() {
         router.newRootScreen(Screens.RaceListScreen())
     }
 
-    fun onCurrentCheckpointTextClicked() {
-        _selectCheckpointDialogLiveData.postValue(CurrentRaceDistance(raceId, distanceId))
+    private fun showDistances() {
+        jobShowAllDistances?.cancel()
+        jobShowAllDistances = viewModelScope.launch(Dispatchers.IO) { provideAllDistances() }
     }
 
-    fun onNewCurrentCheckpointSelected(checkpointView: CheckpointView) {
-        viewModelScope.launch(Dispatchers.IO) {
-            when (val result = checkpointInteractor.saveCurrentSelectedCheckpointId(
-                raceId,
-                distanceId,
-                checkpointView.id
-            )) {
-                is TaskResult.Value -> _closeCheckpointDialogLiveData.postValue(checkpointView.bean.title)
-                is TaskResult.Error -> handleError(result.error)
+    private fun showRunners() {
+        jobShowRunner?.cancel()
+        jobShowRunner = when {
+            isResultMode -> viewModelScope.launch(Dispatchers.IO) { provideFinisherRunners() }
+            else -> viewModelScope.launch(Dispatchers.IO) { provideAllRunners() }
+        }
+    }
+
+    private fun showCurrentCheckpoint() {
+        jobShowCurrentCheckpoint?.cancel()
+        jobShowCurrentCheckpoint = viewModelScope.launch(Dispatchers.IO) {
+            when (val result =
+                checkpointInteractor.getCurrentSelectedCheckpoint(raceId, distanceId)) {
+                is TaskResult.Value -> _closeCheckpointDialogLiveData.postValue(result.value.getName())
+                is TaskResult.Error -> {
+                    if (result.error is CheckpointNotFoundException) {
+                        _closeCheckpointDialogLiveData.postValue("Выбрать кп")
+                    }
+                    handleError(result.error)
+                }
             }
         }
     }
 
-    private suspend fun observeDistanceChanges() {
-        try {
-            distanceInteractor.observeDistanceDataFlow(raceId)
-        } catch (e: Exception) {
-            Timber.e(e)
+    private fun observeDistanceChanges() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                distanceInteractor.observeDistanceDataFlow(raceId)
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
         }
     }
 
-    private suspend fun observeRunnerChanges() {
-        try {
-            runnersInteractor.observeRunnerDataFlow(raceId)
-        } catch (e: Exception) {
-            Timber.e(e)
+    private fun observeRunnerChanges() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                runnersInteractor.observeRunnerDataFlow(raceId)
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
         }
     }
 
@@ -255,17 +290,17 @@ class RunnersViewModel @ViewModelInject constructor(
             val runners = ArrayList(_runnersFlow.value)
             when (runnerChange.modifierType) {
                 ModifierType.ADD, ModifierType.UPDATE -> {
-                    runners.updateElement(runnerView, { it.number == runnerView.number })
+                    runners.updateElement(runnerView, { (it as? RunnerView)?.number == runnerView.number })
                 }
                 ModifierType.REMOVE -> {
-                    runners.removeAll { it.number == runnerView.number }
+                    runners.removeAll { (it as? RunnerView)?.number == runnerView.number }
                 }
             }
             _runnersFlow.value = runners
         }
     }
 
-    private suspend fun showAllDistances() {
+    private suspend fun provideAllDistances() {
         _showProgressLiveData.postValue(true)
         distanceInteractor.getDistancesFlow(raceId)
             .catch { error ->
@@ -286,19 +321,7 @@ class RunnersViewModel @ViewModelInject constructor(
             }
     }
 
-    private suspend fun showCurrentCheckpoint() {
-        when (val result = checkpointInteractor.getCurrentSelectedCheckpoint(raceId, distanceId)) {
-            is TaskResult.Value -> _closeCheckpointDialogLiveData.postValue(result.value.getName())
-            is TaskResult.Error -> {
-                if(result.error is CheckpointNotFoundException){
-                    _closeCheckpointDialogLiveData.postValue("Выбрать кп")
-                }
-                handleError(result.error)
-            }
-        }
-    }
-
-    private suspend fun showAllRunners() {
+    private suspend fun provideAllRunners() {
         _showProgressLiveData.postValue(true)
         runnersInteractor
             .getRunnersFlow(distanceId)
@@ -313,17 +336,36 @@ class RunnersViewModel @ViewModelInject constructor(
         _showProgressLiveData.postValue(false)
     }
 
+    private suspend fun provideFinisherRunners() {
+        _showProgressLiveData.postValue(true)
+        runnersInteractor
+            .getFinishersFlow(distanceId)
+            .catch { error ->
+                handleError(error)
+            }
+            .collect {
+                Timber.w("showAllRunners")
+                val runners = toRunnerViews(it)
+                _runnersFlow.value = runners
+            }
+        _showProgressLiveData.postValue(false)
+    }
+
     private fun onRunningStart(date: Date) {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val onResult = runnersInteractor.addStartCheckpointToRunners(raceId, distanceId, date)) {
-                is TaskResult.Value -> viewModelScope.launch(Dispatchers.IO) { showAllRunners() }
+            when (val onResult =
+                runnersInteractor.addStartCheckpointToRunners(raceId, distanceId, date)) {
+                is TaskResult.Value -> showRunners()
                 is TaskResult.Error -> Timber.e(onResult.error)
             }
         }
     }
 
     private fun onMarkRunnerOnCheckpointSuccess(updatedRunner: Runner) {
-        val lastCheckpoint = updatedRunner.checkpoints[updatedRunner.actualDistanceId]?.maxByOrNull { it.getResult()?.time ?: 0 }
+        val lastCheckpoint = updatedRunner
+            .checkpoints[updatedRunner.actualDistanceId]
+            ?.maxByOrNull { it.getResult()?.time ?: 0 }
+
         _showSuccessDialogLiveData.postValue(lastCheckpoint to updatedRunner.number)
         handleRunnerChanges(Change(updatedRunner, ModifierType.UPDATE))
     }

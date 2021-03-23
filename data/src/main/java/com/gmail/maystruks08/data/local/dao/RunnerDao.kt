@@ -35,11 +35,11 @@ interface RunnerDao : BaseDao<RunnerTable> {
     fun getRunnerWithResultsFlow(distanceId: String): Flow<List<RunnerWithResult>>
 
     @Transaction
-    @Query("SELECT * FROM runners LEFT JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId AND runners.runnerNumber LIKE :query")
+    @Query("SELECT * FROM runners LEFT JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId AND runners.runnerNumber LIKE '%' || :query || '%';")
     fun getRunnerWithResultsQueryFlow(distanceId: String, query: String): Flow<List<RunnerWithResult>>
 
     @Transaction
-    @Query("SELECT * FROM runners LEFT JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId AND runners.runnerNumber LIKE :query")
+    @Query("SELECT * FROM runners LEFT JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId AND runners.runnerNumber LIKE '%' || :query || '%';")
     fun getRunnerWithResultsQuery(distanceId: String, query: String): List<RunnerWithResult>
 
     @Transaction

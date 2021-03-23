@@ -11,7 +11,7 @@ import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

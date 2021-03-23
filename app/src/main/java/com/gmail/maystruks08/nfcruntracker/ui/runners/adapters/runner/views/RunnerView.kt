@@ -1,7 +1,9 @@
-package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
+package com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.RunnerListAdapter
+import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
 
 data class RunnerView(
     val cardId: String?,
@@ -14,8 +16,17 @@ data class RunnerView(
     val progress: List<CheckpointView>,
     val isOffTrack: Boolean,
     val placeholder: Boolean = false
-) : Parcelable {
+) :BaseRunnerView,  Parcelable {
 
+    override val type: Int = RunnerListAdapter.RUNNER
+
+    override fun isItemTheSame(other: BaseRunnerView?): Boolean {
+        return type == other?.type && number == (other as? RunnerView)?.number
+    }
+
+    override fun isContentTheSame(other: BaseRunnerView?): Boolean {
+        return this == (other as? RunnerView)
+    }
     constructor(source: Parcel) : this(
         source.readString().orEmpty(),
         source.readLong(),
@@ -45,14 +56,6 @@ data class RunnerView(
     }
 
     companion object{
-        fun getPlaceholder() =  arrayListOf(
-            RunnerView("",  0, "", "", null, "", "0", emptyList(), isOffTrack = false, placeholder = true),
-            RunnerView("",  0, "", "", null, "", "0", emptyList(), isOffTrack = false, placeholder = true),
-            RunnerView("",  0, "", "", null, "", "0", emptyList(), isOffTrack = false, placeholder = true),
-            RunnerView("",  0, "", "", null, "", "0", emptyList(), isOffTrack = false, placeholder = true),
-            RunnerView("",  0, "", "", null, "", "0", emptyList(), isOffTrack = false, placeholder = true),
-            RunnerView("",  0, "", "", null, "", "0", emptyList(), isOffTrack = false, placeholder = true),
-        )
 
         @JvmField
         val CREATOR: Parcelable.Creator<RunnerView> = object : Parcelable.Creator<RunnerView> {

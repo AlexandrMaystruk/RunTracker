@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.nfcruntracker.ui.runners.adapters
+package com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.distance
 
 import androidx.recyclerview.widget.DiffUtil
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.DistanceView

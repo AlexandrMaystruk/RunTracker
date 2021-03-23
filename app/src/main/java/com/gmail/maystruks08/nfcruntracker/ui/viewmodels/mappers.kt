@@ -6,6 +6,8 @@ import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.toDateFormat
 import com.gmail.maystruks08.domain.toTimeUTCFormat
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerResultView
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.views.Bean
 import com.gmail.maystruks08.nfcruntracker.ui.views.StepState
 
