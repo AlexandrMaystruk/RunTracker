@@ -29,4 +29,7 @@ interface RunnersRepository {
     @Throws(SaveRunnerDataException::class, SyncWithServerException::class)
     suspend fun updateRunnerData(runner: Runner): Runner
 
+    suspend fun getRaceId(): String
+
+
 }

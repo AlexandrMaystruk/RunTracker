@@ -42,13 +42,15 @@ data class Race(
         dateOrStart: Date,
         checkpoints: MutableList<Checkpoint>? = null,
     ) {
-        val newDistance = Distance(id,
-            raceId,
-            name,
-            authorId,
-            dateOrStart,
-            checkpoints ?: mutableListOf(),
-            sortedSetOf(
+        val newDistance = Distance(
+            id = id,
+            raceId = raceId,
+            name = name,
+            authorId = authorId,
+            dateOfStart = dateOrStart,
+            checkpoints = checkpoints ?: mutableListOf(),
+            statistic = DistanceStatistic(),
+            runners = sortedSetOf(
                 compareBy<Runner> { it.totalResults[id] }
                     .thenBy { it.isOffTrack[id] }
                     .thenBy { runner -> runner.checkpoints[id]?.count { it.getResult() != null } }

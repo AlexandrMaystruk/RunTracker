@@ -3,6 +3,7 @@ package com.gmail.maystruks08.domain.interactors
 import com.gmail.maystruks08.domain.INFO
 import com.gmail.maystruks08.domain.LogHelper
 import com.gmail.maystruks08.domain.entities.Change
+import com.gmail.maystruks08.domain.entities.DistanceStatistic
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
@@ -10,14 +11,21 @@ import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.exception.CheckpointNotFoundException
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.repository.CheckpointsRepository
+import com.gmail.maystruks08.domain.repository.DistanceRepository
 import com.gmail.maystruks08.domain.repository.RunnersRepository
 import com.gmail.maystruks08.domain.toDateTimeFormat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
 class RunnersInteractorImpl @Inject constructor(
     private val runnersRepository: RunnersRepository,
+    private val distanceRepository: DistanceRepository,
     private val checkpointsRepository: CheckpointsRepository,
     private val logHelper: LogHelper
 ) : RunnersInteractor {
@@ -33,6 +41,22 @@ class RunnersInteractorImpl @Inject constructor(
 
     override suspend fun getRunnersFlow(distanceId: String): Flow<List<Runner>> {
         return runnersRepository.getRunnersFlow(distanceId = distanceId)
+            .map { list ->
+                list.sortedByDescending { it.getPassedCheckpointCount() }
+            }
+            .onEach {
+                withContext(Dispatchers.IO){
+                    launch {
+                        updateDistanceStatistic(distanceId, it)
+                    }
+                }
+            }
+    }
+
+    private suspend fun updateDistanceStatistic(distanceId: String, runners: List<Runner>) {
+        val statistic = DistanceStatistic()
+        statistic.calculateStatistic(distanceId, runners)
+        distanceRepository.saveDistanceStatistic(runnersRepository.getRaceId(), distanceId, statistic)
     }
 
     override suspend fun getRunners(
@@ -48,7 +72,9 @@ class RunnersInteractorImpl @Inject constructor(
         return runnersRepository.getRunnersFlow(
             distanceId = distanceId,
             onlyFinishers = true
-        )/*.sortedBy { it.totalResult } }*/
+        ).map { list ->
+            list.sortedBy { it.totalResults[it.actualDistanceId]?.time }
+        }
     }
 
     override suspend fun getFinishers(

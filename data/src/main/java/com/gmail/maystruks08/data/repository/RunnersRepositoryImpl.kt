@@ -62,6 +62,10 @@ class RunnersRepositoryImpl @Inject constructor(
         return runner
     }
 
+    override suspend fun getRaceId(): String {
+        return configPreferences.getRaceId()
+    }
+
     override suspend fun observeRunnerData(raceId: String) {
         api
             .subscribeToRunnerCollectionChange(raceId)
@@ -95,7 +99,9 @@ class RunnersRepositoryImpl @Inject constructor(
                     }
                     onlyFinishers -> {
                         val checkpoints = runnerWithResult.getCheckpoints(true)
-                        return@mapNotNull if (checkpoints.isNotEmpty()) runnerWithResult.runnerTable.toRunner().apply { this.checkpoints[distanceId] = checkpoints }
+                        return@mapNotNull if (checkpoints.isNotEmpty()) runnerWithResult.runnerTable.toRunner().apply {
+                            addCheckpoints(distanceId, checkpoints)
+                        }
                         else null
                     }
                     else -> return@mapNotNull null
@@ -118,7 +124,9 @@ class RunnersRepositoryImpl @Inject constructor(
                     }
                     onlyFinishers -> {
                         val checkpoints = it.getCheckpoints(true)
-                        return@mapNotNull if (checkpoints.isNotEmpty()) it.runnerTable.toRunner().apply { this.checkpoints[distanceId] = checkpoints }
+                        return@mapNotNull if (checkpoints.isNotEmpty()) it.runnerTable.toRunner().apply {
+                            addCheckpoints(distanceId, checkpoints)
+                        }
                         else null
                     }
                     else -> return@mapNotNull null
@@ -146,20 +154,20 @@ class RunnersRepositoryImpl @Inject constructor(
 
     private fun RunnerWithResult.getCheckpoints(onlyFinishers: Boolean = false): MutableList<Checkpoint> {
         val distanceWithCheckpoints = distanceDAO.getDistance(runnerTable.actualDistanceId)
-        if (onlyFinishers && results.size != distanceWithCheckpoints.checkpoints.size) return mutableListOf()
+        val checkpointResult = results.distinct()
+        if (onlyFinishers && checkpointResult.size != distanceWithCheckpoints.checkpoints.size) return mutableListOf()
         return distanceWithCheckpoints.checkpoints.map { checkpointTable ->
-            val checkpointResult =
-                results.firstOrNull { it.checkpointId == checkpointTable.checkpointId }
+            val runnerResults = checkpointResult.firstOrNull { it.checkpointId == checkpointTable.checkpointId }
             val checkpoint = CheckpointImpl(
                 checkpointTable.checkpointId,
                 checkpointTable.distanceId,
                 checkpointTable.name
             )
-            if (checkpointResult == null) checkpoint
+            if (runnerResults == null) checkpoint
             else CheckpointResultIml(
                 checkpoint,
-                checkpointResult.time,
-                checkpointResult.hasPrevious
+                runnerResults.time,
+                runnerResults.hasPrevious
             )
         }.toMutableList()
     }

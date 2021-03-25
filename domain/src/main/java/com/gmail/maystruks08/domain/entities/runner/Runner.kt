@@ -2,6 +2,7 @@ package com.gmail.maystruks08.domain.entities.runner
 
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import java.util.*
 
 data class Runner(
@@ -31,6 +32,11 @@ data class Runner(
         cardId = newCardId
     }
 
+    fun addCheckpoints(distanceId: String, newCheckpoints: MutableList<Checkpoint>){
+        checkpoints[distanceId] = newCheckpoints
+        calculateTotalResultForDistance(distanceId)
+    }
+
     /**
      * Add checkpoint to runner entity
      * If previous checkpoint is absent -> mark current checkpoint as hasPrevious = false
@@ -45,7 +51,7 @@ data class Runner(
         val indexOfExistingElement = actualCheckpoints.indexOfFirst { it.getId() == checkpoint.getId() && it.getDistanceId() == checkpoint.getDistanceId() }
         if (indexOfExistingElement != -1) {
             actualCheckpoints.removeAt(indexOfExistingElement)
-            if (!isRestart) addCheckpoint(checkpoint, actualCheckpoints.size) else addStartCheckpoint(checkpoint)
+            if (!isRestart) addCheckpoint(checkpoint, indexOfExistingElement, actualCheckpoints.size) else addStartCheckpoint(checkpoint)
             actualCheckpoints.sortBy { it.getId() }
             for (index in 1 until actualCheckpoints.lastIndex) {
                 val current = actualCheckpoints[index]
@@ -87,12 +93,12 @@ data class Runner(
     /**
      * Need to add logic. Is it possible to change the order of passage of checkpoints?
      */
-    private fun addCheckpoint(checkpoint: Checkpoint, checkpointsCount: Int) {
+    private fun addCheckpoint(checkpoint: Checkpoint, index: Int,  checkpointsCount: Int) {
         if (hasNotPassedPreviously(checkpoint)) {
             checkpoint.setHasPrevious(false)
         }
         val actualCheckpoints = checkpoints[actualDistanceId]?: mutableListOf()
-        actualCheckpoints.add(checkpoint.getId().toInt(), checkpoint)
+        actualCheckpoints.add(index, checkpoint)
         if (checkpoints.size == checkpointsCount) {
             totalResults[actualDistanceId] = calculateTotalResult()
         }
@@ -118,5 +124,18 @@ data class Runner(
         val last = actualCheckpoints.lastOrNull()?.getResult()
         return if (first != null && last != null) Date(last.time - first.time) else null
     }
+
+    private fun calculateTotalResultForDistance(distanceId: String) {
+        val actualCheckpoints = checkpoints[distanceId]?: mutableListOf()
+        val first = actualCheckpoints.firstOrNull()?.getResult()
+        val last = actualCheckpoints.lastOrNull()?.getResult()
+        if (first != null && last != null) {
+            totalResults[distanceId] = Date(last.time - first.time)
+        }
+    }
+
+    fun getCheckpointCount() = checkpoints[actualDistanceId]?.count()?:0
+
+    fun getPassedCheckpointCount() = checkpoints[actualDistanceId]?.count { it is CheckpointResultIml }?:0
 }
 

@@ -38,6 +38,15 @@ interface DistanceDAO : BaseDao<DistanceTable> {
     fun deleteDistances()
 
 
+    @Query("UPDATE distances SET runnerCountInProgress =:runnerCountInProgress, runnerCountOffTrack =:runnerCountOffTrack, finisherCount =:finisherCount WHERE distanceId =:distanceId AND raceId =:raceId")
+    fun updateDistanceStatistic(
+        raceId: String,
+        distanceId: String,
+        runnerCountInProgress: Int,
+        runnerCountOffTrack: Int,
+        finisherCount: Int
+    )
+
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertJoin(join: DistanceRunnerCrossRef)

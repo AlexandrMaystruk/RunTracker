@@ -9,6 +9,7 @@ import com.gmail.maystruks08.data.mappers.toTable
 import com.gmail.maystruks08.data.remote.Api
 import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.entities.Distance
+import com.gmail.maystruks08.domain.entities.DistanceStatistic
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.repository.CheckpointsRepository
 import com.gmail.maystruks08.domain.repository.DistanceRepository
@@ -52,6 +53,16 @@ class DistanceRepositoryImpl @Inject constructor(
         return distanceDAO.getDistanceDistinctUntilChanged(raceId).map { distanceList ->
             distanceList.map { it.toDistanceEntity() }
         }
+    }
+
+    override suspend fun saveDistanceStatistic(raceId: String, distanceId: String, statistic: DistanceStatistic) {
+        distanceDAO.updateDistanceStatistic(
+            raceId = raceId,
+            distanceId = distanceId,
+            runnerCountInProgress = statistic.runnerCountInProgress,
+            runnerCountOffTrack = statistic.runnerCountOffTrack,
+            finisherCount = statistic.finisherCount
+        )
     }
 
     private fun checkIsDataUploaded(distanceId: String): Boolean {

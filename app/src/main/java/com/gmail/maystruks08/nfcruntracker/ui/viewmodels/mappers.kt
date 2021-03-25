@@ -21,6 +21,18 @@ fun toRunnerViews(runners: List<Runner>): MutableList<RunnerView> {
     }
 }
 
+fun toFinisherViews(runners: List<Runner>): MutableList<RunnerResultView> {
+    return mutableListOf<RunnerResultView>().apply {
+        val iterator = runners.iterator()
+        var position = 1
+        while (iterator.hasNext()) {
+            val item = iterator.next()
+            this.add(item.toRunnerResultView(position))
+            position++
+        }
+    }
+}
+
 fun Runner.toRunnerView() = RunnerView(
     this.cardId,
     this.number,
@@ -68,5 +80,5 @@ fun Race.toView(): RaceView {
 }
 
 fun Distance.toView(isSelected: Boolean = false): DistanceView {
-    return DistanceView(id, name, isSelected)
+    return DistanceView(id, name, statistic.runnerCountInProgress, statistic.runnerCountOffTrack, statistic.finisherCount, isSelected)
 }

@@ -10,6 +10,7 @@ import com.gmail.maystruks08.data.remote.pojo.DistancePojo
 import com.gmail.maystruks08.data.remote.pojo.RacePojo
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.domain.entities.Distance
+import com.gmail.maystruks08.domain.entities.DistanceStatistic
 import com.gmail.maystruks08.domain.entities.Race
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
@@ -42,6 +43,7 @@ fun DistanceWithRunners.toDistanceEntity(): Distance {
         ?.toSortedSet(compareBy<Runner> { it.totalResults[it.actualDistanceId] }
             .thenBy { it.isOffTrack[it.actualDistanceId] }
             .thenBy { it.checkpoints[it.actualDistanceId]?.count { it.getResult() != null } })
+    val statistic = DistanceStatistic(distance.runnerCountInProgress, distance.runnerCountOffTrack, distance.finisherCount)
     return Distance(
         id = distance.distanceId,
         raceId = distance.raceId,
@@ -49,6 +51,7 @@ fun DistanceWithRunners.toDistanceEntity(): Distance {
         authorId = distance.authorId,
         dateOfStart = Date(distance.dateOfStart),
         checkpoints = checkpointList,
+        statistic = statistic,
         runners = runners?: mutableSetOf()
     )
 }
@@ -61,6 +64,7 @@ fun DistanceTable.toDistanceEntity(): Distance {
         authorId = authorId,
         dateOfStart = Date(dateOfStart),
         checkpoints = mutableListOf(),
+        statistic = DistanceStatistic(runnerCountInProgress, runnerCountOffTrack, finisherCount),
         runners = mutableSetOf()
     )
 }

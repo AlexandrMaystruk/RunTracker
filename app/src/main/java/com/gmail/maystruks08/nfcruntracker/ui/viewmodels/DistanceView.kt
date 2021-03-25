@@ -3,17 +3,30 @@ package com.gmail.maystruks08.nfcruntracker.ui.viewmodels
 import android.os.Parcel
 import android.os.Parcelable
 
-data class DistanceView(val id: String, val name: String, var isSelected: Boolean = false) : Parcelable {
+data class DistanceView(
+    val id: String,
+    val name: String,
+    val runnerCountInProgress: Int,
+    val runnerCountOffTrack: Int,
+    val finisherCount: Int,
+    var isSelected: Boolean = false
+) : Parcelable {
 
     constructor(parcel: Parcel) : this(
         parcel.readString().orEmpty(),
         parcel.readString().orEmpty(),
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readInt(),
         parcel.readInt() != 0
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id)
         parcel.writeString(name)
+        parcel.writeInt(runnerCountInProgress)
+        parcel.writeInt(runnerCountOffTrack)
+        parcel.writeInt(finisherCount)
         parcel.writeInt(if (isSelected) 1 else 0)
     }
 

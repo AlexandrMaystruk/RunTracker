@@ -31,15 +31,15 @@ interface RunnerDao : BaseDao<RunnerTable> {
     /** GET */
 
     @Transaction
-    @Query("SELECT * FROM runners LEFT JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId")
+    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId")
     fun getRunnerWithResultsFlow(distanceId: String): Flow<List<RunnerWithResult>>
 
     @Transaction
-    @Query("SELECT * FROM runners LEFT JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId AND runners.runnerNumber LIKE '%' || :query || '%';")
+    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId AND runners.runnerNumber LIKE '%' || :query || '%';")
     fun getRunnerWithResultsQueryFlow(distanceId: String, query: String): Flow<List<RunnerWithResult>>
 
     @Transaction
-    @Query("SELECT * FROM runners LEFT JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId AND runners.runnerNumber LIKE '%' || :query || '%';")
+    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId AND runners.runnerNumber LIKE '%' || :query || '%';")
     fun getRunnerWithResultsQuery(distanceId: String, query: String): List<RunnerWithResult>
 
     @Transaction
@@ -60,7 +60,7 @@ interface RunnerDao : BaseDao<RunnerTable> {
     fun getRunnerDistanceIds(runnerNumber: Long): List<String>
 
     @Transaction
-    @Query("SELECT DISTINCT id FROM race_table LEFT JOIN distances ON race_table.id == distances.raceId LEFT JOIN distance_runner_cross_ref ON distances.distanceId == distance_runner_cross_ref.distanceId WHERE runnerNumber =:runnerNumber")
+    @Query("SELECT DISTINCT id FROM race_table INNER JOIN distances ON race_table.id == distances.raceId INNER JOIN distance_runner_cross_ref ON distances.distanceId == distance_runner_cross_ref.distanceId WHERE runnerNumber =:runnerNumber")
     fun getRunnerRaceIds(runnerNumber: Long): List<String>
 
 

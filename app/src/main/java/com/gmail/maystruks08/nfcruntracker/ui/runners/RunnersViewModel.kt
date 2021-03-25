@@ -111,7 +111,7 @@ class RunnersViewModel @ViewModelInject constructor(
         val updatedDistance = ArrayList(_distanceFlow.value.map {
             val isSelected = it.id == distanceId
             if (isSelected) _showRunnersTitleFlow.value = it.name
-            DistanceView(it.id, it.name, isSelected)
+            it.copy(isSelected = isSelected)
         })
         _distanceFlow.value = updatedDistance
 
@@ -344,8 +344,8 @@ class RunnersViewModel @ViewModelInject constructor(
                 handleError(error)
             }
             .collect {
-                Timber.w("showAllRunners")
-                val runners = toRunnerViews(it)
+                Timber.w("provideFinisherRunners")
+                val runners = toFinisherViews(it)
                 _runnersFlow.value = runners
             }
         _showProgressLiveData.postValue(false)
