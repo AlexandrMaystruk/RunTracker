@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.CurrentRaceDistance
 import com.gmail.maystruks08.domain.DEF_STRING_VALUE
 import com.gmail.maystruks08.domain.entities.Change
+import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
@@ -94,9 +95,8 @@ class RunnersViewModel @ViewModelInject constructor(
     }
 
     fun renderUI() {
-        showDistances()
         showRunners()
-        showCurrentCheckpoint()
+        showDistances()
         observeRunnerChanges()
         observeDistanceChanges()
     }
@@ -108,15 +108,8 @@ class RunnersViewModel @ViewModelInject constructor(
 
     fun changeDistance(distanceId: String) {
         this.distanceId = distanceId
-        val updatedDistance = ArrayList(_distanceFlow.value.map {
-            val isSelected = it.id == distanceId
-            if (isSelected) _showRunnersTitleFlow.value = it.name
-            it.copy(isSelected = isSelected)
-        })
-        _distanceFlow.value = updatedDistance
-
         showRunners()
-        viewModelScope.launch(Dispatchers.IO) { showCurrentCheckpoint() }
+        showDistances()
     }
 
     fun onNfcCardScanned(cardId: String) {
@@ -307,17 +300,9 @@ class RunnersViewModel @ViewModelInject constructor(
                 handleError(error)
             }
             .collect { distanceList ->
-                val distanceViews = if (distanceId == DEF_STRING_VALUE) {
-                    distanceList.mapIndexed { index, distance ->
-                        val isSelected = index == 0
-                        if (isSelected) _showRunnersTitleFlow.value = distance.name
-                        distance.toView(isSelected)
-                    }
-                } else {
-                    distanceList.map { it.toView(distanceId == it.id) }
-                }.toMutableList()
-                _distanceFlow.value = distanceViews
                 _showProgressLiveData.postValue(false)
+                _distanceFlow.value = distanceList.mapDistanceList()
+                showCurrentCheckpoint()
             }
     }
 
@@ -370,6 +355,28 @@ class RunnersViewModel @ViewModelInject constructor(
         handleRunnerChanges(Change(updatedRunner, ModifierType.UPDATE))
     }
 
+    private fun List<Distance>.mapDistanceList(): MutableList<DistanceView>{
+        return if (distanceId == DEF_STRING_VALUE) {
+            mapIndexed { index, distance ->
+                val isSelected = index == 0
+                if (isSelected) {
+                    distanceId = distance.id
+                    _showRunnersTitleFlow.value = distance.name
+                }
+                distance.toView(isSelected)
+            }
+        } else {
+            map {
+                val isSelected = distanceId == it.id
+                if (isSelected) {
+                    distanceId = it.id
+                    _showRunnersTitleFlow.value = it.name
+                }
+                it.toView(isSelected)
+            }
+        }.toMutableList()
+    }
+
     private fun handleError(e: Throwable) {
         _showProgressLiveData.postValue(false)
         when (e) {
@@ -393,7 +400,6 @@ class RunnersViewModel @ViewModelInject constructor(
     private fun isRunnerOfftrack() = lastSelectedRunner?.isOffTrack == true
 
     private fun isRunnerHasResult() = !lastSelectedRunner?.result.isNullOrEmpty()
-
 
     override fun onCleared() {
         startRunTrackerBus.unsubscribe(this.name())

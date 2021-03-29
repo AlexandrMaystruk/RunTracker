@@ -2,6 +2,8 @@ package com.gmail.maystruks08.nfcruntracker.ui.views
 
 import android.content.Context
 import android.graphics.*
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.ColorRes
@@ -43,9 +45,9 @@ class ChartView : View {
     }
 
     private val chart: Chart = Chart().apply {
-        chartItems.add(ChartItem("12", R.color.colorWhite, R.color.colorGreen, 12))
-        chartItems.add(ChartItem("28", R.color.colorWhite, R.color.colorRed, 28))
-        chartItems.add(ChartItem("34", R.color.colorWhite, R.color.design_default_color_primary, 34))
+        chartItems.add(ChartItem("12", R.color.colorWhite, R.color.colorGreen, 0))
+        chartItems.add(ChartItem("28", R.color.colorWhite, R.color.colorRed, 0))
+        chartItems.add(ChartItem("34", R.color.colorWhite, R.color.design_default_color_primary, 0))
     }
 
     var strokeWidth: Float = 15f
@@ -80,10 +82,10 @@ class ChartView : View {
             invalidate()
         }
 
-    fun setChartItems(chartItems: List<ChartItem>) {
+    fun setChartItems(chartItems: Array<out ChartItem>) {
         chart.chartItems.clear()
-        chart.chartItems.addAll(chartItems)
-        invalidate()
+        chart.chartItems.addAll(chartItems.filter { it.progress > 0 })
+        requestLayout()
     }
 
     private var _startAngle = 90f
@@ -202,7 +204,36 @@ data class ChartItem(
     @ColorRes val textColor: Int,
     @ColorRes val backgroundColor: Int,
     val progress: Int
-)
+): Parcelable {
+
+    constructor(parcel: Parcel) : this(
+        parcel.readString().orEmpty(),
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readInt()
+    )
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(text)
+        parcel.writeInt(textColor)
+        parcel.writeInt(backgroundColor)
+        parcel.writeInt(progress)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<ChartItem> {
+        override fun createFromParcel(parcel: Parcel): ChartItem {
+            return ChartItem(parcel)
+        }
+
+        override fun newArray(size: Int): Array<ChartItem?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
 
 
 

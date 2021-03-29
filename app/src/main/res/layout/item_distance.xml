@@ -45,7 +45,7 @@
         app:circlePadding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeWidth="14dp"
+        app:strokeWidth="18dp"
         app:textPadding="0dp"
         app:textSize="12sp" />
 

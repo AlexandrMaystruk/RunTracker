@@ -22,6 +22,7 @@ class DistanceViewHolder(
             } else {
                 distanceCard.strokeLineWidth = 1f
             }
+            chartView.setChartItems(distanceView.chartItems)
             itemView.setOnClickListener {
                 interaction?.onItemSelected(distanceView)
             }

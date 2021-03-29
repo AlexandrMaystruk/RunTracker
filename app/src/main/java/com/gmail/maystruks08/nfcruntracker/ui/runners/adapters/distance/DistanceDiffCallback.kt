@@ -10,6 +10,8 @@ object DistanceDiffCallback : DiffUtil.ItemCallback<DistanceView?>() {
     }
 
     override fun areContentsTheSame(oldDistance: DistanceView, newDistance: DistanceView): Boolean {
-        return oldDistance.name == newDistance.name && oldDistance.isSelected == newDistance.isSelected
+        return oldDistance.name == newDistance.name &&
+                oldDistance.isSelected == newDistance.isSelected &&
+                oldDistance.chartItems.contentEquals(newDistance.chartItems)
     }
 }

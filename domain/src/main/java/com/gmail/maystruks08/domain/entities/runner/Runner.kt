@@ -19,13 +19,13 @@ data class Runner(
     val raceIds: MutableList<String>,
     val distanceIds: MutableList<String>,
     val checkpoints: MutableMap<String, MutableList<Checkpoint>>, //key distance id value checkpoints
-    val isOffTrack: MutableMap<String, Boolean>, //key distance id
+    val offTrackDistances: MutableList<String>, //distance id
     val teamNames: MutableMap<String, String?>, //key distance id
     val totalResults: MutableMap<String, Date?>, //key distance id
 ) {
 
     fun markThatRunnerIsOffTrack(){
-        isOffTrack[actualDistanceId] = true
+        offTrackDistances.add(actualDistanceId)
     }
 
     fun updateCardId(newCardId: String){

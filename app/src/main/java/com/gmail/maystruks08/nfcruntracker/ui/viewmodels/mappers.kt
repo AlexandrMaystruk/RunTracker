@@ -6,9 +6,11 @@ import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.toDateFormat
 import com.gmail.maystruks08.domain.toTimeUTCFormat
+import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerResultView
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.views.Bean
+import com.gmail.maystruks08.nfcruntracker.ui.views.ChartItem
 import com.gmail.maystruks08.nfcruntracker.ui.views.StepState
 
 fun toRunnerViews(runners: List<Runner>): MutableList<RunnerView> {
@@ -42,7 +44,7 @@ fun Runner.toRunnerView() = RunnerView(
     this.dateOfBirthday.toDateFormat(),
     this.actualDistanceId,
     this.checkpoints[actualDistanceId]?.toCheckpointViews().orEmpty(),
-    this.isOffTrack[actualDistanceId]?:false
+    this.offTrackDistances.any { it == actualDistanceId }
 )
 
 fun Runner.toRunnerResultView(position: Int) = RunnerResultView(
@@ -80,5 +82,30 @@ fun Race.toView(): RaceView {
 }
 
 fun Distance.toView(isSelected: Boolean = false): DistanceView {
-    return DistanceView(id, name, statistic.runnerCountInProgress, statistic.runnerCountOffTrack, statistic.finisherCount, isSelected)
+    val items = arrayOf(
+        ChartItem(
+            statistic.runnerCountInProgress.toString(),
+            R.color.colorWhite,
+            R.color.design_default_color_primary,
+            statistic.runnerCountInProgress
+        ),
+        ChartItem(
+            statistic.runnerCountOffTrack.toString(),
+            R.color.colorWhite,
+            R.color.colorRed,
+            statistic.runnerCountOffTrack
+        ),
+        ChartItem(
+            statistic.finisherCount.toString(),
+            R.color.colorWhite,
+            R.color.colorGreen,
+            statistic.finisherCount
+        ),
+    )
+    return DistanceView(
+        id = id,
+        name = name,
+        chartItems = items,
+        isSelected = isSelected
+    )
 }

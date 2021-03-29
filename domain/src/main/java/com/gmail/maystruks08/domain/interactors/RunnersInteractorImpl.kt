@@ -44,13 +44,13 @@ class RunnersInteractorImpl @Inject constructor(
             .map { list ->
                 list.sortedByDescending { it.getPassedCheckpointCount() }
             }
-            .onEach {
-                withContext(Dispatchers.IO){
-                    launch {
-                        updateDistanceStatistic(distanceId, it)
-                    }
-                }
-            }
+//            .onEach {
+//                withContext(Dispatchers.IO){
+//                    launch {
+//                        updateDistanceStatistic(distanceId, it)
+//                    }
+//                }
+//            }
     }
 
     private suspend fun updateDistanceStatistic(distanceId: String, runners: List<Runner>) {
@@ -121,8 +121,7 @@ class RunnersInteractorImpl @Inject constructor(
 
     override suspend fun markRunnerGotOffTheRoute(runnerNumber: Long): TaskResult<Exception, Runner> {
         return TaskResult.build {
-            val runner =
-                runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
+            val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
             runner.markThatRunnerIsOffTrack()
             logHelper.log(INFO, "Runner ${runner.number} ${runner.fullName} is off track")
             runnersRepository.updateRunnerData(runner)
@@ -153,7 +152,7 @@ class RunnersInteractorImpl @Inject constructor(
             logHelper.log(INFO, "Remove checkpoint: $checkpointId for runner ${runner.number}  actualDistanceId:${runner.actualDistanceId}  ${runner.fullName}")
             runner.removeCheckpoint(checkpointId)
             val teamName = runner.teamNames[actualDistanceID]
-            if(!teamName.isNullOrEmpty() &&  runner.isOffTrack[actualDistanceID] != true){
+            if(!teamName.isNullOrEmpty() && !runner.offTrackDistances.any { it == actualDistanceID }){
                 runnersRepository.getRunnerTeamMembers(runner.number, teamName)?.map { teamRunner ->
                     logHelper.log(INFO, "Remove checkpoint: $checkpointId for team runner ${teamRunner.number}  actualDistanceId:${runner.actualDistanceId}  ${teamRunner.fullName}")
                     teamRunner.removeCheckpoint(checkpointId)
@@ -172,7 +171,7 @@ class RunnersInteractorImpl @Inject constructor(
         val currentDate = Date()
         runner.addPassedCheckpoint(checkpoint = CheckpointResultIml(checkpoint = currentCheckpoint, currentDate))
         val teamName = runner.teamNames[actualDistanceID]
-        if(!teamName.isNullOrEmpty() && runner.isOffTrack[actualDistanceID] != true){
+        if(!teamName.isNullOrEmpty() && !runner.offTrackDistances.any { it == actualDistanceID }){
             runnersRepository.getRunnerTeamMembers(runner.number, teamName)?.map { teamRunner ->
                 teamRunner.addPassedCheckpoint(checkpoint = CheckpointResultIml(checkpoint = currentCheckpoint, currentDate))
                 logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.getName()} to team runner ${teamRunner.shortName}  ${teamRunner.actualDistanceId}  ${teamRunner.shortName}")

@@ -9,5 +9,8 @@ data class DistancePojo(
     val authorId: String = "",
     val dateOfStart: Date = Date(),
     val checkpointsIds: List<String> = emptyList(),
-    val runnerIds: List<Long> = emptyList()
+    val runnerIds: List<Long> = emptyList(),
+    val runnerCountInProgress: Int = 0,
+    val runnerCountOffTrack: Int = 0,
+    val finisherCount: Int = 0
 )

@@ -52,7 +52,7 @@ data class Race(
             statistic = DistanceStatistic(),
             runners = sortedSetOf(
                 compareBy<Runner> { it.totalResults[id] }
-                    .thenBy { it.isOffTrack[id] }
+                    .thenBy { runner -> runner.offTrackDistances.any { it == runner.actualDistanceId } }
                     .thenBy { runner -> runner.checkpoints[id]?.count { it.getResult() != null } }
             ))
         distanceList.add(newDistance)

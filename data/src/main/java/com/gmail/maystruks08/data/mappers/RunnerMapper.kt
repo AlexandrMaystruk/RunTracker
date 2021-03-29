@@ -34,7 +34,7 @@ fun RunnerPojo.fromFirestoreRunner(): Runner {
         raceIds,
         distanceIds,
         checkpointsResult,
-        isOffTrack,
+        offTrackDistances,
         teamNames,
         totalResults
     )

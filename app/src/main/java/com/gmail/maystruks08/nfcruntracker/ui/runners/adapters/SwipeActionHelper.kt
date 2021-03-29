@@ -49,7 +49,7 @@ abstract class SwipeActionHelper(context: Context) :
         val itemHeight = itemView.bottom - itemView.top
 
         when {
-            //Swipe left (Delete)
+            //Swipe left (Off track)
             dX < 0 -> {
                 deleteIcon?.let {
                     val iconTop = itemView.top + (itemHeight - it.intrinsicHeight) / 2
@@ -69,7 +69,7 @@ abstract class SwipeActionHelper(context: Context) :
                     prevDX = dX
                 }
             }
-            //Swipe right (In cafe)
+            //Swipe right (Add current checkpoint)
             dX > 0 -> {
                 inCafeIcon?.let {
                     val iconTop = itemView.top + (itemHeight - it.intrinsicHeight) / 2

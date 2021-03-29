@@ -23,6 +23,7 @@ import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.gson.Gson
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -39,6 +40,7 @@ class RunnersRepositoryImpl @Inject constructor(
     private val distanceDAO: DistanceDAO,
     private val runnerDao: RunnerDao,
     private val configPreferences: ConfigPreferences,
+    private val gson: Gson
 ) : RunnersRepository, RunnerDataChangeListener {
 
     override suspend fun updateRunnerData(runner: Runner): Runner {
@@ -93,13 +95,15 @@ class RunnersRepositoryImpl @Inject constructor(
             .mapNotNull { runnerWithResult ->
                 when {
                     !onlyFinishers -> {
-                        runnerWithResult.runnerTable.toRunner().apply {
+                        runnerWithResult.runnerTable.toRunner(gson).apply {
                             this.checkpoints[distanceId] = runnerWithResult.getCheckpoints()
                         }
                     }
                     onlyFinishers -> {
                         val checkpoints = runnerWithResult.getCheckpoints(true)
-                        return@mapNotNull if (checkpoints.isNotEmpty()) runnerWithResult.runnerTable.toRunner().apply {
+                        return@mapNotNull if (checkpoints.isNotEmpty()) runnerWithResult.runnerTable.toRunner(
+                            gson
+                        ).apply {
                             addCheckpoints(distanceId, checkpoints)
                         }
                         else null
@@ -118,15 +122,16 @@ class RunnersRepositoryImpl @Inject constructor(
             runnersWithResults.mapNotNull {
                 when {
                     !onlyFinishers -> {
-                        it.runnerTable.toRunner().apply {
+                        it.runnerTable.toRunner(gson).apply {
                             this.checkpoints[distanceId] = it.getCheckpoints()
                         }
                     }
                     onlyFinishers -> {
                         val checkpoints = it.getCheckpoints(true)
-                        return@mapNotNull if (checkpoints.isNotEmpty()) it.runnerTable.toRunner().apply {
-                            addCheckpoints(distanceId, checkpoints)
-                        }
+                        return@mapNotNull if (checkpoints.isNotEmpty()) it.runnerTable.toRunner(gson)
+                            .apply {
+                                addCheckpoints(distanceId, checkpoints)
+                            }
                         else null
                     }
                     else -> return@mapNotNull null
@@ -145,7 +150,7 @@ class RunnersRepositoryImpl @Inject constructor(
     }
 
     private fun RunnerWithResult.toRunner(): Runner {
-        return runnerTable.toRunner().apply {
+        return runnerTable.toRunner(gson).apply {
             this.raceIds.clearAndAddAll(runnerDao.getRunnerRaceIds(number))
             this.distanceIds.clearAndAddAll(runnerDao.getRunnerDistanceIds(number))
             this.checkpoints[actualDistanceId] = getCheckpoints()
@@ -197,7 +202,7 @@ class RunnersRepositoryImpl @Inject constructor(
     }
 
     private suspend fun insertRunner(runner: Runner) {
-        val runnerTable = runner.toRunnerTable(false)
+        val runnerTable = runner.toRunnerTable(gson, false)
         val resultTables = mutableListOf<ResultTable>()
         val runnerResultCrossRefTables = mutableListOf<RunnerResultCrossRef>()
         val distanceRunnerCrossRefTables = runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }

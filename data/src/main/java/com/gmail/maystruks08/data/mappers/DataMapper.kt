@@ -25,7 +25,7 @@ import java.util.*
  * Convert database table to entity
  */
 fun RaceWithDistances.toRaceEntity(gson: Gson): Race {
-    val distances = distancesWithRunners.map { it.toDistanceEntity() }.toMutableList()
+    val distances = distancesWithRunners.map { it.toDistanceEntity(gson) }.toMutableList()
     return Race(
         id = raceTable.id,
         name = raceTable.name,
@@ -37,12 +37,12 @@ fun RaceWithDistances.toRaceEntity(gson: Gson): Race {
     )
 }
 
-fun DistanceWithRunners.toDistanceEntity(): Distance {
+fun DistanceWithRunners.toDistanceEntity(gson: Gson): Distance {
     val checkpointList = checkpoints.map { it.toCheckpoint() }.toMutableList()
-    val runners = runners?.map { it.toRunner() }
+    val runners = runners?.map { it.toRunner(gson) }
         ?.toSortedSet(compareBy<Runner> { it.totalResults[it.actualDistanceId] }
-            .thenBy { it.isOffTrack[it.actualDistanceId] }
-            .thenBy { it.checkpoints[it.actualDistanceId]?.count { it.getResult() != null } })
+            .thenBy {runner -> runner.offTrackDistances.any { it == runner.actualDistanceId } }
+            .thenBy {runner -> runner.checkpoints[runner.actualDistanceId]?.count { it.getResult() != null } })
     val statistic = DistanceStatistic(distance.runnerCountInProgress, distance.runnerCountOffTrack, distance.finisherCount)
     return Distance(
         id = distance.distanceId,
@@ -69,7 +69,7 @@ fun DistanceTable.toDistanceEntity(): Distance {
     )
 }
 
-fun RunnerTable.toRunner(): Runner {
+fun RunnerTable.toRunner(gson: Gson): Runner {
     return Runner(
         cardId = cardId,
         number = runnerNumber,
@@ -82,7 +82,7 @@ fun RunnerTable.toRunner(): Runner {
         teamNames = mutableMapOf(),
         totalResults = mutableMapOf(),
         checkpoints = mutableMapOf(),
-        isOffTrack = mutableMapOf(),
+        offTrackDistances = gson.fromJsonOrNull(isOffTrackMapJson)?: mutableListOf(),
         distanceIds = mutableListOf(),
         raceIds = mutableListOf(),
         actualDistanceId = actualDistanceId,
@@ -117,7 +117,7 @@ fun Race.toRaceTable(gson: Gson): RaceTable {
 }
 
 
-fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
+fun Runner.toRunnerTable(gson: Gson, needToSync: Boolean = true): RunnerTable {
     return RunnerTable(
         cardId = this.cardId,
         runnerNumber = this.number,
@@ -129,6 +129,7 @@ fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
         dateOfBirthday = this.dateOfBirthday,
         actualDistanceId = this.actualDistanceId,
         actualRaceId =  this.actualRaceId,
+        isOffTrackMapJson = gson.toJson(this.offTrackDistances),
         needToSync = needToSync
     )
 }
@@ -178,7 +179,10 @@ fun Distance.toFirestoreDistance(raceId: String): DistancePojo {
         authorId = authorId,
         dateOfStart = dateOfStart,
         checkpointsIds = checkpoints.map { it.getId() },
-        runnerIds = runners.map { it.number }
+        runnerIds = runners.map { it.number },
+        runnerCountInProgress = statistic.runnerCountInProgress,
+        runnerCountOffTrack = statistic.runnerCountOffTrack,
+        finisherCount = statistic.finisherCount
     )
 }
 
@@ -210,7 +214,7 @@ fun Runner.toFirestoreRunner(): RunnerPojo {
         raceIds = raceIds,
         distanceIds = distanceIds,
         checkpoints = checkpointsResult,
-        isOffTrack = isOffTrack,
+        offTrackDistances = offTrackDistances,
         teamNames = teamNames,
         totalResults = totalResults
     )
@@ -239,6 +243,9 @@ fun DistancePojo.toTable(): Pair<DistanceTable, List<DistanceRunnerCrossRef>> {
         name = name,
         authorId = authorId,
         dateOfStart = dateOfStart.time,
+        runnerCountInProgress = runnerCountInProgress,
+        runnerCountOffTrack = runnerCountOffTrack,
+        finisherCount = finisherCount
     ) to runnerIds.map { DistanceRunnerCrossRef(id, it) }
 }
 

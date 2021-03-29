@@ -6,13 +6,13 @@ data class DistanceStatistic(var runnerCountInProgress: Int = 0, var runnerCount
 
     fun calculateStatistic(distanceId: String, distanceRunners: List<Runner>){
         runnerCountInProgress = distanceRunners.size
-        distanceRunners.forEach {
+        distanceRunners.forEach { runner ->
             when {
-                it.isOffTrack[distanceId] == true -> {
+                runner.offTrackDistances.any { it == runner.actualDistanceId} -> {
                     runnerCountInProgress --
                     runnerCountOffTrack++
                 }
-                it.getCheckpointCount() == it.getPassedCheckpointCount() -> {
+                runner.getCheckpointCount() == runner.getPassedCheckpointCount() -> {
                     finisherCount++
                     runnerCountInProgress --
                 }
