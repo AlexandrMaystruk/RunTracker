@@ -2,6 +2,7 @@ package com.gmail.maystruks08.data.local.dao
 
 import androidx.room.*
 import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
+import com.gmail.maystruks08.data.local.entity.relation.DistanceStatisticTable
 import com.gmail.maystruks08.data.local.entity.relation.DistanceWithCheckpoints
 import com.gmail.maystruks08.data.local.entity.relation.DistanceWithRunners
 import com.gmail.maystruks08.data.local.entity.tables.DistanceTable
@@ -37,6 +38,32 @@ interface DistanceDAO : BaseDao<DistanceTable> {
     @Query("DELETE FROM distances")
     fun deleteDistances()
 
+
+
+    @Query("SELECT COUNT(*) FROM runners WHERE actualRaceId =:raceId AND actualDistanceId =:distanceId;")
+    fun getRunnersCount(
+        raceId: String,
+        distanceId: String
+    ): Int
+
+    @Query("SELECT COUNT(*) FROM runners  WHERE actualRaceId =:raceId AND actualDistanceId =:distanceId AND isOffTrackMapJson LIKE '%' || :distanceId || '%';")
+    fun getRunnerCountOffTrack(
+        raceId: String,
+        distanceId: String
+    ): Int
+
+    @Query("SELECT COUNT(*) FROM runners WHERE actualRaceId =:raceId AND actualDistanceId =:distanceId AND isOffTrackMapJson NOT LIKE '%' || :distanceId || '%' AND (SELECT COUNT(*) FROM checkpoints WHERE checkpoints.distanceId =:distanceId) = (SELECT COUNT(*) FROM result WHERE runners.runnerNumber = result.runnerNumber )")
+    fun getFinisherCount(
+        raceId: String,
+        distanceId: String
+    ): Int
+
+
+    @Query("SELECT runnerCountInProgress, runnerCountOffTrack, finisherCount FROM distances WHERE raceId =:raceId AND distanceId =:distanceId")
+    fun getDistanceStatistic(
+        raceId: String,
+        distanceId: String
+    ): DistanceStatisticTable?
 
     @Query("UPDATE distances SET runnerCountInProgress =:runnerCountInProgress, runnerCountOffTrack =:runnerCountOffTrack, finisherCount =:finisherCount WHERE distanceId =:distanceId AND raceId =:raceId")
     fun updateDistanceStatistic(

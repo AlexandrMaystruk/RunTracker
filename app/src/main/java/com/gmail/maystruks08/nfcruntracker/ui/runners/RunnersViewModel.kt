@@ -14,6 +14,7 @@ import com.gmail.maystruks08.domain.exception.CheckpointNotFoundException
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
+import com.gmail.maystruks08.domain.interactors.CalculateDistanceStatisticUseCase
 import com.gmail.maystruks08.domain.interactors.CheckpointInteractor
 import com.gmail.maystruks08.domain.interactors.DistanceInteractor
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
@@ -46,6 +47,7 @@ class RunnersViewModel @ViewModelInject constructor(
     private val distanceInteractor: DistanceInteractor,
     private val runnersInteractor: RunnersInteractor,
     private val checkpointInteractor: CheckpointInteractor,
+    private val calculateDistanceStatisticUseCase: CalculateDistanceStatisticUseCase,
     private val router: Router,
     private val startRunTrackerBus: StartRunTrackerBus
 ) : BaseViewModel() {
@@ -136,12 +138,10 @@ class RunnersViewModel @ViewModelInject constructor(
             val runnerNumber = lastSelectedRunner?.number ?: return@launch
             if (lastSelectedRunner?.isOffTrack == true) return@launch
             when (val onResult = runnersInteractor.markRunnerGotOffTheRoute(runnerNumber)) {
-                is TaskResult.Value -> handleRunnerChanges(
-                    Change(
-                        onResult.value,
-                        ModifierType.UPDATE
-                    )
-                )
+                is TaskResult.Value -> {
+                    handleRunnerChanges(Change(onResult.value, ModifierType.UPDATE))
+                    recalculateDistanceStatistic()
+                }
                 is TaskResult.Error -> handleError(onResult.error)
             }
             lastSelectedRunner = null
@@ -340,9 +340,18 @@ class RunnersViewModel @ViewModelInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             when (val onResult =
                 runnersInteractor.addStartCheckpointToRunners(raceId, distanceId, date)) {
-                is TaskResult.Value -> showRunners()
+                is TaskResult.Value -> {
+                    showRunners()
+                    recalculateDistanceStatistic()
+                }
                 is TaskResult.Error -> Timber.e(onResult.error)
             }
+        }
+    }
+
+    private fun recalculateDistanceStatistic(){
+        viewModelScope.launch(Dispatchers.Default) {
+            calculateDistanceStatisticUseCase.invoke(raceId, distanceId)
         }
     }
 
@@ -353,6 +362,7 @@ class RunnersViewModel @ViewModelInject constructor(
 
         _showSuccessDialogLiveData.postValue(lastCheckpoint to updatedRunner.number)
         handleRunnerChanges(Change(updatedRunner, ModifierType.UPDATE))
+        recalculateDistanceStatistic()
     }
 
     private fun List<Distance>.mapDistanceList(): MutableList<DistanceView>{

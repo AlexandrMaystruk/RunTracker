@@ -43,7 +43,7 @@ fun DistanceWithRunners.toDistanceEntity(gson: Gson): Distance {
         ?.toSortedSet(compareBy<Runner> { it.totalResults[it.actualDistanceId] }
             .thenBy {runner -> runner.offTrackDistances.any { it == runner.actualDistanceId } }
             .thenBy {runner -> runner.checkpoints[runner.actualDistanceId]?.count { it.getResult() != null } })
-    val statistic = DistanceStatistic(distance.runnerCountInProgress, distance.runnerCountOffTrack, distance.finisherCount)
+    val statistic = DistanceStatistic(distance.distanceId, distance.runnerCountInProgress, distance.runnerCountOffTrack, distance.finisherCount)
     return Distance(
         id = distance.distanceId,
         raceId = distance.raceId,
@@ -64,7 +64,7 @@ fun DistanceTable.toDistanceEntity(): Distance {
         authorId = authorId,
         dateOfStart = Date(dateOfStart),
         checkpoints = mutableListOf(),
-        statistic = DistanceStatistic(runnerCountInProgress, runnerCountOffTrack, finisherCount),
+        statistic = DistanceStatistic(distanceId, runnerCountInProgress, runnerCountOffTrack, finisherCount),
         runners = mutableSetOf()
     )
 }

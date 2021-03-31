@@ -19,6 +19,7 @@ class RunnerViewHolder(
 
     @SuppressLint("SetTextI18n")
     override fun bind(item: RunnerView) {
+        isSwipeEnable = !item.isOffTrack
         with(binding) {
             tvRunnerNumber.text = "#${item.number}"
             tvRunnerFullName.text = if (item.fullName.length > 26) item.fullName.take(25) + ".." else item.fullName

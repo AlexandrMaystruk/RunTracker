@@ -49,16 +49,6 @@ class DistanceRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveDistanceStatistic(
-        raceId: String,
-        distanceId: String,
-        statistic: DistanceStatistic
-    ) {
-        firestoreApi.updateDistanceStatistic(
-            distanceId = distanceId,
-            distanceStatistic = statistic
-        )
-    }
 
     private fun checkIsDataUploaded(distanceId: String): Boolean {
         //TODO implement

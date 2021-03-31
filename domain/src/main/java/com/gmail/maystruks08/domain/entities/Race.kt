@@ -49,7 +49,7 @@ data class Race(
             authorId = authorId,
             dateOfStart = dateOrStart,
             checkpoints = checkpoints ?: mutableListOf(),
-            statistic = DistanceStatistic(),
+            statistic = DistanceStatistic(distanceId = id),
             runners = sortedSetOf(
                 compareBy<Runner> { it.totalResults[id] }
                     .thenBy { runner -> runner.offTrackDistances.any { it == runner.actualDistanceId } }

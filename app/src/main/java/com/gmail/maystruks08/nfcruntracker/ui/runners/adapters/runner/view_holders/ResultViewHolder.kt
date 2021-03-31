@@ -11,6 +11,7 @@ class ResultViewHolder(
     private val binding = ItemResultBinding.bind(itemView)
 
     override fun bind(item: RunnerResultView) {
+        isSwipeEnable = false
         val runnerNumberText = "#${item.runnerNumber}"
         with(binding) {
             tvRunnerPosition.text = item.position.toString()

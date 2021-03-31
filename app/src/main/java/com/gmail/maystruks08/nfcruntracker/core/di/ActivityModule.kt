@@ -86,6 +86,15 @@ abstract class ActivityModule {
     abstract fun bindDistanceRepository(impl: DistanceRepositoryImpl): DistanceRepository
 
 
+    @Binds
+    @ActivityScoped
+    abstract fun bindDistanceStatisticUseCase(impl: CalculateDistanceStatisticUseCaseImpl): CalculateDistanceStatisticUseCase
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindDistanceStatisticRepository(impl: DistanceStatisticRepositoryImpl): DistanceStatisticRepository
+
+
 }
 
 @Module

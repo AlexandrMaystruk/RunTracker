@@ -10,6 +10,8 @@ abstract class BaseViewHolder<T : BaseRunnerView>(
     protected val interaction: Interaction?
 ) : RecyclerView.ViewHolder(itemView) {
 
+    var isSwipeEnable = true
+
     abstract fun bind(item: T)
 
 }

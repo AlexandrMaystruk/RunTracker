@@ -8,7 +8,10 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.nfcruntracker.R
+import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.toPx
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.view_holders.BaseViewHolder
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.view_holders.ResultViewHolder
 
 abstract class SwipeActionHelper(context: Context) :
     ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -34,6 +37,10 @@ abstract class SwipeActionHelper(context: Context) :
         }
     }
 
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+
+    }
+
     override fun onMove(
         recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
@@ -47,6 +54,7 @@ abstract class SwipeActionHelper(context: Context) :
     ) {
         val itemView = viewHolder.itemView
         val itemHeight = itemView.bottom - itemView.top
+        if ((viewHolder as? BaseViewHolder<*>)?.isSwipeEnable == false) return
 
         when {
             //Swipe left (Off track)
