@@ -8,37 +8,31 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.nfcruntracker.R
-import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.toPx
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.view_holders.BaseViewHolder
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.view_holders.ResultViewHolder
 
 abstract class SwipeActionHelper(context: Context) :
     ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
 
-    private val deleteIcon: Drawable? = ContextCompat.getDrawable(context, R.drawable.ic_trash)
-    private val deleteBg: Drawable
+    private val offTrackIcon: Drawable? = ContextCompat.getDrawable(context, R.drawable.ic_trash)
+    private val offTrackBg: Drawable
 
-    private val inCafeIcon: Drawable? = ContextCompat.getDrawable(context, R.drawable.ic_settings)
-    private val inCafeBg: Drawable
+    private val markAtCurrentIcon: Drawable? = ContextCompat.getDrawable(context, R.drawable.ic_settings)
+    private val markAtCurrentBg: Drawable
 
     private var prevDX = -1f
 
     init {
-        deleteBg = GradientDrawable().apply {
+        offTrackBg = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
-            cornerRadius = context.resources.displayMetrics.toPx(3f)
+            cornerRadius = context.resources.displayMetrics.toPx(8f)
             setColor(ContextCompat.getColor(context, R.color.colorRed))
         }
-        inCafeBg = GradientDrawable().apply {
+        markAtCurrentBg = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
-            cornerRadius = context.resources.displayMetrics.toPx(3f)
+            cornerRadius = context.resources.displayMetrics.toPx(8f)
             setColor(ContextCompat.getColor(context, R.color.colorPrimary))
         }
-    }
-
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-
     }
 
     override fun onMove(
@@ -46,6 +40,14 @@ abstract class SwipeActionHelper(context: Context) :
         target: RecyclerView.ViewHolder
     ): Boolean {
         return false
+    }
+
+    override fun getSwipeDirs(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder
+    ): Int {
+        if ((viewHolder as? BaseViewHolder<*>)?.isSwipeEnable == false) return 0
+        return super.getSwipeDirs(recyclerView, viewHolder)
     }
 
     override fun onChildDraw(
@@ -59,11 +61,11 @@ abstract class SwipeActionHelper(context: Context) :
         when {
             //Swipe left (Off track)
             dX < 0 -> {
-                deleteIcon?.let {
+                offTrackIcon?.let {
                     val iconTop = itemView.top + (itemHeight - it.intrinsicHeight) / 2
                     val iconMargin = (itemHeight - it.intrinsicHeight) / 3
                     val iconBottom = iconTop + it.intrinsicHeight
-                    deleteBg.setBounds(
+                    offTrackBg.setBounds(
                         itemView.right + dX.toInt(),
                         itemView.top,
                         itemView.right,
@@ -72,18 +74,18 @@ abstract class SwipeActionHelper(context: Context) :
                     val iconRight = itemView.right - iconMargin
                     val iconLeft = itemView.right - it.intrinsicWidth - iconMargin
                     it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
-                    deleteBg.draw(c)
+                    offTrackBg.draw(c)
                     it.draw(c)
                     prevDX = dX
                 }
             }
             //Swipe right (Add current checkpoint)
             dX > 0 -> {
-                inCafeIcon?.let {
+                markAtCurrentIcon?.let {
                     val iconTop = itemView.top + (itemHeight - it.intrinsicHeight) / 2
                     val iconMargin = (itemHeight - it.intrinsicHeight) / 3
                     val iconBottom = iconTop + it.intrinsicHeight
-                    inCafeBg.setBounds(
+                    markAtCurrentBg.setBounds(
                         itemView.left,
                         itemView.top,
                         itemView.right + dX.toInt(),
@@ -92,7 +94,7 @@ abstract class SwipeActionHelper(context: Context) :
                     val iconLeft = itemView.left + iconMargin
                     val iconRight = itemView.left + it.intrinsicWidth + iconMargin
                     it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
-                    inCafeBg.draw(c)
+                    markAtCurrentBg.draw(c)
                     it.draw(c)
                     prevDX = dX
                 }
