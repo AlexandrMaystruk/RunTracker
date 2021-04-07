@@ -31,16 +31,13 @@ interface RunnerDao : BaseDao<RunnerTable> {
     /** GET */
 
     @Transaction
-    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId")
-    fun getRunnerWithResultsFlow(distanceId: String): Flow<List<RunnerWithResult>>
+    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE actualRaceId =:raceId AND distanceId =:distanceId")
+    fun getRunnerWithResultsFlow(raceId: String, distanceId: String): Flow<List<RunnerWithResult>>
+
 
     @Transaction
-    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId AND runners.runnerNumber LIKE '%' || :query || '%';")
-    fun getRunnerWithResultsQueryFlow(distanceId: String, query: String): Flow<List<RunnerWithResult>>
-
-    @Transaction
-    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE distanceId =:distanceId AND runners.runnerNumber LIKE '%' || :query || '%';")
-    fun getRunnerWithResultsQuery(distanceId: String, query: String): List<RunnerWithResult>
+    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE actualRaceId =:raceId AND distanceId =:distanceId AND runners.runnerNumber LIKE '%' || :query || '%';")
+    fun getRunnerWithResultsQuery(raceId: String, distanceId: String, query: String): List<RunnerWithResult>
 
     @Transaction
     @Query("SELECT * FROM runners WHERE runners.runnerNumber =:runnerNumber")

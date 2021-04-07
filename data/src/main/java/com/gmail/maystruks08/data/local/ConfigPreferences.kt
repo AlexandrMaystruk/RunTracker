@@ -92,4 +92,17 @@ class ConfigPreferences @Inject constructor(context: Context) {
         return sp.getString(CURRENT_RACE_NAME, null) ?: "-1"
     }
 
+    fun clearRaceId() {
+        sp.edit().apply {
+            remove(CURRENT_RACE_ID)
+            apply()
+        }
+    }
+
+    fun clearRaceName() {
+        sp.edit().apply {
+            remove(CURRENT_RACE_NAME)
+            apply()
+        }
+    }
 }

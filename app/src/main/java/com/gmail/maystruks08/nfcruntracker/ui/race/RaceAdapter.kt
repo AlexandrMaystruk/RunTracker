@@ -30,11 +30,10 @@ class RaceAdapter(private val interaction: Interaction) : RecyclerView.Adapter<R
 
         private val binding = ItemRaceBinding.bind(itemView)
 
-
         fun bindHolder(item: RaceView, interaction: Interaction) {
             with(binding) {
                 tvName.text = item.name
-                root.setOnClickListener {
+                btnSelectRace.setOnClickListener {
                     interaction.onClickAtRace(item)
                 }
             }

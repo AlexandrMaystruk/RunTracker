@@ -6,4 +6,6 @@ interface SettingsRepository {
 
     fun getAdminUserIds(): List<String>
 
+    fun clearCurrentSelectedRace()
+
 }

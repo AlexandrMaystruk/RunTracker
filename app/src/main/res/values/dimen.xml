@@ -49,7 +49,7 @@
     <dimen name="runnerItemSmallHeight">95dp</dimen>
 
 
-    <dimen name="raceItemHeight">160dp</dimen>
+    <dimen name="raceItemHeight">140dp</dimen>
 
 
     <dimen name="transition_s">4dp</dimen>
