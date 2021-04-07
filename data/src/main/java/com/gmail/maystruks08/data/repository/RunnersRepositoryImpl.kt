@@ -123,14 +123,14 @@ class RunnersRepositoryImpl @Inject constructor(
                 when {
                     !onlyFinishers -> {
                         it.runnerTable.toRunner(gson).apply {
-                            this.checkpoints[distanceId] = it.getCheckpoints()
+                            this.checkpoints[actualDistanceId] = it.getCheckpoints()
                         }
                     }
                     onlyFinishers -> {
-                        val checkpoints = it.getCheckpoints(true)
+                        val checkpoints = it.getCheckpoints(onlyFinishers = true)
                         return@mapNotNull if (checkpoints.isNotEmpty()) it.runnerTable.toRunner(gson)
                             .apply {
-                                addCheckpoints(distanceId, checkpoints)
+                                addCheckpoints(actualDistanceId, checkpoints)
                             }
                         else null
                     }
@@ -205,7 +205,8 @@ class RunnersRepositoryImpl @Inject constructor(
         val runnerTable = runner.toRunnerTable(gson, false)
         val resultTables = mutableListOf<ResultTable>()
         val runnerResultCrossRefTables = mutableListOf<RunnerResultCrossRef>()
-        val distanceRunnerCrossRefTables = runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }
+        val distanceRunnerCrossRefTables =
+            runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }
         runner.checkpoints.forEach { (_, checkpoints) ->
             checkpoints.forEach {
                 if (it is CheckpointResultIml) {
@@ -235,4 +236,42 @@ class RunnersRepositoryImpl @Inject constructor(
         val count = runnerDao.delete(runner.number)
         Timber.i("Removed runner ${runner.shortName} from DB count: $count")
     }
+
+    /* private suspend fun RunnerWithResult.getCheckpoints(
+        onlyFinishers: Boolean = false,
+        isInit: Boolean = false
+    ): MutableList<Checkpoint> {
+        val distanceId = runnerTable.actualDistanceId
+        val count = checkpointDAO.getCheckpointCount(distanceId)
+        val checkpointsList = if (isInit) getRemoteCheckpoints(distanceId, distanceId)
+        else checkpointDAO.getCheckpointsByDistanceId(distanceId)
+        val checkpointResult = results.distinct()
+        if (onlyFinishers && checkpointResult.size != count) return mutableListOf()
+        return checkpointsList.map { checkpointTable ->
+            val runnerResults = checkpointResult.firstOrNull { it.checkpointId == checkpointTable.checkpointId }
+            val checkpoint = CheckpointImpl(
+                checkpointTable.checkpointId,
+                checkpointTable.distanceId,
+                checkpointTable.name
+            )
+            if (runnerResults == null) checkpoint
+            else CheckpointResultIml(
+                checkpoint,
+                runnerResults.time,
+                runnerResults.hasPrevious
+            )
+        }.toMutableList()
+    }
+
+    private suspend fun getRemoteCheckpoints(raceId: String, distanceId: String): List<CheckpointTable> {
+        return api.getCheckpoints(
+            raceId,
+            distanceId
+        ).data?.toDataClass<HashMap<String, CheckpointPojo>?>()
+            ?.let { hashMap ->
+                hashMap.values.map {
+                    it.toCheckpointTable()
+                }
+            } ?: checkpointDAO.getCheckpointsByDistanceId(distanceId)
+    }*/
 }

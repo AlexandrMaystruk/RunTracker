@@ -7,8 +7,6 @@ import com.gmail.maystruks08.data.local.AppDatabase
 import com.gmail.maystruks08.data.local.dao.*
 import com.gmail.maystruks08.data.remote.Api
 import com.gmail.maystruks08.data.remote.ApiImpl
-import com.gmail.maystruks08.data.remote.FirestoreApi
-import com.gmail.maystruks08.data.remote.FirestoreApiImpl
 import com.gmail.maystruks08.data.repository.SyncRunnersDataScheduler
 import com.gmail.maystruks08.domain.LogHelper
 import com.gmail.maystruks08.domain.NetworkUtil
@@ -27,6 +25,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Singleton
 
 @Module
@@ -110,6 +109,7 @@ object DatabaseModule {
     fun gson(): Gson = Gson()
 }
 
+@ExperimentalCoroutinesApi
 @Module
 @InstallIn(SingletonComponent::class)
 object FirebaseModule {
@@ -118,10 +118,6 @@ object FirebaseModule {
     @Singleton
     fun firebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
 
-    @Provides
-    @Singleton
-    fun firestoreApi(firebaseFirestore: FirebaseFirestore): FirestoreApi =
-        FirestoreApiImpl(firebaseFirestore)
 
     @Provides
     @Singleton

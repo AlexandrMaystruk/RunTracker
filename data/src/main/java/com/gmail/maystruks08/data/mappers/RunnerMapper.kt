@@ -8,6 +8,7 @@ import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.RunnerSex
 import com.gmail.maystruks08.domain.parseServerTime
+import java.util.*
 
 
 fun RunnerPojo.fromFirestoreRunner(): Runner {
@@ -19,6 +20,9 @@ fun RunnerPojo.fromFirestoreRunner(): Runner {
                 it.runnerTime.parseServerTime()
             )
         }.toMutableList()
+    }
+    val totalResultsMap = mutableMapOf<String, Date?>().apply {
+        totalResults.forEach { (t, u) -> put(t, u?.parseServerTime()) }
     }
     return Runner(
         number,
@@ -36,7 +40,7 @@ fun RunnerPojo.fromFirestoreRunner(): Runner {
         checkpointsResult,
         offTrackDistances,
         teamNames,
-        totalResults
+        totalResultsMap
     )
 }
 

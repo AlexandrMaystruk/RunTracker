@@ -18,7 +18,7 @@ import com.gmail.maystruks08.domain.interactors.CalculateDistanceStatisticUseCas
 import com.gmail.maystruks08.domain.interactors.CheckpointInteractor
 import com.gmail.maystruks08.domain.interactors.DistanceInteractor
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
-import com.gmail.maystruks08.domain.toTimeFormat
+import com.gmail.maystruks08.domain.timeInMillisToTimeFormat
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.core.bus.StartRunTrackerBus
@@ -75,6 +75,7 @@ class RunnersViewModel @ViewModelInject constructor(
 
     private var jobShowRunner: Job? = null
     private var jobShowAllDistances: Job? = null
+    private var jobShowDistanceTimer: Job? = null
     private var jobShowCurrentCheckpoint: Job? = null
 
     private lateinit var raceId: String
@@ -85,10 +86,6 @@ class RunnersViewModel @ViewModelInject constructor(
 
     init {
         startRunTrackerBus.subscribeStartCommandEvent(this.name(), ::onRunningStart)
-
-        viewModelScope.startCoroutineTimer(delayMillis = 0, repeatMillis = 1000) {
-            _showTimeLiveData.postValue(Date().toTimeFormat())
-        }
     }
 
     fun init(raceId: String, distanceId: String?) {
@@ -257,12 +254,12 @@ class RunnersViewModel @ViewModelInject constructor(
     }
 
     private fun observeRunnerChanges() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
                 runnersInteractor.observeRunnerDataFlow(raceId)
-            } catch (e: Exception) {
-                Timber.e(e)
             }
+        } catch (e: Exception) {
+            Timber.e(e)
         }
     }
 
@@ -283,7 +280,9 @@ class RunnersViewModel @ViewModelInject constructor(
             val runners = ArrayList(_runnersFlow.value)
             when (runnerChange.modifierType) {
                 ModifierType.ADD, ModifierType.UPDATE -> {
-                    runners.updateElement(runnerView, { (it as? RunnerView)?.number == runnerView.number })
+                    runners.updateElement(
+                        runnerView,
+                        { (it as? RunnerView)?.number == runnerView.number })
                 }
                 ModifierType.REMOVE -> {
                     runners.removeAll { (it as? RunnerView)?.number == runnerView.number }
@@ -349,7 +348,7 @@ class RunnersViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun recalculateDistanceStatistic(){
+    private fun recalculateDistanceStatistic() {
         viewModelScope.launch(Dispatchers.Default) {
             calculateDistanceStatisticUseCase.invoke(raceId, distanceId)
         }
@@ -365,12 +364,13 @@ class RunnersViewModel @ViewModelInject constructor(
         recalculateDistanceStatistic()
     }
 
-    private fun List<Distance>.mapDistanceList(): MutableList<DistanceView>{
+    private fun List<Distance>.mapDistanceList(): MutableList<DistanceView> {
         return if (distanceId == DEF_STRING_VALUE) {
             mapIndexed { index, distance ->
                 val isSelected = index == 0
                 if (isSelected) {
                     distanceId = distance.id
+                    showDistanceTime(distance.dateOfStart)
                     _showRunnersTitleFlow.value = distance.name
                 }
                 distance.toView(isSelected)
@@ -380,6 +380,7 @@ class RunnersViewModel @ViewModelInject constructor(
                 val isSelected = distanceId == it.id
                 if (isSelected) {
                     distanceId = it.id
+                    showDistanceTime(it.dateOfStart)
                     _showRunnersTitleFlow.value = it.name
                 }
                 it.toView(isSelected)
@@ -404,6 +405,14 @@ class RunnersViewModel @ViewModelInject constructor(
             }
             is CheckpointNotFoundException -> toastLiveData.postValue("КП не выбрано для дистанции")
             else -> Timber.e(e)
+        }
+    }
+
+    private fun showDistanceTime(distanceStartTime: Date) {
+        jobShowDistanceTimer?.cancel()
+        jobShowDistanceTimer = viewModelScope.startCoroutineTimer(delayMillis = 0, repeatMillis = 1000) {
+            val time = (System.currentTimeMillis() - distanceStartTime.time).timeInMillisToTimeFormat()
+            _showTimeLiveData.postValue(time)
         }
     }
 

@@ -8,10 +8,13 @@ import com.gmail.maystruks08.data.local.entity.tables.CheckpointTable
 interface CheckpointDAO : BaseDao<CheckpointTable> {
 
     @Query("SELECT * FROM checkpoints WHERE distanceId =:distanceId")
-    fun getCheckpointsByRaceAndDistanceId(distanceId: String): List<CheckpointTable>
+    fun getCheckpointsByDistanceId(distanceId: String): List<CheckpointTable>
 
     @Query("SELECT * FROM checkpoints WHERE checkpointId =:checkpointId AND distanceId =:distanceId")
     fun getCheckpoint(distanceId: String, checkpointId: String): CheckpointTable?
+
+    @Query("SELECT COUNT(*) FROM checkpoints WHERE distanceId =:distanceId")
+    fun getCheckpointCount(distanceId: String): Int
 
     @Query("DELETE FROM checkpoints WHERE checkpointId =:checkpointId")
     fun deleteCheckpointById(checkpointId: Long)

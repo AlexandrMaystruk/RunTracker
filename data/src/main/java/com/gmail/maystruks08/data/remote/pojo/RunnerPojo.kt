@@ -1,7 +1,5 @@
 package com.gmail.maystruks08.data.remote.pojo
 
-import java.util.*
-
 data class RunnerPojo(
     var number: Long = 0,
     var cardId: String? = null,
@@ -18,5 +16,5 @@ data class RunnerPojo(
     val checkpoints: MutableMap<String, List<CheckpointPojo>> = mutableMapOf(), //key distance id value checkpoints
     val offTrackDistances: MutableList<String> = mutableListOf(), //key distance id
     val teamNames: MutableMap<String, String?> = mutableMapOf(), //key distance id
-    val totalResults: MutableMap<String, Date?> = mutableMapOf(), //key distance id
+    val totalResults: MutableMap<String, String?> = mutableMapOf(), //key distance id
 )

@@ -35,7 +35,7 @@ class CheckpointsRepositoryImpl @Inject constructor(
                     checkpointDAO.insertAllOrReplace(checkpoints.map { it.toCheckpointTable() })
                 }
         }
-        val checkpointsTable = checkpointDAO.getCheckpointsByRaceAndDistanceId( distanceId)
+        val checkpointsTable = checkpointDAO.getCheckpointsByDistanceId(distanceId)
         return checkpointsTable.map {
             CheckpointImpl(
                 it.checkpointId,

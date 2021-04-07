@@ -37,6 +37,23 @@ fun Date.toDateTimeShortFormat(): String = SimpleDateFormat(DATA_TIME_SHORT_FORM
 
 fun Date.toServerFormat(): String = SimpleDateFormat(SERVER_FORMAT, Locale.getDefault()).format(this)
 
+fun Long.timeInMillisToTimeFormat(): String {
+    val seconds = this / 1000
+    val hours = String.format("%2d", seconds / 3600).replace(" ", "0")
+    val minutes = String.format("%2d", seconds % 3600 / 60).replace(" ", "0")
+    val sec = String.format("%2d", seconds % 60).replace(" ", "0")
+    return "$hours:$minutes:$sec"
+}
+
+
+fun Date.toUITimeFormat(): String {
+    val seconds = this.time / 1000
+    val hours = String.format("%2d", seconds / 3600).replace(" ", "0")
+    val minutes = String.format("%2d", seconds % 3600 / 60).replace(" ", "0")
+    val sec = String.format("%2d", seconds % 60).replace(" ", "0")
+    return "$hours:$minutes:$sec"
+}
+
 
 fun String.parseServerTime(): Date {
     return try {

@@ -17,6 +17,7 @@ import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.RunnerSex
+import com.gmail.maystruks08.domain.parseServerTime
 import com.gmail.maystruks08.domain.toServerFormat
 import com.google.gson.Gson
 import java.util.*
@@ -179,10 +180,7 @@ fun Distance.toFirestoreDistance(raceId: String): DistancePojo {
         authorId = authorId,
         dateOfStart = dateOfStart,
         checkpointsIds = checkpoints.map { it.getId() },
-        runnerIds = runners.map { it.number },
-        runnerCountInProgress = statistic.runnerCountInProgress,
-        runnerCountOffTrack = statistic.runnerCountOffTrack,
-        finisherCount = statistic.finisherCount
+        runnerIds = runners.map { it.number }
     )
 }
 
@@ -200,6 +198,9 @@ fun Runner.toFirestoreRunner(): RunnerPojo {
             }
         }
     }
+    val totalResultsMap = mutableMapOf<String, String?>().apply {
+        totalResults.forEach { (t, u) -> put(t, u?.toServerFormat()) }
+    }
     return RunnerPojo(
         number = number,
         cardId = cardId,
@@ -216,7 +217,7 @@ fun Runner.toFirestoreRunner(): RunnerPojo {
         checkpoints = checkpointsResult,
         offTrackDistances = offTrackDistances,
         teamNames = teamNames,
-        totalResults = totalResults
+        totalResults = totalResultsMap
     )
 }
 
@@ -242,10 +243,7 @@ fun DistancePojo.toTable(): Pair<DistanceTable, List<DistanceRunnerCrossRef>> {
         raceId = raceId,
         name = name,
         authorId = authorId,
-        dateOfStart = dateOfStart.time,
-        runnerCountInProgress = runnerCountInProgress,
-        runnerCountOffTrack = runnerCountOffTrack,
-        finisherCount = finisherCount
+        dateOfStart = dateOfStart.time
     ) to runnerIds.map { DistanceRunnerCrossRef(id, it) }
 }
 

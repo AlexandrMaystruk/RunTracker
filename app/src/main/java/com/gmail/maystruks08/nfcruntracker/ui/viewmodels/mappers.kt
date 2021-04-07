@@ -4,8 +4,9 @@ import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.Race
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.timeInMillisToTimeFormat
 import com.gmail.maystruks08.domain.toDateFormat
-import com.gmail.maystruks08.domain.toTimeUTCFormat
+import com.gmail.maystruks08.domain.toUITimeFormat
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerResultView
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerView
@@ -40,19 +41,21 @@ fun Runner.toRunnerView() = RunnerView(
     this.number,
     this.fullName,
     this.city,
-    this.totalResults[actualDistanceId]?.toTimeUTCFormat(),
+    this.totalResults[actualDistanceId]?.toUITimeFormat(),
     this.dateOfBirthday.toDateFormat(),
     this.actualDistanceId,
     this.checkpoints[actualDistanceId]?.toCheckpointViews().orEmpty(),
     this.offTrackDistances.any { it == actualDistanceId }
 )
 
-fun Runner.toRunnerResultView(position: Int) = RunnerResultView(
-    this.number.toString(),
-    this.fullName,
-    this.totalResults[actualDistanceId]!!.toTimeUTCFormat(),
-    position
-)
+fun Runner.toRunnerResultView(position: Int): RunnerResultView {
+    return RunnerResultView(
+        runnerNumber = this.number.toString(),
+        runnerFullName = this.fullName,
+        runnerResultTime =  this.totalResults[actualDistanceId]!!.time.timeInMillisToTimeFormat(),
+        position = position
+    )
+}
 
 fun List<Checkpoint>.toCheckpointViews(): List<CheckpointView> {
     val current = this.findLast { it.getResult() != null }
