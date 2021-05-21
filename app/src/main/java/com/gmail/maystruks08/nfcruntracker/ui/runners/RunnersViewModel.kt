@@ -36,6 +36,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onStart
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import java.util.*
@@ -56,22 +57,24 @@ class RunnersViewModel @ViewModelInject constructor(
     val runners get() = _runnersFlow
     val showSuccessDialog get() = _showSuccessDialogLiveData
     val showConfirmationDialog get() = _showAlertDialogLiveData
-    val showProgress get() = _showProgressLiveData
+    val showProgress get() = _showProgressFlow
     val showTime get() = _showTimeLiveData
     val showSelectCheckpointDialog get() = _selectCheckpointDialogLiveData
     val closeSelectCheckpointDialog get() = _closeCheckpointDialogLiveData
     val showRunnersTitle get() = _showRunnersTitleFlow
+    val enableSelectCheckpointButton get() = _enableSelectCheckpointButtonFlow
 
 
     private val _distanceFlow = MutableStateFlow<MutableList<DistanceView>>(mutableListOf())
     private val _runnersFlow = MutableStateFlow<List<BaseRunnerView>>(mutableListOf())
     private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, Long>>()
     private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
-    private val _showProgressLiveData = SingleLiveEvent<Boolean>()
+    private val _showProgressFlow = MutableStateFlow(true)
     private val _showTimeLiveData = SingleLiveEvent<String>()
     private val _selectCheckpointDialogLiveData = SingleLiveEvent<CurrentRaceDistance>()
     private val _closeCheckpointDialogLiveData = SingleLiveEvent<String>()
     private val _showRunnersTitleFlow = MutableStateFlow("")
+    private val _enableSelectCheckpointButtonFlow = MutableStateFlow(true)
 
     private var jobShowRunner: Job? = null
     private var jobShowAllDistances: Job? = null
@@ -102,6 +105,7 @@ class RunnersViewModel @ViewModelInject constructor(
 
     fun changeMode() {
         isResultMode = !isResultMode
+        _enableSelectCheckpointButtonFlow.value = !isResultMode
         showRunners()
     }
 
@@ -160,12 +164,15 @@ class RunnersViewModel @ViewModelInject constructor(
     fun onSearchQueryChanged(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
             if (query.isNotEmpty()) {
-                when (val result = runnersInteractor.getRunners(distanceId, query)) {
+                val queryResult = when {
+                    isResultMode -> runnersInteractor.getFinishers(distanceId, query)
+                    else -> runnersInteractor.getRunners(distanceId, query)
+                }
+                when (queryResult) {
                     is TaskResult.Value -> {
-                        val runnerViews = result.value.map { it.toRunnerView() }.toMutableList()
-                        _runnersFlow.value = runnerViews
+                        _runnersFlow.value = queryResult.value.map { it.toRunnerView() }.toMutableList()
                     }
-                    is TaskResult.Error -> handleError(result.error)
+                    is TaskResult.Error -> handleError(queryResult.error)
                 }
             } else {
                 Timber.v("showAllRunners  onSearchQueryChanged")
@@ -293,46 +300,47 @@ class RunnersViewModel @ViewModelInject constructor(
     }
 
     private suspend fun provideAllDistances() {
-        _showProgressLiveData.postValue(true)
-        distanceInteractor.getDistancesFlow(raceId)
+        distanceInteractor
+            .getDistancesFlow(raceId)
+            .onStart { _showProgressFlow.value = true }
             .catch { error ->
                 handleError(error)
             }
             .collect { distanceList ->
-                _showProgressLiveData.postValue(false)
+                _showProgressFlow.value = false
                 _distanceFlow.value = distanceList.mapDistanceList()
                 showCurrentCheckpoint()
             }
     }
 
     private suspend fun provideAllRunners() {
-        _showProgressLiveData.postValue(true)
         runnersInteractor
             .getRunnersFlow(distanceId)
+            .onStart { _showProgressFlow.value = true }
             .catch { error ->
                 handleError(error)
             }
             .collect {
                 Timber.w("showAllRunners")
                 val runners = toRunnerViews(it)
+                _showProgressFlow.value = false
                 _runnersFlow.value = runners
             }
-        _showProgressLiveData.postValue(false)
     }
 
     private suspend fun provideFinisherRunners() {
-        _showProgressLiveData.postValue(true)
         runnersInteractor
             .getFinishersFlow(distanceId)
+            .onStart { _showProgressFlow.value = true }
             .catch { error ->
                 handleError(error)
             }
             .collect {
                 Timber.w("provideFinisherRunners")
                 val runners = toFinisherViews(it)
+                _showProgressFlow.value = false
                 _runnersFlow.value = runners
             }
-        _showProgressLiveData.postValue(false)
     }
 
     private fun onRunningStart(date: Date) {
@@ -389,7 +397,7 @@ class RunnersViewModel @ViewModelInject constructor(
     }
 
     private fun handleError(e: Throwable) {
-        _showProgressLiveData.postValue(false)
+        _showProgressFlow.value = false
         when (e) {
             is SaveRunnerDataException -> {
                 Timber.e(e)

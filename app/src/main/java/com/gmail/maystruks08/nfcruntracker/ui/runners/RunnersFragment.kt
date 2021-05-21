@@ -13,24 +13,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
-import com.gmail.maystruks08.nfcruntracker.core.ext.argument
-import com.gmail.maystruks08.nfcruntracker.core.ext.argumentNullable
-import com.gmail.maystruks08.nfcruntracker.core.ext.findFragmentByTag
-import com.gmail.maystruks08.nfcruntracker.core.ext.name
+import com.gmail.maystruks08.nfcruntracker.core.ext.*
 import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnersBinding
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.distance.DistanceListAdapter
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.DividerItemDecoration
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.DividerVerticalItemDecoration
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.SwipeActionHelper
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.distance.DistanceListAdapter
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.Interaction
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.RunnerListAdapter
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SelectCheckpointDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SuccessDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.DistanceView
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -100,16 +97,29 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners),
             }
 
             lifecycleScope.launchWhenStarted {
-                runners.collect{
+                runners.collect {
                     runnerAdapter.submitList(it)
                 }
             }
 
             lifecycleScope.launchWhenStarted {
-                showRunnersTitle.collect{
+                showRunnersTitle.collect {
                     binding.tvRunnersTitle.text = it
                 }
             }
+
+            lifecycleScope.launchWhenStarted {
+                enableSelectCheckpointButton.collect { enable ->
+                    binding.tvCurrentCheckpoint.setVisibility(enable)
+                }
+            }
+
+            lifecycleScope.launchWhenStarted {
+                showProgress.collect { isNeedToShow ->
+                    binding.progress.setVisibility(isNeedToShow)
+                }
+            }
+
 
             showConfirmationDialog.observe(viewLifecycleOwner) {
                 alertDialog?.dismiss()
@@ -141,10 +151,6 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners),
             closeSelectCheckpointDialog.observe(viewLifecycleOwner, { selectedCheckpoint ->
                 findFragmentByTag<SelectCheckpointDialogFragment>(SelectCheckpointDialogFragment.name())?.dismiss()
                 binding.tvCurrentCheckpoint.text = selectedCheckpoint
-            })
-
-            showProgress.observe(viewLifecycleOwner, {
-                //TODO fix progress
             })
 
             showTime.observe(viewLifecycleOwner, {
