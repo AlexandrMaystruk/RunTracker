@@ -11,8 +11,9 @@ import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.interactors.CheckpointInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toCheckpointView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointPosition
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.toCheckpointView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +28,6 @@ class SelectCheckpointDialogViewModel @ViewModelInject constructor(
     val showCheckpoints get() = _showCheckpointsStateFlow
     val showProgress get() = _showProgressLiveData
 
-
     private val _showCheckpointsStateFlow = MutableStateFlow<ArrayList<CheckpointView>>(ArrayList())
     private val _showProgressLiveData = SingleLiveEvent<Boolean>()
 
@@ -41,9 +41,14 @@ class SelectCheckpointDialogViewModel @ViewModelInject constructor(
                         raceDistance.first,
                         raceDistance.second
                     ) as? TaskResult.Value)?.value
-
-                    val checkpoints =
-                        ArrayList(result.value.map { it.toCheckpointView(currentCheckpoint?.getId()) })
+                    val checkpoints = ArrayList(result.value.mapIndexed { index, it ->
+                        val position = when (index) {
+                            0 -> CheckpointPosition.Start
+                            result.value.lastIndex -> CheckpointPosition.End
+                            else -> CheckpointPosition.Center
+                        }
+                        it.toCheckpointView(position, false, currentCheckpoint?.getId())
+                    })
                     _showCheckpointsStateFlow.value = checkpoints
                 }
                 is TaskResult.Error -> handleError(result.error)

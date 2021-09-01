@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runner
 
+import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -12,18 +13,20 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnerBinding
+import com.gmail.maystruks08.nfcruntracker.ui.adapter.AppAdapter
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SuccessDialogFragment
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class RunnerFragment : BaseFragment(R.layout.fragment_runner), CheckpointsAdapter.Interaction {
+class RunnerFragment : BaseFragment(R.layout.fragment_runner),
+    RunnerCheckpointsViewHolderManager.Interaction {
 
     private val viewModel: RunnerViewModel by viewModels()
     private val binding: FragmentRunnerBinding by viewBinding {
         runnerCheckpointsRecyclerView.adapter = null
     }
-    private lateinit var checkpointsAdapter: CheckpointsAdapter
+    private lateinit var checkpointsAdapter: AppAdapter
 
     private var alertDialog: AlertDialog? = null
     private var runnerNumber: Long by argument()
@@ -44,6 +47,11 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner), CheckpointsAdapte
         )
         .withTitle(R.string.screen_runner)
         .build()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        checkpointsAdapter = AppAdapter(listOf(RunnerCheckpointsViewHolderManager(this)))
+    }
 
     override fun bindViewModel() {
         viewModel.onShowRunnerClicked(runnerNumber)
@@ -76,8 +84,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner), CheckpointsAdapte
                     }
                 }
             }
-            checkpointsAdapter.isOffTrack = runner.isOffTrack
-            checkpointsAdapter.checkpoints = runner.progress.toMutableList()
+            checkpointsAdapter.submitList(runner.progress)
         })
 
         viewModel.linkCardModeEnable.observe(viewLifecycleOwner, {
@@ -143,19 +150,16 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner), CheckpointsAdapte
             btnMarkCheckpointAsPassedInManual.setOnClickListener {
                 viewModel.btnMarkCheckpointAsPassedInManualClicked()
             }
-            runnerCheckpointsRecyclerView.apply {
-                checkpointsAdapter = CheckpointsAdapter(this@RunnerFragment)
-                adapter = checkpointsAdapter
-            }
+            runnerCheckpointsRecyclerView.adapter = checkpointsAdapter
         }
     }
 
-    override fun onLongCLickAtCheckpointDate(checkpointView: CheckpointView) {
+    override fun onLongCLickAtCheckpointDate(item: CheckpointView) {
         val builder = AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.attention))
             .setMessage(getString(R.string.remove_checkpoint_for_runner))
             .setPositiveButton(android.R.string.yes) { _, _ ->
-                viewModel.deleteCheckpointFromRunner(runnerNumber, checkpointView)
+                viewModel.deleteCheckpointFromRunner(runnerNumber, item)
                 alertDialog?.dismiss()
             }
             .setNegativeButton(android.R.string.no) { _, _ ->

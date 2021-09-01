@@ -1,16 +1,17 @@
 package com.gmail.maystruks08.nfcruntracker.ui.settings
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.gmail.maystruks08.domain.entities.account.AssesLevel
+import com.gmail.maystruks08.domain.interactors.GetAccountAccessLevelUseCase
 import com.gmail.maystruks08.domain.interactors.LogOutUseCase
-import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
-import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 
@@ -18,13 +19,26 @@ import ru.terrakok.cicerone.Router
 @ExperimentalCoroutinesApi
 class SettingsViewModel @ViewModelInject constructor(
     private val router: Router,
-    private val repository: SettingsRepository,
+    private val getAccountAccessLevelUseCase: GetAccountAccessLevelUseCase,
     private val logOutUseCase: LogOutUseCase
 ) : BaseViewModel() {
 
-    val changeStartButtonVisibility get(): LiveData<Boolean> = changeStartButtonVisibilityLiveData
-    private val changeStartButtonVisibilityLiveData = SingleLiveEvent<Boolean>()
+    private lateinit var changeStartButtonVisibilityLiveData: MutableStateFlow<AssesLevel>
+    val uiState
+        get(): Flow<ViewState> = changeStartButtonVisibilityLiveData.map {
+            when (it) {
+                AssesLevel.Admin -> ViewState.ShowStartButton
+                else -> ViewState.HideStartButton
+            }
+        }
 
+    init {
+        viewModelScope.launch {
+            getAccountAccessLevelUseCase
+                .invoke()
+                .also { changeStartButtonVisibilityLiveData.value = it }
+        }
+    }
 
     fun onSignOutClicked() {
         viewModelScope.launch {
@@ -37,12 +51,12 @@ class SettingsViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun resolveStartButtonVisibility(){
-        val isCurrentUserAdmin = repository.getAdminUserIds().contains(FirebaseAuth.getInstance().currentUser?.uid)
-        changeStartButtonVisibilityLiveData.postValue(isCurrentUserAdmin)
-    }
-
     fun onBackClicked() {
         router.exit()
+    }
+
+    sealed class ViewState {
+        object ShowStartButton : ViewState()
+        object HideStartButton : ViewState()
     }
 }

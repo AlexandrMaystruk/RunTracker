@@ -1,8 +1,8 @@
 package com.gmail.maystruks08.nfcruntracker.ui.race
 
+import android.os.Bundle
 import android.text.InputType
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.GridLayoutManager
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
@@ -10,8 +10,9 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.findFragmentByTag
 import com.gmail.maystruks08.nfcruntracker.core.ext.setVisibility
 import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRaceBinding
+import com.gmail.maystruks08.nfcruntracker.ui.adapter.AppAdapter
 import com.gmail.maystruks08.nfcruntracker.ui.race.create.CreateRaceBottomShitFragment
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RaceView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.RaceView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -19,13 +20,13 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
 @AndroidEntryPoint
-class RaceFragment : BaseFragment(R.layout.fragment_race), RaceAdapter.Interaction {
+class RaceFragment : BaseFragment(R.layout.fragment_race), RaceViewHolderManager.Interaction {
 
     private val viewModel: RaceViewModel by viewModels()
     private val binding: FragmentRaceBinding by viewBinding {
         raceRecyclerView.adapter = null
     }
-    private lateinit var adapter: RaceAdapter
+    private lateinit var adapter: AppAdapter
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
@@ -34,9 +35,14 @@ class RaceFragment : BaseFragment(R.layout.fragment_race), RaceAdapter.Interacti
         .withTitle(R.string.screen_race_list)
         .build()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        adapter = AppAdapter(listOf(RaceViewHolderManager(this)))
+    }
+
     override fun bindViewModel() {
         viewModel.races.observe(viewLifecycleOwner, {
-            adapter.raceList = it
+            adapter.submitList(it)
         })
         viewModel.showCreateRaceDialog.observe(viewLifecycleOwner, { needToShow ->
             if (needToShow) {
@@ -54,7 +60,6 @@ class RaceFragment : BaseFragment(R.layout.fragment_race), RaceAdapter.Interacti
     }
 
     override fun initViews() {
-        adapter = RaceAdapter(this)
         with(binding) {
             raceRecyclerView.adapter = this@RaceFragment.adapter
 
@@ -65,8 +70,8 @@ class RaceFragment : BaseFragment(R.layout.fragment_race), RaceAdapter.Interacti
         viewModel.initUI()
     }
 
-    override fun onClickAtRace(raceView: RaceView) {
-        viewModel.onRaceClicked(raceView)
+    override fun onItemSelected(item: RaceView) {
+        viewModel.onRaceClicked(item)
     }
 
     override fun onPause() {

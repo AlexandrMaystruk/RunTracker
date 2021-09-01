@@ -3,14 +3,15 @@ package com.gmail.maystruks08.nfcruntracker.ui.race
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.interactors.RaceInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.RaceView
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.RaceView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.toView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -27,7 +28,7 @@ class RaceViewModel @ViewModelInject constructor(
     private val interactor: RaceInteractor
 ) : BaseViewModel() {
 
-    val races: LiveData<MutableList<RaceView>> get() = _racesLiveData
+    val races: LiveData<List<RaceView>> get() = _racesLiveData.map { it.toList() }
     val showProgress: SingleLiveEvent<Boolean> get() = _showProgressLiveData
     val showCreateRaceDialog: SingleLiveEvent<Boolean> get() = _showCreateRaceDialogLiveData
 

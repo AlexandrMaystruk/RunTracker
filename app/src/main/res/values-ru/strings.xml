@@ -66,5 +66,6 @@
     <string name="signUp">Выйти</string>
     <string name="competition_time">Время: %1$s</string>
     <string name="cancel">Cancel</string>
+    <string name="save_new_race">Сохранить</string>
 
 </resources>

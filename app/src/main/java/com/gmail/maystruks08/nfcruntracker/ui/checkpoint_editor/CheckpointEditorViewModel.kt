@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.gmail.maystruks08.domain.interactors.CheckpointInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 

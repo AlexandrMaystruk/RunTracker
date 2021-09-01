@@ -20,7 +20,6 @@ import com.gmail.maystruks08.domain.interactors.DistanceInteractor
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.domain.timeInMillisToTimeFormat
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
-import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.core.bus.StartRunTrackerBus
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.core.ext.startCoroutineTimer
@@ -29,14 +28,12 @@ import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertType
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.BaseRunnerView
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerView
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.*
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.views.RunnerScreenItems
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.views.RunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import java.util.*
@@ -53,26 +50,29 @@ class RunnersViewModel @ViewModelInject constructor(
     private val startRunTrackerBus: StartRunTrackerBus
 ) : BaseViewModel() {
 
-    val distance get() = _distanceFlow
+    val distance get() = _distanceFlow.map { it.toList() }
     val runners get() = _runnersFlow
-    val showSuccessDialog get() = _showSuccessDialogLiveData
-    val showConfirmationDialog get() = _showAlertDialogLiveData
+    val showSuccessDialog get() = _showSuccessDialogChannel.receiveAsFlow()
+    val showConfirmationDialog get() = _showAlertDialogChannel.receiveAsFlow()
+    val showSelectCheckpointDialog get() = _selectCheckpointDialogChannel.receiveAsFlow()
+    val closeSelectCheckpointDialog get() = _closeCheckpointDialogChannel.receiveAsFlow()
+    val showTime get() = _showTimeChannel.receiveAsFlow()
+
     val showProgress get() = _showProgressFlow
-    val showTime get() = _showTimeLiveData
-    val showSelectCheckpointDialog get() = _selectCheckpointDialogLiveData
-    val closeSelectCheckpointDialog get() = _closeCheckpointDialogLiveData
     val showRunnersTitle get() = _showRunnersTitleFlow
     val enableSelectCheckpointButton get() = _enableSelectCheckpointButtonFlow
 
 
     private val _distanceFlow = MutableStateFlow<MutableList<DistanceView>>(mutableListOf())
-    private val _runnersFlow = MutableStateFlow<List<BaseRunnerView>>(mutableListOf())
-    private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, Long>>()
-    private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
+    private val _runnersFlow = MutableStateFlow<List<RunnerScreenItems>>(mutableListOf())
+
+    private val _showSuccessDialogChannel = Channel<Pair<Checkpoint?, Long>>(Channel.BUFFERED)
+    private val _showAlertDialogChannel = Channel<AlertType>(Channel.BUFFERED)
+    private val _showTimeChannel = Channel<String>(Channel.BUFFERED)
     private val _showProgressFlow = MutableStateFlow(true)
-    private val _showTimeLiveData = SingleLiveEvent<String>()
-    private val _selectCheckpointDialogLiveData = SingleLiveEvent<CurrentRaceDistance>()
-    private val _closeCheckpointDialogLiveData = SingleLiveEvent<String>()
+
+    private val _selectCheckpointDialogChannel = Channel<CurrentRaceDistance>(Channel.BUFFERED)
+    private val _closeCheckpointDialogChannel = Channel<String>(Channel.BUFFERED)
     private val _showRunnersTitleFlow = MutableStateFlow("")
     private val _enableSelectCheckpointButtonFlow = MutableStateFlow(true)
 
@@ -125,12 +125,16 @@ class RunnersViewModel @ViewModelInject constructor(
     }
 
     fun onRunnerSwipedLeft(position: Int, swipedRunner: RunnerView?) {
-        _showAlertDialogLiveData.value = AlertTypeConfirmOfftrack(position)
+        viewModelScope.launch {
+            _showAlertDialogChannel.send(AlertTypeConfirmOfftrack(position))
+        }
         lastSelectedRunner = swipedRunner
     }
 
     fun onRunnerSwipedRight(position: Int, swipedRunner: RunnerView?) {
-        _showAlertDialogLiveData.value = AlertTypeMarkRunnerAtCheckpoint(position)
+        viewModelScope.launch {
+            _showAlertDialogChannel.send(AlertTypeMarkRunnerAtCheckpoint(position))
+        }
         lastSelectedRunner = swipedRunner
     }
 
@@ -163,20 +167,25 @@ class RunnersViewModel @ViewModelInject constructor(
 
     fun onSearchQueryChanged(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (query.isNotEmpty()) {
-                val queryResult = when {
-                    isResultMode -> runnersInteractor.getFinishers(distanceId, query)
-                    else -> runnersInteractor.getRunners(distanceId, query)
-                }
-                when (queryResult) {
-                    is TaskResult.Value -> {
-                        _runnersFlow.value = queryResult.value.map { it.toRunnerView() }.toMutableList()
-                    }
-                    is TaskResult.Error -> handleError(queryResult.error)
-                }
-            } else {
+            if (query.isEmpty()) {
                 Timber.v("showAllRunners  onSearchQueryChanged")
                 showRunners()
+                return@launch
+            }
+            if (isResultMode) {
+                runnersInteractor.getFinishers(distanceId, query).also {
+                    when (it) {
+                        is TaskResult.Value -> _runnersFlow.value = toFinisherViews(it.value)
+                        is TaskResult.Error -> handleError(it.error)
+                    }
+                }
+                return@launch
+            }
+            runnersInteractor.getRunners(distanceId, query).also {
+                when (it) {
+                    is TaskResult.Value -> _runnersFlow.value = toRunnerViews(it.value)
+                    is TaskResult.Error -> handleError(it.error)
+                }
             }
         }
     }
@@ -188,14 +197,16 @@ class RunnersViewModel @ViewModelInject constructor(
                 distanceId,
                 checkpointView.id
             )) {
-                is TaskResult.Value -> _closeCheckpointDialogLiveData.postValue(checkpointView.bean.title)
+                is TaskResult.Value -> _closeCheckpointDialogChannel.send(checkpointView.bean.title)
                 is TaskResult.Error -> handleError(result.error)
             }
         }
     }
 
     fun onCurrentCheckpointTextClicked() {
-        _selectCheckpointDialogLiveData.postValue(CurrentRaceDistance(raceId, distanceId))
+        viewModelScope.launch {
+            _selectCheckpointDialogChannel.send(CurrentRaceDistance(raceId, distanceId))
+        }
     }
 
     fun onOpenSettingsFragmentClicked() {
@@ -239,10 +250,10 @@ class RunnersViewModel @ViewModelInject constructor(
         jobShowCurrentCheckpoint = viewModelScope.launch(Dispatchers.IO) {
             when (val result =
                 checkpointInteractor.getCurrentSelectedCheckpoint(raceId, distanceId)) {
-                is TaskResult.Value -> _closeCheckpointDialogLiveData.postValue(result.value.getName())
+                is TaskResult.Value -> _closeCheckpointDialogChannel.send(result.value.getName())
                 is TaskResult.Error -> {
                     if (result.error is CheckpointNotFoundException) {
-                        _closeCheckpointDialogLiveData.postValue("Выбрать кп")
+                        _closeCheckpointDialogChannel.send("Выбрать кп")
                     }
                     handleError(result.error)
                 }
@@ -287,12 +298,10 @@ class RunnersViewModel @ViewModelInject constructor(
             val runners = ArrayList(_runnersFlow.value)
             when (runnerChange.modifierType) {
                 ModifierType.ADD, ModifierType.UPDATE -> {
-                    runners.updateElement(
-                        runnerView,
-                        { (it as? RunnerView)?.number == runnerView.number })
+                    runners.updateElement(runnerView, { it?.number == runnerView.number })
                 }
                 ModifierType.REMOVE -> {
-                    runners.removeAll { (it as? RunnerView)?.number == runnerView.number }
+                    runners.removeAll { it?.number == runnerView.number }
                 }
             }
             _runnersFlow.value = runners
@@ -337,9 +346,9 @@ class RunnersViewModel @ViewModelInject constructor(
             }
             .collect {
                 Timber.w("provideFinisherRunners")
-                val runners = toFinisherViews(it)
+                val finishers = toFinisherViews(it)
                 _showProgressFlow.value = false
-                _runnersFlow.value = runners
+                _runnersFlow.value = finishers
             }
     }
 
@@ -367,7 +376,7 @@ class RunnersViewModel @ViewModelInject constructor(
             .checkpoints[updatedRunner.actualDistanceId]
             ?.maxByOrNull { it.getResult()?.time ?: 0 }
 
-        _showSuccessDialogLiveData.postValue(lastCheckpoint to updatedRunner.number)
+        viewModelScope.launch { _showSuccessDialogChannel.send(lastCheckpoint to updatedRunner.number) }
         handleRunnerChanges(Change(updatedRunner, ModifierType.UPDATE))
         recalculateDistanceStatistic()
     }
@@ -419,8 +428,11 @@ class RunnersViewModel @ViewModelInject constructor(
     private fun showDistanceTime(distanceStartTime: Date) {
         jobShowDistanceTimer?.cancel()
         jobShowDistanceTimer = viewModelScope.startCoroutineTimer(delayMillis = 0, repeatMillis = 1000) {
-            val time = (System.currentTimeMillis() - distanceStartTime.time).timeInMillisToTimeFormat()
-            _showTimeLiveData.postValue(time)
+            val time =
+                (System.currentTimeMillis() - distanceStartTime.time).timeInMillisToTimeFormat()
+            viewModelScope.launch {
+                _showTimeChannel.send(time)
+            }
         }
     }
 

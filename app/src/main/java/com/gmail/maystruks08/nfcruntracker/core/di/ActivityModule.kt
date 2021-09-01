@@ -43,6 +43,11 @@ abstract class ActivityModule {
 
     @Binds
     @ActivityScoped
+    abstract fun bindGetAccountAccessLevelUseCase(impl: GetAccountAccessLevelUseCaseImpl): GetAccountAccessLevelUseCase
+
+
+    @Binds
+    @ActivityScoped
     abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
 
 

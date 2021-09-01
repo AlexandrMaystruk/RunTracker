@@ -5,9 +5,9 @@
     <string name="signOut">Logout</string>
 
     <string name="screen_settings">Settings</string>
-    <string name="screen_register_new_runner">Member Registration</string>
+    <string name="screen_register_new_runner">Registration</string>
     <string name="screen_runners_results">Results</string>
-    <string name="screen_runner">Member Information</string>
+    <string name="screen_runner">Runner Information</string>
     <string name="screen_scan_qr_code">Scan QR code</string>
     <string name="screen_race_list">Race list</string>
 
@@ -39,12 +39,12 @@
     <string name="save_new_race">Save race</string>
 
 
-    <string name="error_member_already_exist">A participant with such a card already exists</string>
+    <string name="error_member_already_exist">A runner with such a card already exists</string>
     <string name="error_sync_with_server">Sync with server error</string>
     <string name="error_save_data_to_local_db">Save data to local database error</string>
     <string name="error_runner_not_found">Runner not found</string>
     <string name="attention">Attention!</string>
-    <string name ="remove_checkpoint_for_runner">Do you want the participant to clear the current CP?</string>
+    <string name ="remove_checkpoint_for_runner">Do you want to clear the current CP?</string>
     <string name="mark_runner_without_card">Mark runner on CP without card?</string>
     <string name="total_time">Total time: %1$s</string>
     <string name="off_track">Off track</string>
@@ -56,7 +56,7 @@
     <string name="success_message">Checkpoint %1$s added to runner %2$s</string>
     <string name="nfc_disabled">NFC disabled!</string>
     <string name="nfc_disabled_full_message">NFC scanner disabled! Some features will not work!</string>
-    <string name="is_enable_nfc">Enable NFC to scan membership cards?</string>
+    <string name="is_enable_nfc">Enable NFC to scan runners cards?</string>
     <string name="please_enable_nfc">Please activate NFC and click Back to return to the app!</string>
     <string name="device_offline">Device offline</string>
 

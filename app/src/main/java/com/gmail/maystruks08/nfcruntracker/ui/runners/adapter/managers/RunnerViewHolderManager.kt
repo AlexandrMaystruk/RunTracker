@@ -1,28 +1,68 @@
-package com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.view_holders
+package com.gmail.maystruks08.nfcruntracker.ui.adapter
 
 import android.annotation.SuppressLint
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.ext.gone
 import com.gmail.maystruks08.nfcruntracker.core.ext.show
 import com.gmail.maystruks08.nfcruntracker.databinding.ItemRunnerBinding
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.Interaction
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.BaseViewHolder
+import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.Item
+import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.ViewHolderManager
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.views.RunnerView
+
+class RunnerViewHolderManager(
+    private val interaction: Interaction
+) : ViewHolderManager<ItemRunnerBinding, RunnerView> {
+
+    override fun isRelativeItem(item: Item) = item is RunnerView
+
+    override fun getLayoutId() = R.layout.item_runner
+
+    override fun getViewHolder(
+        layoutInflater: LayoutInflater,
+        parent: ViewGroup
+    ): BaseViewHolder<ItemRunnerBinding, RunnerView> {
+        val binding = ItemRunnerBinding.inflate(layoutInflater, parent, false)
+        return RunnerViewHolder(binding, interaction)
+    }
+
+    override fun getDiffUtil() = diffUtil
+
+    private val diffUtil = object : DiffUtil.ItemCallback<RunnerView>() {
+        override fun areItemsTheSame(oldItem: RunnerView, newItem: RunnerView) =
+            oldItem.number == newItem.number
+
+        override fun areContentsTheSame(oldItem: RunnerView, newItem: RunnerView) =
+            oldItem == newItem
+    }
+
+    interface Interaction {
+        fun onItemSelected(item: RunnerView)
+    }
+
+}
+
 
 class RunnerViewHolder(
-    itemView: View,
-    interaction: Interaction?
-) : BaseViewHolder<RunnerView>(itemView, interaction) {
+    binding: ItemRunnerBinding,
+    private val interaction: RunnerViewHolderManager.Interaction
+) : BaseViewHolder<ItemRunnerBinding, RunnerView>(binding) {
 
-    private val binding = ItemRunnerBinding.bind(itemView)
+    var isSwipeEnable = true
 
     @SuppressLint("SetTextI18n")
-    override fun bind(item: RunnerView) {
+    override fun onBind(item: RunnerView) = with(binding) {
+        super.onBind(item)
         isSwipeEnable = !item.isOffTrack
         with(binding) {
             tvRunnerNumber.text = "#${item.number}"
-            tvRunnerFullName.text = if (item.fullName.length > 26) item.fullName.take(25) + ".." else item.fullName
+            tvRunnerFullName.text =
+                if (item.fullName.length > 26) item.fullName.take(25) + ".." else item.fullName
             runnerProgress.visibility = View.VISIBLE
             runnerProgress.setStepBean(item.progress.map { it.bean })
         }
@@ -34,6 +74,7 @@ class RunnerViewHolder(
         itemView.setOnClickListener {
             interaction?.onItemSelected(item)
         }
+
     }
 
     private fun smallCard(color: Int) {

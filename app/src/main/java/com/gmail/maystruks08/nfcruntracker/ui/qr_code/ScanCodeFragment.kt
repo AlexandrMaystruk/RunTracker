@@ -34,12 +34,12 @@ class ScanCodeFragment : BaseFragment(R.layout.fragment_scan_code) {
     override fun initViews() {
         with(binding) {
             codeScanner = CodeScanner(requireContext(), scannerView).apply {
-                camera = CodeScanner.CAMERA_BACK // or CAMERA_FRONT or specific camera id
-                formats = CodeScanner.ALL_FORMATS //  ex. listOf(BarcodeFormat.QR_CODE)
-                autoFocusMode = AutoFocusMode.SAFE // or CONTINUOUS
-                scanMode = ScanMode.SINGLE // or CONTINUOUS or PREVIEW
-                isAutoFocusEnabled = true // Whether to enable auto focus or not
-                isFlashEnabled = false // Whether to enable flash or not
+                camera = CodeScanner.CAMERA_BACK
+                formats = CodeScanner.ALL_FORMATS
+                autoFocusMode = AutoFocusMode.SAFE
+                scanMode = ScanMode.SINGLE
+                isAutoFocusEnabled = true
+                isFlashEnabled = false
                 decodeCallback = DecodeCallback {
                     activity?.runOnUiThread {
                         callback.invoke(it.text)

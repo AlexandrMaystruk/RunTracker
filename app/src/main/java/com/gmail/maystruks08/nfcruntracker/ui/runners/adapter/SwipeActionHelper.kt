@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.nfcruntracker.ui.runners.adapters
+package com.gmail.maystruks08.nfcruntracker.ui.runners.adapter
 
 import android.content.Context
 import android.graphics.Canvas
@@ -9,15 +9,17 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.ext.toPx
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.view_holders.BaseViewHolder
+import com.gmail.maystruks08.nfcruntracker.ui.adapter.RunnerViewHolder
 
 abstract class SwipeActionHelper(context: Context) :
     ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
 
-    private val offTrackIcon: Drawable? = ContextCompat.getDrawable(context, R.drawable.ic_trash)
+    private val offTrackIcon: Drawable? =
+        ContextCompat.getDrawable(context, R.drawable.ic_remove_circle)
     private val offTrackBg: Drawable
 
-    private val markAtCurrentIcon: Drawable? = ContextCompat.getDrawable(context, R.drawable.ic_settings)
+    private val markAtCurrentIcon: Drawable? =
+        ContextCompat.getDrawable(context, R.drawable.ic_check)
     private val markAtCurrentBg: Drawable
 
     private var prevDX = -1f
@@ -31,7 +33,7 @@ abstract class SwipeActionHelper(context: Context) :
         markAtCurrentBg = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = context.resources.displayMetrics.toPx(8f)
-            setColor(ContextCompat.getColor(context, R.color.colorPrimary))
+            setColor(ContextCompat.getColor(context, R.color.colorGreen))
         }
     }
 
@@ -46,8 +48,11 @@ abstract class SwipeActionHelper(context: Context) :
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder
     ): Int {
-        if ((viewHolder as? BaseViewHolder<*>)?.isSwipeEnable == false) return 0
-        return super.getSwipeDirs(recyclerView, viewHolder)
+        if ((viewHolder as? RunnerViewHolder)?.isSwipeEnable == true) return super.getSwipeDirs(
+            recyclerView,
+            viewHolder
+        )
+        return 0
     }
 
     override fun onChildDraw(
@@ -56,7 +61,8 @@ abstract class SwipeActionHelper(context: Context) :
     ) {
         val itemView = viewHolder.itemView
         val itemHeight = itemView.bottom - itemView.top
-        if ((viewHolder as? BaseViewHolder<*>)?.isSwipeEnable == false) return
+
+        if ((viewHolder as? RunnerViewHolder)?.isSwipeEnable != true) return
 
         when {
             //Swipe left (Off track)

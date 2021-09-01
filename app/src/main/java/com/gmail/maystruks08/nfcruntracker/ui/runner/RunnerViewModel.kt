@@ -10,9 +10,9 @@ import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerView
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.toRunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.views.RunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.toRunnerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router

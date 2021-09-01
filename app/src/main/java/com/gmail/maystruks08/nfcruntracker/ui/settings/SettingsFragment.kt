@@ -2,6 +2,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.settings
 
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
@@ -11,6 +12,7 @@ import com.gmail.maystruks08.nfcruntracker.databinding.FragmentSettingsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.flow.collect
 
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
@@ -28,14 +30,21 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
         .build()
 
     override fun bindViewModel() {
-        with(binding) {
-            viewModel.changeStartButtonVisibility.observe(viewLifecycleOwner, {
-                tvStartRunning.visibility = if (it) View.VISIBLE else View.GONE
-            })
+        lifecycleScope.launchWhenStarted {
+            viewModel.uiState.collect(::renderUiState)
+        }
+        viewModel.toast.observe(viewLifecycleOwner, {
+            context?.toast(it)
+        })
+    }
 
-            viewModel.toast.observe(viewLifecycleOwner, {
-                context?.toast(it)
-            })
+    private fun renderUiState(state: SettingsViewModel.ViewState) {
+        with(binding) {
+            when (state) {
+                SettingsViewModel.ViewState.ShowStartButton -> tvStartRunning.visibility =
+                    View.VISIBLE
+                SettingsViewModel.ViewState.HideStartButton -> tvStartRunning.visibility = View.GONE
+            }
         }
     }
 

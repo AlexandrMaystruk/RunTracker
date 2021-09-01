@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.nfcruntracker.ui.runners.adapters
+package com.gmail.maystruks08.nfcruntracker.ui.runners.adapter
 
 import android.graphics.Rect
 import android.view.View

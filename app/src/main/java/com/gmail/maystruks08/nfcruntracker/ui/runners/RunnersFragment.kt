@@ -3,6 +3,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.runners
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
+import android.transition.TransitionManager
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
@@ -16,18 +17,19 @@ import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.*
 import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnersBinding
+import com.gmail.maystruks08.nfcruntracker.ui.adapter.AppAdapter
+import com.gmail.maystruks08.nfcruntracker.ui.adapter.DistanceViewHolderManager
+import com.gmail.maystruks08.nfcruntracker.ui.adapter.ResultViewHolderManager
+import com.gmail.maystruks08.nfcruntracker.ui.adapter.RunnerViewHolderManager
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.DividerItemDecoration
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.DividerVerticalItemDecoration
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.SwipeActionHelper
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.distance.DistanceListAdapter
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.Interaction
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.RunnerListAdapter
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapters.runner.views.RunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.DividerItemDecoration
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.DividerVerticalItemDecoration
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.SwipeActionHelper
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.views.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SelectCheckpointDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SuccessDialogFragment
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.DistanceView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.DistanceView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -38,8 +40,8 @@ import kotlinx.coroutines.flow.collect
 @AndroidEntryPoint
 @ExperimentalCoroutinesApi
 class RunnersFragment : BaseFragment(R.layout.fragment_runners),
-    Interaction,
-    DistanceListAdapter.Interaction {
+    RunnerViewHolderManager.Interaction,
+    DistanceViewHolderManager.Interaction {
 
     private val viewModel: RunnersViewModel by viewModels()
 
@@ -48,8 +50,8 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners),
         rvDistanceType.adapter = null
         circleMenuLayoutManager = null
     }
-    private lateinit var runnerAdapter: RunnerListAdapter
-    private lateinit var distanceAdapter: DistanceListAdapter
+    private lateinit var runnerAdapter: AppAdapter
+    private lateinit var distanceAdapter: AppAdapter
     private var circleMenuLayoutManager: CircleMenuManager? = null
 
 
@@ -84,8 +86,8 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.init(raceId, distanceId)
-        runnerAdapter = RunnerListAdapter(this)
-        distanceAdapter = DistanceListAdapter(this)
+        runnerAdapter = AppAdapter(listOf(RunnerViewHolderManager(this), ResultViewHolderManager()))
+        distanceAdapter = AppAdapter(listOf(DistanceViewHolderManager(this)))
     }
 
     override fun bindViewModel() {
@@ -110,6 +112,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners),
 
             lifecycleScope.launchWhenStarted {
                 enableSelectCheckpointButton.collect { enable ->
+                    TransitionManager.beginDelayedTransition(binding.root)
                     binding.tvCurrentCheckpoint.setVisibility(enable)
                 }
             }
@@ -120,42 +123,54 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners),
                 }
             }
 
-
-            showConfirmationDialog.observe(viewLifecycleOwner) {
-                alertDialog?.dismiss()
-                when (it) {
-                    is AlertTypeConfirmOfftrack -> showConfirmOffTrackDialog(it.position)
-                    is AlertTypeMarkRunnerAtCheckpoint -> showConfirmMarkRunnerAtCheckpointDialog(it.position)
-                    else -> Unit
+            lifecycleScope.launchWhenStarted {
+                showConfirmationDialog.collect {
+                    alertDialog?.dismiss()
+                    when (it) {
+                        is AlertTypeConfirmOfftrack -> showConfirmOffTrackDialog(it.position)
+                        is AlertTypeMarkRunnerAtCheckpoint -> showConfirmMarkRunnerAtCheckpointDialog(
+                            it.position
+                        )
+                    }
                 }
             }
 
-            showSuccessDialog.observe(viewLifecycleOwner, {
-                val checkpointName = it?.first?.getName() ?: ""
-                val message = getString(R.string.success_message, checkpointName, "#${it.second}")
-                SuccessDialogFragment.getInstance(message)
-                    .show(childFragmentManager, SuccessDialogFragment.name())
-            })
-
-            showSelectCheckpointDialog.observe(viewLifecycleOwner, { raceDistanceIds ->
-                val dialog = findFragmentByTag<SelectCheckpointDialogFragment>(SelectCheckpointDialogFragment.name())
-                if (dialog == null) {
-                    SelectCheckpointDialogFragment
-                        .getInstance(raceDistanceIds.first, raceDistanceIds.second) {
-                            viewModel.onNewCurrentCheckpointSelected(it)
-                        }
-                        .show(childFragmentManager, SelectCheckpointDialogFragment.name())
+            lifecycleScope.launchWhenStarted {
+                showSuccessDialog.collect {
+                    val checkpointName = it.first?.getName() ?: ""
+                    val message = getString(R.string.success_message, checkpointName, "#${it.second}")
+                    SuccessDialogFragment.getInstance(message)
+                        .show(childFragmentManager, SuccessDialogFragment.name())
                 }
-            })
+            }
 
-            closeSelectCheckpointDialog.observe(viewLifecycleOwner, { selectedCheckpoint ->
-                findFragmentByTag<SelectCheckpointDialogFragment>(SelectCheckpointDialogFragment.name())?.dismiss()
-                binding.tvCurrentCheckpoint.text = selectedCheckpoint
-            })
+            lifecycleScope.launchWhenStarted {
+                showSelectCheckpointDialog.collect { raceDistanceIds ->
+                    val dialog = findFragmentByTag<SelectCheckpointDialogFragment>(
+                        SelectCheckpointDialogFragment.name()
+                    )
+                    if (dialog == null) {
+                        SelectCheckpointDialogFragment
+                            .getInstance(raceDistanceIds.first, raceDistanceIds.second) {
+                                viewModel.onNewCurrentCheckpointSelected(it)
+                            }
+                            .show(childFragmentManager, SelectCheckpointDialogFragment.name())
+                    }
+                }
+            }
 
-            showTime.observe(viewLifecycleOwner, {
-                binding.tvTime.text = getString(R.string.competition_time, it)
-            })
+            lifecycleScope.launchWhenStarted {
+                closeSelectCheckpointDialog.collect { selectedCheckpoint ->
+                    findFragmentByTag<SelectCheckpointDialogFragment>(SelectCheckpointDialogFragment.name())?.dismiss()
+                    binding.tvCurrentCheckpoint.text = selectedCheckpoint
+                }
+            }
+
+            lifecycleScope.launchWhenStarted {
+                showTime.collect {
+                    binding.tvTime.text = getString(R.string.competition_time, it)
+                }
+            }
         }
     }
 
@@ -256,12 +271,6 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners),
     override fun onStop() {
         super.onStop()
         hideSoftKeyboard(inputManager)
-    }
-
-    override fun onDestroy() {
-        distanceAdapter.interaction = null
-        runnerAdapter.interaction = null
-        super.onDestroy()
     }
 
     companion object {

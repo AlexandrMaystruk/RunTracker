@@ -10,9 +10,11 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.setVisibility
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentCreateRaceBinding
 import com.gmail.maystruks08.nfcruntracker.ui.race.RaceFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import java.util.*
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 @ObsoleteCoroutinesApi
 class CreateRaceBottomShitFragment : BaseBottomSheetDialogFragment() {

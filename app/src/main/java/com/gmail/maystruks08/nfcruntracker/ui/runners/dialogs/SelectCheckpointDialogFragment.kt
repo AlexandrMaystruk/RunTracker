@@ -13,7 +13,7 @@ import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseDialogFragment
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.databinding.DialogSelectCheckpointBinding
-import com.gmail.maystruks08.nfcruntracker.ui.viewmodels.CheckpointView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
