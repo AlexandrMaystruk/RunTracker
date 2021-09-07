@@ -22,9 +22,9 @@ interface RunnersRepository {
 
     suspend fun getRunnerByCardId(cardId: String): Runner?
 
-    suspend fun getRunnerByNumber(runnerNumber: Long): Runner?
+    suspend fun getRunnerByNumber(runnerNumber: String): Runner?
 
-    suspend fun getRunnerTeamMembers(currentRunnerNumber: Long, teamName: String): List<Runner>?
+    suspend fun getRunnerTeamMembers(currentRunnerNumber: String, teamName: String): List<Runner>?
 
     @Throws(SaveRunnerDataException::class, SyncWithServerException::class)
     suspend fun updateRunnerData(runner: Runner): Runner

@@ -25,7 +25,7 @@ interface Api{
     //DISTANCE
     suspend fun saveDistance(distancePojo: DistancePojo)
 
-    suspend fun updateDistanceRunners(distanceId: String, runnerIds: List<Long>)
+    suspend fun updateDistanceRunners(distanceId: String, runnerIds: List<String>)
 
     suspend fun updateDistanceStatistic(distanceId: String, distanceStatistic: DistanceStatistic)
 

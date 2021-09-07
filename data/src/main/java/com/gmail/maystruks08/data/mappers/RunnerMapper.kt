@@ -32,7 +32,7 @@ fun RunnerPojo.fromFirestoreRunner(): Runner {
         phone,
         RunnerSex.fromOrdinal(sex),
         city,
-        dateOfBirthday.parseServerTime(),
+        dateOfBirthday?.parseServerTime(),
         actualRaceId,
         actualDistanceId,
         raceIds,

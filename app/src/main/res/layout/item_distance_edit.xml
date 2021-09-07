@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.gmail.maystruks08.nfcruntracker.ui.views.CustomConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/distanceCard"
+    android:layout_width="140dp"
+    android:layout_height="110dp"
+    android:text="@string/male"
+    app:backgroundColor="@color/colorAccent"
+    app:cornerAll="6dp">
+
+    <TextView
+        android:id="@+id/tvDistanceName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_s"
+        android:layout_marginStart="@dimen/margin_min"
+        android:layout_marginEnd="@dimen/margin_min"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/text_m"
+        app:layout_constraintBottom_toBottomOf="@+id/chartView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</com.gmail.maystruks08.nfcruntracker.ui.views.CustomConstraintLayout>

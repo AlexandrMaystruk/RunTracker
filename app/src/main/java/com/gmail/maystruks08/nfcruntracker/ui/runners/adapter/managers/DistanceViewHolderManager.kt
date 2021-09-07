@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.nfcruntracker.ui.adapter
+package com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.managers
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

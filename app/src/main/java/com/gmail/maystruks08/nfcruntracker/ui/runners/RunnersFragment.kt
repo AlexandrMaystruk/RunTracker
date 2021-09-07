@@ -18,7 +18,7 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.*
 import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnersBinding
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.AppAdapter
-import com.gmail.maystruks08.nfcruntracker.ui.adapter.DistanceViewHolderManager
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.managers.DistanceViewHolderManager
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.ResultViewHolderManager
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.RunnerViewHolderManager
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
@@ -66,7 +66,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners),
         .withTitle(raceName)
         .withMenu(R.menu.menu_search_with_settings)
         .withMenuItems(
-            listOf(R.id.action_settings, R.id.action_result, R.id.action_select_race),
+            listOf(R.id.action_settings, R.id.action_result, R.id.action_select_race, R.id.action_edit_race),
             listOf(MenuItem.OnMenuItemClickListener {
                 viewModel.onOpenSettingsFragmentClicked()
                 true
@@ -76,6 +76,9 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners),
             }, MenuItem.OnMenuItemClickListener {
                 viewModel.onSelectRaceClicked()
                 true
+            }, MenuItem.OnMenuItemClickListener {
+                    viewModel.onEditCurrentRaceClicked()
+                    true
             })
         )
         .withMenuSearch(InputType.TYPE_CLASS_NUMBER) {
@@ -146,9 +149,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners),
 
             lifecycleScope.launchWhenStarted {
                 showSelectCheckpointDialog.collect { raceDistanceIds ->
-                    val dialog = findFragmentByTag<SelectCheckpointDialogFragment>(
-                        SelectCheckpointDialogFragment.name()
-                    )
+                    val dialog = findFragmentByTag<SelectCheckpointDialogFragment>(SelectCheckpointDialogFragment.name())
                     if (dialog == null) {
                         SelectCheckpointDialogFragment
                             .getInstance(raceDistanceIds.first, raceDistanceIds.second) {

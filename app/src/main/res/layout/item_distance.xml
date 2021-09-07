@@ -14,7 +14,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_xs"
         android:layout_marginTop="@dimen/margin_s"
-        android:text="Iron"
         android:textColor="@color/colorWhite"
         android:textSize="@dimen/text_m"
         app:layout_constraintBottom_toBottomOf="@+id/chartView"

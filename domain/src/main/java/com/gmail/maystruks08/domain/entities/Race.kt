@@ -18,7 +18,7 @@ data class Race(
         return distanceList.firstOrNull { it.id == distanceId }
     }
 
-    fun findRunner(distanceId: String, runnerId: Long): Runner? {
+    fun findRunner(distanceId: String, runnerId: String): Runner? {
         return findDistance(distanceId)?.findRunnerById(runnerId)
     }
 
@@ -28,7 +28,7 @@ data class Race(
 
     fun findRunnerTeamMembers(
         distanceId: String,
-        currentRunnerNumber: Long,
+        currentRunnerNumber: String,
         teamName: String
     ): List<Runner>? {
         return findDistance(distanceId)?.findRunnerTeamMembers(currentRunnerNumber, teamName)

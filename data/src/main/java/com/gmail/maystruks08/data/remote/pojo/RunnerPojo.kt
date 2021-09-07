@@ -1,14 +1,14 @@
 package com.gmail.maystruks08.data.remote.pojo
 
 data class RunnerPojo(
-    var number: Long = 0,
+    var number: String = "",
     var cardId: String? = null,
     var fullName: String = "",
     val shortName: String = "",
     val phone: String = "",
     var sex: Int = 0,
     var city: String = "",
-    var dateOfBirthday: String = "",
+    var dateOfBirthday: String? = null,
     val actualRaceId: String = "",
     val actualDistanceId: String = "",
     val raceIds: MutableList<String> = mutableListOf(),

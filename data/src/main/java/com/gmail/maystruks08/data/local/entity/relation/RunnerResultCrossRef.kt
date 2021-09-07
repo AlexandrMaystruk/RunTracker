@@ -6,4 +6,4 @@ import androidx.room.Entity
     tableName = "runner_result_cross_ref",
     primaryKeys = ["runnerNumber", "resultId"]
 )
-data class RunnerResultCrossRef(val runnerNumber: Long, val resultId: String)
+data class RunnerResultCrossRef(val runnerNumber: String, val resultId: String)

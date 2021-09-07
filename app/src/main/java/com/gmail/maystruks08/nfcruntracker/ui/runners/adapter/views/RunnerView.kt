@@ -4,7 +4,7 @@ import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
 
 data class RunnerView(
     val cardId: String?,
-    override val number: Long,
+    override val number: String,
     val fullName: String,
     val city: String,
     val result: String?,

@@ -25,4 +25,8 @@ class DistanceInteractorImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun provideCurrentSelectedRaceId(): String {
+        return distanceRepository.getLastSelectedRace().first
+    }
 }

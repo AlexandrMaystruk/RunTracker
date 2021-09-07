@@ -29,7 +29,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner),
     private lateinit var checkpointsAdapter: AppAdapter
 
     private var alertDialog: AlertDialog? = null
-    private var runnerNumber: Long by argument()
+    private var runnerNumber: String by argument()
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
@@ -181,7 +181,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner),
 
     companion object {
 
-        fun getInstance(runnerNumber: Long, distanceId: String) = RunnerFragment().apply {
+        fun getInstance(runnerNumber: String, distanceId: String) = RunnerFragment().apply {
             this.runnerNumber = runnerNumber
         }
     }

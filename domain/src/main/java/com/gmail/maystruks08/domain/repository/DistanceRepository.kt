@@ -9,4 +9,7 @@ interface DistanceRepository {
 
     suspend fun getDistanceListFlow(raceId: String): Flow<List<Distance>>
 
+    //return pair. First raceId second race name
+    suspend fun getLastSelectedRace(): Pair<String, String>
+
 }

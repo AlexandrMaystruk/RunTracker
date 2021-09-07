@@ -45,7 +45,7 @@ fun Runner.toRunnerView(): RunnerView {
         this.fullName,
         this.city,
         this.totalResults[actualDistanceId]?.toUITimeFormat(),
-        this.dateOfBirthday.toDateFormat(),
+        this.dateOfBirthday?.toDateFormat().orEmpty(),
         this.actualDistanceId,
         this.checkpoints[actualDistanceId]?.toCheckpointViews(isOffTrack = isOffTrack).orEmpty(),
         isOffTrack
@@ -55,7 +55,7 @@ fun Runner.toRunnerView(): RunnerView {
 fun Runner.toRunnerResultView(position: Int): RunnerResultView {
     return RunnerResultView(
         number = number,
-        runnerNumber = this.number.toString(),
+        runnerNumber = this.number,
         runnerFullName = this.fullName,
         runnerResultTime = this.totalResults[actualDistanceId]!!.time.timeInMillisToTimeFormat(),
         position = position
@@ -125,6 +125,15 @@ fun Checkpoint.toCheckpointView(
         checkpointPosition,
         titlePaintFlag,
         Bean(getName(), stepState)
+    )
+}
+
+
+fun Checkpoint.toCheckpointEditView(checkpointPosition: CheckpointPosition): EditCheckpointView {
+    return EditCheckpointView(
+        id = getId(),
+        title = getName(),
+        position = checkpointPosition
     )
 }
 

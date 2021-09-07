@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.gmail.maystruks08.nfcruntracker">
 
+<!--    <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />-->
+
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />

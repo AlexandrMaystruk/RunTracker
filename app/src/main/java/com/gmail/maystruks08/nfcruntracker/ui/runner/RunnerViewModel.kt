@@ -34,10 +34,10 @@ class RunnerViewModel @ViewModelInject constructor(
 
     private val _runnerLiveData = SingleLiveEvent<RunnerView>()
     private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
-    private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, Long>>()
+    private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, String>>()
     private val _linkCardModeEnableLiveData = SingleLiveEvent<Boolean>()
 
-    fun onShowRunnerClicked(runnerNumber: Long) {
+    fun onShowRunnerClicked(runnerNumber: String) {
         viewModelScope.launch(Dispatchers.IO) {
             when (val onResult = runnersInteractor.getRunner(runnerNumber)) {
                 is TaskResult.Value -> handleRunnerData(onResult.value)
@@ -61,17 +61,17 @@ class RunnerViewModel @ViewModelInject constructor(
         }
     }
 
-    fun markCheckpointAsPassed(runnerNumber: Long) {
+    fun markCheckpointAsPassed(runnerNumber: String) {
         viewModelScope.launch(Dispatchers.IO) {
             if (isRunnerOfftrack() || isRunnerHasResult()) return@launch
-            when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(runnerNumber)) {
+            when (val onResult = runnersInteractor.addCurrentCheckpointToRunnerByNumber(runnerNumber)) {
                 is TaskResult.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
                 is TaskResult.Error -> handleError(onResult.error)
             }
         }
     }
 
-    fun deleteCheckpointFromRunner(runnerNumber: Long, checkpointId: CheckpointView) {
+    fun deleteCheckpointFromRunner(runnerNumber: String, checkpointId: CheckpointView) {
         viewModelScope.launch(Dispatchers.IO) {
             when (val onResult =
                 runnersInteractor.removeCheckpointForRunner(runnerNumber, checkpointId.id)) {

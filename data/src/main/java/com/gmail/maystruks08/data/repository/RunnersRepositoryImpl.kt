@@ -150,7 +150,7 @@ class RunnersRepositoryImpl @Inject constructor(
         return runnerWithResultsTable?.toRunner()
     }
 
-    override suspend fun getRunnerByNumber(runnerNumber: Long): Runner? {
+    override suspend fun getRunnerByNumber(runnerNumber: String): Runner? {
         return runnerDao.getRunnerWithResultsByNumber(runnerNumber)?.toRunner()
     }
 
@@ -183,9 +183,10 @@ class RunnersRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getRunnerTeamMembers(
-        currentRunnerNumber: Long,
+        currentRunnerNumber: String,
         teamName: String
     ): List<Runner>? {
+        //TODO
         return null
     }
 
@@ -202,7 +203,7 @@ class RunnersRepositoryImpl @Inject constructor(
     }
 
 
-    private suspend fun checkIsDataUploaded(runnerNumber: Long): Boolean {
+    private suspend fun checkIsDataUploaded(runnerNumber: String): Boolean {
         return runnerDao.checkNeedToSync(runnerNumber) == null
     }
 

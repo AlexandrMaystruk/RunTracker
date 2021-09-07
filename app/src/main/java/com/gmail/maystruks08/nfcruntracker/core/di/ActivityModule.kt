@@ -45,6 +45,10 @@ abstract class ActivityModule {
     @ActivityScoped
     abstract fun bindGetAccountAccessLevelUseCase(impl: GetAccountAccessLevelUseCaseImpl): GetAccountAccessLevelUseCase
 
+    @Binds
+    @ActivityScoped
+    abstract fun bindExportFromXlsToRemoteUseCase(impl: ExportFromXlsToRemoteUseCaseImpl): ExportFromXlsToRemoteUseCase
+
 
     @Binds
     @ActivityScoped

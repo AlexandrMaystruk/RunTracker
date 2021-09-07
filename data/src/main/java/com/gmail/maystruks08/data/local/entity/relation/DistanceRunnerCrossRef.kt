@@ -8,5 +8,5 @@ import androidx.room.Entity
 )
 data class DistanceRunnerCrossRef(
     val distanceId: String,
-    val runnerNumber: Long
+    val runnerNumber: String
 )

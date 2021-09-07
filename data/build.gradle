@@ -41,6 +41,7 @@ dependencies {
 
     implementation project(':domain')
     implementation files('libs/poi.jar')
+    implementation 'com.google.zxing:core:3.4.1'
 
     api dataDependencies.room
     api dataDependencies.firestore

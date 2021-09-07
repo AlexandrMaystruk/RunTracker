@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.data.repository
 
+import com.gmail.maystruks08.data.local.ConfigPreferences
 import com.gmail.maystruks08.data.local.dao.DistanceDAO
 import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
 import com.gmail.maystruks08.data.local.entity.tables.DistanceTable
@@ -21,7 +22,8 @@ import javax.inject.Inject
 class DistanceRepositoryImpl @Inject constructor(
     private val firestoreApi: Api,
     private val distanceDAO: DistanceDAO,
-    private val checkpointsRepository: CheckpointsRepository
+    private val checkpointsRepository: CheckpointsRepository,
+    private val configPreferences: ConfigPreferences,
 ) : DistanceRepository {
 
     override suspend fun observeDistanceDataFlow(raceId: String) {
@@ -47,6 +49,10 @@ class DistanceRepositoryImpl @Inject constructor(
         return distanceDAO.getDistanceDistinctUntilChanged(raceId).map { distanceList ->
             distanceList.map { it.toDistanceEntity() }
         }
+    }
+
+    override suspend fun getLastSelectedRace(): Pair<String, String> {
+        return configPreferences.getRaceId() to configPreferences.getRaceName()
     }
 
 

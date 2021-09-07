@@ -41,11 +41,11 @@ interface RunnerDao : BaseDao<RunnerTable> {
 
     @Transaction
     @Query("SELECT * FROM runners WHERE runners.runnerNumber =:runnerNumber")
-    fun getRunnerWithResultsByNumber(runnerNumber: Int): RunnerWithResult
+    fun getRunnerWithResultsByCard(runnerNumber: Int): RunnerWithResult
 
     @Transaction
     @Query("SELECT * FROM runners WHERE runners.cardId =:cardUUID")
-    fun getRunnerWithResultsByNumber(cardUUID: String): RunnerWithResult
+    fun getRunnerWithResultsByCard(cardUUID: String): RunnerWithResult?
 
 
     @Query("SELECT * FROM runners WHERE runners.cardId =:cardUUID")
@@ -54,16 +54,16 @@ interface RunnerDao : BaseDao<RunnerTable> {
 
     @Transaction
     @Query("SELECT DISTINCT distanceId FROM distance_runner_cross_ref WHERE runnerNumber =:runnerNumber ")
-    fun getRunnerDistanceIds(runnerNumber: Long): List<String>
+    fun getRunnerDistanceIds(runnerNumber: String): List<String>
 
     @Transaction
     @Query("SELECT DISTINCT id FROM race_table INNER JOIN distances ON race_table.id == distances.raceId INNER JOIN distance_runner_cross_ref ON distances.distanceId == distance_runner_cross_ref.distanceId WHERE runnerNumber =:runnerNumber")
-    fun getRunnerRaceIds(runnerNumber: Long): List<String>
+    fun getRunnerRaceIds(runnerNumber: String): List<String>
 
 
     @Transaction
     @Query("SELECT * FROM runners WHERE runners.runnerNumber =:runnerNumber LIMIT 1")
-    fun getRunnerWithResultsByNumber(runnerNumber: Long): RunnerWithResult?
+    fun getRunnerWithResultsByNumber(runnerNumber: String): RunnerWithResult?
 
     @Transaction
     @Query("SELECT * FROM runners WHERE runners.cardId =:cardId LIMIT 1")
@@ -80,14 +80,14 @@ interface RunnerDao : BaseDao<RunnerTable> {
 
     @Transaction
     @Query("SELECT * FROM runners WHERE runnerNumber =:runnerNumber AND needToSync = 1 ")
-    suspend fun checkNeedToSync(runnerNumber: Long): RunnerTable?
+    suspend fun checkNeedToSync(runnerNumber: String): RunnerTable?
 
     @Query("UPDATE runners SET needToSync = :needToSync WHERE runnerNumber = :runnerNumber")
-    suspend fun markAsNeedToSync(runnerNumber: Long, needToSync: Boolean)
+    suspend fun markAsNeedToSync(runnerNumber: String, needToSync: Boolean)
 
 
     @Query("DELETE FROM runners WHERE runnerNumber =:runnerNumber ")
-    suspend fun delete(runnerNumber: Long): Int
+    suspend fun delete(runnerNumber: String): Int
 
 
     @Delete

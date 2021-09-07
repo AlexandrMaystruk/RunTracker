@@ -66,7 +66,7 @@ class RunnersViewModel @ViewModelInject constructor(
     private val _distanceFlow = MutableStateFlow<MutableList<DistanceView>>(mutableListOf())
     private val _runnersFlow = MutableStateFlow<List<RunnerScreenItems>>(mutableListOf())
 
-    private val _showSuccessDialogChannel = Channel<Pair<Checkpoint?, Long>>(Channel.BUFFERED)
+    private val _showSuccessDialogChannel = Channel<Pair<Checkpoint?, String>>(Channel.BUFFERED)
     private val _showAlertDialogChannel = Channel<AlertType>(Channel.BUFFERED)
     private val _showTimeChannel = Channel<String>(Channel.BUFFERED)
     private val _showProgressFlow = MutableStateFlow(true)
@@ -117,7 +117,7 @@ class RunnersViewModel @ViewModelInject constructor(
 
     fun onNfcCardScanned(cardId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(cardId)) {
+            when (val onResult = runnersInteractor.addCurrentCheckpointToRunnerByNumber(cardId)) {
                 is TaskResult.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
                 is TaskResult.Error -> handleError(onResult.error)
             }
@@ -157,7 +157,7 @@ class RunnersViewModel @ViewModelInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (isRunnerOfftrack() || isRunnerHasResult()) return@launch
             when (val onResult =
-                runnersInteractor.addCurrentCheckpointToRunner(lastSelectedRunner?.number ?: -1)) {
+                runnersInteractor.addCurrentCheckpointToRunnerByNumber(lastSelectedRunner?.number ?: "")) {
                 is TaskResult.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
                 is TaskResult.Error -> handleError(onResult.error)
             }
@@ -224,12 +224,16 @@ class RunnersViewModel @ViewModelInject constructor(
         })
     }
 
-    fun onClickedAtRunner(runnerNumber: Long, distanceId: String) {
+    fun onClickedAtRunner(runnerNumber: String, distanceId: String) {
         router.navigateTo(Screens.RunnerScreen(runnerNumber, distanceId))
     }
 
     fun onSelectRaceClicked() {
         router.newRootScreen(Screens.RaceListScreen())
+    }
+
+    fun onEditCurrentRaceClicked(){
+        router.navigateTo(Screens.RaceEditorScreen())
     }
 
     private fun showDistances() {
@@ -283,9 +287,8 @@ class RunnersViewModel @ViewModelInject constructor(
 
     private fun handleScannedQrCode(code: String) {
         Timber.d("QR CODE: $code")
-        val runnerNumber = code.toLongOrNull() ?: -1L
         viewModelScope.launch(Dispatchers.IO) {
-            when (val onResult = runnersInteractor.addCurrentCheckpointToRunner(runnerNumber)) {
+            when (val onResult = runnersInteractor.addCurrentCheckpointToRunnerByNumber(code)) {
                 is TaskResult.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
                 is TaskResult.Error -> handleError(onResult.error)
             }
@@ -387,7 +390,7 @@ class RunnersViewModel @ViewModelInject constructor(
                 val isSelected = index == 0
                 if (isSelected) {
                     distanceId = distance.id
-                    showDistanceTime(distance.dateOfStart)
+                    distance.dateOfStart?.let { showDistanceTime(it) }
                     _showRunnersTitleFlow.value = distance.name
                 }
                 distance.toView(isSelected)
@@ -397,7 +400,7 @@ class RunnersViewModel @ViewModelInject constructor(
                 val isSelected = distanceId == it.id
                 if (isSelected) {
                     distanceId = it.id
-                    showDistanceTime(it.dateOfStart)
+                    it.dateOfStart?.let { it1 -> showDistanceTime(it1) }
                     _showRunnersTitleFlow.value = it.name
                 }
                 it.toView(isSelected)
@@ -428,8 +431,7 @@ class RunnersViewModel @ViewModelInject constructor(
     private fun showDistanceTime(distanceStartTime: Date) {
         jobShowDistanceTimer?.cancel()
         jobShowDistanceTimer = viewModelScope.startCoroutineTimer(delayMillis = 0, repeatMillis = 1000) {
-            val time =
-                (System.currentTimeMillis() - distanceStartTime.time).timeInMillisToTimeFormat()
+            val time = (System.currentTimeMillis() - distanceStartTime.time).timeInMillisToTimeFormat()
             viewModelScope.launch {
                 _showTimeChannel.send(time)
             }

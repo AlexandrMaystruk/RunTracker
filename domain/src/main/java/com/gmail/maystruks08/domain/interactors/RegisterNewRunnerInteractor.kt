@@ -20,7 +20,7 @@ interface RegisterNewRunnerInteractor {
         var runnerSex: RunnerSex,
         var dateOfBirthday: Date,
         var city: String,
-        var runnerNumber: Long,
+        var runnerNumber: String,
         var runnerCardId: String?,
         var teamName: String?
     )

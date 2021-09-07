@@ -9,4 +9,6 @@ interface DistanceInteractor {
 
     suspend fun getDistancesFlow(raceId: String): Flow<List<Distance>>
 
+    suspend fun provideCurrentSelectedRaceId(): String
+
 }

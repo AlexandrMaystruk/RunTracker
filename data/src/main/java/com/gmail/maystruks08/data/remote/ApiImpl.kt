@@ -89,17 +89,17 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
     }
 
     override suspend fun saveRace(racePojo: RacePojo) {
-        val raceDocument = db.collection(RACES_COLLECTION).document(racePojo.id)
+        val raceDocument = db.collection(RACES_COLLECTION).document(racePojo.id.replaceSpecialSymbols())
         awaitTaskCompletable(raceDocument.set(racePojo))
     }
 
     override suspend fun saveDistance(distancePojo: DistancePojo) {
-        val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distancePojo.id)
+        val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distancePojo.id.replaceSpecialSymbols())
         awaitTaskCompletable(distanceDocument.set(distancePojo))
     }
 
-    override suspend fun updateDistanceRunners(distanceId: String, runnerIds: List<Long>) {
-        val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distanceId)
+    override suspend fun updateDistanceRunners(distanceId: String, runnerIds: List<String>) {
+        val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distanceId.replaceSpecialSymbols())
         awaitTaskCompletable(distanceDocument.update("runnerIds", runnerIds))
     }
 
@@ -107,7 +107,7 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
         distanceId: String,
         distanceStatistic: DistanceStatistic
     ) {
-        val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distanceId)
+        val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distanceId.replaceSpecialSymbols())
         awaitTaskCompletable(
             distanceDocument.update(
                 mapOf(
@@ -120,7 +120,7 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
     }
 
     override suspend fun saveRunner(runnerPojo: RunnerPojo) {
-        val runnerDocument = db.collection(RUNNER_COLLECTION).document(runnerPojo.number.toString())
+        val runnerDocument = db.collection(RUNNER_COLLECTION).document(runnerPojo.number.replaceSpecialSymbols())
         return try {
             awaitTaskCompletable(runnerDocument.update(runnerPojo.serializeToMap()))
         } catch (e: FirebaseFirestoreException) {
@@ -137,7 +137,7 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
         checkpoints: List<Checkpoint>
     ) {
         val checkpointDocumentName = "${raceId}_$distanceId"
-        val document = db.collection(CHECKPOINTS_COLLECTION).document(checkpointDocumentName)
+        val document = db.collection(CHECKPOINTS_COLLECTION).document(checkpointDocumentName.replaceSpecialSymbols())
         val map = hashMapOf<String, Any>()
             .apply {
                 checkpoints.forEach { this[it.getId()] = it.toFirestoreCheckpoint() }
@@ -157,7 +157,7 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
         distanceId: String
     ): DocumentSnapshot {
         val checkpointDocumentName = "${raceId}_$distanceId"
-        return awaitTaskResult(db.collection(CHECKPOINTS_COLLECTION).document(checkpointDocumentName).get())
+        return awaitTaskResult(db.collection(CHECKPOINTS_COLLECTION).document(checkpointDocumentName.replaceSpecialSymbols()).get())
     }
 
     override suspend fun getCheckpointsSelectionState(userId: String): DocumentSnapshot {
@@ -178,5 +178,9 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
         DocumentChange.Type.ADDED -> ModifierType.ADD
         DocumentChange.Type.MODIFIED -> ModifierType.UPDATE
         DocumentChange.Type.REMOVED -> ModifierType.REMOVE
+    }
+
+    private fun String.replaceSpecialSymbols(): String{
+        return replace("/", "_")
     }
 }

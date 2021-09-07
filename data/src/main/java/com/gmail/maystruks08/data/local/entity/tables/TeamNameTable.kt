@@ -18,6 +18,6 @@ data class TeamNameTable(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val distanceId: String,
-    val runnerId: Long,
+    val runnerId: String,
     var name: String
 )

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    app:layoutDescription="@xml/fragment_runners_motions_test_scene"
+    app:layoutDescription="@xml/fragment_edit_distance_motions_scene"
     tools:context="com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment">
 
     <androidx.appcompat.widget.Toolbar
@@ -33,10 +33,12 @@
         android:layout_height="50dp"
         android:orientation="horizontal"
         android:scrollbarAlwaysDrawHorizontalTrack="true"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="@id/view_background"
         app:layout_constraintEnd_toEndOf="@id/view_card"
         app:layout_constraintStart_toStartOf="@id/view_card"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        tools:listitem="@layout/item_distance_edit" />
 
     <View
         android:id="@+id/view_card"
@@ -50,57 +52,25 @@
         app:layout_constraintTop_toBottomOf="@+id/rvDistanceType" />
 
     <TextView
-        android:id="@+id/tvRunnersTitle"
+        android:id="@+id/tvEditCheckpointsLabel"
         style="@style/TextL"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_m"
         android:layout_marginTop="@dimen/margin_m"
-        android:text="Бегуны"
+        android:text="Edit checkpoints"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@id/view_card"
         app:layout_constraintTop_toTopOf="@id/view_card" />
 
-    <TextView
-        android:id="@+id/tvCurrentCheckpoint"
-        style="@style/TextM"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_xs"
-        android:layout_marginEnd="@dimen/margin_xs"
-        android:text="Текущее кп 15"
-        app:layout_constraintStart_toStartOf="@id/tvRunnersTitle"
-        app:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
-
-    <TextView
-        android:id="@+id/tvTime"
-        style="@style/TextM"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_xs"
-        android:layout_marginTop="@dimen/margin_xs"
-        android:layout_marginEnd="@dimen/margin_m"
-        android:gravity="end"
-        app:layout_constraintEnd_toEndOf="@id/view_card"
-        app:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
-
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvDistanceList"
+        android:id="@+id/rvDistanceCheckpoints"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="@id/view_card"
         app:layout_constraintLeft_toLeftOf="@id/view_card"
         app:layout_constraintRight_toRightOf="@id/view_card"
-        app:layout_constraintTop_toBottomOf="@+id/tvCurrentCheckpoint" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnRegisterNewRunner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_m"
-        android:contentDescription="@string/cd_distance_image"
-        android:src="@drawable/ic_add"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tvCurrentCheckpoint"
+        tools:listitem="@layout/item_edit_checkpoint" />
 
 </androidx.constraintlayout.motion.widget.MotionLayout>

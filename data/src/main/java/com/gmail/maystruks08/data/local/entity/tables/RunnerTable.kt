@@ -8,14 +8,14 @@ import java.util.*
 @Entity(tableName = "runners")
 data class RunnerTable(
     @PrimaryKey
-    val runnerNumber: Long,
+    val runnerNumber: String,
     val cardId: String?,
     val fullName: String,
     val shortName: String,
     val phone: String,
     val sex: Int,
     val city: String,
-    val dateOfBirthday: Date,
+    val dateOfBirthday: Date?,
     val actualRaceId: String,
     val actualDistanceId: String,
     val isOffTrackMapJson: String,

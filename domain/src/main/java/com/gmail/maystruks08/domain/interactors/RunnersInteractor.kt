@@ -10,7 +10,7 @@ interface RunnersInteractor {
 
     suspend fun observeRunnerDataFlow(currentRaceId: String)
 
-    suspend fun getRunner(runnerNumber: Long): TaskResult<Exception, Runner>
+    suspend fun getRunner(runnerNumber: String): TaskResult<Exception, Runner>
 
     suspend fun getRunnersFlow(distanceId: String): Flow<List<Runner>>
 
@@ -23,19 +23,19 @@ interface RunnersInteractor {
 
     suspend fun addCurrentCheckpointToRunner(cardId: String): TaskResult<Exception, Runner>
 
-    suspend fun addCurrentCheckpointToRunner(runnerNumber: Long): TaskResult<Exception, Runner>
+    suspend fun addCurrentCheckpointToRunnerByNumber(runnerNumber: String): TaskResult<Exception, Runner>
 
     suspend fun addStartCheckpointToRunners(raceId: String, distanceId: String, date: Date): TaskResult<Exception, Unit>
 
     suspend fun changeRunnerCardId(
-        runnerNumber: Long,
+        runnerNumber: String,
         newCardId: String
     ): TaskResult<Exception, Change<Runner>>
 
-    suspend fun markRunnerGotOffTheRoute(runnerNumber: Long): TaskResult<Exception, Runner>
+    suspend fun markRunnerGotOffTheRoute(runnerNumber: String): TaskResult<Exception, Runner>
 
     suspend fun removeCheckpointForRunner(
-        runnerNumber: Long,
+        runnerNumber: String,
         checkpointId: String
     ): TaskResult<Exception, Change<Runner>>
 

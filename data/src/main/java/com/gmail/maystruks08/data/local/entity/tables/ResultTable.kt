@@ -18,7 +18,7 @@ data class ResultTable(
     @PrimaryKey(autoGenerate = true)
     val resultId: Long = 0,
     val checkpointId: String,
-    val runnerNumber: Long,
+    val runnerNumber: String,
     val time: Date,
     var hasPrevious: Boolean
 )

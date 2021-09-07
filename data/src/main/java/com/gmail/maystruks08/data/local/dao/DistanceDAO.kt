@@ -33,7 +33,7 @@ interface DistanceDAO : BaseDao<DistanceTable> {
 
 
     @Query("SELECT runnerNumber FROM distance_runner_cross_ref LE WHERE distanceId =:distanceId")
-    fun getDistanceRunnersIds(distanceId: String): List<Long>
+    fun getDistanceRunnersIds(distanceId: String): List<String>
 
     @Query("DELETE FROM distances")
     fun deleteDistances()

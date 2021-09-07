@@ -11,6 +11,8 @@
     <string name="screen_scan_qr_code">Scan QR code</string>
     <string name="screen_race_list">Race list</string>
 
+    <string name="menu_item_edit_race">Edit current race</string>
+
 
     <string name="tab_runner_result">Runners</string>
     <string name="tab_iron_runner_result">Iron</string>

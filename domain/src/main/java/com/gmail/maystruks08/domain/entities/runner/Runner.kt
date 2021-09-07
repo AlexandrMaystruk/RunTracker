@@ -6,14 +6,14 @@ import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import java.util.*
 
 data class Runner(
-    val number: Long,
+    val number: String,
     var cardId: String?,
     val fullName: String,
     val shortName: String,
     val phone: String,
     val sex: RunnerSex,
     val city: String,
-    val dateOfBirthday: Date,
+    val dateOfBirthday: Date?,
     val actualRaceId: String,
     val actualDistanceId: String,
     val raceIds: MutableList<String>,

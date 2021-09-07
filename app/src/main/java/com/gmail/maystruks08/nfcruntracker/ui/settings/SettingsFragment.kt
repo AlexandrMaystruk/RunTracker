@@ -41,8 +41,7 @@ class SettingsFragment : BaseFragment(R.layout.fragment_settings) {
     private fun renderUiState(state: SettingsViewModel.ViewState) {
         with(binding) {
             when (state) {
-                SettingsViewModel.ViewState.ShowStartButton -> tvStartRunning.visibility =
-                    View.VISIBLE
+                SettingsViewModel.ViewState.ShowStartButton -> tvStartRunning.visibility = View.VISIBLE
                 SettingsViewModel.ViewState.HideStartButton -> tvStartRunning.visibility = View.GONE
             }
         }
