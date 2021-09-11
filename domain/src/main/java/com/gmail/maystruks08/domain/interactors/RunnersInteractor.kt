@@ -21,7 +21,7 @@ interface RunnersInteractor {
     suspend fun getFinishers(distanceId: String, query: String): TaskResult<Exception, List<Runner>>
 
 
-    suspend fun addCurrentCheckpointToRunner(cardId: String): TaskResult<Exception, Runner>
+    suspend fun addCurrentCheckpointToRunnerByCardId(cardId: String): TaskResult<Exception, Runner>
 
     suspend fun addCurrentCheckpointToRunnerByNumber(runnerNumber: String): TaskResult<Exception, Runner>
 

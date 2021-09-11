@@ -3,6 +3,7 @@ package com.gmail.maystruks08.data.remote
 import com.gmail.maystruks08.data.awaitTaskCompletable
 import com.gmail.maystruks08.data.awaitTaskResult
 import com.gmail.maystruks08.data.mappers.toFirestoreCheckpoint
+import com.gmail.maystruks08.data.remote.pojo.DistanceCheckpointPojo
 import com.gmail.maystruks08.data.remote.pojo.DistancePojo
 import com.gmail.maystruks08.data.remote.pojo.RacePojo
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
@@ -72,7 +73,7 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
     @ExperimentalCoroutinesApi
     override suspend fun subscribeToRunnerCollectionChange(raceId: String): Flow<List<Change<RunnerPojo>>> {
         return channelFlow {
-            val eventDocument = db.collection(RUNNER_COLLECTION).whereArrayContains("raceIds", raceId)
+            val eventDocument = db.collection(RUNNER_COLLECTION).whereEqualTo("actualRaceId", raceId)
             val subscription = eventDocument.addSnapshotListener { snapshots, _ ->
                 Timber.i("Snapshot size = ${snapshots?.documentChanges?.size}")
                 val runnersChanges = snapshots?.documentChanges?.map {
@@ -132,12 +133,10 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
     }
 
     override suspend fun saveCheckpoints(
-        raceId: String,
         distanceId: String,
         checkpoints: List<Checkpoint>
     ) {
-        val checkpointDocumentName = "${raceId}_$distanceId"
-        val document = db.collection(CHECKPOINTS_COLLECTION).document(checkpointDocumentName.replaceSpecialSymbols())
+        val document = db.collection(CHECKPOINTS_COLLECTION).document(distanceId.replaceSpecialSymbols())
         val map = hashMapOf<String, Any>()
             .apply {
                 checkpoints.forEach { this[it.getId()] = it.toFirestoreCheckpoint() }
@@ -152,12 +151,26 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
         }
     }
 
+    override suspend fun saveDistanceCheckpoints(
+        distanceId: String,
+        checkpoints: List<DistanceCheckpointPojo>
+    ) {
+        val document = db.collection(CHECKPOINTS_COLLECTION).document(distanceId.replaceSpecialSymbols())
+        val map = hashMapOf<String, Any>().apply { checkpoints.forEach { this[it.id] = it } }
+        return try {
+            awaitTaskCompletable(document.update(map))
+        } catch (e: FirebaseFirestoreException) {
+            awaitTaskCompletable(document.set(map))
+        } catch (e: Exception){
+            Timber.e(e)
+            throw e
+        }
+    }
+
     override suspend fun getCheckpoints(
-        raceId: String,
         distanceId: String
     ): DocumentSnapshot {
-        val checkpointDocumentName = "${raceId}_$distanceId"
-        return awaitTaskResult(db.collection(CHECKPOINTS_COLLECTION).document(checkpointDocumentName.replaceSpecialSymbols()).get())
+        return awaitTaskResult(db.collection(CHECKPOINTS_COLLECTION).document(distanceId.replaceSpecialSymbols()).get())
     }
 
     override suspend fun getCheckpointsSelectionState(userId: String): DocumentSnapshot {

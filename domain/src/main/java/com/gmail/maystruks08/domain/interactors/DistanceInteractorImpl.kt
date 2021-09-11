@@ -4,6 +4,7 @@ import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.repository.DistanceRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -21,9 +22,13 @@ class DistanceInteractorImpl @Inject constructor(
     override suspend fun getDistancesFlow(raceId: String): Flow<List<Distance>> {
         return distanceRepository.getDistanceListFlow(raceId).onEach {
             withContext(Dispatchers.Default) {
-                it.forEach { launch { calculateDistanceStatisticUseCase.invoke(raceId, it.id) } }
+                it.forEach {
+                    launch {
+                        calculateDistanceStatisticUseCase.invoke(raceId, it.id)
+                    }
+                }
             }
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
     override suspend fun provideCurrentSelectedRaceId(): String {

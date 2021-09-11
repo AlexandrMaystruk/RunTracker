@@ -36,9 +36,7 @@ class EditCheckpointViewHolderManager(
             oldItem == newItem
     }
 
-    interface Interaction {
-
-    }
+    interface Interaction
 
 }
 

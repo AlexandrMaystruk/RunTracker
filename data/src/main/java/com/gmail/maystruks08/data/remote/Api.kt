@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.data.remote
 
+import com.gmail.maystruks08.data.remote.pojo.DistanceCheckpointPojo
 import com.gmail.maystruks08.data.remote.pojo.DistancePojo
 import com.gmail.maystruks08.data.remote.pojo.RacePojo
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
@@ -35,9 +36,12 @@ interface Api{
 
 
     //CHECKPOINTS
-    suspend fun getCheckpoints(raceId: String, distanceId: String): DocumentSnapshot
+    suspend fun getCheckpoints(distanceId: String): DocumentSnapshot
 
-    suspend fun saveCheckpoints(raceId: String, distanceId: String, checkpoints: List<Checkpoint>)
+    suspend fun saveDistanceCheckpoints(distanceId: String, checkpoints: List<DistanceCheckpointPojo>)
+
+
+    suspend fun saveCheckpoints(distanceId: String, checkpoints: List<Checkpoint>)
 
 
     suspend fun getCheckpointsSelectionState(userId: String): DocumentSnapshot

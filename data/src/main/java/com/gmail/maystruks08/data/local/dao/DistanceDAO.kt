@@ -5,9 +5,11 @@ import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
 import com.gmail.maystruks08.data.local.entity.relation.DistanceStatisticTable
 import com.gmail.maystruks08.data.local.entity.relation.DistanceWithCheckpoints
 import com.gmail.maystruks08.data.local.entity.relation.DistanceWithRunners
+import com.gmail.maystruks08.data.local.entity.tables.CheckpointTable
 import com.gmail.maystruks08.data.local.entity.tables.DistanceTable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 @Dao
 interface DistanceDAO : BaseDao<DistanceTable> {
@@ -15,14 +17,18 @@ interface DistanceDAO : BaseDao<DistanceTable> {
     @Query("SELECT * FROM distances WHERE raceId =:raceId ORDER BY name")
     fun getDistanceByRaceIdFlow(raceId: String): Flow<List<DistanceTable>>
 
-    fun getDistanceDistinctUntilChanged(raceId: String) = getDistanceByRaceIdFlow(raceId).distinctUntilChanged()
+    fun getDistanceDistinctUntilChanged(raceId: String) = getDistanceByRaceIdFlow(raceId).distinctUntilChanged().map { distanceTables ->
+        distanceTables.map {
+            DistanceWithCheckpoints(it, getDistanceCheckpoints(it.distanceId))
+        }
+    }
 
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId")
     fun getDistanceById(distanceId: String): DistanceTable
 
     @Transaction
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId")
-    fun getDistance(distanceId: String): DistanceWithCheckpoints
+    fun getDistanceWithCheckpoints(distanceId: String): DistanceWithCheckpoints
 
     @Query("SELECT distanceId FROM distances ORDER BY name LIMIT 1")
     fun getFirstDistanceId(): String
@@ -34,6 +40,12 @@ interface DistanceDAO : BaseDao<DistanceTable> {
 
     @Query("SELECT runnerNumber FROM distance_runner_cross_ref LE WHERE distanceId =:distanceId")
     fun getDistanceRunnersIds(distanceId: String): List<String>
+
+    @Query("SELECT * FROM checkpoints WHERE distanceId =:distanceId")
+    fun getDistanceCheckpoints(distanceId: String): List<CheckpointTable>
+
+    @Query("DELETE FROM distances WHERE distanceId =:distanceId")
+    fun deleteDistance(distanceId: String)
 
     @Query("DELETE FROM distances")
     fun deleteDistances()

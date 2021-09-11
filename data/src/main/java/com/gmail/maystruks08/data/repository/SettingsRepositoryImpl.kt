@@ -4,6 +4,7 @@ import com.gmail.maystruks08.data.XLSParser
 import com.gmail.maystruks08.data.local.ConfigPreferences
 import com.gmail.maystruks08.data.mappers.toFirestoreRunner
 import com.gmail.maystruks08.data.remote.Api
+import com.gmail.maystruks08.data.remote.pojo.DistanceCheckpointPojo
 import com.gmail.maystruks08.data.remote.pojo.DistancePojo
 import com.gmail.maystruks08.data.remote.pojo.RacePojo
 import com.gmail.maystruks08.domain.entities.runner.Runner
@@ -40,14 +41,19 @@ class SettingsRepositoryImpl @Inject constructor(
         val raceName = "100_for_24_2021"
         val raceId = getUUID(raceName)
         val uniqueId = raceId
-        val runners = xlsParser.readExcelFileFromAssets(raceId, "runners_$uniqueId", "100_24_run.xls").toMutableList().apply {
-            val runnersGroup =  xlsParser.readExcelFileFromAssets(raceId, "runners_$uniqueId", "100_24_run_group.xls")
-            addAll(runnersGroup)
-        }
-
-        val iron = xlsParser.readExcelFileFromAssets(raceId, "iron_$uniqueId",  "100_24_iron_run.xls")
+        val runners =
+            xlsParser.readExcelFileFromAssets(raceId, "runners_$uniqueId", "100_24_run.xls")
+                .toMutableList().apply {
+                    val runnersGroup = xlsParser.readExcelFileFromAssets(
+                        raceId,
+                        "runners_$uniqueId",
+                        "100_24_run_group.xls"
+                    )
+                    addAll(runnersGroup)
+                }
+        val iron = xlsParser.readExcelFileFromAssets(raceId, "iron_$uniqueId", "100_24_iron_run.xls")
         val relayRace = xlsParser.readExcelFileFromAssets(raceId, "relay_race_$uniqueId", "100_24_estaf.xls")
-        val scandinavians = xlsParser.readExcelFileFromAssets(raceId, "scandinavians_$uniqueId",  "100_24_scandinav.xls")
+        val scandinavians = xlsParser.readExcelFileFromAssets(raceId, "scandinavians_$uniqueId", "100_24_scandinav.xls")
 
         val distances = listOf(
             DistancePojo(
@@ -84,10 +90,10 @@ class SettingsRepositoryImpl @Inject constructor(
             ),
         )
 
-        runners.forEach { it.distanceIds.add(distances[0].id) }
-        iron.forEach { it.distanceIds.add(distances[1].id) }
-        relayRace.forEach { it.distanceIds.add(distances[2].id) }
-        scandinavians.forEach { it.distanceIds.add(distances[3].id) }
+        distances.forEach {
+            val checkpoints = getCheckpoints(it.name, it.id)
+            api.saveDistanceCheckpoints(it.id, checkpoints)
+        }
 
         val race = RacePojo(
             id = raceId,
@@ -107,7 +113,168 @@ class SettingsRepositoryImpl @Inject constructor(
         exportRunners(scandinavians)
     }
 
-    private suspend fun exportRunners(runners: List<Runner>){
+    private fun getCheckpoints(distanceName: String, distanceId: String): List<DistanceCheckpointPojo> {
+        return when (distanceName) {
+            "Бегуны" -> getNormalCheckpoints(distanceId)
+            "Железные" -> getIronCheckpoints(distanceId)
+            "Эстафета" -> getEstafCheckpoints(distanceId)
+            "Скандинавы" -> getScandinaviansCheckpoints(distanceId)
+            else -> throw RuntimeException()
+        }
+    }
+
+    private fun getEstafCheckpoints(distanceId: String) = listOf(
+        DistanceCheckpointPojo(
+            id = "Старт",
+            distanceId = distanceId,
+            name = "S",
+        ),
+        DistanceCheckpointPojo(
+            id = "F",
+            distanceId = distanceId,
+            name = "F",
+        )
+    )
+
+    private fun getScandinaviansCheckpoints(distanceId: String) = listOf(
+        DistanceCheckpointPojo(
+            id = "Старт",
+            distanceId = distanceId,
+            name = "S",
+        ),
+        DistanceCheckpointPojo(
+            id = "15",
+            distanceId = distanceId,
+            name = "15",
+        ),
+        DistanceCheckpointPojo(
+            id = "40",
+            distanceId = distanceId,
+            name = "40",
+        ),
+        DistanceCheckpointPojo(
+            id = "52",
+            distanceId = distanceId,
+            name = "52",
+        ),
+        DistanceCheckpointPojo(
+            id = "70",
+            distanceId = distanceId,
+            name = "70",
+        ),
+        DistanceCheckpointPojo(
+            id = "80",
+            distanceId = distanceId,
+            name = "80",
+        ),
+
+        DistanceCheckpointPojo(
+            id = "90",
+            distanceId = distanceId,
+            name = "90",
+        ),
+        DistanceCheckpointPojo(
+            id = "F",
+            distanceId = distanceId,
+            name = "F",
+        ),
+    )
+
+    private fun getNormalCheckpoints(distanceId: String) = listOf(
+        DistanceCheckpointPojo(
+            id = "Старт",
+            distanceId = distanceId,
+            name = "S",
+        ),
+        DistanceCheckpointPojo(
+            id = "15",
+            distanceId = distanceId,
+            name = "15",
+        ),
+        DistanceCheckpointPojo(
+            id = "40",
+            distanceId = distanceId,
+            name = "40",
+        ),
+        DistanceCheckpointPojo(
+            id = "52",
+            distanceId = distanceId,
+            name = "52",
+        ),
+        DistanceCheckpointPojo(
+            id = "70",
+            distanceId = distanceId,
+            name = "70",
+        ),
+        DistanceCheckpointPojo(
+            id = "80",
+            distanceId = distanceId,
+            name = "80",
+        ),
+
+        DistanceCheckpointPojo(
+            id = "90",
+            distanceId = distanceId,
+            name = "90",
+        ),
+        DistanceCheckpointPojo(
+            id = "F",
+            distanceId = distanceId,
+            name = "F",
+        ),
+    )
+
+    private fun getIronCheckpoints(distanceId: String) = listOf(
+        DistanceCheckpointPojo(
+            id = "Старт",
+            distanceId = distanceId,
+            name = "S",
+        ),
+
+        DistanceCheckpointPojo(
+            id = "7,5",
+            distanceId = distanceId,
+            name = "7,5",
+        ),
+        DistanceCheckpointPojo(
+            id = "15",
+            distanceId = distanceId,
+            name = "15",
+        ),
+        DistanceCheckpointPojo(
+            id = "42",
+            distanceId = distanceId,
+            name = "42",
+        ),
+        DistanceCheckpointPojo(
+            id = "52",
+            distanceId = distanceId,
+            name = "52",
+        ),
+        DistanceCheckpointPojo(
+            id = "70",
+            distanceId = distanceId,
+            name = "70",
+        ),
+        DistanceCheckpointPojo(
+            id = "81",
+            distanceId = distanceId,
+            name = "81",
+        ),
+
+        DistanceCheckpointPojo(
+            id = "91",
+            distanceId = distanceId,
+            name = "91",
+        ),
+        DistanceCheckpointPojo(
+            id = "F",
+            distanceId = distanceId,
+            name = "F",
+        ),
+    )
+
+    private suspend fun exportRunners(runners: List<Runner>) {
         Timber.i("Parse count ${runners.size}")
         var count = 0
         runners.forEach {
@@ -117,7 +284,7 @@ class SettingsRepositoryImpl @Inject constructor(
         Timber.i("Saved count $count")
     }
 
-    fun getUUID(name: String): String{
+    private fun getUUID(name: String): String{
         return "${name.replace(" ", "_")}_${UUID.randomUUID().toString().replace("-", "_")}"
 
     }

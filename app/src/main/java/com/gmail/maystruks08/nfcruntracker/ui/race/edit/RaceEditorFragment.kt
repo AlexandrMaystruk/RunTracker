@@ -8,7 +8,7 @@ import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
-import com.gmail.maystruks08.nfcruntracker.databinding.FragmentDistanceEditor2Binding
+import com.gmail.maystruks08.nfcruntracker.databinding.FragmentDistanceEditorBinding
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.AppAdapter
 import com.gmail.maystruks08.nfcruntracker.ui.race.edit.adapter.EditCheckpointViewHolderManager
 import com.gmail.maystruks08.nfcruntracker.ui.race.edit.adapter.EditDistanceViewHolderManager
@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.collect
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class RaceEditorFragment : BaseFragment(R.layout.fragment_distance_editor_2),
+class RaceEditorFragment : BaseFragment(R.layout.fragment_distance_editor),
     EditDistanceViewHolderManager.Interaction,
     EditCheckpointViewHolderManager.Interaction {
 
@@ -29,7 +29,7 @@ class RaceEditorFragment : BaseFragment(R.layout.fragment_distance_editor_2),
     private lateinit var distanceCheckpointsAdapter: AppAdapter
 
     private val viewModel: RaceEditorViewModel by viewModels()
-    private val binding: FragmentDistanceEditor2Binding by viewBinding {
+    private val binding: FragmentDistanceEditorBinding by viewBinding {
         binding.rvDistanceType.adapter = null
         binding.rvDistanceCheckpoints.adapter = null
     }

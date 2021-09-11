@@ -59,7 +59,6 @@ class RunnersViewModel @ViewModelInject constructor(
     val showTime get() = _showTimeChannel.receiveAsFlow()
 
     val showProgress get() = _showProgressFlow
-    val showRunnersTitle get() = _showRunnersTitleFlow
     val enableSelectCheckpointButton get() = _enableSelectCheckpointButtonFlow
 
 
@@ -73,7 +72,6 @@ class RunnersViewModel @ViewModelInject constructor(
 
     private val _selectCheckpointDialogChannel = Channel<CurrentRaceDistance>(Channel.BUFFERED)
     private val _closeCheckpointDialogChannel = Channel<String>(Channel.BUFFERED)
-    private val _showRunnersTitleFlow = MutableStateFlow("")
     private val _enableSelectCheckpointButtonFlow = MutableStateFlow(true)
 
     private var jobShowRunner: Job? = null
@@ -391,7 +389,6 @@ class RunnersViewModel @ViewModelInject constructor(
                 if (isSelected) {
                     distanceId = distance.id
                     distance.dateOfStart?.let { showDistanceTime(it) }
-                    _showRunnersTitleFlow.value = distance.name
                 }
                 distance.toView(isSelected)
             }
@@ -401,7 +398,6 @@ class RunnersViewModel @ViewModelInject constructor(
                 if (isSelected) {
                     distanceId = it.id
                     it.dateOfStart?.let { it1 -> showDistanceTime(it1) }
-                    _showRunnersTitleFlow.value = it.name
                 }
                 it.toView(isSelected)
             }

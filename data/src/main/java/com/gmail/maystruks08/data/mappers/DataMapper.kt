@@ -56,14 +56,14 @@ fun DistanceWithRunners.toDistanceEntity(gson: Gson): Distance {
     )
 }
 
-fun DistanceTable.toDistanceEntity(): Distance {
+fun DistanceTable.toDistanceEntity(checkpoints: MutableList<Checkpoint>): Distance {
     return Distance(
         id = distanceId,
         raceId = raceId,
         name = name,
         authorId = authorId,
         dateOfStart = dateOfStart?.let { Date(it) },
-        checkpoints = mutableListOf(),
+        checkpoints = checkpoints,
         statistic = DistanceStatistic(
             distanceId,
             runnerCountInProgress,

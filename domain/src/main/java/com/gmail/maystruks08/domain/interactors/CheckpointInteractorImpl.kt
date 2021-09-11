@@ -13,7 +13,7 @@ class CheckpointInteractorImpl @Inject constructor(private val checkpointsReposi
         distanceId: String
     ): TaskResult<Exception, List<Checkpoint>> {
         return TaskResult.build {
-            checkpointsRepository.getCheckpoints(raceId, distanceId)
+            checkpointsRepository.getCheckpoints(distanceId)
         }
     }
 

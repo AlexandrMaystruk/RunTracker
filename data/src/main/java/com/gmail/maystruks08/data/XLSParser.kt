@@ -48,8 +48,8 @@ class XLSParser @Inject constructor(private val context: Context) {
                 val city = ""
                 var number: String? = null
                 val dateOfBirthday: Date? = null
-                val raceIds: MutableList<String> = mutableListOf()
-                val distanceIds: MutableList<String> = mutableListOf()
+                val raceIds: MutableList<String> = mutableListOf(raceId)
+                val distanceIds: MutableList<String> = mutableListOf(distanceId)
                 val checkpointMap: MutableMap<String, MutableList<Checkpoint>> = mutableMapOf()
                 val offTrackDistances: MutableList<String> = mutableListOf()
                 val teamNames: MutableMap<String, String?> = mutableMapOf()
@@ -58,13 +58,10 @@ class XLSParser @Inject constructor(private val context: Context) {
                 while (cellIterator.hasNext()) {
                     val myCell = cellIterator.next() as HSSFCell
                     when (columnNumber) {
-                        0 -> {
-                            number = myCell.toString().replace(".0", "")
-                        }
+                        0 -> number = myCell.toString().replace(".0", "")
                         1 -> fullName = myCell.toString()
                         2 -> shortName = myCell.toString()
-                        3 -> teamNames[distanceId] =
-                            if (myCell.toString().isEmpty()) null else myCell.toString()
+                        3 -> teamNames[distanceId] = if (myCell.toString().isEmpty()) null else myCell.toString()
                     }
                     columnNumber++
                 }

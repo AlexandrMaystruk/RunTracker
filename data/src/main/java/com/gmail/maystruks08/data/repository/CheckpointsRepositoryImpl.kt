@@ -25,9 +25,9 @@ class CheckpointsRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : CheckpointsRepository {
 
-    override suspend fun getCheckpoints(raceId: String, distanceId: String): List<Checkpoint> {
+    override suspend fun getCheckpoints(distanceId: String): List<Checkpoint> {
         if (networkUtil.isOnline()) {
-            val checkpointsDocument = firestoreApi.getCheckpoints(raceId, distanceId)
+            val checkpointsDocument = firestoreApi.getCheckpoints(distanceId)
             checkpointsDocument.data?.toDataClass<HashMap<String, CheckpointPojo>?>()
                 ?.let { hashMap ->
                     val checkpoints = hashMap.values

@@ -163,7 +163,7 @@ class RunnersRepositoryImpl @Inject constructor(
     }
 
     private fun RunnerWithResult.getCheckpoints(onlyFinishers: Boolean = false): MutableList<Checkpoint> {
-        val distanceWithCheckpoints = distanceDAO.getDistance(runnerTable.actualDistanceId)
+        val distanceWithCheckpoints = distanceDAO.getDistanceWithCheckpoints(runnerTable.actualDistanceId)
         val checkpointResult = results.distinct()
         if (onlyFinishers && checkpointResult.size != distanceWithCheckpoints.checkpoints.size) return mutableListOf()
         return distanceWithCheckpoints.checkpoints.map { checkpointTable ->

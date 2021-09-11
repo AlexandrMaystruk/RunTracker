@@ -108,12 +108,6 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners),
             }
 
             lifecycleScope.launchWhenStarted {
-                showRunnersTitle.collect {
-                    binding.tvRunnersTitle.text = it
-                }
-            }
-
-            lifecycleScope.launchWhenStarted {
                 enableSelectCheckpointButton.collect { enable ->
                     TransitionManager.beginDelayedTransition(binding.root)
                     binding.tvCurrentCheckpoint.setVisibility(enable)

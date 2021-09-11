@@ -30,6 +30,7 @@ class RaceEditorViewModel @ViewModelInject constructor(
 
     private val _showProgressLiveData = MutableLiveData<Boolean>()
     private val _showProgressFlow = MutableStateFlow(false)
+    private val _checkpointsFlow = MutableStateFlow<MutableList<EditCheckpointView>>(mutableListOf())
     private val _distanceFlow = MutableStateFlow<MutableList<DistanceView>>(mutableListOf()).apply {
         viewModelScope.launch {
             val raceId = distanceInteractor.provideCurrentSelectedRaceId()
@@ -46,8 +47,6 @@ class RaceEditorViewModel @ViewModelInject constructor(
                 }
         }
     }
-    private val _checkpointsFlow = MutableStateFlow<MutableList<EditCheckpointView>>(mutableListOf())
-
 
     val distances: StateFlow<List<DistanceView>> get() = _distanceFlow
     val checkpoints: StateFlow<List<EditCheckpointView>> get() = _checkpointsFlow

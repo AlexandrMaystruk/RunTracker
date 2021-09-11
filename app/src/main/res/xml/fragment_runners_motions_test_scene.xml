@@ -58,8 +58,8 @@
             android:id="@+id/tvCurrentCheckpoint"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_xs"
-            android:layout_marginEnd="@dimen/margin_xs"
+            android:layout_marginEnd="0dp"
+            motion:layout_constraintEnd_toEndOf="@+id/tvRunnersTitle"
             motion:layout_constraintStart_toStartOf="@id/tvRunnersTitle"
             motion:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle"
             motion:visibilityMode="ignore" />
@@ -110,13 +110,13 @@
             motion:layout_constraintBottom_toBottomOf="parent"
             motion:layout_constraintEnd_toEndOf="parent" />
         <Constraint
+            android:id="@+id/rvDistanceList"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             motion:layout_constraintBottom_toBottomOf="@id/view_card"
             motion:layout_constraintLeft_toLeftOf="@id/view_card"
             motion:layout_constraintRight_toRightOf="@id/view_card"
-            android:layout_width="0dp"
-            motion:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle"
-            android:id="@+id/rvDistanceList" />
+            motion:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
@@ -183,7 +183,6 @@
             android:id="@+id/tvCurrentCheckpoint"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_xs"
             android:layout_marginEnd="@dimen/margin_xs"
             android:alpha="0"
             motion:layout_constraintStart_toStartOf="@id/tvRunnersTitle"

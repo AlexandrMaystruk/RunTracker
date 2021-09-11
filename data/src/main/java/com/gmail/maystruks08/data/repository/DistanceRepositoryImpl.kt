@@ -4,11 +4,11 @@ import com.gmail.maystruks08.data.local.ConfigPreferences
 import com.gmail.maystruks08.data.local.dao.DistanceDAO
 import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
 import com.gmail.maystruks08.data.local.entity.tables.DistanceTable
+import com.gmail.maystruks08.data.mappers.toCheckpoint
 import com.gmail.maystruks08.data.mappers.toDistanceEntity
 import com.gmail.maystruks08.data.mappers.toTable
 import com.gmail.maystruks08.data.remote.Api
 import com.gmail.maystruks08.domain.entities.Distance
-import com.gmail.maystruks08.domain.entities.DistanceStatistic
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.repository.CheckpointsRepository
 import com.gmail.maystruks08.domain.repository.DistanceRepository
@@ -34,7 +34,7 @@ class DistanceRepositoryImpl @Inject constructor(
                     val distanceWithRunnersIds = it.entity.toTable()
                     val canRewriteLocalCache = checkIsDataUploaded(distanceWithRunnersIds.first.distanceId)
                     if (canRewriteLocalCache) {
-                        checkpointsRepository.getCheckpoints(raceId, it.entity.id)
+                        val checkpoints = checkpointsRepository.getCheckpoints(it.entity.id)
                         when (it.modifierType) {
                             ModifierType.ADD -> insertDistance(distanceWithRunnersIds)
                             ModifierType.UPDATE -> updateDistance(distanceWithRunnersIds)
@@ -47,7 +47,10 @@ class DistanceRepositoryImpl @Inject constructor(
 
     override suspend fun getDistanceListFlow(raceId: String): Flow<List<Distance>> {
         return distanceDAO.getDistanceDistinctUntilChanged(raceId).map { distanceList ->
-            distanceList.map { it.toDistanceEntity() }
+            distanceList.map {
+                val checkpoints = it.checkpoints.map { it.toCheckpoint() }.toMutableList()
+                it.distance.toDistanceEntity(checkpoints)
+            }
         }
     }
 
@@ -76,10 +79,9 @@ class DistanceRepositoryImpl @Inject constructor(
     private fun deleteDistance(distance: Pair<DistanceTable, List<DistanceRunnerCrossRef>>) {
         val distanceTable = distance.first
         val distanceWithRunnerJoin = distance.second
-        distanceDAO.getDistanceById(distanceTable.distanceId)
+        distanceDAO.deleteDistance(distanceTable.distanceId)
         distanceWithRunnerJoin.forEach {
             distanceDAO.deleteDistanceJoin(it.distanceId)
         }
-//        Timber.i("Removed runner from DB count: $count, from cache removed: $isRemoved")
     }
 }
