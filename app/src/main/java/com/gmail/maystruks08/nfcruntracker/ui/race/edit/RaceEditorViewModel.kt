@@ -144,7 +144,7 @@ class RaceEditorViewModel @ViewModelInject constructor(
      * Common scope
      */
     fun onSaveChangedClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val updateDistanceResult = saveDistanceAsync().await()
             val updateCheckpointsResult = saveCheckpointsAsync().await()
             when {
@@ -162,7 +162,7 @@ class RaceEditorViewModel @ViewModelInject constructor(
     }
 
     private suspend fun saveCheckpointsAsync(): Deferred<TaskResult<Exception, Unit>>{
-        return viewModelScope.async {
+        return viewModelScope.async(Dispatchers.IO) {
             val editedCheckpoints = _checkpointsFlow.value.filterIsInstance(EditCheckpointView::class.java)
             saveCheckpointsUseCase.invoke(
                 distanceId,
@@ -177,8 +177,9 @@ class RaceEditorViewModel @ViewModelInject constructor(
     }
 
     private suspend fun saveDistanceAsync():  Deferred<TaskResult<Exception, Unit>> {
-        return viewModelScope.async {
-            val editedDistances = _distanceFlow.value.firstOrNull { it.isSelected } ?: return@async TaskResult.build { throw RuntimeException() }
+        return viewModelScope.async(Dispatchers.IO) {
+            val editedDistances = _distanceFlow.value.firstOrNull { it.isSelected }
+                ?: return@async TaskResult.build { throw RuntimeException() }
             updateDistanceNameUseCase.invoke(
                 distanceId,
                 editedDistances.name
