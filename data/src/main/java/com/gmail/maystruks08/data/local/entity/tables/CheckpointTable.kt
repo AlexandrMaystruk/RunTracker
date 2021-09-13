@@ -11,5 +11,6 @@ import androidx.room.Index
 data class CheckpointTable(
     val checkpointId: String,
     val distanceId: String,
-    val name: String
+    val name: String,
+    val position: Int
 )

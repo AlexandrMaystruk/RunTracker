@@ -100,7 +100,8 @@ fun CheckpointTable.toCheckpoint(): Checkpoint {
     return CheckpointImpl(
         _id = this.checkpointId,
         _distanceId = this.distanceId,
-        _name = this.name
+        _name = this.name,
+        _position = this.position
     )
 }
 
@@ -144,6 +145,7 @@ fun Checkpoint.toCheckpointTable(): CheckpointTable {
         checkpointId = getId(),
         distanceId = getDistanceId(),
         name = getName(),
+        position = getPosition()
     )
 }
 
@@ -171,7 +173,7 @@ fun Race.toFirestoreRace(gson: Gson): RacePojo {
         registrationIsOpen,
         authorId,
         adminListIds,
-        distanceList.map { it.id.toString() }
+        distanceList.map { it.id }
     )
 }
 
@@ -255,5 +257,6 @@ fun CheckpointPojo.toCheckpointTable(): CheckpointTable {
         checkpointId = this.id,
         distanceId = this.distanceId,
         name = this.name,
+        position = this.position
     )
 }

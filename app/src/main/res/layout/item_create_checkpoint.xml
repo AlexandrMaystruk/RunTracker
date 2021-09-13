@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_height="50dp"
     app:cardCornerRadius="@dimen/cardview_default_radius"
-    app:cardElevation="@dimen/transition_s"
-    android:layout_height="50dp">
+    app:cardElevation="@dimen/transition_s">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
 
         <ImageView
             android:id="@+id/ivCheckpointState"
@@ -47,34 +47,23 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_m"
             android:layout_marginEnd="@dimen/margin_m"
+            android:text="Add new checkpoint"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/ivSaveCheckpointChanges"
             app:layout_constraintStart_toEndOf="@+id/ivCheckpointState"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/etCheckpointName"
-            style="@style/TextM"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_m"
-            android:layout_marginEnd="@dimen/margin_m"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/ivSaveCheckpointChanges"
-            app:layout_constraintStart_toEndOf="@+id/ivCheckpointState"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/ivSaveCheckpointChanges"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_m"
-            android:src="@drawable/ic_save"
-            android:visibility="gone"
+            android:layout_marginEnd="@dimen/margin_m"
+            android:src="@drawable/ic_add"
+            app:fabCustomSize="40dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -5,6 +5,7 @@ import java.util.*
 data class CheckpointImpl(private val _id: String,
                           private val _distanceId: String,
                           private val _name: String,
+                          private val _position: Int
 ) : Checkpoint {
 
     override fun getId(): String {
@@ -28,4 +29,8 @@ data class CheckpointImpl(private val _id: String,
     }
 
     override fun setHasPrevious(flag: Boolean) {}
+
+    override fun getPosition(): Int {
+        return _position
+    }
 }

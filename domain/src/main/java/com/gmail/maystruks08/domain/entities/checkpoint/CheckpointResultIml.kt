@@ -5,7 +5,7 @@ import java.util.*
 data class CheckpointResultIml(
     private val checkpoint: Checkpoint,
     private var date: Date,
-    private var hasPrevious: Boolean = true
+    private var hasPrevious: Boolean = true,
 ) : Checkpoint {
 
     override fun getId(): String {
@@ -30,5 +30,9 @@ data class CheckpointResultIml(
 
     override fun setHasPrevious(flag: Boolean) {
         this.hasPrevious = flag
+    }
+
+    override fun getPosition(): Int {
+       return checkpoint.getPosition()
     }
 }

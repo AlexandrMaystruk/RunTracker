@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import com.gmail.maystruks08.nfcruntracker.R
+import com.gmail.maystruks08.nfcruntracker.core.ext.color
 import com.gmail.maystruks08.nfcruntracker.databinding.ItemDistanceBinding
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.BaseViewHolder
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.Item
@@ -55,14 +56,14 @@ class DistanceViewHolder(
     override fun onBind(item: DistanceView) = with(binding) {
         super.onBind(item)
         tvDistanceName.text = item.name
-        if (item.isSelected) {
+            if (item.isSelected) {
             distanceCard.strokeLineColor = Color.WHITE
             distanceCard.strokeLineWidth = 5f
-            distanceCard.backgroundColor = ContextCompat.getColor(root.context, R.color.colorAccent)
+            distanceCard.backgroundColor = root.context.color(R.color.colorAccent)
         } else {
             distanceCard.strokeLineColor = Color.BLACK
             distanceCard.strokeLineWidth = 1f
-            distanceCard.backgroundColor = ContextCompat.getColor(root.context, R.color.colorAccentDark)
+            distanceCard.backgroundColor = root.context.color(R.color.colorAccentDark)
         }
         chartView.setChartItems(item.chartItems)
         itemView.setOnClickListener {

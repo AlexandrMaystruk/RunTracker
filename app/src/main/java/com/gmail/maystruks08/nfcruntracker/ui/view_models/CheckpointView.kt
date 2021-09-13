@@ -4,11 +4,17 @@ import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.Item
 import com.gmail.maystruks08.nfcruntracker.ui.views.Bean
 import java.util.*
 
+
+interface EditCheckpoint : Item
+
+class CreateNewCheckpointView: EditCheckpoint
+
 data class EditCheckpointView(
     val id: String,
     val title: String,
-    val position: CheckpointPosition
-) : Item
+    val positionState: CheckpointPosition,
+    val isEditMode: Boolean
+) : EditCheckpoint
 
 
 data class CheckpointView/**/(

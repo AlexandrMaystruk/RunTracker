@@ -2,6 +2,8 @@ package com.gmail.maystruks08.nfcruntracker.core.di
 
 import com.gmail.maystruks08.data.repository.*
 import com.gmail.maystruks08.domain.interactors.*
+import com.gmail.maystruks08.domain.interactors.use_cases.SaveCheckpointsUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.SaveCheckpointsUseCaseImpl
 import com.gmail.maystruks08.domain.repository.*
 import com.gmail.maystruks08.nfcruntracker.ui.login.LogOutUseCaseImpl
 import dagger.Binds
@@ -102,6 +104,12 @@ abstract class ActivityModule {
     @Binds
     @ActivityScoped
     abstract fun bindDistanceStatisticRepository(impl: DistanceStatisticRepositoryImpl): DistanceStatisticRepository
+
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindSaveCheckpointsUseCase(impl: SaveCheckpointsUseCaseImpl): SaveCheckpointsUseCase
+
 
 
 }

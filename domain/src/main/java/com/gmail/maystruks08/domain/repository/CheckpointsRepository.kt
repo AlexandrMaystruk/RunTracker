@@ -14,4 +14,6 @@ interface CheckpointsRepository {
         checkpointId: String
     )
 
+    suspend fun saveEditedCheckpoints(distanceId: String, editedCheckpoints: List<Checkpoint>)
+
 }

@@ -145,17 +145,23 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
             awaitTaskCompletable(document.update(map))
         } catch (e: FirebaseFirestoreException) {
             awaitTaskCompletable(document.set(map))
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Timber.e(e)
             throw e
         }
+    }
+
+    override suspend fun deleteDistanceCheckpoints(distanceId: String) {
+        val document = db.collection(CHECKPOINTS_COLLECTION).document(distanceId.replaceSpecialSymbols())
+        awaitTaskCompletable(document.delete())
     }
 
     override suspend fun saveDistanceCheckpoints(
         distanceId: String,
         checkpoints: List<DistanceCheckpointPojo>
     ) {
-        val document = db.collection(CHECKPOINTS_COLLECTION).document(distanceId.replaceSpecialSymbols())
+        val document =
+            db.collection(CHECKPOINTS_COLLECTION).document(distanceId.replaceSpecialSymbols())
         val map = hashMapOf<String, Any>().apply { checkpoints.forEach { this[it.id] = it } }
         return try {
             awaitTaskCompletable(document.update(map))

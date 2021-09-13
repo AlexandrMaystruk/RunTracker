@@ -16,6 +16,8 @@ interface Checkpoint {
 
     fun setHasPrevious(flag: Boolean)
 
+    fun getPosition(): Int
+
 }
 
 

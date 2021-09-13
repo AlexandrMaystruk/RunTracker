@@ -4,6 +4,7 @@ import android.graphics.Paint
 import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.Race
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.timeInMillisToTimeFormat
 import com.gmail.maystruks08.domain.toDateFormat
@@ -133,7 +134,18 @@ fun Checkpoint.toCheckpointEditView(checkpointPosition: CheckpointPosition): Edi
     return EditCheckpointView(
         id = getId(),
         title = getName(),
-        position = checkpointPosition
+        positionState = checkpointPosition,
+        isEditMode = false
+    )
+}
+
+
+fun EditCheckpointView.toEntity(distanceId: String, position: Int): Checkpoint {
+    return CheckpointImpl(
+        _id = id,
+        _distanceId = distanceId,
+        _name = title,
+        _position = position
     )
 }
 

@@ -5,4 +5,5 @@ data class CheckpointPojo(
     val distanceId: String = "unknown",
     val name: String = "unknown",
     val runnerTime: String = "unknown",
+    val position: Int = -1
 )

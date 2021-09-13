@@ -171,7 +171,8 @@ class RunnersRepositoryImpl @Inject constructor(
             val checkpoint = CheckpointImpl(
                 checkpointTable.checkpointId,
                 checkpointTable.distanceId,
-                checkpointTable.name
+                checkpointTable.name,
+                checkpointTable.position
             )
             if (runnerResults == null) checkpoint
             else CheckpointResultIml(

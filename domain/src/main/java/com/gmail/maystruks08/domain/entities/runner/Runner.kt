@@ -72,6 +72,7 @@ data class Runner(
                 oldCheckpoint.getId(),
                 oldCheckpoint.getDistanceId(),
                 oldCheckpoint.getName(),
+                oldCheckpoint.getPosition()
             )
         }
     }
@@ -81,7 +82,8 @@ data class Runner(
             CheckpointImpl(
                 it.getId(),
                 it.getDistanceId(),
-                it.getName()
+                it.getName(),
+                it.getPosition()
             )
         }.orEmpty()
         totalResults[actualDistanceId] = null

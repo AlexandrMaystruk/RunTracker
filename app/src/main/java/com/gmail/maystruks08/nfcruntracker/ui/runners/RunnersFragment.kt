@@ -25,7 +25,7 @@ import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.DividerItemDecoration
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.DividerVerticalItemDecoration
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.SwipeActionHelper
+import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.RunnerSwipeActionHelper
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.views.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SelectCheckpointDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SuccessDialogFragment
@@ -194,7 +194,7 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners),
     }
 
     private fun setUpItemTouchHelper() {
-        val orderSwipeActionHelper = object : SwipeActionHelper(requireContext()) {
+        val orderSwipeActionHelper = object : RunnerSwipeActionHelper(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 val swipedRunner = runnerAdapter.currentList[position] as? RunnerView

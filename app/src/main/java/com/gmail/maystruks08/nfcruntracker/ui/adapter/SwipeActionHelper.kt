@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.nfcruntracker.ui.runners.adapter
+package com.gmail.maystruks08.nfcruntracker.ui.adapter
 
 import android.content.Context
 import android.graphics.Canvas
@@ -7,33 +7,40 @@ import android.graphics.drawable.GradientDrawable
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.ext.toPx
-import com.gmail.maystruks08.nfcruntracker.ui.adapter.RunnerViewHolder
 
-abstract class SwipeActionHelper(context: Context) :
-    ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+abstract class SwipeActionHelper(
+    context: Context,
+    private val rightIconDrawableId: Int?,
+    private val rightIconBgId: Int?,
+    private val leftIconDrawableId: Int?,
+    private val leftIconBgId: Int?,
+    private val swipeDirs:Int
+) : ItemTouchHelper.SimpleCallback(0, swipeDirs) {
 
-    private val offTrackIcon: Drawable? =
-        ContextCompat.getDrawable(context, R.drawable.ic_remove_circle)
-    private val offTrackBg: Drawable
+    private val rightIcon: Drawable? = rightIconDrawableId?.let { ContextCompat.getDrawable(context, it) }
+    private var rightIconBg: Drawable? = null
 
-    private val markAtCurrentIcon: Drawable? =
-        ContextCompat.getDrawable(context, R.drawable.ic_check)
-    private val markAtCurrentBg: Drawable
+    private val leftIcon: Drawable? = leftIconDrawableId?.let { ContextCompat.getDrawable(context, it) }
+    private var leftIconBg: Drawable? = null
 
     private var prevDX = -1f
 
     init {
-        offTrackBg = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            cornerRadius = context.resources.displayMetrics.toPx(8f)
-            setColor(ContextCompat.getColor(context, R.color.colorRed))
+        rightIconBgId?.let {
+            rightIconBg = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = context.resources.displayMetrics.toPx(8f)
+                setColor(ContextCompat.getColor(context, rightIconBgId))
+            }
         }
-        markAtCurrentBg = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            cornerRadius = context.resources.displayMetrics.toPx(8f)
-            setColor(ContextCompat.getColor(context, R.color.colorGreen))
+
+        leftIconBgId?.let {
+            leftIconBg = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = context.resources.displayMetrics.toPx(8f)
+                setColor(ContextCompat.getColor(context, leftIconBgId))
+            }
         }
     }
 
@@ -44,17 +51,6 @@ abstract class SwipeActionHelper(context: Context) :
         return false
     }
 
-    override fun getSwipeDirs(
-        recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder
-    ): Int {
-        if ((viewHolder as? RunnerViewHolder)?.isSwipeEnable == true) return super.getSwipeDirs(
-            recyclerView,
-            viewHolder
-        )
-        return 0
-    }
-
     override fun onChildDraw(
         c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
         dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
@@ -62,16 +58,14 @@ abstract class SwipeActionHelper(context: Context) :
         val itemView = viewHolder.itemView
         val itemHeight = itemView.bottom - itemView.top
 
-        if ((viewHolder as? RunnerViewHolder)?.isSwipeEnable != true) return
-
         when {
             //Swipe left (Off track)
             dX < 0 -> {
-                offTrackIcon?.let {
+                rightIcon?.let {
                     val iconTop = itemView.top + (itemHeight - it.intrinsicHeight) / 2
                     val iconMargin = (itemHeight - it.intrinsicHeight) / 3
                     val iconBottom = iconTop + it.intrinsicHeight
-                    offTrackBg.setBounds(
+                    rightIconBg?.setBounds(
                         itemView.right + dX.toInt(),
                         itemView.top,
                         itemView.right,
@@ -80,18 +74,18 @@ abstract class SwipeActionHelper(context: Context) :
                     val iconRight = itemView.right - iconMargin
                     val iconLeft = itemView.right - it.intrinsicWidth - iconMargin
                     it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
-                    offTrackBg.draw(c)
+                    rightIconBg?.draw(c)
                     it.draw(c)
                     prevDX = dX
                 }
             }
             //Swipe right (Add current checkpoint)
             dX > 0 -> {
-                markAtCurrentIcon?.let {
+                leftIcon?.let {
                     val iconTop = itemView.top + (itemHeight - it.intrinsicHeight) / 2
                     val iconMargin = (itemHeight - it.intrinsicHeight) / 3
                     val iconBottom = iconTop + it.intrinsicHeight
-                    markAtCurrentBg.setBounds(
+                    leftIconBg?.setBounds(
                         itemView.left,
                         itemView.top,
                         itemView.right + dX.toInt(),
@@ -100,7 +94,7 @@ abstract class SwipeActionHelper(context: Context) :
                     val iconLeft = itemView.left + iconMargin
                     val iconRight = itemView.left + it.intrinsicWidth + iconMargin
                     it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
-                    markAtCurrentBg.draw(c)
+                    leftIconBg?.draw(c)
                     it.draw(c)
                     prevDX = dX
                 }
@@ -109,3 +103,4 @@ abstract class SwipeActionHelper(context: Context) :
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
 }
+

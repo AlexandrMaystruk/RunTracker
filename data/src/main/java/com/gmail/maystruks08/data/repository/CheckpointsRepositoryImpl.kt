@@ -5,6 +5,7 @@ import com.gmail.maystruks08.data.local.dao.UserSettingsDAO
 import com.gmail.maystruks08.data.local.entity.tables.UserSettingsTable
 import com.gmail.maystruks08.data.mappers.toCheckpoint
 import com.gmail.maystruks08.data.mappers.toCheckpointTable
+import com.gmail.maystruks08.data.mappers.toFirestoreDistanceCheckpoint
 import com.gmail.maystruks08.data.remote.Api
 import com.gmail.maystruks08.data.remote.pojo.CheckpointPojo
 import com.gmail.maystruks08.data.toDataClass
@@ -40,7 +41,8 @@ class CheckpointsRepositoryImpl @Inject constructor(
             CheckpointImpl(
                 it.checkpointId,
                 it.distanceId,
-                it.name
+                it.name,
+                it.position
             )
         }
     }
@@ -73,5 +75,12 @@ class CheckpointsRepositoryImpl @Inject constructor(
                 userSettingsDAO.insertOrReplace(currentUserSettings)
             }
         }
+    }
+
+    override suspend fun saveEditedCheckpoints(distanceId: String, editedCheckpoints: List<Checkpoint>) {
+        checkpointDAO.deleteCheckpointsByRaceAndDistanceId(distanceId)
+        firestoreApi.deleteDistanceCheckpoints(distanceId)
+        val firestoreDistanceCheckpoints  = editedCheckpoints.map { it.toFirestoreDistanceCheckpoint() }
+        firestoreApi.saveDistanceCheckpoints(distanceId, firestoreDistanceCheckpoints)
     }
 }

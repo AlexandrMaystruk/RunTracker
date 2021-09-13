@@ -43,6 +43,8 @@ interface Api{
 
     suspend fun saveCheckpoints(distanceId: String, checkpoints: List<Checkpoint>)
 
+    suspend fun deleteDistanceCheckpoints(distanceId: String)
+
 
     suspend fun getCheckpointsSelectionState(userId: String): DocumentSnapshot
 
