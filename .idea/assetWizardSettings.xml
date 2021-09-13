@@ -317,7 +317,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:$USER_HOME$/Library/Android/sdk/icons/material/materialicons/edit_location_alt/baseline_edit_location_alt_24.xml" />
+                                      <entry key="url" value="file:$USER_HOME$/Library/Android/sdk/icons/material/materialicons/mode_edit/baseline_mode_edit_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -327,8 +327,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="0eb66e" />
-                            <entry key="outputName" value="ic_edit" />
+                            <entry key="color" value="fffbfb" />
+                            <entry key="outputName" value="ic_mode_edit" />
                             <entry key="sourceFile" value="$USER_HOME$/Downloads/google.svg" />
                           </map>
                         </option>

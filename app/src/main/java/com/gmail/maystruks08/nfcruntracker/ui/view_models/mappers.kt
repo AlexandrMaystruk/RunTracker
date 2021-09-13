@@ -182,3 +182,33 @@ fun Distance.toView(isSelected: Boolean = false): DistanceView {
         isSelected = isSelected
     )
 }
+
+fun Distance.toEditView(isSelected: Boolean = false): EditDistanceView {
+    val items = arrayOf(
+        ChartItem(
+            statistic.runnerCountInProgress.toString(),
+            R.color.colorWhite,
+            R.color.design_default_color_primary,
+            statistic.runnerCountInProgress
+        ),
+        ChartItem(
+            statistic.runnerCountOffTrack.toString(),
+            R.color.colorWhite,
+            R.color.colorRed,
+            statistic.runnerCountOffTrack
+        ),
+        ChartItem(
+            statistic.finisherCount.toString(),
+            R.color.colorWhite,
+            R.color.colorGreen,
+            statistic.finisherCount
+        ),
+    )
+    return EditDistanceView(
+        id = id,
+        name = name,
+        chartItems = items,
+        isSelected = isSelected,
+        isEditMode = false
+    )
+}

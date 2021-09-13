@@ -12,8 +12,8 @@
         android:id="@+id/tvDistanceName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_s"
         android:layout_marginStart="@dimen/margin_min"
+        android:layout_marginTop="@dimen/margin_s"
         android:layout_marginEnd="@dimen/margin_min"
         android:textColor="@color/colorWhite"
         android:textSize="@dimen/text_m"
@@ -21,5 +21,30 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/etDistanceName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_min"
+        android:layout_marginTop="@dimen/margin_min"
+        android:layout_marginEnd="@dimen/margin_min"
+        android:background="@drawable/edit_text_bg"
+        android:padding="@dimen/margin_min"
+        android:textColor="@color/colorBlack"
+        android:textSize="@dimen/text_m"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/chartView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/ivEditDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_xs"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </com.gmail.maystruks08.nfcruntracker.ui.views.CustomConstraintLayout>

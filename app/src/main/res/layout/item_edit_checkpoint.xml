@@ -60,6 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_m"
             android:layout_marginEnd="@dimen/margin_m"
+            android:textColorHint="@color/colorGrey"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/ivSaveCheckpointChanges"

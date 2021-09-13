@@ -9,13 +9,13 @@ import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.interactors.DistanceInteractor
 import com.gmail.maystruks08.domain.interactors.use_cases.SaveCheckpointsUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.UpdateDistanceNameUseCase
+import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.gmail.maystruks08.nfcruntracker.utils.ResourceProvider
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import java.util.*
@@ -24,7 +24,9 @@ import java.util.*
 class RaceEditorViewModel @ViewModelInject constructor(
     private val router: Router,
     private val distanceInteractor: DistanceInteractor,
-    private val saveCheckpointsUseCase: SaveCheckpointsUseCase
+    private val saveCheckpointsUseCase: SaveCheckpointsUseCase,
+    private val updateDistanceNameUseCase: UpdateDistanceNameUseCase,
+    private val resourceProvider: ResourceProvider
 ) : BaseViewModel() {
 
 
@@ -33,27 +35,31 @@ class RaceEditorViewModel @ViewModelInject constructor(
     private val _showProgressLiveData = MutableLiveData<Boolean>()
     private val _showProgressFlow = MutableStateFlow(false)
     private val _checkpointsFlow = MutableStateFlow<MutableList<EditCheckpoint>>(mutableListOf())
-    private val _distanceFlow = MutableStateFlow<MutableList<DistanceView>>(mutableListOf()).apply {
-        viewModelScope.launch {
-            val raceId = distanceInteractor.provideCurrentSelectedRaceId()
-            distanceInteractor
-                .getDistancesFlow(raceId)
-                .onStart { _showProgressFlow.value = true }
-                .catch { error ->
-                    handleError(error)
-                }
-                .map { it.mapDistanceList() }
-                .collect { distanceList ->
-                    _showProgressFlow.value = false
-                    value = distanceList
-                }
+    private val _distanceFlow =
+        MutableStateFlow<MutableList<EditDistanceView>>(mutableListOf()).apply {
+            viewModelScope.launch {
+                val raceId = distanceInteractor.provideCurrentSelectedRaceId()
+                distanceInteractor
+                    .getDistancesFlow(raceId)
+                    .onStart { _showProgressFlow.value = true }
+                    .catch { error ->
+                        handleError(error)
+                    }
+                    .map { it.mapDistanceList() }
+                    .collect { distanceList ->
+                        _showProgressFlow.value = false
+                        value = distanceList
+                    }
+            }
         }
-    }
 
-    val distances: StateFlow<List<DistanceView>> get() = _distanceFlow
+    val distances: StateFlow<List<EditDistanceView>> get() = _distanceFlow
     val checkpoints: StateFlow<List<EditCheckpoint>> get() = _checkpointsFlow
     val showProgress: LiveData<Boolean> get() = _showProgressLiveData
 
+    /**
+     * Distance scope
+     */
     fun changeDistance(id: String) {
         this.distanceId = id
         viewModelScope.launch {
@@ -72,6 +78,25 @@ class RaceEditorViewModel @ViewModelInject constructor(
         }
     }
 
+    fun onEditDistanceClicked(position: Int, item: EditDistanceView) {
+        val updatedDistances = _distanceFlow.value.toMutableList().apply {
+            removeAt(position)
+            add(position, item.copy(isEditMode = true))
+        }
+        _distanceFlow.value = updatedDistances
+    }
+
+    fun onDistanceEdited(position: Int, item: EditDistanceView) {
+        val updatedDistances = _distanceFlow.value.toMutableList().apply {
+            removeAt(position)
+            add(position, item.copy(isEditMode = false))
+        }
+        _distanceFlow.value = updatedDistances
+    }
+
+    /**
+     * Checkpoint scope
+     */
     fun onCheckpointSwipedLeft(position: Int, item: EditCheckpointView) {
         if (item.isEditMode) {
             //remove item
@@ -105,7 +130,7 @@ class RaceEditorViewModel @ViewModelInject constructor(
                 position,
                 EditCheckpointView(
                     UUID.randomUUID().toString(),
-                    "no name",
+                    resourceProvider.getString(R.string.def_new_checkpoint_name),
                     CheckpointPosition.Center,
                     true
                 )
@@ -115,16 +140,49 @@ class RaceEditorViewModel @ViewModelInject constructor(
         _checkpointsFlow.value = updatedCheckpoints
     }
 
+    /**
+     * Common scope
+     */
     fun onSaveChangedClicked() {
         viewModelScope.launch(Dispatchers.IO) {
-            val editedCheckpoints = _checkpointsFlow.value.filterIsInstance(EditCheckpointView::class.java)
-            when (val result = saveCheckpointsUseCase.invoke(
-                distanceId,
-                editedCheckpoints.mapIndexed { index, editCheckpointView ->   editCheckpointView.toEntity(distanceId, index) }
-            )) {
-                is TaskResult.Error -> handleError(result.error)
-                is TaskResult.Value -> withContext(Dispatchers.Main) {router.exit()}
+            val updateDistanceResult = saveDistanceAsync().await()
+            val updateCheckpointsResult = saveCheckpointsAsync().await()
+            when {
+                updateCheckpointsResult is TaskResult.Value && updateDistanceResult is TaskResult.Value -> {
+                    withContext(Dispatchers.Main) { router.exit() }
+                }
+                updateCheckpointsResult is TaskResult.Value -> {
+                    //updated only checkpoints
+                }
+                updateDistanceResult is TaskResult.Value -> {
+                    //updated only distance name
+                }
             }
+        }
+    }
+
+    private suspend fun saveCheckpointsAsync(): Deferred<TaskResult<Exception, Unit>>{
+        return viewModelScope.async {
+            val editedCheckpoints = _checkpointsFlow.value.filterIsInstance(EditCheckpointView::class.java)
+            saveCheckpointsUseCase.invoke(
+                distanceId,
+                editedCheckpoints.mapIndexed { index, editCheckpointView ->
+                    editCheckpointView.toEntity(
+                        distanceId,
+                        index
+                    )
+                }
+            )
+        }
+    }
+
+    private suspend fun saveDistanceAsync():  Deferred<TaskResult<Exception, Unit>> {
+        return viewModelScope.async {
+            val editedDistances = _distanceFlow.value.firstOrNull { it.isSelected } ?: return@async TaskResult.build { throw RuntimeException() }
+            updateDistanceNameUseCase.invoke(
+                distanceId,
+                editedDistances.name
+            )
         }
     }
 
@@ -138,7 +196,7 @@ class RaceEditorViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun List<Distance>.mapDistanceList(): MutableList<DistanceView> {
+    private fun List<Distance>.mapDistanceList(): MutableList<EditDistanceView> {
         return if (distanceId == DEF_STRING_VALUE) {
             mapIndexed { index, distance ->
                 val isSelected = index == 0
@@ -154,10 +212,10 @@ class RaceEditorViewModel @ViewModelInject constructor(
                             checkpoint.toCheckpointEditView(checkpointPosition)
                         }.toMutableList()
 
-                    checkpoints.add(lastIndex - 1, CreateNewCheckpointView())
+                    checkpoints.add(checkpoints.lastIndex, CreateNewCheckpointView())
                     _checkpointsFlow.value = checkpoints
                 }
-                distance.toView(isSelected)
+                distance.toEditView(isSelected)
             }
         } else {
             map {
@@ -173,10 +231,10 @@ class RaceEditorViewModel @ViewModelInject constructor(
                             }
                             checkpoint.toCheckpointEditView(checkpointPosition)
                         }.toMutableList()
-                    checkpoints.add(lastIndex - 1, CreateNewCheckpointView())
+                    checkpoints.add(checkpoints.lastIndex, CreateNewCheckpointView())
                     _checkpointsFlow.value = checkpoints
                 }
-                it.toView(isSelected)
+                it.toEditView(isSelected)
             }
         }.toMutableList()
     }

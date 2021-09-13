@@ -67,5 +67,6 @@
     <string name="competition_time">Время: %1$s</string>
     <string name="cancel">Cancel</string>
     <string name="save_new_race">Сохранить</string>
+    <string name="def_new_checkpoint_name">Введите название</string>
 
 </resources>

@@ -30,6 +30,9 @@ interface Api{
 
     suspend fun updateDistanceStatistic(distanceId: String, distanceStatistic: DistanceStatistic)
 
+    suspend fun updateDistanceName(distanceId: String, newName: String)
+
+
 
     //RUNNER
     suspend fun saveRunner(runnerPojo: RunnerPojo)

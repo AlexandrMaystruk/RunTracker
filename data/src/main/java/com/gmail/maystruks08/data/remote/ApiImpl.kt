@@ -120,13 +120,27 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
         )
     }
 
+    override suspend fun updateDistanceName(distanceId: String, newName: String) {
+        val distanceDocument =
+            db.collection(DISTANCES_COLLECTION).document(distanceId.replaceSpecialSymbols())
+        awaitTaskCompletable(
+            distanceDocument.update(
+                mapOf(
+                    "name" to newName,
+                )
+            )
+        )
+    }
+
+
     override suspend fun saveRunner(runnerPojo: RunnerPojo) {
-        val runnerDocument = db.collection(RUNNER_COLLECTION).document(runnerPojo.number.replaceSpecialSymbols())
+        val runnerDocument =
+            db.collection(RUNNER_COLLECTION).document(runnerPojo.number.replaceSpecialSymbols())
         return try {
             awaitTaskCompletable(runnerDocument.update(runnerPojo.serializeToMap()))
         } catch (e: FirebaseFirestoreException) {
             awaitTaskCompletable(runnerDocument.set(runnerPojo))
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Timber.e(e)
             throw e
         }

@@ -77,6 +77,7 @@
     <string name="signUp">Sign Up</string>
     <string name="competition_time">Time: %1$s</string>
     <string name="cancel">Cancel</string>
+    <string name="def_new_checkpoint_name">no name</string>
 
 
 </resources>

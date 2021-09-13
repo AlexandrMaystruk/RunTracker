@@ -4,6 +4,8 @@ import com.gmail.maystruks08.data.repository.*
 import com.gmail.maystruks08.domain.interactors.*
 import com.gmail.maystruks08.domain.interactors.use_cases.SaveCheckpointsUseCase
 import com.gmail.maystruks08.domain.interactors.use_cases.SaveCheckpointsUseCaseImpl
+import com.gmail.maystruks08.domain.interactors.use_cases.UpdateDistanceNameUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.UpdateDistanceNameUseCaseImpl
 import com.gmail.maystruks08.domain.repository.*
 import com.gmail.maystruks08.nfcruntracker.ui.login.LogOutUseCaseImpl
 import dagger.Binds
@@ -110,6 +112,9 @@ abstract class ActivityModule {
     @ActivityScoped
     abstract fun bindSaveCheckpointsUseCase(impl: SaveCheckpointsUseCaseImpl): SaveCheckpointsUseCase
 
+    @Binds
+    @ActivityScoped
+    abstract fun bindUpdateDistanceNameUseCase(impl: UpdateDistanceNameUseCaseImpl): UpdateDistanceNameUseCase
 
 
 }

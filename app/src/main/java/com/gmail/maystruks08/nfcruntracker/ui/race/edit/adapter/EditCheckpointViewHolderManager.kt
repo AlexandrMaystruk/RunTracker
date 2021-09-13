@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DiffUtil
 import com.gmail.maystruks08.nfcruntracker.R
+import com.gmail.maystruks08.nfcruntracker.core.ext.string
 import com.gmail.maystruks08.nfcruntracker.databinding.ItemEditCheckpointBinding
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.BaseViewHolder
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.Item
@@ -87,9 +88,16 @@ class EditCheckpointViewHolder(
         tvCheckpointName.visibility = View.GONE
         etCheckpointName.visibility = View.VISIBLE
         ivSaveCheckpointChanges.visibility = View.VISIBLE
-        etCheckpointName.setText(item.title)
+        if (item.title == root.context.string(R.string.def_new_checkpoint_name)) {
+            etCheckpointName.setText("")
+            etCheckpointName.hint = item.title
+        } else {
+            etCheckpointName.setText(item.title)
+            etCheckpointName.hint = root.context.string(R.string.def_new_checkpoint_name)
+        }
         etCheckpointName.addTextChangedListener { newTitle = it.toString() }
         ivSaveCheckpointChanges.setOnClickListener {
+            if (etCheckpointName.text.isNullOrEmpty()) return@setOnClickListener
             interaction.onCheckpointChanged(
                 adapterPosition,
                 item.copy(

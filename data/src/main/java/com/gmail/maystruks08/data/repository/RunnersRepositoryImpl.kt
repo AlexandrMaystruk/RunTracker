@@ -166,7 +166,7 @@ class RunnersRepositoryImpl @Inject constructor(
         val distanceWithCheckpoints = distanceDAO.getDistanceWithCheckpoints(runnerTable.actualDistanceId)
         val checkpointResult = results.distinct()
         if (onlyFinishers && checkpointResult.size != distanceWithCheckpoints.checkpoints.size) return mutableListOf()
-        return distanceWithCheckpoints.checkpoints.map { checkpointTable ->
+        val result =  distanceWithCheckpoints.checkpoints.map { checkpointTable ->
             val runnerResults = checkpointResult.firstOrNull { it.checkpointId == checkpointTable.checkpointId }
             val checkpoint = CheckpointImpl(
                 checkpointTable.checkpointId,
@@ -181,6 +181,8 @@ class RunnersRepositoryImpl @Inject constructor(
                 runnerResults.hasPrevious
             )
         }.toMutableList()
+        result.sortBy { it.getPosition() }
+        return result
     }
 
     override suspend fun getRunnerTeamMembers(

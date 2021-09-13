@@ -19,6 +19,7 @@ import com.gmail.maystruks08.nfcruntracker.ui.race.edit.adapter.EditDistanceView
 import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.DividerItemDecoration
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.DistanceView
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.EditCheckpointView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.EditDistanceView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -91,8 +92,16 @@ class RaceEditorFragment : BaseFragment(R.layout.fragment_distance_editor),
         setUpItemTouchHelper()
     }
 
-    override fun onItemSelected(distance: DistanceView) {
+    override fun onItemSelected(distance: EditDistanceView) {
         viewModel.changeDistance(distance.id)
+    }
+
+    override fun onEditDistanceClicked(position: Int, distance: EditDistanceView) {
+        viewModel.onEditDistanceClicked(position, distance)
+    }
+
+    override fun onDistanceEdited(position: Int, distance: EditDistanceView) {
+        viewModel.onDistanceEdited(position, distance)
     }
 
     override fun onCheckpointChanged(position: Int, item: EditCheckpointView) {

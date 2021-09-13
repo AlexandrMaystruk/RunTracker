@@ -201,7 +201,8 @@ class RunnersFragment : BaseFragment(R.layout.fragment_runners),
                 swipedRunner ?: return
                 if (direction == ItemTouchHelper.LEFT) {
                     viewModel.onRunnerSwipedLeft(position, swipedRunner)
-                } else if (direction == ItemTouchHelper.RIGHT) {
+                }
+                if (direction == ItemTouchHelper.RIGHT) {
                     viewModel.onRunnerSwipedRight(position, swipedRunner)
                 }
             }

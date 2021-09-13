@@ -330,9 +330,9 @@ class RunnersViewModel @ViewModelInject constructor(
             .catch { error ->
                 handleError(error)
             }
-            .collect {
+            .map { toRunnerViews(it) }
+            .collect { runners ->
                 Timber.w("showAllRunners")
-                val runners = toRunnerViews(it)
                 _showProgressFlow.value = false
                 _runnersFlow.value = runners
             }
@@ -345,9 +345,9 @@ class RunnersViewModel @ViewModelInject constructor(
             .catch { error ->
                 handleError(error)
             }
-            .collect {
+            .map { toFinisherViews(it) }
+            .collect { finishers ->
                 Timber.w("provideFinisherRunners")
-                val finishers = toFinisherViews(it)
                 _showProgressFlow.value = false
                 _runnersFlow.value = finishers
             }

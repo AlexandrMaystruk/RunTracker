@@ -12,4 +12,6 @@ interface DistanceRepository {
     //return pair. First raceId second race name
     suspend fun getLastSelectedRace(): Pair<String, String>
 
+    suspend fun updateDistanceName(distanceId: String, newName: String)
+
 }

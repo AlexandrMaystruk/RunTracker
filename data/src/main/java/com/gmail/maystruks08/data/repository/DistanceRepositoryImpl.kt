@@ -47,15 +47,20 @@ class DistanceRepositoryImpl @Inject constructor(
 
     override suspend fun getDistanceListFlow(raceId: String): Flow<List<Distance>> {
         return distanceDAO.getDistanceDistinctUntilChanged(raceId).map { distanceList ->
-            distanceList.map {
-                val checkpoints = it.checkpoints.map { it.toCheckpoint() }.toMutableList()
-                it.distance.toDistanceEntity(checkpoints)
+            distanceList.map { distanceWithCheckpoints ->
+                val checkpoints = distanceWithCheckpoints.checkpoints.map { it.toCheckpoint() }.toMutableList()
+                checkpoints.sortBy { it.getPosition() }
+                distanceWithCheckpoints.distance.toDistanceEntity(checkpoints)
             }
         }
     }
 
     override suspend fun getLastSelectedRace(): Pair<String, String> {
         return configPreferences.getRaceId() to configPreferences.getRaceName()
+    }
+
+    override suspend fun updateDistanceName(distanceId: String, newName: String) {
+        firestoreApi.updateDistanceName(distanceId, newName)
     }
 
 
