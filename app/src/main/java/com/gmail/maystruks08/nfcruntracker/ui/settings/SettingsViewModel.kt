@@ -3,9 +3,9 @@ package com.gmail.maystruks08.nfcruntracker.ui.settings
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.account.AssesLevel
-import com.gmail.maystruks08.domain.interactors.ExportFromXlsToRemoteUseCase
-import com.gmail.maystruks08.domain.interactors.GetAccountAccessLevelUseCase
-import com.gmail.maystruks08.domain.interactors.LogOutUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.ExportFromXlsToRemoteUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.GetAccountAccessLevelUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.LogOutUseCase
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi

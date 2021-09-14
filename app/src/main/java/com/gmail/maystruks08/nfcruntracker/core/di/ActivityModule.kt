@@ -2,10 +2,16 @@ package com.gmail.maystruks08.nfcruntracker.core.di
 
 import com.gmail.maystruks08.data.repository.*
 import com.gmail.maystruks08.domain.interactors.*
-import com.gmail.maystruks08.domain.interactors.use_cases.SaveCheckpointsUseCase
-import com.gmail.maystruks08.domain.interactors.use_cases.SaveCheckpointsUseCaseImpl
-import com.gmail.maystruks08.domain.interactors.use_cases.UpdateDistanceNameUseCase
-import com.gmail.maystruks08.domain.interactors.use_cases.UpdateDistanceNameUseCaseImpl
+import com.gmail.maystruks08.domain.interactors.use_cases.*
+import com.gmail.maystruks08.domain.interactors.use_cases.CalculateDistanceStatisticUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.CalculateDistanceStatisticUseCaseImpl
+import com.gmail.maystruks08.domain.interactors.use_cases.CreateRaceUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.CreateRaceUseCaseImpl
+import com.gmail.maystruks08.domain.interactors.use_cases.ExportFromXlsToRemoteUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.ExportFromXlsToRemoteUseCaseImpl
+import com.gmail.maystruks08.domain.interactors.use_cases.GetAccountAccessLevelUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.GetAccountAccessLevelUseCaseImpl
+import com.gmail.maystruks08.domain.interactors.use_cases.LogOutUseCase
 import com.gmail.maystruks08.domain.repository.*
 import com.gmail.maystruks08.nfcruntracker.ui.login.LogOutUseCaseImpl
 import dagger.Binds
@@ -134,5 +140,19 @@ object NavigationModule {
     @Provides
     @ActivityScoped
     fun navigatorHolder(cicerone: Cicerone<Router>): NavigatorHolder = cicerone.navigatorHolder
+
+}
+
+@Module
+@InstallIn(ActivityComponent::class)
+interface RunnerUseCaseModule {
+
+    @Binds
+    @ActivityScoped
+    fun bindProvideRunnersUseCase(impl: ProvideRunnersUseCaseImpl): ProvideRunnersUseCase
+
+    @Binds
+    @ActivityScoped
+    fun bindProvideFinishersUseCase(impl: ProvideFinishersUseCaseImpl): ProvideFinishersUseCase
 
 }

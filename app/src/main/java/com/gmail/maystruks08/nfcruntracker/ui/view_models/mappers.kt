@@ -10,8 +10,9 @@ import com.gmail.maystruks08.domain.timeInMillisToTimeFormat
 import com.gmail.maystruks08.domain.toDateFormat
 import com.gmail.maystruks08.domain.toUITimeFormat
 import com.gmail.maystruks08.nfcruntracker.R
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.views.RunnerResultView
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.views.RunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerDetailView
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.result.RunnerResultView
 import com.gmail.maystruks08.nfcruntracker.ui.views.Bean
 import com.gmail.maystruks08.nfcruntracker.ui.views.ChartItem
 import com.gmail.maystruks08.nfcruntracker.ui.views.StepState
@@ -41,17 +42,31 @@ fun toFinisherViews(runners: List<Runner>): MutableList<RunnerResultView> {
 fun Runner.toRunnerView(): RunnerView {
     val isOffTrack = offTrackDistances.any { it == actualDistanceId }
     return RunnerView(
-        this.cardId,
-        this.number,
-        this.fullName,
-        this.city,
-        this.totalResults[actualDistanceId]?.toUITimeFormat(),
-        this.dateOfBirthday?.toDateFormat().orEmpty(),
-        this.actualDistanceId,
-        this.checkpoints[actualDistanceId]?.toCheckpointViews(isOffTrack = isOffTrack).orEmpty(),
-        isOffTrack
+        number = this.number,
+        shortName = this.shortName,
+        result = this.totalResults[actualDistanceId]?.toUITimeFormat(),
+        actualDistanceId = this.actualDistanceId,
+        progress = this.checkpoints[actualDistanceId]?.toCheckpointViews(isOffTrack = isOffTrack).orEmpty(),
+        isOffTrack = isOffTrack,
+        placeholder = false
     )
 }
+
+fun Runner.toRunnerDetailView(): RunnerDetailView {
+    val isOffTrack = offTrackDistances.any { it == actualDistanceId }
+    return RunnerDetailView(
+        number = this.number,
+        fullName = this.fullName,
+        city = this.city,
+        result = this.totalResults[actualDistanceId]?.toUITimeFormat(),
+        dateOfBirthday = this.dateOfBirthday?.toDateFormat().orEmpty(),
+        actualDistanceId = this.actualDistanceId,
+        progress = this.checkpoints[actualDistanceId]?.toCheckpointViews(isOffTrack = isOffTrack).orEmpty(),
+        cardId = this.cardId,
+        isOffTrack = isOffTrack
+    )
+}
+
 
 fun Runner.toRunnerResultView(position: Int): RunnerResultView {
     return RunnerResultView(

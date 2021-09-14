@@ -1,6 +1,7 @@
 package com.gmail.maystruks08.domain.interactors
 
 import com.gmail.maystruks08.domain.entities.Distance
+import com.gmail.maystruks08.domain.interactors.use_cases.CalculateDistanceStatisticUseCase
 import com.gmail.maystruks08.domain.repository.DistanceRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

@@ -53,6 +53,18 @@ class RunnersInteractorImpl @Inject constructor(
             distanceId = distanceId,
             onlyFinishers = true
         ).map { list ->
+
+            if(distanceId == "Eftafeta"){
+                list.groupBy { it.currentTeamName }.forEach {
+
+
+                }
+
+                return@map  list.sortedBy { it.totalResults[it.actualDistanceId]?.time }
+            }
+
+
+
             list.sortedBy { it.totalResults[it.actualDistanceId]?.time }
         }
     }

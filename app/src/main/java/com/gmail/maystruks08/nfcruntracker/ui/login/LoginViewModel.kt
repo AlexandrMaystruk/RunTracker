@@ -119,7 +119,7 @@ class LoginViewModel @ViewModelInject constructor(
         val raceId = configPreferences.getRaceId()
         val raceName = configPreferences.getRaceId()
         if (raceId != "-1") {
-            router.newRootScreen(Screens.RunnersScreen(raceId, raceName, null))
+            router.newRootScreen(Screens.MainScreen(raceId, raceName, null))
         } else {
             router.newRootScreen(Screens.RaceListScreen())
         }

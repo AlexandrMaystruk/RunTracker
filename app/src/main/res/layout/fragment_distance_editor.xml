@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layoutDescription="@xml/fragment_edit_distance_motions_scene"
-    tools:context="com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment">
+    tools:context="com.gmail.maystruks08.nfcruntracker.ui.main.MainScreenFragment">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

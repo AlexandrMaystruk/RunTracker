@@ -25,7 +25,7 @@ import com.gmail.maystruks08.nfcruntracker.databinding.ActivityHostBinding
 import com.gmail.maystruks08.nfcruntracker.ui.login.LoginFragment
 import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
-import com.gmail.maystruks08.nfcruntracker.ui.runners.RunnersFragment
+import com.gmail.maystruks08.nfcruntracker.ui.main.MainScreenFragment
 import com.gmail.maystruks08.nfcruntracker.utils.NfcAdapter
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -160,7 +160,7 @@ class HostActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         nfcAdapter.processReadCard(intent)?.let { cardId ->
             Timber.log(Log.INFO, "Card scanned: $cardId at ${Date().toDateTimeFormat()}")
-            getFragment<RunnersFragment>(Screens.RunnersScreen.tag())?.onNfcCardScanned(cardId)
+            getFragment<MainScreenFragment>(Screens.MainScreen.tag())?.onNfcCardScanned(cardId)
             getFragment<RunnerFragment>(Screens.RunnerScreen.tag())?.onNfcCardScanned(cardId)
             getFragment<RegisterNewRunnerFragment>(Screens.RegisterNewRunnerScreen.tag())?.onNfcCardScanned(cardId)
 

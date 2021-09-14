@@ -16,8 +16,7 @@ import com.gmail.maystruks08.nfcruntracker.ui.race.edit.adapter.CheckpointSwipeA
 import com.gmail.maystruks08.nfcruntracker.ui.race.edit.adapter.CreateNewCheckpointViewHolderManager
 import com.gmail.maystruks08.nfcruntracker.ui.race.edit.adapter.EditCheckpointViewHolderManager
 import com.gmail.maystruks08.nfcruntracker.ui.race.edit.adapter.EditDistanceViewHolderManager
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.DividerItemDecoration
-import com.gmail.maystruks08.nfcruntracker.ui.view_models.DistanceView
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.DividerItemDecoration
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.EditCheckpointView
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.EditDistanceView
 import dagger.hilt.android.AndroidEntryPoint

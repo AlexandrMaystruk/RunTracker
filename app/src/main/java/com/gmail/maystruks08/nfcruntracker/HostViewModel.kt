@@ -29,7 +29,7 @@ class HostViewModel @ViewModelInject constructor(
             viewModelScope.launch {
                 when (val result = runnerDataChangeListener.getLastSavedRace()) {
                     is TaskResult.Value -> router.newRootScreen(
-                        Screens.RunnersScreen(
+                        Screens.MainScreen(
                             raceId = result.value.first,
                             raceName = result.value.second,
                             firstDistanceId = null

@@ -10,9 +10,9 @@ import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.interactors.RunnersInteractor
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerDetailView
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
-import com.gmail.maystruks08.nfcruntracker.ui.runners.adapter.views.RunnerView
-import com.gmail.maystruks08.nfcruntracker.ui.view_models.toRunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.view_models.toRunnerDetailView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
@@ -32,7 +32,7 @@ class RunnerViewModel @ViewModelInject constructor(
     val showSuccessDialog get() = _showSuccessDialogLiveData
     val linkCardModeEnable get() = _linkCardModeEnableLiveData
 
-    private val _runnerLiveData = SingleLiveEvent<RunnerView>()
+    private val _runnerLiveData = SingleLiveEvent<RunnerDetailView>()
     private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
     private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, String>>()
     private val _linkCardModeEnableLiveData = SingleLiveEvent<Boolean>()
@@ -121,7 +121,7 @@ class RunnerViewModel @ViewModelInject constructor(
     }
 
     private fun handleRunnerData(runner: Runner) {
-        _runnerLiveData.postValue(runner.toRunnerView())
+        _runnerLiveData.postValue(runner.toRunnerDetailView())
         linkCardModeEnable.postValue(false)
     }
 

@@ -47,6 +47,7 @@
 
     <dimen name="runnerItemBigHeight">130dp</dimen>
     <dimen name="runnerItemSmallHeight">95dp</dimen>
+    <dimen name="teamItemSmallHeight">190dp</dimen>
 
 
     <dimen name="raceItemHeight">140dp</dimen>

@@ -14,7 +14,7 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnerBinding
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.AppAdapter
-import com.gmail.maystruks08.nfcruntracker.ui.runners.dialogs.SuccessDialogFragment
+import com.gmail.maystruks08.nfcruntracker.ui.main.dialogs.SuccessDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -181,7 +181,7 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner),
 
     companion object {
 
-        fun getInstance(runnerNumber: String, distanceId: String) = RunnerFragment().apply {
+        fun getInstance(runnerNumber: String) = RunnerFragment().apply {
             this.runnerNumber = runnerNumber
         }
     }

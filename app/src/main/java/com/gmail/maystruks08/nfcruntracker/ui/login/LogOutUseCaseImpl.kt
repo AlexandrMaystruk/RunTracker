@@ -1,7 +1,7 @@
 package com.gmail.maystruks08.nfcruntracker.ui.login
 
 import com.gmail.maystruks08.data.awaitTaskCompletable
-import com.gmail.maystruks08.domain.interactors.LogOutUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.LogOutUseCase
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth

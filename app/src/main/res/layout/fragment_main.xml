@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layoutDescription="@xml/fragment_runners_motions_test_scene"
+    tools:context="com.gmail.maystruks08.nfcruntracker.ui.main.MainScreenFragment">
+
+    <View
+        android:id="@+id/view_background"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvDistanceType"
+        android:layout_width="0dp"
+        android:layout_height="110dp"
+        android:layout_marginBottom="@dimen/margin_m"
+        android:orientation="horizontal"
+        android:scrollbarAlwaysDrawHorizontalTrack="true"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="@id/view_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintVertical_bias="1.0"
+        tools:listitem="@layout/item_distance" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_size"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_collapseMode="pin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark" />
+
+    <View
+        android:id="@+id/view_card"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/margin_s"
+        android:background="@drawable/bg_corner_white"
+        android:elevation="@dimen/cardview_default_elevation"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rvDistanceType" />
+
+    <TextView
+        android:id="@+id/tvRunnersTitle"
+        style="@style/TextM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_m"
+        android:layout_marginTop="@dimen/margin_m"
+        android:elevation="@dimen/cardview_default_elevation"
+        android:text="Текущее кп:"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@id/view_card"
+        app:layout_constraintTop_toTopOf="@id/view_card" />
+
+    <TextView
+        android:id="@+id/tvCurrentCheckpoint"
+        style="@style/MainButton.Green"
+        android:layout_marginEnd="@dimen/margin_xs"
+        android:background="@drawable/bg_main_btn_green"
+        android:elevation="@dimen/cardview_default_elevation"
+        android:gravity="center"
+        android:minWidth="@dimen/button_width_s"
+        android:padding="@dimen/margin_xs"
+        android:text="Выбрать кп"
+        android:textColor="@color/colorWhite"
+        app:layout_constraintStart_toStartOf="@id/tvRunnersTitle"
+        app:layout_constraintTop_toBottomOf="@+id/tvRunnersTitle" />
+
+    <TextView
+        android:id="@+id/tvTime"
+        style="@style/TextM"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_xs"
+        android:layout_marginEnd="@dimen/margin_m"
+        android:elevation="@dimen/cardview_default_elevation"
+        android:gravity="end"
+        app:layout_constraintBottom_toBottomOf="@+id/tvRunnersTitle"
+        app:layout_constraintEnd_toEndOf="@id/view_card"
+        app:layout_constraintTop_toTopOf="@+id/tvRunnersTitle" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRunners"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="@dimen/cardview_default_elevation"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="@id/view_card"
+        app:layout_constraintLeft_toLeftOf="@id/view_card"
+        app:layout_constraintRight_toRightOf="@id/view_card"
+        app:layout_constraintTop_toBottomOf="@+id/tvCurrentCheckpoint"
+        tools:listitem="@layout/item_runner" />
+
+    <include
+        android:id="@+id/circleMenu"
+        layout="@layout/circle_menu_layout"
+        android:elevation="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/rvRunners" />
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="@dimen/transition_s" />
+
+
+</androidx.constraintlayout.motion.widget.MotionLayout>

@@ -3,7 +3,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.race.create
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.TaskResult
-import com.gmail.maystruks08.domain.interactors.CreateRaceUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.CreateRaceUseCase
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers

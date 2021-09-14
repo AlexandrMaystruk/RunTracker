@@ -71,14 +71,14 @@ class RaceViewModel @ViewModelInject constructor(
         viewModelScope.launch {
             when (interactor.saveLastSelectedRace(raceView.id, raceView.name)) {
                 is TaskResult.Value -> router.navigateTo(
-                    Screens.RunnersScreen(
+                    Screens.MainScreen(
                         raceView.id,
                         raceView.name,
                         raceView.firstDistanceId
                     )
                 )
                 is TaskResult.Error -> router.navigateTo(
-                    Screens.RunnersScreen(
+                    Screens.MainScreen(
                         raceView.id,
                         raceView.name,
                         raceView.firstDistanceId
