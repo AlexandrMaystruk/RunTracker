@@ -13,6 +13,7 @@ import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.interactors.use_cases.*
 import com.gmail.maystruks08.domain.interactors.use_cases.runner.ManageRunnerCheckpointInteractor
+import com.gmail.maystruks08.domain.interactors.use_cases.runner.OffTrackRunnerUseCase
 import com.gmail.maystruks08.domain.interactors.use_cases.runner.SubscribeToRunnersUpdateUseCase
 import com.gmail.maystruks08.domain.timeInMillisToTimeFormat
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
@@ -47,6 +48,8 @@ class MainScreenViewModel @ViewModelInject constructor(
     private val saveCurrentSelectedCheckpointUseCase: SaveCurrentSelectedCheckpointUseCase,
 
     private val manageCheckpoints: ManageRunnerCheckpointInteractor,
+    private val offTrackRunnerUseCase: OffTrackRunnerUseCase,
+
 
     private val subscribeToDistanceUpdateUseCase: SubscribeToDistanceUpdateUseCase,
     private val subscribeToRunnersUpdateUseCase: SubscribeToRunnersUpdateUseCase,
@@ -206,7 +209,7 @@ class MainScreenViewModel @ViewModelInject constructor(
             val runnerNumber = lastSelectedRunner?.number ?: return@launch
             if (lastSelectedRunner?.isOffTrack == true) return@launch
             try {
-                val updatedRunner = manageCheckpoints.addCurrentCheckpointByNumber(runnerNumber)
+                val updatedRunner = offTrackRunnerUseCase.invoke(runnerNumber)
                 handleRunnerChanges(Change(updatedRunner, ModifierType.UPDATE))
             } catch (e: Exception) {
                 handleError(e)
