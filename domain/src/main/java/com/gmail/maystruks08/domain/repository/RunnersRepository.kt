@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface RunnersRepository {
 
-    suspend fun observeRunnerData(raceId: String)
+    suspend fun observeRunnerData(raceId: String): Flow<Unit>
 
     suspend fun getRunners(
         distanceId: String,

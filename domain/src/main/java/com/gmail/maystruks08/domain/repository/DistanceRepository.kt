@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface DistanceRepository {
 
-    suspend fun observeDistanceDataFlow(raceId: String)
+    suspend fun observeDistanceDataFlow(raceId: String): Flow<Unit>
 
     suspend fun getDistanceListFlow(raceId: String): Flow<List<Distance>>
 

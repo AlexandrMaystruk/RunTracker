@@ -73,11 +73,10 @@ class RunnersRepositoryImpl @Inject constructor(
         return configPreferences.getRaceId()
     }
 
-    override suspend fun observeRunnerData(raceId: String) {
-        api
+    override suspend fun observeRunnerData(raceId: String): Flow<Unit> {
+       return api
             .subscribeToRunnerCollectionChange(raceId)
-            .flowOn(Dispatchers.IO)
-            .collect { runnerChangeList ->
+            .map { runnerChangeList ->
                 when (runnerChangeList.type) {
                     ModifierType.UPDATE -> runnerChangeList.runners.updateRunnersTable()
                     ModifierType.ADD -> runnerChangeList.runners.insert()

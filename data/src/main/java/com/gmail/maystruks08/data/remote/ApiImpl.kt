@@ -85,9 +85,24 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
                         DocumentChange.Type.REMOVED ->deleteRunners.add(it.document.toObject(RunnerPojo::class.java))
                     }
                 }
-                channel.offer(RunnerChanges(ModifierType.ADD, insertRunners))
-                channel.offer(RunnerChanges(ModifierType.UPDATE, updateRunners))
-                channel.offer(RunnerChanges(ModifierType.REMOVE, deleteRunners))
+                if (insertRunners.isNotEmpty()) channel.offer(
+                    RunnerChanges(
+                        ModifierType.ADD,
+                        insertRunners
+                    )
+                )
+                if (updateRunners.isNotEmpty()) channel.offer(
+                    RunnerChanges(
+                        ModifierType.UPDATE,
+                        updateRunners
+                    )
+                )
+                if (deleteRunners.isNotEmpty()) channel.offer(
+                    RunnerChanges(
+                        ModifierType.REMOVE,
+                        deleteRunners
+                    )
+                )
             }
             awaitClose {
                 subscription.remove()

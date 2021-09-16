@@ -313,9 +313,13 @@ class MainScreenViewModel @ViewModelInject constructor(
     }
 
     private fun observeDistanceChanges() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
-                subscribeToDistanceUpdateUseCase.invoke()
+                subscribeToDistanceUpdateUseCase
+                    .invoke()
+                    .collect {
+                        Timber.d("Received distances data from remote")
+                    }
             } catch (e: Exception) {
                 Timber.e(e)
             }
@@ -323,9 +327,13 @@ class MainScreenViewModel @ViewModelInject constructor(
     }
 
     private fun observeRunnerChanges() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
-                subscribeToRunnersUpdateUseCase.invoke()
+                subscribeToRunnersUpdateUseCase
+                    .invoke()
+                    .collect {
+                        Timber.d("Received runners data from remote")
+                    }
             } catch (e: Exception) {
                 Timber.e(e)
             }

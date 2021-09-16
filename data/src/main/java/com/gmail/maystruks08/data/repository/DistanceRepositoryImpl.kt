@@ -26,20 +26,21 @@ class DistanceRepositoryImpl @Inject constructor(
     private val configPreferences: ConfigPreferences,
 ) : DistanceRepository {
 
-    override suspend fun observeDistanceDataFlow(raceId: String) {
-        firestoreApi
+    override suspend fun observeDistanceDataFlow(raceId: String): Flow<Unit> {
+       return firestoreApi
             .subscribeToDistanceCollectionChange(raceId)
-            .collect { distanceChangeList ->
+            .map { distanceChangeList ->
                 distanceChangeList.forEach {
                     val distanceWithRunnersIds = it.entity.toTable()
                     val canRewriteLocalCache = checkIsDataUploaded(distanceWithRunnersIds.first.distanceId)
                     if (canRewriteLocalCache) {
-                        val checkpoints = checkpointsRepository.getCheckpoints(it.entity.id)
                         when (it.modifierType) {
                             ModifierType.ADD -> insertDistance(distanceWithRunnersIds)
                             ModifierType.UPDATE -> updateDistance(distanceWithRunnersIds)
                             ModifierType.REMOVE -> deleteDistance(distanceWithRunnersIds)
                         }
+                        //need to call this for cache checkpoints
+                        checkpointsRepository.getCheckpoints(it.entity.id)
                     }
                 }
             }
