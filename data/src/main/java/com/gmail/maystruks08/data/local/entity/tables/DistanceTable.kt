@@ -11,6 +11,7 @@ data class DistanceTable(
     val raceId: String,
     val authorId: String,
     val name: String,
+    val type: String,
     val dateOfStart: Long?,
     val runnerCountInProgress: Int = 0,
     val runnerCountOffTrack: Int = 0,

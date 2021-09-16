@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import com.gmail.maystruks08.data.local.ConfigPreferences
+import com.gmail.maystruks08.domain.DEF_STRING_VALUE
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
@@ -118,8 +119,8 @@ class LoginViewModel @ViewModelInject constructor(
     private fun navigateToFragment() {
         val raceId = configPreferences.getRaceId()
         val raceName = configPreferences.getRaceId()
-        if (raceId != "-1") {
-            router.newRootScreen(Screens.MainScreen(raceId, raceName, null))
+        if (raceId != DEF_STRING_VALUE) {
+            router.newRootScreen(Screens.MainScreen(raceId, raceName))
         } else {
             router.newRootScreen(Screens.RaceListScreen())
         }

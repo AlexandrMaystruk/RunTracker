@@ -48,21 +48,14 @@ class TeamViewHolder(
     private val interaction: TeamViewHolderManager.Interaction
 ) : BaseViewHolder<ItemTeamBinding, TeamView>(binding) {
 
+    private val teamAdapter = SimpleTeamAdapter()
+
     override fun onBind(item: TeamView) = with(binding) {
         super.onBind(item)
         tvTeamName.text = item.teamName
         tvTeamResult.text = item.teamResult.orEmpty()
-
-        val firstRunner = item.runners.first()
-        tvRunnerNumber.text = firstRunner.number
-        tvRunnerName.text = firstRunner.shortName
-        tvRunnerResult.text = firstRunner.result.orEmpty()
-
-        val secondRunner = item.runners.last()
-        tvRunnerNumber2.text = secondRunner.number
-        tvRunnerName2.text = secondRunner.shortName
-        tvRunnerResult2.text = secondRunner.result.orEmpty()
-
+        rvTeam.adapter = teamAdapter
+        teamAdapter.team = item.runners
         itemView.setOnClickListener {
             interaction.onItemSelected(item)
         }

@@ -5,36 +5,45 @@ import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.Race
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
+import com.gmail.maystruks08.domain.entities.runner.IRunner
 import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.domain.timeInMillisToTimeFormat
 import com.gmail.maystruks08.domain.toDateFormat
 import com.gmail.maystruks08.domain.toUITimeFormat
 import com.gmail.maystruks08.nfcruntracker.R
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.RunnerScreenItem
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerDetailView
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.TeamView
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.result.RunnerResultView
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.result.TeamResultView
 import com.gmail.maystruks08.nfcruntracker.ui.views.Bean
 import com.gmail.maystruks08.nfcruntracker.ui.views.ChartItem
 import com.gmail.maystruks08.nfcruntracker.ui.views.StepState
 
-fun toRunnerViews(runners: List<Runner>): MutableList<RunnerView> {
-    return mutableListOf<RunnerView>().apply {
+fun toRunnerViews(runners: List<IRunner>): MutableList<RunnerScreenItem> {
+    return mutableListOf<RunnerScreenItem>().apply {
         val iterator = runners.iterator()
         while (iterator.hasNext()) {
-            val item = iterator.next()
-            this.add(item.toRunnerView())
+            when (val item = iterator.next()) {
+                is Runner -> add(item.toRunnerView())
+                is Team -> add(item.toTeamView())
+            }
         }
     }
 }
 
-fun toFinisherViews(runners: List<Runner>): MutableList<RunnerResultView> {
-    return mutableListOf<RunnerResultView>().apply {
+fun toFinisherViews(runners: List<IRunner>): MutableList<RunnerScreenItem> {
+    return mutableListOf<RunnerScreenItem>().apply {
         val iterator = runners.iterator()
-        var position = 1
+        var position = 0
         while (iterator.hasNext()) {
-            val item = iterator.next()
-            this.add(item.toRunnerResultView(position))
             position++
+            when (val item = iterator.next()) {
+                is Runner -> add(item.toRunnerResultView(position))
+                is Team -> add(item.toTeamResultView(position))
+            }
         }
     }
 }
@@ -75,6 +84,29 @@ fun Runner.toRunnerResultView(position: Int): RunnerResultView {
         runnerFullName = this.fullName,
         runnerResultTime = this.totalResults[actualDistanceId]!!.time.timeInMillisToTimeFormat(),
         position = position
+    )
+}
+
+fun Team.toTeamView(): TeamView {
+    val firstRunner = runners.first()
+    val secondRunner = runners.last()
+    return TeamView(
+        number = firstRunner.number + secondRunner.number,
+        teamName = teamName,
+        runners = runners.map { it.toRunnerView() },
+        teamResult = result
+    )
+}
+
+fun Team.toTeamResultView(position: Int): TeamResultView {
+    val firstRunner = runners.first()
+    val secondRunner = runners.last()
+    return TeamResultView(
+        number = firstRunner.number + secondRunner.number,
+        position = position,
+        runners = runners.map { it.toRunnerView() },
+        teamName = firstRunner.currentTeamName.orEmpty(),
+        teamResult = result
     )
 }
 
@@ -193,6 +225,7 @@ fun Distance.toView(isSelected: Boolean = false): DistanceView {
     return DistanceView(
         id = id,
         name = name,
+        type = type.name,
         chartItems = items,
         isSelected = isSelected
     )

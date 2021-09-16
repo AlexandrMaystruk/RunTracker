@@ -7,12 +7,12 @@ import javax.inject.Inject
 
 class RegisterNewRunnerInteractorImpl @Inject constructor(
     private val runnersRepository: RegisterNewRunnersRepository
-) : RegisterNewRunnerInteractor {
+) : RegisterNewRunnerUseCase {
 
-    override suspend fun registerNewRunners(
+    override suspend fun invoke(
         raceId: String,
         distanceId: String,
-        registerInputData: List<RegisterNewRunnerInteractor.RegisterInputData>
+        registerInputData: List<RegisterNewRunnerUseCase.RegisterInputData>
     ): TaskResult<Exception, Unit> {
         return TaskResult.build {
             val runners = registerInputData.map {

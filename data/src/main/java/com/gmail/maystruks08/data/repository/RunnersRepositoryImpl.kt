@@ -8,6 +8,7 @@ import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
 import com.gmail.maystruks08.data.local.entity.relation.RunnerResultCrossRef
 import com.gmail.maystruks08.data.local.entity.relation.RunnerWithResult
 import com.gmail.maystruks08.data.local.entity.tables.ResultTable
+import com.gmail.maystruks08.data.local.entity.tables.TeamNameTable
 import com.gmail.maystruks08.data.mappers.*
 import com.gmail.maystruks08.data.remote.Api
 import com.gmail.maystruks08.domain.DEF_STRING_VALUE
@@ -19,6 +20,7 @@ import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
@@ -120,7 +122,9 @@ class RunnersRepositoryImpl @Inject constructor(
     ): Flow<List<Runner>> {
         val actualDistanceId = if (distanceId == DEF_STRING_VALUE) distanceDAO.getFirstDistanceId() else distanceId
         val actualRaceId = getRaceId()
-        return runnerDao.getRunnerWithResultsFlow(actualRaceId, actualDistanceId)
+        return runnerDao
+            .getRunnerWithResultsFlow(actualRaceId, actualDistanceId)
+            .distinctUntilChanged()
             .map { runnersWithResults ->
                 runnersWithResults.mapNotNull {
                     when {
@@ -134,15 +138,32 @@ class RunnersRepositoryImpl @Inject constructor(
                             return@mapNotNull if (checkpoints.isNotEmpty()) it.runnerTable.toRunner(
                                 gson
                             )
-                            .apply {
-                                addCheckpoints(actualDistanceId, checkpoints)
-                            }
-                        else null
+                                .apply {
+                                    addCheckpoints(actualDistanceId, checkpoints)
+                                }
+                            else null
+                        }
+                        else -> return@mapNotNull null
                     }
-                    else -> return@mapNotNull null
                 }
             }
-        }
+    }
+
+    override suspend fun getTeamRunnersFlow(
+        distanceId: String,
+        onlyFinishers: Boolean
+    ): Flow<List<Team>> {
+        val actualRaceId = getRaceId()
+        val actualDistanceId = if (distanceId == DEF_STRING_VALUE) distanceDAO.getFirstDistanceId() else distanceId
+        return runnerDao
+            .getRunnerWithResultsFlow(actualRaceId, actualDistanceId)
+            .distinctUntilChanged()
+            .map { runnersWithResults ->
+                runnersWithResults.groupBy { it.team?.name }.mapNotNull { entry ->
+                    val teamName = entry.key ?: return@mapNotNull null
+                    Team(teamName, entry.value.map { it.toRunner() })
+                }
+            }
     }
 
     override suspend fun getRunnerByCardId(cardId: String): Runner? {
@@ -214,8 +235,16 @@ class RunnersRepositoryImpl @Inject constructor(
         val runnerTable = runner.toRunnerTable(gson, false)
         val resultTables = mutableListOf<ResultTable>()
         val runnerResultCrossRefTables = mutableListOf<RunnerResultCrossRef>()
-        val distanceRunnerCrossRefTables =
-            runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }
+        val distanceRunnerCrossRefTables = runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }
+        val teamNameTables = runner.teamNames.mapNotNull {
+           val teamName =  it.value?:return@mapNotNull null
+            TeamNameTable(
+                distanceId = it.key,
+                runnerId = runner.number,
+                name = teamName
+            )
+        }
+
         runner.checkpoints.forEach { (_, checkpoints) ->
             checkpoints.forEach {
                 if (it is CheckpointResultIml) {
@@ -229,6 +258,7 @@ class RunnersRepositoryImpl @Inject constructor(
         runnerDao.insertOrReplaceRunner(
             runnerTable,
             resultTables,
+            teamNameTables,
             runnerResultCrossRefTables,
             distanceRunnerCrossRefTables
         )

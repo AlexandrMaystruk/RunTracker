@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.DEF_STRING_VALUE
 import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.TaskResult
-import com.gmail.maystruks08.domain.interactors.DistanceInteractor
+import com.gmail.maystruks08.domain.interactors.use_cases.ProvideDistanceUseCase
 import com.gmail.maystruks08.domain.interactors.use_cases.SaveCheckpointsUseCase
 import com.gmail.maystruks08.domain.interactors.use_cases.UpdateDistanceNameUseCase
 import com.gmail.maystruks08.nfcruntracker.R
@@ -23,7 +23,7 @@ import java.util.*
 @ExperimentalCoroutinesApi
 class RaceEditorViewModel @ViewModelInject constructor(
     private val router: Router,
-    private val distanceInteractor: DistanceInteractor,
+    private val provideDistanceUseCase: ProvideDistanceUseCase,
     private val saveCheckpointsUseCase: SaveCheckpointsUseCase,
     private val updateDistanceNameUseCase: UpdateDistanceNameUseCase,
     private val resourceProvider: ResourceProvider
@@ -38,9 +38,8 @@ class RaceEditorViewModel @ViewModelInject constructor(
     private val _distanceFlow =
         MutableStateFlow<MutableList<EditDistanceView>>(mutableListOf()).apply {
             viewModelScope.launch {
-                val raceId = distanceInteractor.provideCurrentSelectedRaceId()
-                distanceInteractor
-                    .getDistancesFlow(raceId)
+                provideDistanceUseCase
+                    .invoke()
                     .onStart { _showProgressFlow.value = true }
                     .catch { error ->
                         handleError(error)
@@ -63,9 +62,8 @@ class RaceEditorViewModel @ViewModelInject constructor(
     fun changeDistance(id: String) {
         this.distanceId = id
         viewModelScope.launch {
-            val raceId = distanceInteractor.provideCurrentSelectedRaceId()
-            distanceInteractor
-                .getDistancesFlow(raceId)
+            provideDistanceUseCase
+                .invoke()
                 .onStart { _showProgressFlow.value = true }
                 .catch { error ->
                     handleError(error)

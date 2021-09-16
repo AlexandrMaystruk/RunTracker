@@ -11,6 +11,7 @@ import com.gmail.maystruks08.data.remote.pojo.RacePojo
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.DistanceStatistic
+import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.Race
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
@@ -48,6 +49,7 @@ fun DistanceWithRunners.toDistanceEntity(gson: Gson): Distance {
         id = distance.distanceId,
         raceId = distance.raceId,
         name = distance.name,
+        type = DistanceType.valueOf(distance.type),
         authorId = distance.authorId,
         dateOfStart = distance.dateOfStart?.let { Date(it) },
         checkpoints = checkpointList,
@@ -61,6 +63,7 @@ fun DistanceTable.toDistanceEntity(checkpoints: MutableList<Checkpoint>): Distan
         id = distanceId,
         raceId = raceId,
         name = name,
+        type = DistanceType.valueOf(type),
         authorId = authorId,
         dateOfStart = dateOfStart?.let { Date(it) },
         checkpoints = checkpoints,
@@ -247,6 +250,7 @@ fun DistancePojo.toTable(): Pair<DistanceTable, List<DistanceRunnerCrossRef>> {
         distanceId = id,
         raceId = raceId,
         name = name,
+        type = type,
         authorId = authorId,
         dateOfStart = dateOfStart?.time
     ) to runnerIds.map { DistanceRunnerCrossRef(id, it) }

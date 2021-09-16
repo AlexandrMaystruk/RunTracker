@@ -3,12 +3,12 @@ package com.gmail.maystruks08.nfcruntracker.ui.main.dialogs
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.CurrentRaceDistance
-import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.exception.CheckpointNotFoundException
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
-import com.gmail.maystruks08.domain.interactors.CheckpointInteractor
+import com.gmail.maystruks08.domain.interactors.use_cases.GetCurrentSelectedCheckpointUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.ProvideCheckpointsUseCase
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointPosition
@@ -22,7 +22,8 @@ import timber.log.Timber
 
 @ExperimentalCoroutinesApi
 class SelectCheckpointDialogViewModel @ViewModelInject constructor(
-    private val checkpointInteractor: CheckpointInteractor,
+    private val provideCheckpointsUseCase: ProvideCheckpointsUseCase,
+    private val provideCurrentSelectedCheckpointUseCase: GetCurrentSelectedCheckpointUseCase,
 ) : BaseViewModel() {
 
     val showCheckpoints get() = _showCheckpointsStateFlow
@@ -34,24 +35,24 @@ class SelectCheckpointDialogViewModel @ViewModelInject constructor(
 
     fun init(raceDistance: CurrentRaceDistance) {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val result =
-                checkpointInteractor.getCheckpoints(raceDistance.first, raceDistance.second)) {
-                is TaskResult.Value -> {
-                    val currentCheckpoint = (checkpointInteractor.getCurrentSelectedCheckpoint(
-                        raceDistance.first,
-                        raceDistance.second
-                    ) as? TaskResult.Value)?.value
-                    val checkpoints = ArrayList(result.value.mapIndexed { index, it ->
-                        val position = when (index) {
-                            0 -> CheckpointPosition.Start
-                            result.value.lastIndex -> CheckpointPosition.End
-                            else -> CheckpointPosition.Center
-                        }
-                        it.toCheckpointView(position, false, currentCheckpoint?.getId())
-                    })
-                    _showCheckpointsStateFlow.value = checkpoints
+            try {
+                val checkpoints = provideCheckpointsUseCase.invoke(raceDistance.second)
+                val currentCheckpoint = try {
+                    provideCurrentSelectedCheckpointUseCase.invoke(raceDistance.second)
+                } catch (e: Exception) {
+                    null
                 }
-                is TaskResult.Error -> handleError(result.error)
+                val checkpointViews = ArrayList(checkpoints.mapIndexed { index, it ->
+                    val position = when (index) {
+                        0 -> CheckpointPosition.Start
+                        checkpoints.lastIndex -> CheckpointPosition.End
+                        else -> CheckpointPosition.Center
+                    }
+                    it.toCheckpointView(position, false, currentCheckpoint?.getId())
+                })
+                _showCheckpointsStateFlow.value = checkpointViews
+            } catch (e: Exception) {
+                handleError(e)
             }
         }
     }

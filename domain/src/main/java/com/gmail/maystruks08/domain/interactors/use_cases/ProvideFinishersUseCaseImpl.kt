@@ -1,6 +1,7 @@
 package com.gmail.maystruks08.domain.interactors.use_cases
 
 import com.gmail.maystruks08.domain.LogHelper
+import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.runner.IRunner
 import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.domain.repository.RunnersRepository
@@ -13,7 +14,11 @@ class ProvideFinishersUseCaseImpl @Inject constructor(
     private val logHelper: LogHelper
 ) : ProvideFinishersUseCase {
 
-    override suspend fun invoke(distanceId: String): Flow<List<IRunner>> {
+    override suspend fun invoke(
+        distanceId: String,
+        distanceType: DistanceType,
+        query: String?
+    ): Flow<List<IRunner>> {
         return runnersRepository.getRunnersFlow(distanceId = distanceId, onlyFinishers = true)
             .map { list ->
                 val sorted = mutableListOf<IRunner>()

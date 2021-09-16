@@ -18,6 +18,7 @@ import com.gmail.maystruks08.data.local.entity.tables.*
         DistanceRunnerCrossRef::class,
         RunnerResultCrossRef::class,
         UserSettingsTable::class,
+        TeamNameTable::class
     ],
     version = 1,
     exportSchema = false

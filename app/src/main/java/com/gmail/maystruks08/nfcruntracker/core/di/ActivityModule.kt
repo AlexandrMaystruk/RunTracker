@@ -1,17 +1,12 @@
 package com.gmail.maystruks08.nfcruntracker.core.di
 
 import com.gmail.maystruks08.data.repository.*
-import com.gmail.maystruks08.domain.interactors.*
+import com.gmail.maystruks08.domain.interactors.RaceInteractor
+import com.gmail.maystruks08.domain.interactors.RaceInteractorImpl
+import com.gmail.maystruks08.domain.interactors.RegisterNewRunnerInteractorImpl
+import com.gmail.maystruks08.domain.interactors.RegisterNewRunnerUseCase
 import com.gmail.maystruks08.domain.interactors.use_cases.*
-import com.gmail.maystruks08.domain.interactors.use_cases.CalculateDistanceStatisticUseCase
-import com.gmail.maystruks08.domain.interactors.use_cases.CalculateDistanceStatisticUseCaseImpl
-import com.gmail.maystruks08.domain.interactors.use_cases.CreateRaceUseCase
-import com.gmail.maystruks08.domain.interactors.use_cases.CreateRaceUseCaseImpl
-import com.gmail.maystruks08.domain.interactors.use_cases.ExportFromXlsToRemoteUseCase
-import com.gmail.maystruks08.domain.interactors.use_cases.ExportFromXlsToRemoteUseCaseImpl
-import com.gmail.maystruks08.domain.interactors.use_cases.GetAccountAccessLevelUseCase
-import com.gmail.maystruks08.domain.interactors.use_cases.GetAccountAccessLevelUseCaseImpl
-import com.gmail.maystruks08.domain.interactors.use_cases.LogOutUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.runner.*
 import com.gmail.maystruks08.domain.repository.*
 import com.gmail.maystruks08.nfcruntracker.ui.login.LogOutUseCaseImpl
 import dagger.Binds
@@ -36,21 +31,6 @@ abstract class ActivityModule {
     @ActivityScoped
     abstract fun bindLogoutUseCase(impl: LogOutUseCaseImpl): LogOutUseCase
 
-
-    @Binds
-    @ActivityScoped
-    abstract fun bindRunnersInteractor(impl: RunnersInteractorImpl): RunnersInteractor
-
-
-    @Binds
-    @ActivityScoped
-    abstract fun bindRunnersRepository(impl: RunnersRepositoryImpl): RunnersRepository
-
-    @Binds
-    @ActivityScoped
-    abstract fun bindRunnerDataChangeListener(viewModel: RunnersRepositoryImpl): RunnerDataChangeListener
-
-
     @Binds
     @ActivityScoped
     abstract fun bindGetAccountAccessLevelUseCase(impl: GetAccountAccessLevelUseCaseImpl): GetAccountAccessLevelUseCase
@@ -59,15 +39,9 @@ abstract class ActivityModule {
     @ActivityScoped
     abstract fun bindExportFromXlsToRemoteUseCase(impl: ExportFromXlsToRemoteUseCaseImpl): ExportFromXlsToRemoteUseCase
 
-
     @Binds
     @ActivityScoped
-    abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
-
-
-    @Binds
-    @ActivityScoped
-    abstract fun bindCheckpointInteractor(impl: CheckpointInteractorImpl): CheckpointInteractor
+    abstract fun bindProvideCheckpointsUseCase(impl: ProvideCheckpointsUseCaseImpl): ProvideCheckpointsUseCase
 
     @Binds
     @ActivityScoped
@@ -80,39 +54,16 @@ abstract class ActivityModule {
 
     @Binds
     @ActivityScoped
-    abstract fun bindRaceRepository(impl: RaceRepositoryImpl): RaceRepository
-
-    @Binds
-    @ActivityScoped
     abstract fun bindCreateRaceUseCase(impl: CreateRaceUseCaseImpl): CreateRaceUseCase
 
-
     @Binds
     @ActivityScoped
-    abstract fun bindRegisterRunnersRepository(impl: RegisterNewRunnersRepositoryImpl): RegisterNewRunnersRepository
-
-    @Binds
-    @ActivityScoped
-    abstract fun bindRegisterNewRunnerInteractor(impl: RegisterNewRunnerInteractorImpl): RegisterNewRunnerInteractor
-
-
-    @Binds
-    @ActivityScoped
-    abstract fun bindDistanceInteractor(impl: DistanceInteractorImpl): DistanceInteractor
-
-    @Binds
-    @ActivityScoped
-    abstract fun bindDistanceRepository(impl: DistanceRepositoryImpl): DistanceRepository
+    abstract fun bindRegisterNewRunnerInteractor(impl: RegisterNewRunnerInteractorImpl): RegisterNewRunnerUseCase
 
 
     @Binds
     @ActivityScoped
     abstract fun bindDistanceStatisticUseCase(impl: CalculateDistanceStatisticUseCaseImpl): CalculateDistanceStatisticUseCase
-
-    @Binds
-    @ActivityScoped
-    abstract fun bindDistanceStatisticRepository(impl: DistanceStatisticRepositoryImpl): DistanceStatisticRepository
-
 
     @Binds
     @ActivityScoped
@@ -154,5 +105,82 @@ interface RunnerUseCaseModule {
     @Binds
     @ActivityScoped
     fun bindProvideFinishersUseCase(impl: ProvideFinishersUseCaseImpl): ProvideFinishersUseCase
+
+    @Binds
+    @ActivityScoped
+    fun bindProvideDistanceUseCase(impl: ProvideDistanceUseCaseImpl): ProvideDistanceUseCase
+
+    @Binds
+    @ActivityScoped
+    fun bindProvideCurrentRaceIdUseCase(impl: ProvideCurrentRaceIdUseCaseImpl): ProvideCurrentRaceIdUseCase
+
+    @Binds
+    @ActivityScoped
+    fun bindProvideRunnerUseCase(impl: ProvideRunnerUseCaseImpl): ProvideRunnerUseCase
+
+    @Binds
+    @ActivityScoped
+    fun bindManageRunnerCheckpointInteractor(impl: ManageRunnerCheckpointInteractorImpl): ManageRunnerCheckpointInteractor
+
+
+    @Binds
+    @ActivityScoped
+    fun bindGetCurrentSelectedCheckpointUseCase(impl: GetCurrentSelectedCheckpointUseCaseImpl): GetCurrentSelectedCheckpointUseCase
+
+
+    @Binds
+    @ActivityScoped
+    fun bindSubscribeToDistanceUpdateUseCase(impl: SubscribeToDistanceUpdateUseCaseImpl): SubscribeToDistanceUpdateUseCase
+
+    @Binds
+    @ActivityScoped
+    fun bindSubscribeToRunnersUpdateUseCase(impl: SubscribeToRunnersUpdateUseCaseImpl): SubscribeToRunnersUpdateUseCase
+
+    @Binds
+    @ActivityScoped
+    fun bindSaveCurrentSelectedCheckpointUseCase(impl: SaveCurrentSelectedCheckpointUseCaseImpl): SaveCurrentSelectedCheckpointUseCase
+
+    @Binds
+    @ActivityScoped
+    fun bindOffTrackRunnerUseCase(impl: OffTrackRunnerUseCaseImpl): OffTrackRunnerUseCase
+
+}
+
+
+@Module
+@InstallIn(ActivityComponent::class)
+interface RepositoriesModule {
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindDistanceStatisticRepository(impl: DistanceStatisticRepositoryImpl): DistanceStatisticRepository
+
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindRunnersRepository(impl: RunnersRepositoryImpl): RunnersRepository
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindRunnerDataChangeListener(viewModel: RunnersRepositoryImpl): RunnerDataChangeListener
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindRegisterRunnersRepository(impl: RegisterNewRunnersRepositoryImpl): RegisterNewRunnersRepository
+
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindRaceRepository(impl: RaceRepositoryImpl): RaceRepository
+
+
+    @Binds
+    @ActivityScoped
+    abstract fun bindDistanceRepository(impl: DistanceRepositoryImpl): DistanceRepository
+
 
 }

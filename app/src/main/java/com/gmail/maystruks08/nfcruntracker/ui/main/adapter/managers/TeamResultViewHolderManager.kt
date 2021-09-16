@@ -27,20 +27,16 @@ class TeamResultViewHolderManager : ViewHolderManager<ItemTeamResultBinding, Tea
     override fun getDiffUtil() = diffUtil
 
     private val diffUtil = object : DiffUtil.ItemCallback<TeamResultView>() {
-        override fun areItemsTheSame(oldItem: TeamResultView, newItem: TeamResultView) =
-            oldItem.teamName == newItem.teamName
-
-        override fun areContentsTheSame(oldItem: TeamResultView, newItem: TeamResultView) =
-            oldItem == newItem
+        override fun areItemsTheSame(oldItem: TeamResultView, newItem: TeamResultView) = oldItem.teamName == newItem.teamName
+        override fun areContentsTheSame(oldItem: TeamResultView, newItem: TeamResultView) = oldItem == newItem
     }
-
 }
-
 
 class TeamResultViewHolder(
     binding: ItemTeamResultBinding
 ) : BaseViewHolder<ItemTeamResultBinding, TeamResultView>(binding) {
 
+    private val teamAdapter = SimpleTeamAdapter()
 
     override fun onBind(item: TeamResultView) = with(binding) {
         super.onBind(item)
@@ -48,12 +44,8 @@ class TeamResultViewHolder(
         tvTeamPosition.text = teamPositionText
         tvTeamName.text = item.teamName
 
-        tvRunnerNumber.text = item.firstRunnerNumber
-        tvRunnerName.text = item.firstRunnerFullName
-        tvRunnerResult.text = item.firstRunnerResultTime
-
-        tvRunnerNumber2.text = item.secondRunnerNumber
-        tvRunnerName2.text = item.secondRunnerFullName
-        tvRunnerResult2.text = item.secondRunnerResultTime
+        rvTeam.adapter = teamAdapter
+        teamAdapter.team = item.runners
     }
 }
+

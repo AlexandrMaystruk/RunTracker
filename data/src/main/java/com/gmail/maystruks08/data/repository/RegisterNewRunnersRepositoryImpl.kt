@@ -5,6 +5,7 @@ import com.gmail.maystruks08.data.local.dao.DistanceDAO
 import com.gmail.maystruks08.data.local.dao.RunnerDao
 import com.gmail.maystruks08.data.local.entity.relation.DistanceRunnerCrossRef
 import com.gmail.maystruks08.data.local.entity.relation.RunnerResultCrossRef
+import com.gmail.maystruks08.data.local.entity.tables.TeamNameTable
 import com.gmail.maystruks08.data.mappers.toFirestoreRunner
 import com.gmail.maystruks08.data.mappers.toResultTable
 import com.gmail.maystruks08.data.mappers.toRunnerTable
@@ -35,14 +36,20 @@ class RegisterNewRunnersRepositoryImpl @Inject constructor(
                     .filterIsInstance<CheckpointResultIml>()
                     .map { it.toResultTable(runnerTable.runnerNumber) }
 
-                val runnerResultCrossRefTables =
-                    resultTables.map { RunnerResultCrossRef(runner.number, it.checkpointId) }
-                val distanceRunnerCrossRefTables =
-                    runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }
-
+                val runnerResultCrossRefTables = resultTables.map { RunnerResultCrossRef(runner.number, it.checkpointId) }
+                val distanceRunnerCrossRefTables = runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }
+                val teamNameTables = runner.teamNames.mapNotNull {
+                    val teamName =  it.value?:return@mapNotNull null
+                    TeamNameTable(
+                        distanceId = it.key,
+                        runnerId = runner.number,
+                        name = teamName
+                    )
+                }
                 runnerDao.insertOrReplaceRunner(
                     runnerTable,
                     resultTables,
+                    teamNameTables,
                     runnerResultCrossRefTables,
                     distanceRunnerCrossRefTables
                 )

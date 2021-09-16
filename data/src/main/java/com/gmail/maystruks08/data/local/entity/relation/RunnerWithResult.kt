@@ -6,6 +6,7 @@ import androidx.room.Junction
 import androidx.room.Relation
 import com.gmail.maystruks08.data.local.entity.tables.ResultTable
 import com.gmail.maystruks08.data.local.entity.tables.RunnerTable
+import com.gmail.maystruks08.data.local.entity.tables.TeamNameTable
 
 @DatabaseView
 data class RunnerWithResult(
@@ -15,5 +16,8 @@ data class RunnerWithResult(
         entityColumn = "runnerNumber",
         associateBy = Junction(RunnerResultCrossRef::class)
     )
-    val results: List<ResultTable>
+    val results: List<ResultTable>,
+
+    @Relation(parentColumn = "runnerNumber", entityColumn = "runnerId")
+    val team: TeamNameTable?
 )

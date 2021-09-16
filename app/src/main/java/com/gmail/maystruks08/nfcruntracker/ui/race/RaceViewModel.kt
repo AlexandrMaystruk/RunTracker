@@ -74,14 +74,12 @@ class RaceViewModel @ViewModelInject constructor(
                     Screens.MainScreen(
                         raceView.id,
                         raceView.name,
-                        raceView.firstDistanceId
                     )
                 )
                 is TaskResult.Error -> router.navigateTo(
                     Screens.MainScreen(
                         raceView.id,
                         raceView.name,
-                        raceView.firstDistanceId
                     )
                 )
             }

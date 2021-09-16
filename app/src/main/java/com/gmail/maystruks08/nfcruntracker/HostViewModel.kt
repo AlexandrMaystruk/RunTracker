@@ -31,9 +31,7 @@ class HostViewModel @ViewModelInject constructor(
                     is TaskResult.Value -> router.newRootScreen(
                         Screens.MainScreen(
                             raceId = result.value.first,
-                            raceName = result.value.second,
-                            firstDistanceId = null
-                        )
+                            raceName = result.value.second)
                     )
                     is TaskResult.Error -> router.newRootScreen(Screens.RaceListScreen())
                 }

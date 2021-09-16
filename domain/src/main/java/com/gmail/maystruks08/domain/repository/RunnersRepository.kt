@@ -1,6 +1,7 @@
 package com.gmail.maystruks08.domain.repository
 
 import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +20,11 @@ interface RunnersRepository {
         distanceId: String,
         onlyFinishers: Boolean = false
     ): Flow<List<Runner>>
+
+    suspend fun getTeamRunnersFlow(
+        distanceId: String,
+        onlyFinishers: Boolean = false
+    ): Flow<List<Team>>
 
     suspend fun getRunnerByCardId(cardId: String): Runner?
 

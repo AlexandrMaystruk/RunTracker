@@ -28,11 +28,10 @@ object Screens {
     @ExperimentalCoroutinesApi
     class MainScreen(
         private val raceId: String,
-        private val raceName: String,
-        private val firstDistanceId: String?
+        private val raceName: String
     ) : AppScreen() {
 
-        override fun getFragment() = MainScreenFragment.getInstance(raceId, raceName, firstDistanceId)
+        override fun getFragment() = MainScreenFragment.getInstance(raceId, raceName)
 
         companion object {
             fun tag() = MainScreenFragment.name()

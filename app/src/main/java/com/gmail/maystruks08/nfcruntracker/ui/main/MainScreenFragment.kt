@@ -33,10 +33,12 @@ import com.gmail.maystruks08.nfcruntracker.ui.main.utils.CircleMenuManager
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.DistanceView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.flow.collect
 
 
+@FlowPreview
 @ObsoleteCoroutinesApi
 @AndroidEntryPoint
 @ExperimentalCoroutinesApi
@@ -61,7 +63,6 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
 
     private var raceId: String by argument()
     private var raceName: String by argument()
-    private var distanceId: String? by argumentNullable()
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
@@ -90,7 +91,6 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.init(raceId, distanceId)
         runnerAdapter = AppAdapter(
             listOf(
                 RunnerViewHolderManager(this),
@@ -189,8 +189,6 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
                 adapter = distanceAdapter
             }
 
-            viewModel.renderUI()
-
             tvCurrentCheckpoint.setOnClickListener { viewModel.onCurrentCheckpointTextClicked() }
             circleMenuLayoutManager = CircleMenuManager(binding.circleMenu) {
                 when (it) {
@@ -284,11 +282,10 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
 
     companion object {
 
-        fun getInstance(raceId: String, raceName: String, distanceId: String?) =
+        fun getInstance(raceId: String, raceName: String) =
             MainScreenFragment().apply {
                 this.raceId = raceId
                 this.raceName = raceName
-                this.distanceId = distanceId
             }
     }
 }

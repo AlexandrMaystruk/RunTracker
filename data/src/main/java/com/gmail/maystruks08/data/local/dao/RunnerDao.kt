@@ -6,6 +6,7 @@ import com.gmail.maystruks08.data.local.entity.relation.RunnerResultCrossRef
 import com.gmail.maystruks08.data.local.entity.relation.RunnerWithResult
 import com.gmail.maystruks08.data.local.entity.tables.ResultTable
 import com.gmail.maystruks08.data.local.entity.tables.RunnerTable
+import com.gmail.maystruks08.data.local.entity.tables.TeamNameTable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -18,11 +19,13 @@ interface RunnerDao : BaseDao<RunnerTable> {
     suspend fun insertOrReplaceRunner(
         runner: RunnerTable,
         results: List<ResultTable>,
+        teams: List<TeamNameTable>,
         runnerResultCrossRefTables: List<RunnerResultCrossRef>,
         distanceRunnerCrossRefTables: List<DistanceRunnerCrossRef>
     ) {
         insertOrReplace(runner)
         insertAllOrReplaceResults(results)
+        teams.forEach { insertOrReplaceRunnerTeams(it) }
         runnerResultCrossRefTables.forEach { insertOrReplaceRunnerResultJoin(it) }
         distanceRunnerCrossRefTables.forEach { insertOrReplaceDistanceRunnerJoin(it) }
     }
@@ -100,6 +103,9 @@ interface RunnerDao : BaseDao<RunnerTable> {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insertAllResult(obj: List<ResultTable>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertOrReplaceRunnerTeams(table: TeamNameTable)
 
 
     /** JOIN */

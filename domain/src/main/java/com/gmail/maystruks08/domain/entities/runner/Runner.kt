@@ -26,6 +26,7 @@ data class Runner(
 
     val currentTeamName get() = teamNames[actualDistanceId]
     val currentCheckpoints get() = checkpoints[actualDistanceId]
+    val currentResult get() = totalResults[actualDistanceId]
 
     fun markThatRunnerIsOffTrack() {
         offTrackDistances.add(actualDistanceId)

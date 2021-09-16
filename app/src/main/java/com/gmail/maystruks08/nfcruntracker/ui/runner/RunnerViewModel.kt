@@ -2,12 +2,15 @@ package com.gmail.maystruks08.nfcruntracker.ui.runner
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
-import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.runner.IRunner
 import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
-import com.gmail.maystruks08.domain.interactors.RunnersInteractor
+import com.gmail.maystruks08.domain.interactors.use_cases.runner.ManageRunnerCheckpointInteractor
+import com.gmail.maystruks08.domain.interactors.use_cases.runner.OffTrackRunnerUseCase
+import com.gmail.maystruks08.domain.interactors.use_cases.runner.ProvideRunnerUseCase
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerDetailView
@@ -24,7 +27,9 @@ class AlertTypeMarkRunnerAtCheckpoint(position: Int): AlertType(position)
 
 class RunnerViewModel @ViewModelInject constructor(
     private val router: Router,
-    private val runnersInteractor: RunnersInteractor
+    private val checkpointManager: ManageRunnerCheckpointInteractor,
+    private val provideRunnerUseCase: ProvideRunnerUseCase,
+    private val offTrackRunnerUseCase: OffTrackRunnerUseCase,
 ) : BaseViewModel() {
 
     val runner get() = _runnerLiveData
@@ -39,9 +44,11 @@ class RunnerViewModel @ViewModelInject constructor(
 
     fun onShowRunnerClicked(runnerNumber: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val onResult = runnersInteractor.getRunner(runnerNumber)) {
-                is TaskResult.Value -> handleRunnerData(onResult.value)
-                is TaskResult.Error -> handleError(onResult.error)
+            try {
+                val runner = provideRunnerUseCase.invoke(runnerNumber)
+                handleRunnerData(runner)
+            } catch (e: Exception) {
+                handleError(e)
             }
         }
     }
@@ -54,9 +61,11 @@ class RunnerViewModel @ViewModelInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val runnerNumber = runner.value?.number ?: return@launch
             if (isRunnerOfftrack()) return@launch
-            when (val onResult = runnersInteractor.markRunnerGotOffTheRoute(runnerNumber)) {
-                is TaskResult.Value -> handleRunnerData(onResult.value)
-                is TaskResult.Error -> handleError(onResult.error)
+            try {
+                val updatedRunner = offTrackRunnerUseCase.invoke(runnerNumber)
+                handleRunnerData(updatedRunner)
+            } catch (e: Exception) {
+                handleError(e)
             }
         }
     }
@@ -64,29 +73,33 @@ class RunnerViewModel @ViewModelInject constructor(
     fun markCheckpointAsPassed(runnerNumber: String) {
         viewModelScope.launch(Dispatchers.IO) {
             if (isRunnerOfftrack() || isRunnerHasResult()) return@launch
-            when (val onResult = runnersInteractor.addCurrentCheckpointToRunnerByNumber(runnerNumber)) {
-                is TaskResult.Value -> onMarkRunnerOnCheckpointSuccess(onResult.value)
-                is TaskResult.Error -> handleError(onResult.error)
+            try {
+                val updatedRunner = checkpointManager.addCurrentCheckpointByNumber(runnerNumber)
+                onMarkRunnerOnCheckpointSuccess(updatedRunner)
+            } catch (e: Exception) {
+                handleError(e)
             }
         }
     }
 
     fun deleteCheckpointFromRunner(runnerNumber: String, checkpointId: CheckpointView) {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val onResult =
-                runnersInteractor.removeCheckpointForRunner(runnerNumber, checkpointId.id)) {
-                is TaskResult.Value -> handleRunnerData(onResult.value.entity)
-                is TaskResult.Error -> handleError(onResult.error)
+            try {
+                val updatedRunner = checkpointManager.removeCheckpoint(runnerNumber, checkpointId.id)
+                handleRunnerData(updatedRunner.entity)
+            } catch (e: Exception) {
+                handleError(e)
             }
         }
     }
 
     fun btnMarkCheckpointAsPassedInManualClicked() {
-        if (linkCardModeEnable.value == true) linkCardModeEnable.value = false
-        else {
-            if (isRunnerOfftrack() || isRunnerHasResult()) return
-            _showAlertDialogLiveData.value = AlertTypeMarkRunnerAtCheckpoint(0)
+        if (linkCardModeEnable.value == true) {
+            linkCardModeEnable.value = false
+            return
         }
+        if (isRunnerOfftrack() || isRunnerHasResult()) return
+        _showAlertDialogLiveData.value = AlertTypeMarkRunnerAtCheckpoint(0)
     }
 
     fun onLinkCardToRunnerClicked() {
@@ -94,20 +107,20 @@ class RunnerViewModel @ViewModelInject constructor(
     }
 
     fun onNfcCardScanned(cardId: String) {
-        if(linkCardModeEnable.value == true){
-            _runnerLiveData.value?.let {
-                viewModelScope.launch(Dispatchers.IO) {
-                    when (val onResult = runnersInteractor.changeRunnerCardId(it.number, cardId)) {
-                        is TaskResult.Value -> {
-                            handleRunnerData(onResult.value.entity)
-                            toastLiveData.postValue("Карта успешно изменена")
-                            linkCardModeEnable.postValue(false)
-                        }
-                        is TaskResult.Error -> handleError(onResult.error)
-                    }
-                }
-            }
-        }
+//        if(linkCardModeEnable.value == true){
+//            _runnerLiveData.value?.let {
+//                viewModelScope.launch(Dispatchers.IO) {
+//                    when (val onResult = runnersInteractor.changeRunnerCardId(it.number, cardId)) {
+//                        is TaskResult.Value -> {
+//                            handleRunnerData(onResult.value.entity)
+//                            toastLiveData.postValue("Карта успешно изменена")
+//                            linkCardModeEnable.postValue(false)
+//                        }
+//                        is TaskResult.Error -> handleError(onResult.error)
+//                    }
+//                }
+//            }
+//        }
     }
 
     fun onBackClicked() {
@@ -115,14 +128,24 @@ class RunnerViewModel @ViewModelInject constructor(
     }
 
     private fun onMarkRunnerOnCheckpointSuccess(updatedRunner: Runner) {
-        val lastCheckpoint = updatedRunner.checkpoints[updatedRunner.actualDistanceId]?.maxByOrNull { it.getResult()?.time ?: 0 }
+        val lastCheckpoint =
+            updatedRunner.checkpoints[updatedRunner.actualDistanceId]?.maxByOrNull {
+                it.getResult()?.time ?: 0
+            }
         _showSuccessDialogLiveData.postValue(lastCheckpoint to updatedRunner.number)
         handleRunnerData(updatedRunner)
     }
 
-    private fun handleRunnerData(runner: Runner) {
-        _runnerLiveData.postValue(runner.toRunnerDetailView())
-        linkCardModeEnable.postValue(false)
+    private fun handleRunnerData(runner: IRunner) {
+        when (runner) {
+            is Runner -> {
+                _runnerLiveData.postValue(runner.toRunnerDetailView())
+                linkCardModeEnable.postValue(false)
+            }
+            is Team -> {
+                //TODO handle team
+            }
+        }
     }
 
     private fun handleError(e: Exception) {

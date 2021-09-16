@@ -1,7 +1,6 @@
-package com.gmail.maystruks08.domain.interactors
+package com.gmail.maystruks08.domain.interactors.use_cases
 
 import com.gmail.maystruks08.domain.entities.Distance
-import com.gmail.maystruks08.domain.interactors.use_cases.CalculateDistanceStatisticUseCase
 import com.gmail.maystruks08.domain.repository.DistanceRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -11,16 +10,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class DistanceInteractorImpl @Inject constructor(
+class ProvideDistanceUseCaseImpl @Inject constructor(
     private val distanceRepository: DistanceRepository,
     private val calculateDistanceStatisticUseCase: CalculateDistanceStatisticUseCase
-) : DistanceInteractor {
+) : ProvideDistanceUseCase {
 
-    override suspend fun observeDistanceDataFlow(raceId: String) {
-        distanceRepository.observeDistanceDataFlow(raceId)
-    }
-
-    override suspend fun getDistancesFlow(raceId: String): Flow<List<Distance>> {
+    override suspend fun invoke(): Flow<List<Distance>> {
+        val raceId = distanceRepository.getLastSelectedRace().first
         return distanceRepository.getDistanceListFlow(raceId).onEach {
             withContext(Dispatchers.Default) {
                 it.forEach {
@@ -30,9 +26,5 @@ class DistanceInteractorImpl @Inject constructor(
                 }
             }
         }.flowOn(Dispatchers.IO)
-    }
-
-    override suspend fun provideCurrentSelectedRaceId(): String {
-        return distanceRepository.getLastSelectedRace().first
     }
 }

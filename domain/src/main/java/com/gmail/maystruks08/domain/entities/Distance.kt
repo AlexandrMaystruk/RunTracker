@@ -8,6 +8,7 @@ data class Distance(
     val id: String,
     val raceId: String,
     val name: String,
+    val type: DistanceType,
     val authorId: String,
     val dateOfStart: Date?,
     val checkpoints: MutableList<Checkpoint>,

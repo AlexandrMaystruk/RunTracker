@@ -7,6 +7,7 @@ import com.gmail.maystruks08.data.remote.Api
 import com.gmail.maystruks08.data.remote.pojo.DistanceCheckpointPojo
 import com.gmail.maystruks08.data.remote.pojo.DistancePojo
 import com.gmail.maystruks08.data.remote.pojo.RacePojo
+import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -51,6 +52,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 id = "runners_$uniqueId",
                 raceId = raceId,
                 name = "Бегуны",
+                type = DistanceType.MARATHON.name,
                 authorId = authorId,
                 dateOfStart = null,
                 runnerIds = runners.map { it.number }
@@ -59,6 +61,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 id = "iron_$uniqueId",
                 raceId = raceId,
                 name = "Железные",
+                type = DistanceType.MARATHON.name,
                 authorId = authorId,
                 dateOfStart = null,
                 runnerIds = iron.map { it.number }
@@ -66,6 +69,7 @@ class SettingsRepositoryImpl @Inject constructor(
             DistancePojo(
                 id = "relay_race_$uniqueId",
                 raceId = raceId,
+                type = DistanceType.REPLAY.name,
                 name = "Эстафета",
                 authorId = authorId,
                 dateOfStart = null,
@@ -74,6 +78,7 @@ class SettingsRepositoryImpl @Inject constructor(
             DistancePojo(
                 id = "teams_$uniqueId",
                 raceId = raceId,
+                type = DistanceType.TEAM.name,
                 name = "Команды",
                 authorId = authorId,
                 dateOfStart = null,

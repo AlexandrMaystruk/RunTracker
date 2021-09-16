@@ -5,9 +5,9 @@ import com.gmail.maystruks08.domain.entities.runner.RunnerSex
 import java.util.*
 
 
-interface RegisterNewRunnerInteractor {
+interface RegisterNewRunnerUseCase {
 
-    suspend fun registerNewRunners(
+    suspend fun invoke(
         raceId: String,
         distanceId: String,
         registerInputData: List<RegisterInputData>

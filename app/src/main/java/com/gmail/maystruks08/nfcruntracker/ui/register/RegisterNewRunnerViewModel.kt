@@ -8,7 +8,7 @@ import com.gmail.maystruks08.domain.exception.EmptyRegistrationRunnerDataExcepti
 import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.exception.SyncWithServerException
-import com.gmail.maystruks08.domain.interactors.RegisterNewRunnerInteractor
+import com.gmail.maystruks08.domain.interactors.RegisterNewRunnerUseCase
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +19,7 @@ import timber.log.Timber
 
 class RegisterNewRunnerViewModel @ViewModelInject constructor(
     private val router: Router,
-    private val interactor: RegisterNewRunnerInteractor
+    private val interactor: RegisterNewRunnerUseCase
 ) : BaseViewModel() {
 
 
@@ -51,7 +51,7 @@ class RegisterNewRunnerViewModel @ViewModelInject constructor(
                     } else {
                         it.shortName ?: it.fullName ?: ""
                     }
-                    RegisterNewRunnerInteractor.RegisterInputData(
+                    RegisterNewRunnerUseCase.RegisterInputData(
                         fullName = it.fullName!!,
                         shortName = shortName,
                         phone = it.phone!!,
@@ -63,7 +63,7 @@ class RegisterNewRunnerViewModel @ViewModelInject constructor(
                         teamName = teamName,
                     )
                 }
-                when (val result = interactor.registerNewRunners(raceId, distanceId, inputData)) {
+                when (val result = interactor.invoke(raceId, distanceId, inputData)) {
                     is TaskResult.Value -> withContext(Dispatchers.Main) { onBackClicked() }
                     is TaskResult.Error -> handleError(result.error)
                 }
