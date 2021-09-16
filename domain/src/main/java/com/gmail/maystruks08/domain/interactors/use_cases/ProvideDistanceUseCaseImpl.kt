@@ -21,7 +21,7 @@ class ProvideDistanceUseCaseImpl @Inject constructor(
             withContext(Dispatchers.Default) {
                 it.forEach {
                     launch {
-                        calculateDistanceStatisticUseCase.invoke(raceId, it.id)
+                        calculateDistanceStatisticUseCase.invoke(it.id)
                     }
                 }
             }

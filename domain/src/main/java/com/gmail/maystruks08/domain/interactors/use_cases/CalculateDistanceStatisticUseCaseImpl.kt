@@ -9,10 +9,13 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class CalculateDistanceStatisticUseCaseImpl @Inject constructor(
+    private val provideCurrentRaceIdUseCase: ProvideCurrentRaceIdUseCase,
     private val distanceStatisticRepository: DistanceStatisticRepository
 ) : CalculateDistanceStatisticUseCase {
 
-    override suspend fun invoke(raceId: String, distanceId: String) {
+    override suspend fun invoke(distanceId: String?) {
+        if(distanceId.isNullOrEmpty()) return
+        val raceId = provideCurrentRaceIdUseCase.invoke()
         withContext(Dispatchers.Default) {
             val runnerCountDeferred = async {
                 distanceStatisticRepository.getDistanceRunnerCount(raceId, distanceId)

@@ -11,7 +11,7 @@ class ProvideCheckpointsUseCaseImpl @Inject constructor(
     override suspend fun invoke(
         distanceId: String
     ): List<Checkpoint> {
-        return repository.getCheckpoints(distanceId)
+        return repository.getCheckpoints(distanceId).sortedBy { it.getPosition() }
     }
 
 }

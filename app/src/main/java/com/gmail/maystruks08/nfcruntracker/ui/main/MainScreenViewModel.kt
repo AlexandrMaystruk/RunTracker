@@ -118,9 +118,7 @@ class MainScreenViewModel @ViewModelInject constructor(
                 .collect { distances ->
                     val distanceViews = distances.mapDistanceList(mode.distanceId)
                     _distanceFlow.value = distanceViews
-                    val selectedDistanceView =
-                        distanceViews.firstOrNull { it.isSelected } ?: distanceViews.firstOrNull()
-                        ?: return@collect
+                    val selectedDistanceView = distanceViews.firstOrNull { it.isSelected } ?: distanceViews.firstOrNull() ?: return@collect
                     renderRunners(mode, selectedDistanceView)
                     showCurrentCheckpoint(selectedDistanceView.id)
                 }
@@ -206,7 +204,7 @@ class MainScreenViewModel @ViewModelInject constructor(
             if (lastSelectedRunner?.isOffTrack == true) return@launch
             try {
                 val updatedRunner = manageCheckpoints.addCurrentCheckpointByNumber(runnerNumber)
-                onMarkRunnerOnCheckpointSuccess(updatedRunner)
+                handleRunnerChanges(Change(updatedRunner, ModifierType.UPDATE))
             } catch (e: Exception) {
                 handleError(e)
             }
@@ -372,7 +370,7 @@ class MainScreenViewModel @ViewModelInject constructor(
 
     private fun recalculateDistanceStatistic() {
         viewModelScope.launch(Dispatchers.Default) {
-//            calculateDistanceStatisticUseCase.invoke(raceId, distanceId)
+            calculateDistanceStatisticUseCase.invoke(_mainScreenModeFlow.value.distanceId)
         }
     }
 
