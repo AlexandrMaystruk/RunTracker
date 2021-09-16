@@ -10,7 +10,6 @@ import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.interactors.use_cases.GetCurrentSelectedCheckpointUseCase
 import com.gmail.maystruks08.domain.interactors.use_cases.ProvideCheckpointsUseCase
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
-import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointPosition
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.toCheckpointView
@@ -29,12 +28,13 @@ class SelectCheckpointDialogViewModel @ViewModelInject constructor(
     val showCheckpoints get() = _showCheckpointsStateFlow
     val showProgress get() = _showProgressLiveData
 
-    private val _showCheckpointsStateFlow = MutableStateFlow<ArrayList<CheckpointView>>(ArrayList())
-    private val _showProgressLiveData = SingleLiveEvent<Boolean>()
+    private val _showCheckpointsStateFlow = MutableStateFlow(ArrayList<CheckpointView>())
+    private val _showProgressLiveData = MutableStateFlow(true)
 
 
     fun init(raceDistance: CurrentRaceDistance) {
         viewModelScope.launch(Dispatchers.IO) {
+            _showProgressLiveData.value = true
             try {
                 val checkpoints = provideCheckpointsUseCase.invoke(raceDistance.second)
                 val currentCheckpoint = try {
@@ -51,6 +51,7 @@ class SelectCheckpointDialogViewModel @ViewModelInject constructor(
                     it.toCheckpointView(position, false, currentCheckpoint?.getId())
                 })
                 _showCheckpointsStateFlow.value = checkpointViews
+                _showProgressLiveData.value = false
             } catch (e: Exception) {
                 handleError(e)
             }
@@ -58,7 +59,7 @@ class SelectCheckpointDialogViewModel @ViewModelInject constructor(
     }
 
     private fun handleError(e: Throwable) {
-        _showProgressLiveData.postValue(false)
+        _showProgressLiveData.value = false
         when (e) {
             is SaveRunnerDataException -> {
                 Timber.e(e)

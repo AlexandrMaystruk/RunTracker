@@ -57,34 +57,31 @@ class MainScreenViewModel @ViewModelInject constructor(
     private val startRunTrackerBus: StartRunTrackerBus
 ) : BaseViewModel() {
 
-    private val _mainScreenModeFlow =
-        MutableStateFlow<MainScreenMode>(MainScreenMode.RenderList(null))
-
+    private val _mainScreenModeFlow = MutableStateFlow<MainScreenMode>(MainScreenMode.RenderList(null))
     private val _runnersFlow = MutableStateFlow<List<RunnerScreenItem>>(mutableListOf())
     private val _distanceFlow = MutableStateFlow<MutableList<DistanceView>>(mutableListOf())
 
-    val distance: StateFlow<List<DistanceView>> get() = _distanceFlow
-    val runners: StateFlow<List<RunnerScreenItem>> get() = _runnersFlow
-
-
-    val showSuccessDialog get() = _showSuccessDialogChannel.receiveAsFlow()
-    val showConfirmationDialog get() = _showAlertDialogChannel.receiveAsFlow()
-    val showSelectCheckpointDialog get() = _selectCheckpointDialogChannel.receiveAsFlow()
-    val closeSelectCheckpointDialog get() = _closeCheckpointDialogChannel.receiveAsFlow()
-    val showTime get() = _showTimeChannel.receiveAsFlow()
-
-    val showProgress get() = _showProgressFlow
-    val enableSelectCheckpointButton get() = _enableSelectCheckpointButtonFlow
-
+    private val _closeCheckpointDialogChannel = MutableStateFlow("Выбрать кп")
+    private val _enableSelectCheckpointButtonFlow = MutableStateFlow(true)
+    private val _showProgressFlow = MutableStateFlow(true)
 
     private val _showSuccessDialogChannel = Channel<Pair<Checkpoint?, String>>(Channel.BUFFERED)
     private val _showAlertDialogChannel = Channel<AlertType>(Channel.BUFFERED)
     private val _showTimeChannel = Channel<String>(Channel.BUFFERED)
-    private val _showProgressFlow = MutableStateFlow(true)
-
     private val _selectCheckpointDialogChannel = Channel<CurrentRaceDistance>(Channel.BUFFERED)
-    private val _closeCheckpointDialogChannel = Channel<String>(Channel.BUFFERED)
-    private val _enableSelectCheckpointButtonFlow = MutableStateFlow(true)
+
+    val distance: StateFlow<List<DistanceView>> get() = _distanceFlow
+    val runners: StateFlow<List<RunnerScreenItem>> get() = _runnersFlow
+    val closeSelectCheckpointDialog: StateFlow<String> get() = _closeCheckpointDialogChannel
+
+    val showProgress get() = _showProgressFlow
+    val enableSelectCheckpointButton get() = _enableSelectCheckpointButtonFlow
+
+    val showSuccessDialog get() = _showSuccessDialogChannel.receiveAsFlow()
+    val showConfirmationDialog get() = _showAlertDialogChannel.receiveAsFlow()
+    val showSelectCheckpointDialog get() = _selectCheckpointDialogChannel.receiveAsFlow()
+    val showTime get() = _showTimeChannel.receiveAsFlow()
+
 
     private var jobShowRunner: Job? = null
     private var jobShowAllDistances: Job? = null
@@ -99,7 +96,8 @@ class MainScreenViewModel @ViewModelInject constructor(
 
         try {
             viewModelScope.launch(Dispatchers.IO) {
-                _mainScreenModeFlow.collect(::renderDistances)
+                _mainScreenModeFlow
+                    .collect(::renderDistances)
             }
         } catch (e: Exception) {
             Timber.i("Error render $e")
@@ -118,7 +116,9 @@ class MainScreenViewModel @ViewModelInject constructor(
                 .collect { distances ->
                     val distanceViews = distances.mapDistanceList(mode.distanceId)
                     _distanceFlow.value = distanceViews
+                    Timber.d("Distance rendered count: ${distanceViews.count()}")
                     val selectedDistanceView = distanceViews.firstOrNull { it.isSelected } ?: distanceViews.firstOrNull() ?: return@collect
+                    _mainScreenModeFlow.value.distanceId = selectedDistanceView.id
                     renderRunners(mode, selectedDistanceView)
                     showCurrentCheckpoint(selectedDistanceView.id)
                 }
@@ -130,6 +130,7 @@ class MainScreenViewModel @ViewModelInject constructor(
         jobShowRunner = viewModelScope.launch(Dispatchers.IO) {
             when (mode) {
                 is MainScreenMode.RenderList -> {
+                    _enableSelectCheckpointButtonFlow.value = true
                     provideRunnersUseCase
                         .invoke(
                             selectedDistanceView.id,
@@ -140,6 +141,7 @@ class MainScreenViewModel @ViewModelInject constructor(
                         .catch { error -> handleError(error) }
                 }
                 is MainScreenMode.RenderResult -> {
+                    _enableSelectCheckpointButtonFlow.value = false
                     provideFinishersUseCase
                         .invoke(
                             selectedDistanceView.id,
@@ -151,6 +153,7 @@ class MainScreenViewModel @ViewModelInject constructor(
                 }
             }.map {
                 _runnersFlow.value = it
+                Timber.i("Update runner list")
                 return@map mode
             }.collect {
                 _showProgressFlow.value = false
@@ -231,19 +234,15 @@ class MainScreenViewModel @ViewModelInject constructor(
         if (query.isEmpty()) {
             Timber.v("showAllRunners  onSearchQueryChanged")
             _mainScreenModeFlow.value = when (val mode = _mainScreenModeFlow.value) {
-                is MainScreenMode.RenderList -> MainScreenMode.RenderResult(
-                    mode.distanceId ?: DEF_STRING_VALUE
-                )
-                is MainScreenMode.RenderResult -> MainScreenMode.RenderList(mode.distanceId)
+                is MainScreenMode.RenderList -> MainScreenMode.RenderList(mode.distanceId)
+                is MainScreenMode.RenderResult -> MainScreenMode.RenderResult(mode.distanceId ?: DEF_STRING_VALUE)
             }
             return
         }
         Timber.v("onSearchQueryChanged")
         _mainScreenModeFlow.value = when (val mode = _mainScreenModeFlow.value) {
-            is MainScreenMode.RenderList -> MainScreenMode.RenderResult(
-                mode.distanceId ?: DEF_STRING_VALUE, query
-            )
-            is MainScreenMode.RenderResult -> MainScreenMode.RenderList(mode.distanceId, query)
+            is MainScreenMode.RenderList -> MainScreenMode.RenderList(mode.distanceId, query)
+            is MainScreenMode.RenderResult -> MainScreenMode.RenderResult(mode.distanceId ?: DEF_STRING_VALUE, query)
         }
     }
 
@@ -251,7 +250,7 @@ class MainScreenViewModel @ViewModelInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 saveCurrentSelectedCheckpointUseCase.invoke(_mainScreenModeFlow.value.distanceId!!,  checkpointView.id)
-                _closeCheckpointDialogChannel.send(checkpointView.bean.title)
+                _closeCheckpointDialogChannel.value = checkpointView.bean.title
             } catch (e: Exception){
                 handleError(e)
             }
@@ -302,9 +301,9 @@ class MainScreenViewModel @ViewModelInject constructor(
         jobShowCurrentCheckpoint = viewModelScope.launch(Dispatchers.IO) {
             try {
                 val checkpoint = provideCurrentSelectedCheckpointUseCase.invoke(distanceId)
-                _closeCheckpointDialogChannel.send(checkpoint.getName())
+                _closeCheckpointDialogChannel.value = checkpoint.getName()
             } catch (e: CheckpointNotFoundException) {
-                _closeCheckpointDialogChannel.send("Выбрать кп")
+                _closeCheckpointDialogChannel.value = "Выбрать кп"
                 handleError(e)
             }
         }
@@ -447,7 +446,44 @@ class MainScreenViewModel @ViewModelInject constructor(
 
 }
 
-sealed class MainScreenMode(val distanceId: String?) {
-    class RenderList(distanceId: String?, val query: String? = null) : MainScreenMode(distanceId)
-    class RenderResult(distanceId: String, val query: String? = null) : MainScreenMode(distanceId)
+sealed class MainScreenMode(var distanceId: String?) {
+    class RenderList(distanceId: String?, val query: String? = null) : MainScreenMode(distanceId) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as RenderList
+
+            if (distanceId != other.distanceId) return false
+            if (query != other.query) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = distanceId?.hashCode() ?: 0
+            result = 31 * result + (query?.hashCode() ?: 0)
+            return result
+        }
+    }
+
+    class RenderResult(distanceId: String, val query: String? = null) : MainScreenMode(distanceId) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as RenderList
+
+            if (distanceId != other.distanceId) return false
+            if (query != other.query) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = distanceId?.hashCode() ?: 0
+            result = 31 * result + (query?.hashCode() ?: 0)
+            return result
+        }
+    }
 }

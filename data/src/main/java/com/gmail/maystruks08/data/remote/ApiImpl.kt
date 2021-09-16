@@ -71,16 +71,23 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
 
 
     @ExperimentalCoroutinesApi
-    override suspend fun subscribeToRunnerCollectionChange(raceId: String): Flow<List<Change<RunnerPojo>>> {
+    override suspend fun subscribeToRunnerCollectionChange(raceId: String): Flow<RunnerChanges> {
         return channelFlow {
             val eventDocument = db.collection(RUNNER_COLLECTION).whereEqualTo("actualRaceId", raceId)
             val subscription = eventDocument.addSnapshotListener { snapshots, _ ->
-                Timber.i("Snapshot size = ${snapshots?.documentChanges?.size}")
-                val runnersChanges = snapshots?.documentChanges?.map {
-                    Timber.e(it.document.data.toString())
-                    Change(it.document.toObject(RunnerPojo::class.java), it.getChangeType())
-                }.orEmpty()
-                channel.offer(runnersChanges)
+                val insertRunners = mutableListOf<RunnerPojo>()
+                val updateRunners = mutableListOf<RunnerPojo>()
+                val deleteRunners = mutableListOf<RunnerPojo>()
+                snapshots?.documentChanges?.forEach {
+                    when(it.type){
+                        DocumentChange.Type.ADDED -> insertRunners.add(it.document.toObject(RunnerPojo::class.java))
+                        DocumentChange.Type.MODIFIED -> updateRunners.add(it.document.toObject(RunnerPojo::class.java))
+                        DocumentChange.Type.REMOVED ->deleteRunners.add(it.document.toObject(RunnerPojo::class.java))
+                    }
+                }
+                channel.offer(RunnerChanges(ModifierType.ADD, insertRunners))
+                channel.offer(RunnerChanges(ModifierType.UPDATE, updateRunners))
+                channel.offer(RunnerChanges(ModifierType.REMOVE, deleteRunners))
             }
             awaitClose {
                 subscription.remove()
@@ -89,13 +96,17 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
         }
     }
 
+    data class RunnerChanges(val type: ModifierType, val runners: List<RunnerPojo>)
+
     override suspend fun saveRace(racePojo: RacePojo) {
-        val raceDocument = db.collection(RACES_COLLECTION).document(racePojo.id.replaceSpecialSymbols())
+        val raceDocument =
+            db.collection(RACES_COLLECTION).document(racePojo.id.replaceSpecialSymbols())
         awaitTaskCompletable(raceDocument.set(racePojo))
     }
 
     override suspend fun saveDistance(distancePojo: DistancePojo) {
-        val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distancePojo.id.replaceSpecialSymbols())
+        val distanceDocument =
+            db.collection(DISTANCES_COLLECTION).document(distancePojo.id.replaceSpecialSymbols())
         awaitTaskCompletable(distanceDocument.set(distancePojo))
     }
 

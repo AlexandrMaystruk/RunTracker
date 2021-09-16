@@ -22,10 +22,9 @@ class ProvideRunnersUseCaseImpl @Inject constructor(
         distanceType: DistanceType,
         query: String?
     ): Flow<List<IRunner>> {
-        if(!query.isNullOrEmpty()) return emptyFlow()
        return when (distanceType) {
             DistanceType.MARATHON -> {
-                runnersRepository.getRunnersFlow(distanceId)
+                runnersRepository.getRunnersFlow(distanceId = distanceId, onlyFinishers = false, query = query)
                     .map { list -> list.sortedByDescending { it.getPassedCheckpointCount() } }
             }
             DistanceType.REPLAY, DistanceType.TEAM -> {

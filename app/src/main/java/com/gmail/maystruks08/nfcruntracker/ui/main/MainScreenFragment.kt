@@ -18,8 +18,6 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.*
 import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentMainBinding
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.AppAdapter
-import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
-import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.DividerItemDecoration
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.DividerVerticalItemDecoration
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.RunnerSwipeActionHelper
@@ -30,6 +28,8 @@ import com.gmail.maystruks08.nfcruntracker.ui.main.dialogs.SelectCheckpointDialo
 import com.gmail.maystruks08.nfcruntracker.ui.main.dialogs.SuccessDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.main.utils.CircleMenuEvent
 import com.gmail.maystruks08.nfcruntracker.ui.main.utils.CircleMenuManager
+import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
+import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.DistanceView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -104,32 +104,37 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
 
     override fun bindViewModel() {
         with(viewModel) {
-            lifecycleScope.launchWhenStarted {
+            lifecycleScope.launchWhenResumed {
                 distance.collect {
                     distanceAdapter.submitList(it)
                 }
             }
 
-            lifecycleScope.launchWhenStarted {
+            lifecycleScope.launchWhenResumed {
                 runners.collect {
                     runnerAdapter.submitList(it)
                 }
             }
 
-            lifecycleScope.launchWhenStarted {
+            lifecycleScope.launchWhenResumed {
                 enableSelectCheckpointButton.collect { enable ->
                     TransitionManager.beginDelayedTransition(binding.root)
                     binding.tvCurrentCheckpoint.setVisibility(enable)
+                    binding.tvRunnersTitle.text = if (enable) {
+                        requireContext().string(R.string.current_checkpoint)
+                    } else {
+                        requireContext().string(R.string.finishers)
+                    }
                 }
             }
 
-            lifecycleScope.launchWhenStarted {
+            lifecycleScope.launchWhenResumed {
                 showProgress.collect { isNeedToShow ->
                     binding.progress.setVisibility(isNeedToShow)
                 }
             }
 
-            lifecycleScope.launchWhenStarted {
+            lifecycleScope.launchWhenResumed {
                 showConfirmationDialog.collect {
                     alertDialog?.dismiss()
                     when (it) {
@@ -141,7 +146,7 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
                 }
             }
 
-            lifecycleScope.launchWhenStarted {
+            lifecycleScope.launchWhenResumed {
                 showSuccessDialog.collect {
                     val checkpointName = it.first?.getName() ?: ""
                     val message = getString(R.string.success_message, checkpointName, "#${it.second}")
@@ -150,7 +155,7 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
                 }
             }
 
-            lifecycleScope.launchWhenStarted {
+            lifecycleScope.launchWhenResumed {
                 showSelectCheckpointDialog.collect { raceDistanceIds ->
                     val dialog = findFragmentByTag<SelectCheckpointDialogFragment>(SelectCheckpointDialogFragment.name())
                     if (dialog == null) {

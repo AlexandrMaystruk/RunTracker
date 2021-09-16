@@ -12,6 +12,7 @@ import com.gmail.maystruks08.domain.CurrentRaceDistance
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseDialogFragment
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
+import com.gmail.maystruks08.nfcruntracker.core.ext.setVisibility
 import com.gmail.maystruks08.nfcruntracker.databinding.DialogSelectCheckpointBinding
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,7 +46,6 @@ class SelectCheckpointDialogFragment : BaseDialogFragment(), CheckpointAdapter.I
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        checkpointAdapter = CheckpointAdapter(this)
         viewModel.init(CurrentRaceDistance(raceId, distanceId))
         return DialogSelectCheckpointBinding.inflate(inflater, container, false)
             .let {
@@ -75,7 +75,15 @@ class SelectCheckpointDialogFragment : BaseDialogFragment(), CheckpointAdapter.I
         }
         with(viewModel) {
             lifecycleScope.launchWhenStarted {
-                showCheckpoints.collect { checkpointAdapter?.checkpoints = it }
+                showCheckpoints.collect {
+                    checkpointAdapter?.checkpoints = it
+                }
+            }
+
+            lifecycleScope.launchWhenStarted {
+                showProgress.collect {
+                    binding.progressBar.setVisibility(it)
+                }
             }
         }
     }

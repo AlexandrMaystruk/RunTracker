@@ -31,12 +31,32 @@ interface RunnerDao : BaseDao<RunnerTable> {
     }
 
 
+    @Transaction
+    suspend fun insertOrReplaceRunners(
+        runners: List<RunnerTable>,
+        results: List<ResultTable>,
+        teams: List<TeamNameTable>,
+        runnerResultCrossRefTables: List<RunnerResultCrossRef>,
+        distanceRunnerCrossRefTables: List<DistanceRunnerCrossRef>
+    ) {
+        insertAllOrReplace(runners)
+        insertAllOrReplaceResults(results)
+        teams.forEach { insertOrReplaceRunnerTeams(it) }
+        runnerResultCrossRefTables.forEach { insertOrReplaceRunnerResultJoin(it) }
+        distanceRunnerCrossRefTables.forEach { insertOrReplaceDistanceRunnerJoin(it) }
+    }
+
+
     /** GET */
 
     @Transaction
     @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE actualRaceId =:raceId AND distanceId =:distanceId")
     fun getRunnerWithResultsFlow(raceId: String, distanceId: String): Flow<List<RunnerWithResult>>
 
+
+    @Transaction
+    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE actualRaceId =:raceId AND distanceId =:distanceId;")
+    fun getRunnerWithResults(raceId: String, distanceId: String): List<RunnerWithResult>
 
     @Transaction
     @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE actualRaceId =:raceId AND distanceId =:distanceId AND runners.runnerNumber LIKE '%' || :query || '%';")
@@ -91,6 +111,9 @@ interface RunnerDao : BaseDao<RunnerTable> {
 
     @Query("DELETE FROM runners WHERE runnerNumber =:runnerNumber ")
     suspend fun delete(runnerNumber: String): Int
+
+    @Query("DELETE FROM runners WHERE runnerNumber IN (:runnerNumbers)")
+    suspend fun delete(runnerNumbers: List<String>): Int
 
 
     @Delete

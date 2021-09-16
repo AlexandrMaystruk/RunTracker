@@ -83,10 +83,12 @@ class ManageRunnerCheckpointInteractorImpl @Inject constructor(
                     )
                 )
                 logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.getName()} to team runner ${teamRunner.shortName}  ${teamRunner.actualDistanceId}  ${teamRunner.shortName}")
+                teamRunner.currentCheckpoints?.sortBy { it.getPosition() }
                 runnersRepository.updateRunnerData(teamRunner)
             }
         }
         logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.getName()} to runner ${runner.number} ${runner.shortName}")
+        runner.currentCheckpoints?.sortBy { it.getPosition() }
         return runnersRepository.updateRunnerData(runner)
     }
 

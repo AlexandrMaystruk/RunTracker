@@ -78,6 +78,11 @@
     <string name="competition_time">Time: %1$s</string>
     <string name="cancel">Cancel</string>
     <string name="def_new_checkpoint_name">no name</string>
+    <string name="current_checkpoint">Current checkpoint:</string>
+    <string name="finishers">Finishers</string>
+
+
+
 
 
 </resources>
