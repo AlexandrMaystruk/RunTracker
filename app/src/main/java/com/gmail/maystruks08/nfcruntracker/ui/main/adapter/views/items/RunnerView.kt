@@ -4,7 +4,7 @@ import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.RunnerScreenIte
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
 
 data class RunnerView(
-    override val number: String,
+    override val id: String,
     val shortName: String,
     val result: String?,
     val actualDistanceId: String,

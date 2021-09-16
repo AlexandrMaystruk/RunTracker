@@ -29,7 +29,7 @@ internal class SimpleTeamAdapter : RecyclerView.Adapter<SimpleTeamAdapter.ViewHo
     class ViewHolder(private val layoutTeamRunnerBinding: LayoutTeamRunnerBinding) :
         RecyclerView.ViewHolder(layoutTeamRunnerBinding.root) {
         fun bindHolder(item: RunnerView) = with(layoutTeamRunnerBinding) {
-            tvNumber.text = item.number
+            tvNumber.text = item.id
             tvName.text = item.shortName
             tvResult.text = item.result
             progress.setStepBean(item.progress.map { it.bean })

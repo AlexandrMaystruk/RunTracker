@@ -35,7 +35,7 @@ class RunnerViewHolderManager(
 
     private val diffUtil = object : DiffUtil.ItemCallback<RunnerView>() {
         override fun areItemsTheSame(oldItem: RunnerView, newItem: RunnerView) =
-            oldItem.number == newItem.number
+            oldItem.id == newItem.id
 
         override fun areContentsTheSame(oldItem: RunnerView, newItem: RunnerView) =
             oldItem == newItem
@@ -60,7 +60,7 @@ class RunnerViewHolder(
         super.onBind(item)
         isSwipeEnable = !item.isOffTrack
         with(binding) {
-            tvRunnerNumber.text = "#${item.number}"
+            tvRunnerNumber.text = "#${item.id}"
             tvRunnerName.text = if (item.shortName.length > 26) item.shortName.take(25) + ".." else item.shortName
             runnerProgress.visibility = View.VISIBLE
             runnerProgress.setStepBean(item.progress.map { it.bean })

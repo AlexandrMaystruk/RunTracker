@@ -15,14 +15,17 @@ data class Runner(
     val city: String,
     val dateOfBirthday: Date?,
     val actualRaceId: String,
-    val actualDistanceId: String,
+    override val actualDistanceId: String,
     val raceIds: MutableList<String>,
     val distanceIds: MutableList<String>,
     val checkpoints: MutableMap<String, MutableList<Checkpoint>>, //key distance id value checkpoints
     val offTrackDistances: MutableList<String>, //distance id
     val teamNames: MutableMap<String, String?>, //key distance id
-    val totalResults: MutableMap<String, Date?>, //key distance id
+    val totalResults: MutableMap<String, Date?>  //key distance id
 ) : IRunner {
+
+    override val id get() = number
+    override var lastAddedCheckpoint: Checkpoint? = null
 
     val currentTeamName get() = teamNames[actualDistanceId]
     val currentCheckpoints get() = checkpoints[actualDistanceId]
@@ -65,6 +68,7 @@ data class Runner(
                 }
             }
         }
+        lastAddedCheckpoint = checkpoint
     }
 
     fun removeCheckpoint(checkpointId: String) {
@@ -95,6 +99,7 @@ data class Runner(
         checkpoints.clear()
         checkpoints[actualDistanceId]?.add(checkpoint)
         checkpoints[actualDistanceId]?.addAll(mappedCheckpoints)
+        lastAddedCheckpoint = checkpoint
     }
 
     /**
@@ -141,9 +146,10 @@ data class Runner(
         }
     }
 
-    fun getCheckpointCount() = checkpoints[actualDistanceId]?.count()?:0
+    fun getCheckpointCount() = checkpoints[actualDistanceId]?.count() ?: 0
 
     override fun getPassedCheckpointCount() =
         currentCheckpoints?.count { it is CheckpointResultIml } ?: 0
+
 }
 

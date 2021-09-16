@@ -6,7 +6,9 @@ import com.gmail.maystruks08.domain.CurrentRaceDistance
 import com.gmail.maystruks08.domain.DEF_STRING_VALUE
 import com.gmail.maystruks08.domain.entities.*
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.runner.IRunner
 import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.domain.exception.CheckpointNotFoundException
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
@@ -206,7 +208,7 @@ class MainScreenViewModel @ViewModelInject constructor(
 
     fun onRunnerOffTrack() {
         viewModelScope.launch(Dispatchers.IO) {
-            val runnerNumber = lastSelectedRunner?.number ?: return@launch
+            val runnerNumber = lastSelectedRunner?.id ?: return@launch
             if (lastSelectedRunner?.isOffTrack == true) return@launch
             try {
                 val updatedRunner = offTrackRunnerUseCase.invoke(runnerNumber)
@@ -223,7 +225,7 @@ class MainScreenViewModel @ViewModelInject constructor(
             if (isRunnerOfftrack() || isRunnerHasResult()) return@launch
             try {
                 val runnerNumber =
-                    lastSelectedRunner?.number ?: kotlin.run { throw RunnerNotFoundException() }
+                    lastSelectedRunner?.id ?: kotlin.run { throw RunnerNotFoundException() }
                 val updatedRunner = manageCheckpoints.addCurrentCheckpointByNumber(runnerNumber)
                 onMarkRunnerOnCheckpointSuccess(updatedRunner)
             } catch (e: Exception) {
@@ -352,16 +354,16 @@ class MainScreenViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun handleRunnerChanges(runnerChange: Change<Runner>) {
+    private fun handleRunnerChanges(runnerChange: Change<IRunner>) {
         val runnerView = runnerChange.entity.toRunnerView()
         if (_mainScreenModeFlow.value.distanceId == runnerChange.entity.actualDistanceId) {
             val runners = ArrayList(_runnersFlow.value)
             when (runnerChange.modifierType) {
                 ModifierType.ADD, ModifierType.UPDATE -> {
-                    runners.updateElement(runnerView, { it?.number == runnerView.number })
+                    runners.updateElement(runnerView, { it?.id == runnerView.id })
                 }
                 ModifierType.REMOVE -> {
-                    runners.removeAll { it?.number == runnerView.number }
+                    runners.removeAll { it?.id == runnerView.id }
                 }
             }
             _runnersFlow.value = runners
@@ -384,13 +386,10 @@ class MainScreenViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun onMarkRunnerOnCheckpointSuccess(updatedRunner: Runner) {
-        val lastCheckpoint = updatedRunner
-            .checkpoints[updatedRunner.actualDistanceId]
-            ?.maxByOrNull { it.getResult()?.time ?: 0 }
-
-        viewModelScope.launch { _showSuccessDialogChannel.send(lastCheckpoint to updatedRunner.number) }
+    private fun onMarkRunnerOnCheckpointSuccess(updatedRunner: IRunner) {
+        val lastCheckpoint = updatedRunner.lastAddedCheckpoint
         handleRunnerChanges(Change(updatedRunner, ModifierType.UPDATE))
+        viewModelScope.launch { _showSuccessDialogChannel.send(lastCheckpoint to updatedRunner.id) }
         recalculateDistanceStatistic()
     }
 

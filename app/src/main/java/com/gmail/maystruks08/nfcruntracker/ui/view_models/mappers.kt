@@ -12,9 +12,11 @@ import com.gmail.maystruks08.domain.timeInMillisToTimeFormat
 import com.gmail.maystruks08.domain.toDateFormat
 import com.gmail.maystruks08.domain.toUITimeFormat
 import com.gmail.maystruks08.nfcruntracker.R
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.RunnerDetailScreenItem
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.RunnerScreenItem
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerDetailView
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.TeamDetailView
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.TeamView
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.result.RunnerResultView
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.result.TeamResultView
@@ -26,10 +28,8 @@ fun toRunnerViews(runners: List<IRunner>): MutableList<RunnerScreenItem> {
     return mutableListOf<RunnerScreenItem>().apply {
         val iterator = runners.iterator()
         while (iterator.hasNext()) {
-            when (val item = iterator.next()) {
-                is Runner -> add(item.toRunnerView())
-                is Team -> add(item.toTeamView())
-            }
+            val item = iterator.next()
+            add(item.toRunnerView())
         }
     }
 }
@@ -40,31 +40,43 @@ fun toFinisherViews(runners: List<IRunner>): MutableList<RunnerScreenItem> {
         var position = 0
         while (iterator.hasNext()) {
             position++
-            when (val item = iterator.next()) {
-                is Runner -> add(item.toRunnerResultView(position))
-                is Team -> add(item.toTeamResultView(position))
-            }
+            val item = iterator.next()
+            add(item.toRunnerResultView(position))
         }
     }
 }
 
-fun Runner.toRunnerView(): RunnerView {
-    val isOffTrack = offTrackDistances.any { it == actualDistanceId }
-    return RunnerView(
-        number = this.number,
-        shortName = this.shortName,
-        result = this.totalResults[actualDistanceId]?.toUITimeFormat(),
-        actualDistanceId = this.actualDistanceId,
-        progress = this.checkpoints[actualDistanceId]?.toCheckpointViews(isOffTrack = isOffTrack).orEmpty(),
-        isOffTrack = isOffTrack,
-        placeholder = false
-    )
+fun IRunner.toRunnerView(): RunnerScreenItem {
+   return when (this) {
+        is Runner -> toRunnerView()
+        is Team -> toTeamView()
+       else -> throw RuntimeException("Incorrect type")
+   }
 }
 
-fun Runner.toRunnerDetailView(): RunnerDetailView {
+fun IRunner.toRunnerResultView(position: Int): RunnerScreenItem {
+    return when (this) {
+        is Runner -> toRunnerResultView(position)
+        is Team -> toTeamResultView(position)
+        else -> throw RuntimeException("Incorrect type")
+    }
+}
+
+
+
+fun IRunner.toRunnerDetailView(): RunnerDetailScreenItem {
+    return when (this) {
+        is Runner -> toRunnerDetailView()
+        is Team -> toTeamDetailView()
+        else -> throw RuntimeException("Incorrect type")
+    }
+}
+
+
+private fun Runner.toRunnerDetailView(): RunnerDetailView {
     val isOffTrack = offTrackDistances.any { it == actualDistanceId }
     return RunnerDetailView(
-        number = this.number,
+        id = this.number,
         fullName = this.fullName,
         city = this.city,
         result = this.totalResults[actualDistanceId]?.toUITimeFormat(),
@@ -76,10 +88,26 @@ fun Runner.toRunnerDetailView(): RunnerDetailView {
     )
 }
 
+private fun Team.toTeamDetailView(): TeamDetailView {
+    return TeamDetailView(teamName, result, runners.map { it.toRunnerDetailView() })
+}
 
-fun Runner.toRunnerResultView(position: Int): RunnerResultView {
+private fun Runner.toRunnerView(): RunnerView {
+    val isOffTrack = offTrackDistances.any { it == actualDistanceId }
+    return RunnerView(
+        id = this.number,
+        shortName = this.shortName,
+        result = this.totalResults[actualDistanceId]?.toUITimeFormat(),
+        actualDistanceId = this.actualDistanceId,
+        progress = this.checkpoints[actualDistanceId]?.toCheckpointViews(isOffTrack = isOffTrack).orEmpty(),
+        isOffTrack = isOffTrack,
+        placeholder = false
+    )
+}
+
+
+private fun Runner.toRunnerResultView(position: Int): RunnerResultView {
     return RunnerResultView(
-        number = number,
         runnerNumber = this.number,
         runnerFullName = this.fullName,
         runnerResultTime = this.totalResults[actualDistanceId]!!.time.timeInMillisToTimeFormat(),
@@ -87,22 +115,20 @@ fun Runner.toRunnerResultView(position: Int): RunnerResultView {
     )
 }
 
-fun Team.toTeamView(): TeamView {
+private fun Team.toTeamView(): TeamView {
     val firstRunner = runners.first()
     val secondRunner = runners.last()
     return TeamView(
-        number = firstRunner.number + secondRunner.number,
+        id = firstRunner.number + secondRunner.number,
         teamName = teamName,
         runners = runners.map { it.toRunnerView() },
         teamResult = result
     )
 }
 
-fun Team.toTeamResultView(position: Int): TeamResultView {
+private fun Team.toTeamResultView(position: Int): TeamResultView {
     val firstRunner = runners.first()
-    val secondRunner = runners.last()
     return TeamResultView(
-        number = firstRunner.number + secondRunner.number,
         position = position,
         runners = runners.map { it.toRunnerView() },
         teamName = firstRunner.currentTeamName.orEmpty(),

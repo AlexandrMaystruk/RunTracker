@@ -1,9 +1,10 @@
 package com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items
 
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.RunnerDetailScreenItem
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
 
 data class RunnerDetailView(
-    val number: String,
+    override val id: String,
     val fullName: String,
     val city: String,
     val result: String?,
@@ -11,5 +12,15 @@ data class RunnerDetailView(
     val actualDistanceId: String,
     val progress: List<CheckpointView>,
     val cardId: String?,
-    val isOffTrack: Boolean
-)
+    private val isOffTrack: Boolean
+): RunnerDetailScreenItem {
+
+    override fun isOffTrack(): Boolean {
+      return isOffTrack
+    }
+
+    override fun isRunnerHasResult(): Boolean {
+        return !result.isNullOrEmpty()
+    }
+
+}

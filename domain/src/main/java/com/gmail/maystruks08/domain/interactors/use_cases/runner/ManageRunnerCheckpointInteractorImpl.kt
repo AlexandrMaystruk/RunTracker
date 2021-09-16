@@ -73,20 +73,6 @@ class ManageRunnerCheckpointInteractorImpl @Inject constructor(
                 currentDate
             )
         )
-        val teamName = runner.teamNames[actualDistanceID]
-        if (!teamName.isNullOrEmpty() && !runner.offTrackDistances.any { it == actualDistanceID }) {
-            runnersRepository.getRunnerTeamMembers(runner.number, teamName)?.map { teamRunner ->
-                teamRunner.addPassedCheckpoint(
-                    checkpoint = CheckpointResultIml(
-                        checkpoint = currentCheckpoint,
-                        currentDate
-                    )
-                )
-                logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.getName()} to team runner ${teamRunner.shortName}  ${teamRunner.actualDistanceId}  ${teamRunner.shortName}")
-                teamRunner.currentCheckpoints?.sortBy { it.getPosition() }
-                runnersRepository.updateRunnerData(teamRunner)
-            }
-        }
         logHelper.log(INFO, "Add checkpoint: ${currentCheckpoint.getName()} to runner ${runner.number} ${runner.shortName}")
         runner.currentCheckpoints?.sortBy { it.getPosition() }
         return runnersRepository.updateRunnerData(runner)

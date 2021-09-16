@@ -13,6 +13,7 @@ import com.gmail.maystruks08.domain.interactors.use_cases.runner.OffTrackRunnerU
 import com.gmail.maystruks08.domain.interactors.use_cases.runner.ProvideRunnerUseCase
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.RunnerDetailScreenItem
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerDetailView
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.toRunnerDetailView
@@ -37,7 +38,7 @@ class RunnerViewModel @ViewModelInject constructor(
     val showSuccessDialog get() = _showSuccessDialogLiveData
     val linkCardModeEnable get() = _linkCardModeEnableLiveData
 
-    private val _runnerLiveData = SingleLiveEvent<RunnerDetailView>()
+    private val _runnerLiveData = SingleLiveEvent<RunnerDetailScreenItem>()
     private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
     private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, String>>()
     private val _linkCardModeEnableLiveData = SingleLiveEvent<Boolean>()
@@ -59,7 +60,7 @@ class RunnerViewModel @ViewModelInject constructor(
 
     fun onRunnerOffTrack() {
         viewModelScope.launch(Dispatchers.IO) {
-            val runnerNumber = runner.value?.number ?: return@launch
+            val runnerNumber = runner.value?.id ?: return@launch
             if (isRunnerOfftrack()) return@launch
             try {
                 val updatedRunner = offTrackRunnerUseCase.invoke(runnerNumber)
@@ -127,25 +128,15 @@ class RunnerViewModel @ViewModelInject constructor(
         router.exit()
     }
 
-    private fun onMarkRunnerOnCheckpointSuccess(updatedRunner: Runner) {
-        val lastCheckpoint =
-            updatedRunner.checkpoints[updatedRunner.actualDistanceId]?.maxByOrNull {
-                it.getResult()?.time ?: 0
-            }
-        _showSuccessDialogLiveData.postValue(lastCheckpoint to updatedRunner.number)
+    private fun onMarkRunnerOnCheckpointSuccess(updatedRunner: IRunner) {
+        val lastCheckpoint = updatedRunner.lastAddedCheckpoint
+        _showSuccessDialogLiveData.postValue(lastCheckpoint to updatedRunner.id)
         handleRunnerData(updatedRunner)
     }
 
     private fun handleRunnerData(runner: IRunner) {
-        when (runner) {
-            is Runner -> {
-                _runnerLiveData.postValue(runner.toRunnerDetailView())
-                linkCardModeEnable.postValue(false)
-            }
-            is Team -> {
-                //TODO handle team
-            }
-        }
+        _runnerLiveData.postValue(runner.toRunnerDetailView())
+        linkCardModeEnable.postValue(false)
     }
 
     private fun handleError(e: Exception) {
@@ -156,7 +147,7 @@ class RunnerViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun isRunnerOfftrack() = runner.value?.isOffTrack == true
+    private fun isRunnerOfftrack() = runner.value?.isOffTrack() == true
 
-    private fun isRunnerHasResult() = !runner.value?.result.isNullOrEmpty()
+    private fun isRunnerHasResult() = runner.value?.isRunnerHasResult() == true
 }
