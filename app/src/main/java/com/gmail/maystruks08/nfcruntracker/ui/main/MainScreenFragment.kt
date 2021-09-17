@@ -242,6 +242,10 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
         viewModel.changeDistance(distance.id)
     }
 
+    override fun onOpenStatisticCLicked(distance: DistanceView) {
+        viewModel.onOpenStatisticCLicked(distance.id)
+    }
+
     fun onNfcCardScanned(cardId: String) {
         viewModel.onNfcCardScanned(cardId)
     }

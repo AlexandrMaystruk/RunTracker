@@ -10,19 +10,21 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class ProvideDistanceUseCaseImpl @Inject constructor(
+class ProvideDistanceListUseCaseImpl @Inject constructor(
     private val distanceRepository: DistanceRepository,
     private val calculateDistanceStatisticUseCase: CalculateDistanceStatisticUseCase
-) : ProvideDistanceUseCase {
+) : ProvideDistanceListUseCase {
 
-    override suspend fun invoke(raceId: String, distanceId: String): Flow<Distance> {
-        return distanceRepository
-            .getDistanceFlow(raceId, distanceId)
-            .onEach {
-                withContext(Dispatchers.Default) {
-                    launch { calculateDistanceStatisticUseCase.invoke(it.id) }
+    override suspend fun invoke(): Flow<List<Distance>> {
+        val raceId = distanceRepository.getLastSelectedRace().first
+        return distanceRepository.getDistanceListFlow(raceId).onEach {
+            withContext(Dispatchers.Default) {
+                it.forEach {
+                    launch {
+                        calculateDistanceStatisticUseCase.invoke(it.id)
+                    }
                 }
             }
-            .flowOn(Dispatchers.IO)
+        }.flowOn(Dispatchers.IO)
     }
 }

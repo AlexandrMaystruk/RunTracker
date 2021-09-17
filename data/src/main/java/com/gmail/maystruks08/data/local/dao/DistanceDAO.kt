@@ -17,11 +17,24 @@ interface DistanceDAO : BaseDao<DistanceTable> {
     @Query("SELECT * FROM distances WHERE raceId =:raceId ORDER BY name")
     fun getDistanceByRaceIdFlow(raceId: String): Flow<List<DistanceTable>>
 
-    fun getDistanceDistinctUntilChanged(raceId: String) = getDistanceByRaceIdFlow(raceId).distinctUntilChanged().map { distanceTables ->
-        distanceTables.map {
-            DistanceWithCheckpoints(it, getDistanceCheckpoints(it.distanceId))
-        }
+    @Query("SELECT * FROM distances WHERE raceId =:raceId AND distanceId =:distanceId LIMIT 1")
+    fun getDistanceByIdFlow(raceId: String, distanceId: String): Flow<DistanceTable>
+
+
+    fun getDistanceDistinctUntilChanged(
+        raceId: String,
+        distanceId: String
+    ): Flow<DistanceWithCheckpoints> = getDistanceByIdFlow(raceId, distanceId).map {
+        DistanceWithCheckpoints(it, getDistanceCheckpoints(it.distanceId))
     }
+
+
+    fun getDistanceDistinctUntilChanged(raceId: String) =
+        getDistanceByRaceIdFlow(raceId).distinctUntilChanged().map { distanceTables ->
+            distanceTables.map {
+                DistanceWithCheckpoints(it, getDistanceCheckpoints(it.distanceId))
+            }
+        }
 
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId")
     fun getDistanceById(distanceId: String): DistanceTable

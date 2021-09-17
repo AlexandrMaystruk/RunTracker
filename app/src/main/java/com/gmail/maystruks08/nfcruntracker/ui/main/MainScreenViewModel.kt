@@ -7,8 +7,6 @@ import com.gmail.maystruks08.domain.DEF_STRING_VALUE
 import com.gmail.maystruks08.domain.entities.*
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.runner.IRunner
-import com.gmail.maystruks08.domain.entities.runner.Runner
-import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.domain.exception.CheckpointNotFoundException
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
@@ -44,7 +42,7 @@ import java.util.*
 class MainScreenViewModel @ViewModelInject constructor(
     private val provideRunnersUseCase: ProvideRunnersUseCase,
     private val provideFinishersUseCase: ProvideFinishersUseCase,
-    private val provideDistanceUseCase: ProvideDistanceUseCase,
+    private val provideDistanceListUseCase: ProvideDistanceListUseCase,
     private val provideCurrentSelectedCheckpointUseCase: GetCurrentSelectedCheckpointUseCase,
     private val provideCurrentRaceIdUseCase: ProvideCurrentRaceIdUseCase,
 
@@ -116,7 +114,7 @@ class MainScreenViewModel @ViewModelInject constructor(
         jobShowAllDistances?.cancel()
         jobShowRunner?.cancel()
         jobShowAllDistances = viewModelScope.launch(Dispatchers.IO) {
-            provideDistanceUseCase
+            provideDistanceListUseCase
                 .invoke()
                 .onStart { _showProgressFlow.value = true }
                 .collect { distances ->
@@ -179,6 +177,13 @@ class MainScreenViewModel @ViewModelInject constructor(
         _mainScreenModeFlow.value = when (_mainScreenModeFlow.value) {
             is MainScreenMode.RenderList -> MainScreenMode.RenderList(distanceId)
             is MainScreenMode.RenderResult -> MainScreenMode.RenderResult(distanceId)
+        }
+    }
+
+    fun onOpenStatisticCLicked(distanceId: String) {
+        viewModelScope.launch {
+            val raceId = provideCurrentRaceIdUseCase.invoke()
+            router.navigateTo(Screens.StatisticScreen(raceId, distanceId))
         }
     }
 
@@ -457,7 +462,6 @@ class MainScreenViewModel @ViewModelInject constructor(
         startRunTrackerBus.unsubscribe(this.name())
         super.onCleared()
     }
-
 }
 
 sealed class MainScreenMode(var distanceId: String?) {

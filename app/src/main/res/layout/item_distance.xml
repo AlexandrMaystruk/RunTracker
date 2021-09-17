@@ -13,16 +13,17 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_xs"
+        android:layout_marginEnd="@dimen/margin_xs"
         android:layout_marginTop="@dimen/margin_s"
         android:textColor="@color/colorWhite"
         android:textSize="@dimen/text_m"
         app:layout_constraintBottom_toBottomOf="@+id/chartView"
-        app:layout_constraintEnd_toStartOf="@+id/chartView"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnOpenStatistic"
         android:layout_width="match_parent"
         android:layout_height="24dp"
         android:layout_margin="@dimen/margin_xs"
@@ -33,19 +34,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <com.gmail.maystruks08.nfcruntracker.ui.views.ChartView
-        android:id="@+id/chartView"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="@dimen/margin_xs"
-        android:layout_marginEnd="@dimen/margin_xs"
-        android:elevation="@dimen/cardview_default_elevation"
-        app:circlePadding="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:strokeWidth="18dp"
-        app:textPadding="0dp"
-        app:textSize="12sp" />
 
 </com.gmail.maystruks08.nfcruntracker.ui.views.CustomConstraintLayout>

@@ -42,6 +42,7 @@ class DistanceViewHolderManager(
 
     interface Interaction {
         fun onItemSelected(distance: DistanceView)
+        fun onOpenStatisticCLicked(distance: DistanceView)
     }
 
 }
@@ -64,7 +65,10 @@ class DistanceViewHolder(
             distanceCard.strokeLineWidth = 1f
             distanceCard.backgroundColor = root.context.color(R.color.colorAccentDark)
         }
-        chartView.setChartItems(item.chartItems)
+
+        btnOpenStatistic.setOnClickListener {
+            interaction.onOpenStatisticCLicked(item)
+        }
         itemView.setOnClickListener {
             interaction.onItemSelected(item)
         }

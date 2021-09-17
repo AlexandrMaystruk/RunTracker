@@ -108,7 +108,7 @@ interface RunnerUseCaseModule {
 
     @Binds
     @ActivityScoped
-    fun bindProvideDistanceUseCase(impl: ProvideDistanceUseCaseImpl): ProvideDistanceUseCase
+    fun bindProvideDistanceListUseCase(impl: ProvideDistanceListUseCaseImpl): ProvideDistanceListUseCase
 
     @Binds
     @ActivityScoped
@@ -144,6 +144,10 @@ interface RunnerUseCaseModule {
     @ActivityScoped
     fun bindOffTrackRunnerUseCase(impl: OffTrackRunnerUseCaseImpl): OffTrackRunnerUseCase
 
+    @Binds
+    @ActivityScoped
+    fun bindProvideDistanceUseCase(impl: ProvideDistanceUseCaseImpl): ProvideDistanceUseCase
+
 }
 
 
@@ -153,34 +157,34 @@ interface RepositoriesModule {
 
     @Binds
     @ActivityScoped
-    abstract fun bindDistanceStatisticRepository(impl: DistanceStatisticRepositoryImpl): DistanceStatisticRepository
+    fun bindDistanceStatisticRepository(impl: DistanceStatisticRepositoryImpl): DistanceStatisticRepository
 
 
     @Binds
     @ActivityScoped
-    abstract fun bindRunnersRepository(impl: RunnersRepositoryImpl): RunnersRepository
+    fun bindRunnersRepository(impl: RunnersRepositoryImpl): RunnersRepository
 
     @Binds
     @ActivityScoped
-    abstract fun bindRunnerDataChangeListener(viewModel: RunnersRepositoryImpl): RunnerDataChangeListener
+    fun bindRunnerDataChangeListener(viewModel: RunnersRepositoryImpl): RunnerDataChangeListener
 
     @Binds
     @ActivityScoped
-    abstract fun bindRegisterRunnersRepository(impl: RegisterNewRunnersRepositoryImpl): RegisterNewRunnersRepository
-
-
-    @Binds
-    @ActivityScoped
-    abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
-
-    @Binds
-    @ActivityScoped
-    abstract fun bindRaceRepository(impl: RaceRepositoryImpl): RaceRepository
+    fun bindRegisterRunnersRepository(impl: RegisterNewRunnersRepositoryImpl): RegisterNewRunnersRepository
 
 
     @Binds
     @ActivityScoped
-    abstract fun bindDistanceRepository(impl: DistanceRepositoryImpl): DistanceRepository
+    fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
+    @Binds
+    @ActivityScoped
+    fun bindRaceRepository(impl: RaceRepositoryImpl): RaceRepository
+
+
+    @Binds
+    @ActivityScoped
+    fun bindDistanceRepository(impl: DistanceRepositoryImpl): DistanceRepository
 
 
 }

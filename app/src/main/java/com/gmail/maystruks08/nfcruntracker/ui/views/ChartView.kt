@@ -47,7 +47,7 @@ class ChartView : View {
     private val chart: Chart = Chart().apply {
         chartItems.add(ChartItem("12", R.color.colorWhite, R.color.colorGreen, 0))
         chartItems.add(ChartItem("28", R.color.colorWhite, R.color.colorRed, 0))
-        chartItems.add(ChartItem("34", R.color.colorWhite, R.color.design_default_color_primary, 0))
+        chartItems.add(ChartItem("34", R.color.colorWhite, R.color.colorAccent, 0))
     }
 
     var strokeWidth: Float = 15f

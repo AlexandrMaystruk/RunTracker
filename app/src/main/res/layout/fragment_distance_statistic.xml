@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layoutDescription="@xml/fragment_edit_distance_motions_scene"
+    tools:context="com.gmail.maystruks08.nfcruntracker.ui.main.MainScreenFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_size"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_collapseMode="pin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark" />
+
+    <View
+        android:id="@+id/view_background"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <TextView
+        android:id="@+id/tvDistanceName"
+        style="@style/TextL"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_m"
+        android:text="Distance name"
+        android:textColor="@color/colorWhite"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/chartView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/chartView" />
+
+
+    <TextView
+        android:id="@+id/tvInProgressLabel"
+        style="@style/TextM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_l"
+        android:layout_marginTop="@dimen/margin_xs"
+        android:drawableStart="@drawable/circle_grey"
+        android:drawablePadding="@dimen/margin_xs"
+        android:text="In progress"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/text_m"
+        app:layout_constraintEnd_toStartOf="@+id/chartView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvDistanceName" />
+
+
+    <TextView
+        android:id="@+id/tvFinishersLabel"
+        style="@style/TextM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_l"
+        android:drawableStart="@drawable/circle_green"
+        android:drawablePadding="@dimen/margin_xs"
+        android:text="Finishers"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/text_m"
+        app:layout_constraintEnd_toStartOf="@+id/chartView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvInProgressLabel" />
+
+
+    <TextView
+        android:id="@+id/tvOffTrackLabel"
+        style="@style/TextM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_l"
+        android:drawableStart="@drawable/circle_red"
+        android:drawablePadding="@dimen/margin_xs"
+        android:text="Off track"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/text_m"
+        app:layout_constraintEnd_toStartOf="@+id/chartView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvFinishersLabel" />
+
+
+    <com.gmail.maystruks08.nfcruntracker.ui.views.ChartView
+        android:id="@+id/chartView"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_marginEnd="@dimen/margin_m"
+        android:elevation="@dimen/cardview_default_elevation"
+        app:circlePadding="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/view_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:strokeWidth="18dp"
+        app:textPadding="0dp"
+        app:textSize="12sp" />
+
+    <View
+        android:id="@+id/view_card"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/margin_m"
+        android:layout_marginEnd="@dimen/margin_m"
+        android:layout_marginBottom="@dimen/margin_m"
+        android:background="@drawable/bg_corner_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_background" />
+
+    <TextView
+        android:id="@+id/tvCheckpointsStatisticLabel"
+        style="@style/TextL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_m"
+        android:layout_marginTop="@dimen/margin_m"
+        android:text="Checkpoint statistic"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@id/view_card"
+        app:layout_constraintTop_toTopOf="@id/view_card" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCheckpoints"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="@id/view_card"
+        app:layout_constraintLeft_toLeftOf="@id/view_card"
+        app:layout_constraintRight_toRightOf="@id/view_card"
+        app:layout_constraintTop_toBottomOf="@+id/tvCheckpointsStatisticLabel"
+        tools:listitem="@layout/item_edit_checkpoint" />
+</androidx.constraintlayout.widget.ConstraintLayout>

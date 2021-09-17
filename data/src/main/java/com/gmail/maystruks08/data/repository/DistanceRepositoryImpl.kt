@@ -14,7 +14,6 @@ import com.gmail.maystruks08.domain.repository.CheckpointsRepository
 import com.gmail.maystruks08.domain.repository.DistanceRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -53,6 +52,14 @@ class DistanceRepositoryImpl @Inject constructor(
                 checkpoints.sortBy { it.getPosition() }
                 distanceWithCheckpoints.distance.toDistanceEntity(checkpoints)
             }
+        }
+    }
+
+    override suspend fun getDistanceFlow(raceId: String, distanceId: String): Flow<Distance> {
+        return distanceDAO.getDistanceDistinctUntilChanged(raceId, distanceId).map { distanceWithCheckpoints->
+            val checkpoints = distanceWithCheckpoints.checkpoints.map { it.toCheckpoint() }.toMutableList()
+            checkpoints.sortBy { it.getPosition() }
+            distanceWithCheckpoints.distance.toDistanceEntity(checkpoints)
         }
     }
 

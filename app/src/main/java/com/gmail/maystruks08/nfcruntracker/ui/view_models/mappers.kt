@@ -232,7 +232,7 @@ fun Distance.toView(isSelected: Boolean = false): DistanceView {
         ChartItem(
             statistic.runnerCountInProgress.toString(),
             R.color.colorWhite,
-            R.color.design_default_color_primary,
+            R.color.colorAccent,
             statistic.runnerCountInProgress
         ),
         ChartItem(
@@ -262,7 +262,7 @@ fun Distance.toEditView(isSelected: Boolean = false): EditDistanceView {
         ChartItem(
             statistic.runnerCountInProgress.toString(),
             R.color.colorWhite,
-            R.color.design_default_color_primary,
+            R.color.colorAccent,
             statistic.runnerCountInProgress
         ),
         ChartItem(

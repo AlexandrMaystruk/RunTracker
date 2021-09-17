@@ -13,10 +13,10 @@ class CalculateDistanceStatisticUseCaseImpl @Inject constructor(
     private val distanceStatisticRepository: DistanceStatisticRepository
 ) : CalculateDistanceStatisticUseCase {
 
-    override suspend fun invoke(distanceId: String?) {
-        if(distanceId.isNullOrEmpty()) return
+    override suspend fun invoke(distanceId: String?): DistanceStatistic? {
+        if(distanceId.isNullOrEmpty()) return null
         val raceId = provideCurrentRaceIdUseCase.invoke()
-        withContext(Dispatchers.Default) {
+       return withContext(Dispatchers.Default) {
             val runnerCountDeferred = async {
                 distanceStatisticRepository.getDistanceRunnerCount(raceId, distanceId)
             }
@@ -30,15 +30,18 @@ class CalculateDistanceStatisticUseCaseImpl @Inject constructor(
             val finisherCount = finisherCountDeferred.await()
             val offTrackCount = offTrackCountDeferred.await()
 
+            val statistic = DistanceStatistic(
+            distanceId = distanceId,
+            runnerCountInProgress = runnerCount - offTrackCount - finisherCount,
+            runnerCountOffTrack = offTrackCount,
+            finisherCount = finisherCount)
+
             distanceStatisticRepository.saveDistanceStatistic(
                 raceId = raceId,
-                statistic = DistanceStatistic(
-                    distanceId = distanceId,
-                    runnerCountInProgress = runnerCount - offTrackCount - finisherCount,
-                    runnerCountOffTrack = offTrackCount,
-                    finisherCount = finisherCount
-                )
+                statistic = statistic
             )
+
+            return@withContext statistic
         }
     }
 
