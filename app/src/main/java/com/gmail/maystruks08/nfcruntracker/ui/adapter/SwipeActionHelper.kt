@@ -88,7 +88,7 @@ abstract class SwipeActionHelper(
                     leftIconBg?.setBounds(
                         itemView.left,
                         itemView.top,
-                        itemView.right + dX.toInt(),
+                        itemView.left + dX.toInt(),
                         itemView.bottom
                     )
                     val iconLeft = itemView.left + iconMargin

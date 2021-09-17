@@ -2,12 +2,18 @@ package com.gmail.maystruks08.nfcruntracker.ui.main.adapter.managers
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.databinding.ItemTeamBinding
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.BaseViewHolder
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.Item
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.ViewHolderManager
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.RunnerSwipeActionHelper
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.TeamRunnerSwipeActionHelper
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.TeamView
 
 class TeamViewHolderManager(
@@ -37,7 +43,9 @@ class TeamViewHolderManager(
     }
 
     interface Interaction {
-        fun onItemSelected(distance: TeamView)
+        fun onItemSelected(team: TeamView)
+        fun onRunnerSwipedLeft(position: Int, swipedRunner: RunnerView)
+        fun onRunnerSwipedRight(position: Int, swipedRunner: RunnerView)
     }
 
 }
@@ -55,9 +63,27 @@ class TeamViewHolder(
         tvTeamName.text = item.teamName
         tvTeamResult.text = item.teamResult.orEmpty()
         rvTeam.adapter = teamAdapter
+        setUpItemTouchHelper()
         teamAdapter.team = item.runners
         itemView.setOnClickListener {
             interaction.onItemSelected(item)
         }
+    }
+
+    private fun setUpItemTouchHelper() {
+        val orderSwipeActionHelper = object : TeamRunnerSwipeActionHelper(binding.root.context) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val swipedRunner = teamAdapter.team[position] as? RunnerView
+                swipedRunner ?: return
+                if (direction == ItemTouchHelper.LEFT) {
+                    interaction.onRunnerSwipedLeft(position, swipedRunner)
+                }
+                if (direction == ItemTouchHelper.RIGHT) {
+                    interaction.onRunnerSwipedRight(position, swipedRunner)
+                }
+            }
+        }
+        ItemTouchHelper(orderSwipeActionHelper).attachToRecyclerView(binding.rvTeam)
     }
 }

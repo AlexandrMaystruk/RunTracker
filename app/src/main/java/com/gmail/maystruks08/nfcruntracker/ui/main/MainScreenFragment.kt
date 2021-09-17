@@ -226,8 +226,16 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
         viewModel.onClickedAtRunner(item.id)
     }
 
-    override fun onItemSelected(distance: TeamView) {
+    override fun onItemSelected(team: TeamView) {
+        viewModel.onClickedAtTeam(team)
+    }
 
+    override fun onRunnerSwipedLeft(position: Int, swipedRunner: RunnerView) {
+        viewModel.onRunnerSwipedLeft(position, swipedRunner)
+    }
+
+    override fun onRunnerSwipedRight(position: Int, swipedRunner: RunnerView) {
+        viewModel.onRunnerSwipedRight(position, swipedRunner)
     }
 
     override fun onItemSelected(distance: DistanceView) {

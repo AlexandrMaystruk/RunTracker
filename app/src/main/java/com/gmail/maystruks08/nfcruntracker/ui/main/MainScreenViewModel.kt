@@ -26,6 +26,7 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.updateElement
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.RunnerScreenItem
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerView
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.TeamView
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertType
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeConfirmOfftrack
 import com.gmail.maystruks08.nfcruntracker.ui.runner.AlertTypeMarkRunnerAtCheckpoint
@@ -224,8 +225,7 @@ class MainScreenViewModel @ViewModelInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (isRunnerOfftrack() || isRunnerHasResult()) return@launch
             try {
-                val runnerNumber =
-                    lastSelectedRunner?.id ?: kotlin.run { throw RunnerNotFoundException() }
+                val runnerNumber = lastSelectedRunner?.id ?: kotlin.run { throw RunnerNotFoundException() }
                 val updatedRunner = manageCheckpoints.addCurrentCheckpointByNumber(runnerNumber)
                 onMarkRunnerOnCheckpointSuccess(updatedRunner)
             } catch (e: Exception) {
@@ -291,6 +291,10 @@ class MainScreenViewModel @ViewModelInject constructor(
 
     fun onClickedAtRunner(runnerNumber: String) {
         router.navigateTo(Screens.RunnerScreen(runnerNumber))
+    }
+
+    fun onClickedAtTeam(team: TeamView) {
+        router.navigateTo(Screens.RunnerScreen(team.runners.first().id))
     }
 
     fun onSelectRaceClicked() {

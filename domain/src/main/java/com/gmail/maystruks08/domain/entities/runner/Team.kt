@@ -14,13 +14,13 @@ data class Team(
 
     override val id get() = teamName
     override var lastAddedCheckpoint: Checkpoint? = null
-    override val actualDistanceId: String
-        get() = runners.firstOrNull()?.actualDistanceId ?: DEF_STRING_VALUE
+    override val actualDistanceId: String get() = runners.firstOrNull()?.actualDistanceId ?: DEF_STRING_VALUE
 
     val result: Date?
         get() {
             return when (distanceType) {
                 DistanceType.REPLAY -> {
+                    if(runners.any { it.offTrackDistances.contains(it.actualDistanceId) }) return null
                     val hasUncompletedCheckpoints = runners.any { runner ->
                         runner.currentCheckpoints?.any { it is CheckpointImpl } == true
                     }
@@ -33,6 +33,7 @@ data class Team(
                     Date(totalTime)
                 }
                 DistanceType.TEAM -> {
+                    if(runners.any { it.offTrackDistances.contains(it.actualDistanceId) }) return null
                     if (runners.any { it.currentResult == null }) return null
                     runners.minByOrNull { it.currentResult?.time ?: Long.MAX_VALUE }?.currentResult
                 }
