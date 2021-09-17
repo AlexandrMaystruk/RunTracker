@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
@@ -14,6 +13,8 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRunnerBinding
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.AppAdapter
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.DividerVerticalItemDecoration
+import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.managers.DetailViewHolderManager
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerDetailView
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.TeamDetailView
 import com.gmail.maystruks08.nfcruntracker.ui.main.dialogs.SuccessDialogFragment
@@ -26,9 +27,9 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner),
 
     private val viewModel: RunnerViewModel by viewModels()
     private val binding: FragmentRunnerBinding by viewBinding {
-        runnerCheckpointsRecyclerView.adapter = null
+        rvRunnersDetail.adapter = null
     }
-    private lateinit var checkpointsAdapter: AppAdapter
+    private lateinit var detailItemAdapter: AppAdapter
 
     private var alertDialog: AlertDialog? = null
     private var runnerNumber: String by argument()
@@ -52,64 +53,40 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkpointsAdapter = AppAdapter(listOf(RunnerCheckpointsViewHolderManager(this)))
+        detailItemAdapter = AppAdapter(listOf(DetailViewHolderManager(this)))
     }
 
     override fun bindViewModel() {
         viewModel.onShowRunnerClicked(runnerNumber)
-
         viewModel.runner.observe(viewLifecycleOwner, { runner ->
-            with(binding) {
-                when(runner){
-                    is RunnerDetailView -> {
-                        val numberStr = "#" + runner.id
-                        tvRunnerNumber.text = numberStr
-                        tvRunnerFullName.text = runner.fullName
-                        tvDateOfBirthday.text = runner.dateOfBirthday
-                        tvRunnerCity.text = runner.city
-                        tvRunnerCardId.text = runner.cardId
-                        checkpointsAdapter.submitList(runner.progress)
-                        when {
-                            runner.isOffTrack() -> {
-                                val buttonText = getString(R.string.off_track)
-                                btnMarkCheckpointAsPassedInManual.text = buttonText
-                                btnMarkCheckpointAsPassedInManual.isEnabled = false
-                                btnMarkCheckpointAsPassedInManual.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_main_btn_red)
-                            }
-                            runner.result != null -> {
-                                val totalResultStr = getString(R.string.total_time, runner.result)
-                                btnMarkCheckpointAsPassedInManual.text = totalResultStr
-                                btnMarkCheckpointAsPassedInManual.isEnabled = false
-                                btnMarkCheckpointAsPassedInManual.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_main_btn_green)
-                            }
-                            else -> {
-                                btnMarkCheckpointAsPassedInManual.text = getString(R.string.mark_at_current_checkpoint)
-                                btnMarkCheckpointAsPassedInManual.isEnabled = true
-                                btnMarkCheckpointAsPassedInManual.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_main_btn)
-                            }
-                        }
-                    }
-                    is TeamDetailView -> {
-                        //TODO implement
-                    }
+            when (runner) {
+                is RunnerDetailView -> {
+                    binding.llTeamHeader.visibility = View.GONE
+                    detailItemAdapter.submitList(listOf(runner))
+                }
+                is TeamDetailView -> {
+                    binding.llTeamHeader.visibility = View.VISIBLE
+                    binding.tvTeamName.text = runner.id
+                    binding.tvTeamResult.text = runner.teamResult
+                    detailItemAdapter.submitList(runner.runners)
                 }
             }
         })
 
         viewModel.linkCardModeEnable.observe(viewLifecycleOwner, {
             with(binding) {
-                if (it) {
-                    runnerCheckpointsRecyclerView.visibility = View.GONE
-                    tvPleaseScanCard.visibility = View.VISIBLE
-                    btnMarkCheckpointAsPassedInManual.isEnabled = true
-                    btnMarkCheckpointAsPassedInManual.text =
-                        getString(R.string.disable_link_card_mode)
-                } else {
-                    tvPleaseScanCard.visibility = View.GONE
-                    runnerCheckpointsRecyclerView.visibility = View.VISIBLE
-                    btnMarkCheckpointAsPassedInManual.text =
-                        getString(R.string.mark_at_current_checkpoint)
-                }
+//                if (it) {
+//                    rvRunnersDetail.visibility = View.GONE
+//                    tvPleaseScanCard.visibility = View.VISIBLE
+//                    btnMarkCheckpointAsPassedInManual.isEnabled = true
+//                    btnMarkCheckpointAsPassedInManual.text =
+//                        getString(R.string.disable_link_card_mode)
+//                } else {
+//                    tvPleaseScanCard.visibility = View.GONE
+//                    runnerCheckpointsRecyclerView.visibility = View.VISIBLE
+//                    btnMarkCheckpointAsPassedInManual.text =
+//                        getString(R.string.mark_at_current_checkpoint)
+//                }
             }
         })
 
@@ -156,10 +133,17 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner),
 
     override fun initViews() {
         with(binding) {
-            btnMarkCheckpointAsPassedInManual.setOnClickListener {
-                viewModel.btnMarkCheckpointAsPassedInManualClicked()
-            }
-            runnerCheckpointsRecyclerView.adapter = checkpointsAdapter
+//            btnMarkCheckpointAsPassedInManual.setOnClickListener {
+//                viewModel.btnMarkCheckpointAsPassedInManualClicked()
+//            }
+            rvRunnersDetail.adapter = detailItemAdapter
+            rvRunnersDetail.addItemDecoration(
+                DividerVerticalItemDecoration(
+                    resources.getDimensionPixelSize(
+                        R.dimen.margin_s
+                    )
+                )
+            )
         }
     }
 
