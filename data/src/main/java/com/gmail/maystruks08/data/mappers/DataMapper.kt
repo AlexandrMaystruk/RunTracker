@@ -98,6 +98,33 @@ fun RunnerTable.toRunner(gson: Gson): Runner {
     )
 }
 
+fun RunnerTable.toRunner(
+    raceIds: MutableList<String>,
+    distanceIds: MutableList<String>,
+    checkpoints: MutableMap<String, MutableList<Checkpoint>>,
+    offTrackDistances: MutableList<String>,
+    teamNames: MutableMap<String, String?>
+): Runner {
+    return Runner(
+        cardId = cardId,
+        number = runnerNumber,
+        fullName = fullName,
+        shortName = shortName,
+        phone = phone,
+        city = city,
+        sex = RunnerSex.fromOrdinal(sex),
+        dateOfBirthday = dateOfBirthday,
+        actualDistanceId = actualDistanceId,
+        actualRaceId = actualRaceId,
+        raceIds = raceIds,
+        distanceIds = distanceIds,
+        checkpoints = checkpoints,
+        offTrackDistances = offTrackDistances,
+        teamNames = teamNames,
+        totalResults = mutableMapOf()
+    ).also { it.calculateTotalResults() }
+}
+
 
 fun CheckpointTable.toCheckpoint(): Checkpoint {
     return CheckpointImpl(
@@ -156,8 +183,9 @@ fun CheckpointResultIml.toResultTable(runnerNumber: String): ResultTable {
     return ResultTable(
         runnerNumber = runnerNumber,
         checkpointId = getId(),
-        time = this.getResult(),
-        hasPrevious = this.hasPrevious()
+        time = getResult(),
+        hasPrevious = hasPrevious(),
+        distanceId = getDistanceId()
     )
 }
 
@@ -206,9 +234,6 @@ fun Runner.toFirestoreRunner(): RunnerPojo {
             }
         }
     }
-    val totalResultsMap = mutableMapOf<String, String?>().apply {
-        totalResults.forEach { (t, u) -> put(t, u?.toServerFormat()) }
-    }
     return RunnerPojo(
         number = number,
         cardId = cardId,
@@ -224,8 +249,7 @@ fun Runner.toFirestoreRunner(): RunnerPojo {
         distanceIds = distanceIds,
         checkpoints = checkpointsResult,
         offTrackDistances = offTrackDistances,
-        teamNames = teamNames,
-        totalResults = totalResultsMap
+        teamNames = teamNames
     )
 }
 

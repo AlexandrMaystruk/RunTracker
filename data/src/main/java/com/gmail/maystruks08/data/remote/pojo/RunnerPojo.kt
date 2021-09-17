@@ -16,5 +16,4 @@ data class RunnerPojo(
     val checkpoints: MutableMap<String, List<CheckpointPojo>> = mutableMapOf(), //key distance id value checkpoints
     val offTrackDistances: MutableList<String> = mutableListOf(), //key distance id
     val teamNames: MutableMap<String, String?> = mutableMapOf(), //key distance id
-    val totalResults: MutableMap<String, String?> = mutableMapOf(), //key distance id
 )

@@ -29,7 +29,7 @@ class ProvideRunnersUseCaseImpl @Inject constructor(
             }
             DistanceType.REPLAY, DistanceType.TEAM -> {
                 runnersRepository
-                    .getTeamRunnersFlow(distanceId)
+                    .getTeamRunnersFlow(distanceId, distanceType)
                     .map { list -> list.sortedByDescending { it.getPassedCheckpointCount() } }
             }
         }.flowOn(Dispatchers.IO)

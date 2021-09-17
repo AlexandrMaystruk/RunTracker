@@ -1,6 +1,7 @@
 package com.gmail.maystruks08.data.repository
 
 import android.database.sqlite.SQLiteException
+import com.gmail.maystruks08.data.fromJsonOrNull
 import com.gmail.maystruks08.data.local.ConfigPreferences
 import com.gmail.maystruks08.data.local.dao.DistanceDAO
 import com.gmail.maystruks08.data.local.dao.RunnerDao
@@ -15,7 +16,7 @@ import com.gmail.maystruks08.data.remote.Api
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.domain.DEF_STRING_VALUE
 import com.gmail.maystruks08.domain.NetworkUtil
-import com.gmail.maystruks08.domain.clearAndAddAll
+import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
@@ -28,7 +29,6 @@ import com.gmail.maystruks08.domain.exception.SyncWithServerException
 import com.gmail.maystruks08.domain.repository.RunnersRepository
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -94,11 +94,7 @@ class RunnersRepositoryImpl @Inject constructor(
         return runnerDao.getRunnerWithResultsQuery(actualRaceId, distanceId, query)
             .mapNotNull { runnerWithResult ->
                 when {
-                    !onlyFinishers -> {
-                        runnerWithResult.runnerTable.toRunner(gson).apply {
-                            this.checkpoints[distanceId] = runnerWithResult.getCheckpoints()
-                        }
-                    }
+                    !onlyFinishers -> runnerWithResult.toRunner()
                     onlyFinishers -> {
                         val checkpoints = runnerWithResult.getCheckpoints(true)
                         return@mapNotNull if (checkpoints.isNotEmpty()) runnerWithResult.runnerTable.toRunner(
@@ -125,12 +121,7 @@ class RunnersRepositoryImpl @Inject constructor(
                 val runnersWithResults = runnerDao.getRunnerWithResults(actualRaceId, actualDistanceId)
                 val runners = runnersWithResults.mapNotNull {
                     when {
-                        !onlyFinishers -> {
-                            it.runnerTable.toRunner(gson)
-                                .apply {
-                                    addCheckpoints(actualDistanceId, it.getCheckpoints())
-                                }
-                        }
+                        !onlyFinishers -> it.toRunner()
                         onlyFinishers -> {
                             val checkpoints = it.getCheckpoints(onlyFinishers = true)
                             return@mapNotNull if (checkpoints.isNotEmpty()) it.runnerTable.toRunner(gson).apply { addCheckpoints(actualDistanceId, checkpoints) }
@@ -147,11 +138,7 @@ class RunnersRepositoryImpl @Inject constructor(
             val runnersWithResults = runnerDao.getRunnerWithResultsQuery(actualRaceId, actualDistanceId, query)
             val runners = runnersWithResults.mapNotNull {
                 when {
-                    !onlyFinishers -> {
-                        it.runnerTable.toRunner(gson).apply {
-                            addCheckpoints(actualDistanceId, it.getCheckpoints())
-                        }
-                    }
+                    !onlyFinishers -> it.toRunner()
                     onlyFinishers -> {
                         val checkpoints = it.getCheckpoints(onlyFinishers = true)
                         return@mapNotNull if (checkpoints.isNotEmpty()) it.runnerTable.toRunner(gson)
@@ -167,6 +154,7 @@ class RunnersRepositoryImpl @Inject constructor(
 
     override suspend fun getTeamRunnersFlow(
         distanceId: String,
+        distanceType: DistanceType,
         onlyFinishers: Boolean
     ): Flow<List<Team>> {
         val actualRaceId = getRaceId()
@@ -177,7 +165,37 @@ class RunnersRepositoryImpl @Inject constructor(
             .map { runnersWithResults ->
                 runnersWithResults.groupBy { it.team?.name }.mapNotNull { entry ->
                     val teamName = entry.key ?: return@mapNotNull null
-                    Team(teamName, entry.value.map { it.toRunner() })
+                    if(distanceType == DistanceType.REPLAY){
+                        val runners = entry.value.sortedBy { it.runnerTable.runnerNumber }.mapIndexed { index, runnerWithResult ->
+                            with(runnerWithResult){
+                                val number = runnerTable.runnerNumber
+                                val raceIds = runnerDao.getRunnerRaceIds(number).toMutableList()
+                                val distanceIds = runnerDao.getRunnerDistanceIds(number).toMutableList()
+                                val checkpoints = mutableMapOf<String, MutableList<Checkpoint>>().apply {
+                                    val checkpoints = getCheckpoints()
+                                    val replayCheckpointIndex = checkpoints.size / 2
+                                    if(index % 2 == 0){
+                                        this[runnerTable.actualDistanceId] = checkpoints.subList(0, replayCheckpointIndex)
+                                    } else {
+                                        this[runnerTable.actualDistanceId] = checkpoints.subList(replayCheckpointIndex - 1, checkpoints.size)
+                                    }
+                                }
+                                val offTrackDistances: MutableList<String> = gson.fromJsonOrNull(runnerTable.isOffTrackMapJson) ?: mutableListOf()
+                                val teamNames = mutableMapOf<String, String?>().apply {
+                                    team?.let { this[it.distanceId] = it.name }
+                                }
+                                runnerTable.toRunner(
+                                    raceIds,
+                                    distanceIds,
+                                    checkpoints,
+                                    offTrackDistances,
+                                    teamNames
+                                )
+                            }
+                        }
+                        return@mapNotNull Team(teamName, runners, distanceType)
+                    }
+                    Team(teamName, entry.value.map { it.toRunner() }, distanceType)
                 }
             }
     }
@@ -191,19 +209,70 @@ class RunnersRepositoryImpl @Inject constructor(
         return runnerDao.getRunnerWithResultsByNumber(runnerNumber)?.toRunner()
     }
 
-    private fun RunnerWithResult.toRunner(): Runner {
-        return runnerTable.toRunner(gson).apply {
-            this.raceIds.clearAndAddAll(runnerDao.getRunnerRaceIds(number))
-            this.distanceIds.clearAndAddAll(runnerDao.getRunnerDistanceIds(number))
-            this.checkpoints[actualDistanceId] = getCheckpoints()
+    override suspend fun getTeam(teamName: String): Team? {
+        val runnersTable = runnerDao.getTeamRunnersWithResults(teamName)
+        if (runnersTable.isNullOrEmpty()) return null
+        val typeString = distanceDAO.getDistanceTypeById(runnersTable.first().runnerTable.actualDistanceId)
+        val distanceType = DistanceType.valueOf(typeString)
+        if(distanceType == DistanceType.REPLAY){
+            val runners = runnersTable.sortedBy { it.runnerTable.runnerNumber }.mapIndexed { index, runnerWithResult ->
+                with(runnerWithResult){
+                    val number = runnerTable.runnerNumber
+                    val raceIds = runnerDao.getRunnerRaceIds(number).toMutableList()
+                    val distanceIds = runnerDao.getRunnerDistanceIds(number).toMutableList()
+                    val checkpoints = mutableMapOf<String, MutableList<Checkpoint>>().apply {
+                        val checkpoints = getCheckpoints()
+                        val replayCheckpointIndex = checkpoints.size / 2
+                        if(index % 2 == 0){
+                            this[runnerTable.actualDistanceId] = checkpoints.subList(0, replayCheckpointIndex)
+                        } else {
+                            this[runnerTable.actualDistanceId] = checkpoints.subList(replayCheckpointIndex - 1, checkpoints.size)
+                        }
+                    }
+                    val offTrackDistances: MutableList<String> = gson.fromJsonOrNull(runnerTable.isOffTrackMapJson) ?: mutableListOf()
+                    val teamNames = mutableMapOf<String, String?>().apply {
+                        team?.let { this[it.distanceId] = it.name }
+                    }
+                    runnerTable.toRunner(
+                        raceIds,
+                        distanceIds,
+                        checkpoints,
+                        offTrackDistances,
+                        teamNames
+                    )
+                }
+            }
+            return Team(teamName, runners, distanceType)
         }
+        val runners = runnersTable.map { it.toRunner() }
+        return Team(teamName, runners, distanceType)
+    }
+
+    private fun RunnerWithResult.toRunner(): Runner {
+        val number = runnerTable.runnerNumber
+        val raceIds = runnerDao.getRunnerRaceIds(number).toMutableList()
+        val distanceIds = runnerDao.getRunnerDistanceIds(number).toMutableList()
+        val checkpoints = mutableMapOf<String, MutableList<Checkpoint>>().apply {
+            this[runnerTable.actualDistanceId] = getCheckpoints()
+        }
+        val offTrackDistances: MutableList<String> = gson.fromJsonOrNull(runnerTable.isOffTrackMapJson) ?: mutableListOf()
+        val teamNames = mutableMapOf<String, String?>().apply {
+            team?.let { this[it.distanceId] = it.name }
+        }
+        return runnerTable.toRunner(
+            raceIds,
+            distanceIds,
+            checkpoints,
+            offTrackDistances,
+            teamNames
+        )
     }
 
     private fun RunnerWithResult.getCheckpoints(onlyFinishers: Boolean = false): MutableList<Checkpoint> {
         val distanceWithCheckpoints = distanceDAO.getDistanceWithCheckpoints(runnerTable.actualDistanceId)
         val checkpointResult = results.distinct()
         if (onlyFinishers && checkpointResult.size != distanceWithCheckpoints.checkpoints.size) return mutableListOf()
-        val result =  distanceWithCheckpoints.checkpoints.map { checkpointTable ->
+        val result = distanceWithCheckpoints.checkpoints.map { checkpointTable ->
             val runnerResults = checkpointResult.firstOrNull { it.checkpointId == checkpointTable.checkpointId }
             val checkpoint = CheckpointImpl(
                 checkpointTable.checkpointId,
@@ -220,14 +289,6 @@ class RunnersRepositoryImpl @Inject constructor(
         }.toMutableList()
         result.sortBy { it.getPosition() }
         return result
-    }
-
-    override suspend fun getRunnerTeamMembers(
-        currentRunnerNumber: String,
-        teamName: String
-    ): List<Runner>? {
-        //TODO
-        return null
     }
 
     override suspend fun getLastSavedRace(): TaskResult<Exception, Pair<String, String>> {
@@ -258,8 +319,7 @@ class RunnersRepositoryImpl @Inject constructor(
         forEach { runnerPojo ->
             val runner = runnerPojo.fromFirestoreRunner()
             runner.toRunnerTable(gson, false).also { runners.add(it) }
-            runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }
-                .also { distanceRunnerCrossRefTables.addAll(it) }
+            runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }.also { distanceRunnerCrossRefTables.addAll(it) }
             runner.teamNames.mapNotNull {
                 val teamName = it.value ?: return@mapNotNull null
                 TeamNameTable(
@@ -303,8 +363,7 @@ class RunnersRepositoryImpl @Inject constructor(
         val runnerTable = runner.toRunnerTable(gson, false)
         val resultTables = mutableListOf<ResultTable>()
         val runnerResultCrossRefTables = mutableListOf<RunnerResultCrossRef>()
-        val distanceRunnerCrossRefTables =
-            runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }
+        val distanceRunnerCrossRefTables = runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }
         val teamNameTables = runner.teamNames.mapNotNull {
             val teamName = it.value ?: return@mapNotNull null
             TeamNameTable(

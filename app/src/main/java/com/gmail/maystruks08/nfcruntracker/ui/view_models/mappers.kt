@@ -89,7 +89,7 @@ private fun Runner.toRunnerDetailView(): RunnerDetailView {
 }
 
 private fun Team.toTeamDetailView(): TeamDetailView {
-    return TeamDetailView(teamName, result, runners.map { it.toRunnerDetailView() })
+    return TeamDetailView(teamName, result?.toUITimeFormat(), runners.map { it.toRunnerDetailView() })
 }
 
 private fun Runner.toRunnerView(): RunnerView {
@@ -122,7 +122,7 @@ private fun Team.toTeamView(): TeamView {
         id = firstRunner.number + secondRunner.number,
         teamName = teamName,
         runners = runners.map { it.toRunnerView() },
-        teamResult = result
+        teamResult = result?.toUITimeFormat()
     )
 }
 
@@ -132,7 +132,7 @@ private fun Team.toTeamResultView(position: Int): TeamResultView {
         position = position,
         runners = runners.map { it.toRunnerView() },
         teamName = firstRunner.currentTeamName.orEmpty(),
-        teamResult = result
+        teamResult = result?.toUITimeFormat()
     )
 }
 

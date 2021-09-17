@@ -1,20 +1,43 @@
 package com.gmail.maystruks08.domain.entities.runner
 
+import com.gmail.maystruks08.domain.DEF_STRING_VALUE
+import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
+import java.util.*
 
 data class Team(
     val teamName: String,
-    val runners: List<Runner>
+    val runners: List<Runner>,
+    val distanceType: DistanceType
 ) : IRunner {
 
     override val id get() = teamName
     override var lastAddedCheckpoint: Checkpoint? = null
-    override val actualDistanceId: String get() = runners.firstOrNull()?.actualDistanceId?:""
+    override val actualDistanceId: String
+        get() = runners.firstOrNull()?.actualDistanceId ?: DEF_STRING_VALUE
 
-    val result: String?
+    val result: Date?
         get() {
-            //TODO implement
-            return null
+            return when (distanceType) {
+                DistanceType.REPLAY -> {
+                    val hasUncompletedCheckpoints = runners.any { runner ->
+                        runner.currentCheckpoints?.any { it is CheckpointImpl } == true
+                    }
+                    if (hasUncompletedCheckpoints) return null
+                    if (runners.any { it.currentResult == null }) return null
+                    var totalTime = 0L
+                    runners.forEach {
+                        totalTime += it.currentResult?.time ?: 0L
+                    }
+                    Date(totalTime)
+                }
+                DistanceType.TEAM -> {
+                    if (runners.any { it.currentResult == null }) return null
+                    runners.minByOrNull { it.currentResult?.time ?: Long.MAX_VALUE }?.currentResult
+                }
+                else -> null
+            }
         }
 
 

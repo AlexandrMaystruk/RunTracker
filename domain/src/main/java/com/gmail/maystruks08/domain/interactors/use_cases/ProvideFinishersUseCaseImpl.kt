@@ -27,7 +27,7 @@ class ProvideFinishersUseCaseImpl @Inject constructor(
                     if (teamName.isNullOrEmpty()) {
                         sorted.addAll(it.value)
                     } else {
-                        sorted.add(Team(teamName, it.value))
+                        sorted.add(Team(teamName, it.value, distanceType))
                     }
                 }
                 sorted.sortedByDescending { it.getPassedCheckpointCount() }

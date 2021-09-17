@@ -3,8 +3,10 @@ package com.gmail.maystruks08.domain.interactors.use_cases.runner
 import com.gmail.maystruks08.domain.INFO
 import com.gmail.maystruks08.domain.LogHelper
 import com.gmail.maystruks08.domain.entities.Change
+import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
+import com.gmail.maystruks08.domain.entities.runner.IRunner
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.exception.CheckpointNotFoundException
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
@@ -26,9 +28,18 @@ class ManageRunnerCheckpointInteractorImpl @Inject constructor(
         return runner
     }
 
-    override suspend fun addCurrentCheckpointByNumber(runnerNumber: String): Runner {
+    override suspend fun addCurrentCheckpointByNumber(runnerNumber: String): IRunner {
         val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
         markRunnerAtCheckpoint(runner)
+        val teamName = runner.currentTeamName
+        if(!teamName.isNullOrEmpty()){
+            val team = runnersRepository.getTeam(teamName)?: return runner
+            if(team.distanceType == DistanceType.REPLAY){
+                markRunnerAtCheckpoint(team.runners.last())
+                return runnersRepository.getTeam(teamName)?: return runner
+            }
+            return team
+        }
         return runner
     }
 
@@ -47,17 +58,8 @@ class ManageRunnerCheckpointInteractorImpl @Inject constructor(
         checkpointId: String
     ): Change<Runner> {
         val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
-        val actualDistanceID = runner.actualDistanceId
         logHelper.log(INFO, "Remove checkpoint: $checkpointId for runner ${runner.number}  actualDistanceId:${runner.actualDistanceId}  ${runner.fullName}")
         runner.removeCheckpoint(checkpointId)
-        val teamName = runner.teamNames[actualDistanceID]
-        if (!teamName.isNullOrEmpty() && !runner.offTrackDistances.any { it == actualDistanceID }) {
-            runnersRepository.getRunnerTeamMembers(runner.number, teamName)?.map { teamRunner ->
-                logHelper.log(INFO, "Remove checkpoint: $checkpointId for team runner ${teamRunner.number}  actualDistanceId:${runner.actualDistanceId}  ${teamRunner.fullName}")
-                teamRunner.removeCheckpoint(checkpointId)
-                runnersRepository.updateRunnerData(teamRunner)
-            }
-        }
         return Change(runnersRepository.updateRunnerData(runner), ModifierType.UPDATE)
     }
 

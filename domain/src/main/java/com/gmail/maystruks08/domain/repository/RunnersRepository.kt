@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.domain.repository
 
+import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
@@ -24,6 +25,7 @@ interface RunnersRepository {
 
     suspend fun getTeamRunnersFlow(
         distanceId: String,
+        distanceType: DistanceType,
         onlyFinishers: Boolean = false
     ): Flow<List<Team>>
 
@@ -31,7 +33,7 @@ interface RunnersRepository {
 
     suspend fun getRunnerByNumber(runnerNumber: String): Runner?
 
-    suspend fun getRunnerTeamMembers(currentRunnerNumber: String, teamName: String): List<Runner>?
+    suspend fun getTeam(teamName: String): Team?
 
     @Throws(SaveRunnerDataException::class, SyncWithServerException::class)
     suspend fun updateRunnerData(runner: Runner): Runner

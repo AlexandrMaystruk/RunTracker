@@ -59,6 +59,11 @@ interface RunnerDao : BaseDao<RunnerTable> {
     fun getRunnerWithResults(raceId: String, distanceId: String): List<RunnerWithResult>
 
     @Transaction
+    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber INNER JOIN teams ON runners.runnerNumber == teams.runnerId WHERE teams.name =:teamName;")
+    fun getTeamRunnersWithResults(teamName: String): List<RunnerWithResult>
+
+
+    @Transaction
     @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE actualRaceId =:raceId AND distanceId =:distanceId AND runners.runnerNumber LIKE '%' || :query || '%';")
     fun getRunnerWithResultsQuery(raceId: String, distanceId: String, query: String): List<RunnerWithResult>
 

@@ -26,6 +26,9 @@ interface DistanceDAO : BaseDao<DistanceTable> {
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId")
     fun getDistanceById(distanceId: String): DistanceTable
 
+    @Query("SELECT type FROM distances WHERE distanceId =:distanceId")
+    fun getDistanceTypeById(distanceId: String): String
+
     @Transaction
     @Query("SELECT * FROM distances WHERE distanceId =:distanceId")
     fun getDistanceWithCheckpoints(distanceId: String): DistanceWithCheckpoints

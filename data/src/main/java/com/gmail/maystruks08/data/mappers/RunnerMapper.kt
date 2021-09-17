@@ -23,9 +23,6 @@ fun RunnerPojo.fromFirestoreRunner(): Runner {
             )
         }.toMutableList()
     }
-    val totalResultsMap = mutableMapOf<String, Date?>().apply {
-        totalResults.forEach { (t, u) -> put(t, u?.parseServerTime()) }
-    }
     return Runner(
         number,
         cardId,
@@ -42,8 +39,10 @@ fun RunnerPojo.fromFirestoreRunner(): Runner {
         checkpointsResult,
         offTrackDistances,
         teamNames,
-        totalResultsMap
-    )
+        mutableMapOf()
+    ).also {
+        it.calculateTotalResults()
+    }
 }
 
 fun Checkpoint.toFirestoreCheckpoint() = CheckpointPojo(id = getId(), distanceId = getDistanceId(), name = getName(), runnerTime = getResult()?.toServerFormat().orEmpty(), position = getPosition())

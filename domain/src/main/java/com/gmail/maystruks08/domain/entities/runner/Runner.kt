@@ -146,6 +146,16 @@ data class Runner(
         }
     }
 
+    fun calculateTotalResults() {
+        if(currentCheckpoints?.any { it is CheckpointImpl } == true) return
+        val actualCheckpoints = currentCheckpoints ?: mutableListOf()
+        val first = actualCheckpoints.firstOrNull()?.getResult()
+        val last = actualCheckpoints.lastOrNull()?.getResult()
+        if (first != null && last != null) {
+            totalResults[actualDistanceId] = Date(last.time - first.time)
+        }
+    }
+
     fun getCheckpointCount() = checkpoints[actualDistanceId]?.count() ?: 0
 
     override fun getPassedCheckpointCount() =
