@@ -1,8 +1,10 @@
 package com.gmail.maystruks08.nfcruntracker.ui.view_models
 
 import android.graphics.Paint
+import com.gmail.maystruks08.domain.entities.CheckpointStatistic
 import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.Race
+import com.gmail.maystruks08.domain.entities.Statistic
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.runner.IRunner
@@ -202,6 +204,13 @@ fun Checkpoint.toCheckpointView(
     )
 }
 
+fun CheckpointStatistic.toCheckpointStatisticViewView(): CheckpointStatisticView {
+    return CheckpointStatisticView(
+        title = checkpointName,
+        runnerCountInProgress = runnerCountInProgress.toString(),
+        runnerCountWhoVisitCheckpoint = runnerCountWhoVisitCheckpoint.toString()
+    )
+}
 
 fun Checkpoint.toCheckpointEditView(checkpointPosition: CheckpointPosition): EditCheckpointView {
     return EditCheckpointView(

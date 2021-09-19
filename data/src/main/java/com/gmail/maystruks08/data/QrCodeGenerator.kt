@@ -15,7 +15,6 @@ import javax.inject.Inject
 class QrCodeGenerator @Inject constructor() {
 
     companion object {
-        @Suppress("DEPRECATION")
         private val qrPackageName = Environment.getExternalStorageDirectory().path + "/RunTracker"
         private const val IMAGES = "/QR_codes"
     }
@@ -32,7 +31,7 @@ class QrCodeGenerator @Inject constructor() {
                 rqCodeBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
                 counter++
             } catch (e: Exception) {
-                e.printStackTrace()
+                Timber.e(e)
             } finally {
                 try {
                     fos?.close()

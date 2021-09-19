@@ -9,7 +9,7 @@ import com.gmail.maystruks08.data.remote.pojo.RacePojo
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.data.serializeToMap
 import com.gmail.maystruks08.domain.entities.Change
-import com.gmail.maystruks08.domain.entities.DistanceStatistic
+import com.gmail.maystruks08.domain.entities.Statistic
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.google.firebase.firestore.DocumentChange
@@ -132,7 +132,7 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
 
     override suspend fun updateDistanceStatistic(
         distanceId: String,
-        distanceStatistic: DistanceStatistic
+        distanceStatistic: Statistic
     ) {
         val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distanceId.replaceSpecialSymbols())
         awaitTaskCompletable(

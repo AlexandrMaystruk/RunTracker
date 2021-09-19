@@ -1,4 +1,4 @@
-package com.gmail.maystruks08.nfcruntracker.ui.main.dialogs.statistic
+package com.gmail.maystruks08.nfcruntracker.ui.statistic
 
 import android.os.Bundle
 import androidx.fragment.app.viewModels
@@ -10,6 +10,7 @@ import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.argument
 import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentDistanceStatisticBinding
+import com.gmail.maystruks08.nfcruntracker.ui.adapter.AppAdapter
 import com.gmail.maystruks08.nfcruntracker.ui.main.dialogs.CheckpointAdapter
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,8 +19,7 @@ import kotlinx.coroutines.flow.collect
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class DistanceStatisticFragment : BaseFragment(R.layout.fragment_distance_statistic),
-    CheckpointAdapter.Interaction {
+class DistanceStatisticFragment : BaseFragment(R.layout.fragment_distance_statistic) {
 
     private val viewModel: DistanceStatisticViewModel by viewModels()
     private var raceId: String by argument()
@@ -28,17 +28,17 @@ class DistanceStatisticFragment : BaseFragment(R.layout.fragment_distance_statis
         binding.rvCheckpoints.adapter = null
     }
 
-    private var checkpointAdapter: CheckpointAdapter? = null
+    private var checkpointAdapter: AppAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkpointAdapter = CheckpointAdapter(this)
+        checkpointAdapter = AppAdapter(listOf(CheckpointStatisticHolderManager()))
     }
 
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
         .withNavigationIcon(R.drawable.ic_arrow_back) { viewModel.onBackClicked() }
-        .withTitle(R.string.screen_runner)
+        .withTitle(R.string.screen_distance_statistic)
         .build()
 
     override fun bindViewModel() {
@@ -53,7 +53,7 @@ class DistanceStatisticFragment : BaseFragment(R.layout.fragment_distance_statis
             }
             lifecycleScope.launchWhenStarted {
                 showCheckpoints.collect {
-                    checkpointAdapter?.checkpoints = it
+                    checkpointAdapter?.submitList(it)
                 }
             }
 
@@ -70,10 +70,6 @@ class DistanceStatisticFragment : BaseFragment(R.layout.fragment_distance_statis
         with(binding) {
             rvCheckpoints.adapter = checkpointAdapter
         }
-
-    }
-
-    override fun onClickAtCheckpoint(checkpointView: CheckpointView) {
 
     }
 

@@ -148,6 +148,10 @@ interface RunnerUseCaseModule {
     @ActivityScoped
     fun bindProvideDistanceUseCase(impl: ProvideDistanceUseCaseImpl): ProvideDistanceUseCase
 
+    @Binds
+    @ActivityScoped
+    fun bindCalculateCheckpointStatisticUseCase(impl: CalculateCheckpointStatisticUseCaseImpl): CalculateCheckpointStatisticUseCase
+
 }
 
 

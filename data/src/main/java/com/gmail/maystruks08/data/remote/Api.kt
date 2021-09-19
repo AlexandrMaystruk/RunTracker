@@ -5,7 +5,7 @@ import com.gmail.maystruks08.data.remote.pojo.DistancePojo
 import com.gmail.maystruks08.data.remote.pojo.RacePojo
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.domain.entities.Change
-import com.gmail.maystruks08.domain.entities.DistanceStatistic
+import com.gmail.maystruks08.domain.entities.Statistic
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.flow.Flow
@@ -28,7 +28,7 @@ interface Api{
 
     suspend fun updateDistanceRunners(distanceId: String, runnerIds: List<String>)
 
-    suspend fun updateDistanceStatistic(distanceId: String, distanceStatistic: DistanceStatistic)
+    suspend fun updateDistanceStatistic(distanceId: String, distanceStatistic: Statistic)
 
     suspend fun updateDistanceName(distanceId: String, newName: String)
 

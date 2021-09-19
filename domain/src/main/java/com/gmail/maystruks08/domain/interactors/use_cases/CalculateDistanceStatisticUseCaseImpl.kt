@@ -1,7 +1,6 @@
 package com.gmail.maystruks08.domain.interactors.use_cases
 
-import com.gmail.maystruks08.domain.entities.DistanceStatistic
-import com.gmail.maystruks08.domain.interactors.use_cases.CalculateDistanceStatisticUseCase
+import com.gmail.maystruks08.domain.entities.Statistic
 import com.gmail.maystruks08.domain.repository.DistanceStatisticRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -13,7 +12,7 @@ class CalculateDistanceStatisticUseCaseImpl @Inject constructor(
     private val distanceStatisticRepository: DistanceStatisticRepository
 ) : CalculateDistanceStatisticUseCase {
 
-    override suspend fun invoke(distanceId: String?): DistanceStatistic? {
+    override suspend fun invoke(distanceId: String?): Statistic? {
         if(distanceId.isNullOrEmpty()) return null
         val raceId = provideCurrentRaceIdUseCase.invoke()
        return withContext(Dispatchers.Default) {
@@ -30,7 +29,7 @@ class CalculateDistanceStatisticUseCaseImpl @Inject constructor(
             val finisherCount = finisherCountDeferred.await()
             val offTrackCount = offTrackCountDeferred.await()
 
-            val statistic = DistanceStatistic(
+            val statistic = Statistic(
             distanceId = distanceId,
             runnerCountInProgress = runnerCount - offTrackCount - finisherCount,
             runnerCountOffTrack = offTrackCount,

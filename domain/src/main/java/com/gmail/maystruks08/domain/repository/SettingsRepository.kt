@@ -10,4 +10,6 @@ interface SettingsRepository {
 
     suspend fun exportRunnerDataFromXlsToRemote()
 
+    suspend fun generateQrCodes()
+
 }

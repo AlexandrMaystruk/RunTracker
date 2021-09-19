@@ -12,7 +12,7 @@ data class Distance(
     val authorId: String,
     val dateOfStart: Date?,
     val checkpoints: MutableList<Checkpoint>,
-    val statistic: DistanceStatistic,
+    val statistic: Statistic,
     val runners: MutableSet<Runner> = sortedSetOf(
         compareBy<Runner> { it.totalResults[id] }
             .thenBy { runner -> runner.offTrackDistances.any { it == id } }

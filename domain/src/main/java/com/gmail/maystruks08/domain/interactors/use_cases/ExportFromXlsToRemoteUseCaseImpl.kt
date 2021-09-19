@@ -9,7 +9,8 @@ class ExportFromXlsToRemoteUseCaseImpl @Inject constructor(
 ) : ExportFromXlsToRemoteUseCase {
 
     override suspend fun invoke() {
-        repository.exportRunnerDataFromXlsToRemote()
+        repository.generateQrCodes()
+//        repository.exportRunnerDataFromXlsToRemote()
     }
 
 }

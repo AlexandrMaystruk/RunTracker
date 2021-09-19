@@ -1,6 +1,5 @@
 package com.gmail.maystruks08.nfcruntracker.core.navigation
 
-import com.gmail.maystruks08.domain.entities.DistanceStatistic
 import com.gmail.maystruks08.nfcruntracker.core.ext.name
 import com.gmail.maystruks08.nfcruntracker.ui.race.edit.RaceEditorFragment
 import com.gmail.maystruks08.nfcruntracker.ui.login.LoginFragment
@@ -9,7 +8,7 @@ import com.gmail.maystruks08.nfcruntracker.ui.race.RaceFragment
 import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.main.MainScreenFragment
-import com.gmail.maystruks08.nfcruntracker.ui.main.dialogs.statistic.DistanceStatisticFragment
+import com.gmail.maystruks08.nfcruntracker.ui.statistic.DistanceStatisticFragment
 import com.gmail.maystruks08.nfcruntracker.ui.settings.SettingsFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi

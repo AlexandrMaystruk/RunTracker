@@ -86,6 +86,12 @@ interface DistanceDAO : BaseDao<DistanceTable> {
         distanceId: String
     ): Int
 
+    @Query("SELECT COUNT(*) FROM result WHERE checkpointId =:checkpointId AND distanceId =:distanceId")
+    fun getFinisherCountAtCheckpoint(
+        distanceId: String,
+        checkpointId: String
+    ): Int
+
 
     @Query("SELECT runnerCountInProgress, runnerCountOffTrack, finisherCount FROM distances WHERE raceId =:raceId AND distanceId =:distanceId")
     fun getDistanceStatistic(

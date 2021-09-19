@@ -2,7 +2,7 @@ package com.gmail.maystruks08.domain.entities
 
 import com.gmail.maystruks08.domain.entities.runner.Runner
 
-data class DistanceStatistic(val distanceId: String, var runnerCountInProgress: Int = 0, var runnerCountOffTrack: Int = 0, var finisherCount: Int = 0){
+data class Statistic(val distanceId: String, var runnerCountInProgress: Int = 0, var runnerCountOffTrack: Int = 0, var finisherCount: Int = 0){
 
     fun calculateStatistic(distanceRunners: List<Runner>){
         runnerCountInProgress = distanceRunners.size

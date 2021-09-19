@@ -102,7 +102,11 @@ class HostActivity : AppCompatActivity() {
                 snackBar?.dismiss()
             }
         }
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE)
+        ActivityCompat.requestPermissions(this, arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ), CAMERA_REQUEST_CODE)
     }
 
     override fun onBackPressed() {

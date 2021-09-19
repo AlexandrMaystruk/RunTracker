@@ -17,7 +17,7 @@ data class EditCheckpointView(
 ) : EditCheckpoint
 
 
-data class CheckpointView/**/(
+data class CheckpointView(
     val id: String,
     val title: String,
     val position: CheckpointPosition,
@@ -26,6 +26,11 @@ data class CheckpointView/**/(
     var date: Date? = null
 ) : Item
 
+data class CheckpointStatisticView(
+    val title: String,
+    var runnerCountWhoVisitCheckpoint: String,
+    var runnerCountInProgress: String
+) : Item
 
 sealed class CheckpointPosition {
     object Start : CheckpointPosition()

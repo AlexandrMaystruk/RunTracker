@@ -1,7 +1,7 @@
 package com.gmail.maystruks08.data.repository
 
 import com.gmail.maystruks08.data.local.dao.DistanceDAO
-import com.gmail.maystruks08.domain.entities.DistanceStatistic
+import com.gmail.maystruks08.domain.entities.Statistic
 import com.gmail.maystruks08.domain.repository.DistanceStatisticRepository
 import javax.inject.Inject
 
@@ -21,7 +21,15 @@ class DistanceStatisticRepositoryImpl @Inject constructor(
         return distanceDAO.getRunnerCountOffTrack(raceId, distanceId)
     }
 
-    override suspend fun saveDistanceStatistic(raceId: String, statistic: DistanceStatistic) {
+    override suspend fun getCheckpointRunnerFinisherCount(
+        raceId: String,
+        distanceId: String,
+        checkpointId: String
+    ): Int {
+        return distanceDAO.getFinisherCountAtCheckpoint(distanceId, checkpointId)
+    }
+
+    override suspend fun saveDistanceStatistic(raceId: String, statistic: Statistic) {
         val statisticTable = distanceDAO.getDistanceStatistic(raceId, statistic.distanceId)
         if (
             statisticTable?.finisherCount != statistic.finisherCount ||
