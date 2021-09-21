@@ -18,7 +18,8 @@ data class RunnerTable(
     val dateOfBirthday: Date?,
     val actualRaceId: String,
     val actualDistanceId: String,
-    val isOffTrackMapJson: String,
+    val currentTeamName: String?,
+    val isOffTrackDistance: String?,
     val needToSync: Boolean = true
 )
 

@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.domain.repository
 
+import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.Team
@@ -11,21 +12,14 @@ interface RunnersRepository {
 
     suspend fun observeRunnerData(raceId: String): Flow<Unit>
 
-    suspend fun getRunners(
-        distanceId: String,
-        query: String,
-        onlyFinishers: Boolean = false
-    ): List<Runner>
-
     suspend fun getRunnersFlow(
-        distanceId: String,
+        distance: Distance,
         onlyFinishers: Boolean = false,
         query: String? = null
     ): Flow<List<Runner>>
 
     suspend fun getTeamRunnersFlow(
-        distanceId: String,
-        distanceType: DistanceType,
+        distance: Distance,
         onlyFinishers: Boolean = false
     ): Flow<List<Team>>
 

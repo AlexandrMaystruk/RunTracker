@@ -1,7 +1,7 @@
 package com.gmail.maystruks08.domain.interactors.use_cases
 
 import com.gmail.maystruks08.domain.LogHelper
-import com.gmail.maystruks08.domain.entities.DistanceType
+import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.runner.IRunner
 import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.domain.repository.RunnersRepository
@@ -15,11 +15,10 @@ class ProvideFinishersUseCaseImpl @Inject constructor(
 ) : ProvideFinishersUseCase {
 
     override suspend fun invoke(
-        distanceId: String,
-        distanceType: DistanceType,
+        distance: Distance,
         query: String?
     ): Flow<List<IRunner>> {
-        return runnersRepository.getRunnersFlow(distanceId = distanceId, onlyFinishers = true)
+        return runnersRepository.getRunnersFlow(distance = distance, onlyFinishers = true)
             .map { list ->
                 val sorted = mutableListOf<IRunner>()
                 list.groupBy { it.currentTeamName }.forEach {
@@ -27,7 +26,7 @@ class ProvideFinishersUseCaseImpl @Inject constructor(
                     if (teamName.isNullOrEmpty()) {
                         sorted.addAll(it.value)
                     } else {
-                        sorted.add(Team(teamName, it.value, distanceType))
+                        sorted.add(Team(teamName, it.value, distance.type))
                     }
                 }
                 sorted.sortedByDescending { it.getPassedCheckpointCount() }

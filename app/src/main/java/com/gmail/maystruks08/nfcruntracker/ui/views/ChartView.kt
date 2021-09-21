@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.os.Parcel
 import android.os.Parcelable
+import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.ColorRes
@@ -98,7 +99,7 @@ class ChartView : View {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        chart.getRecalculatedChartItems().forEach {
+        chart.getRecalculatedChartItems(_radius).forEach {
             drawSegment(canvas, it.startAngle, it.endAngle, it.backgroundColor, strokeWidth)
             drawText(
                 canvas,
@@ -170,12 +171,19 @@ class ChartView : View {
 
     internal data class Chart(val chartItems: MutableList<ChartItem> = mutableListOf()) {
 
-        fun getRecalculatedChartItems(): List<ChartItemInternal> {
+        fun getRecalculatedChartItems(_radius: Float): List<ChartItemInternal> {
             val progressSum = chartItems.sumBy { it.progress }.toFloat()
             var startAngleInDegrease = 0f
             return chartItems.map {
                 val progressInPercent = it.progress / progressSum * 100
                 val endAngleInDegrease = startAngleInDegrease + (progressInPercent / 100 * 360)
+//                val circleLength = 2 * 3.14 * _radius
+//                val angle = endAngleInDegrease - startAngleInDegrease
+//                val segmentLength =  ((3.14 * _radius) / 180) * angle
+//                val textLength = paint.measureText(it.text)
+//                if(textLength < segmentLength){
+//                    //recalculate
+//                }
                 val item = ChartItemInternal(
                     it.text,
                     it.textColor,

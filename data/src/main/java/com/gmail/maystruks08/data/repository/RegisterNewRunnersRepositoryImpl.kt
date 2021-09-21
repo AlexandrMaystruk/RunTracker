@@ -15,37 +15,34 @@ import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
 import com.gmail.maystruks08.domain.repository.RegisterNewRunnersRepository
-import com.google.gson.Gson
 import javax.inject.Inject
 
 class RegisterNewRunnersRepositoryImpl @Inject constructor(
     private val api: Api,
     private val runnerDao: RunnerDao,
     private val distanceDAO: DistanceDAO,
-    private val networkUtil: NetworkUtil,
-    private val gson: Gson
+    private val networkUtil: NetworkUtil
 ) : RegisterNewRunnersRepository {
 
     override suspend fun saveNewRunners(raceId: String, distanceId: String, runners: List<Runner>) {
         runners.forEach { runner ->
             try {
-                val runnerTable = runner.toRunnerTable(gson, false)
-
-                val resultTables = runner.checkpoints
-                    .map { it.value }
+                val runnerTable = runner.toRunnerTable(false)
+                val resultTables = runner.currentCheckpoints
                     .filterIsInstance<CheckpointResultIml>()
                     .map { it.toResultTable(runnerTable.runnerNumber) }
-
                 val runnerResultCrossRefTables = resultTables.map { RunnerResultCrossRef(runner.number, it.checkpointId) }
-                val distanceRunnerCrossRefTables = runner.distanceIds.map { DistanceRunnerCrossRef(it, runner.number) }
-                val teamNameTables = runner.teamNames.mapNotNull {
-                    val teamName =  it.value?:return@mapNotNull null
-                    TeamNameTable(
-                        distanceId = it.key,
-                        runnerId = runner.number,
-                        name = teamName
-                    )
+                val distanceRunnerCrossRefTables = mutableListOf(DistanceRunnerCrossRef(runner.actualDistanceId, runner.number))
+                val teamNameTables = mutableListOf<TeamNameTable>().apply {
+                    runner.currentTeamName?.let {
+                        TeamNameTable(
+                            distanceId = runner.actualDistanceId,
+                            runnerId = runner.number,
+                            name = it
+                        )
+                    }?.also { add(it) }
                 }
+
                 runnerDao.insertOrReplaceRunner(
                     runnerTable,
                     resultTables,

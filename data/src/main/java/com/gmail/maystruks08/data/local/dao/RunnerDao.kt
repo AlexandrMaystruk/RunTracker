@@ -51,16 +51,20 @@ interface RunnerDao : BaseDao<RunnerTable> {
 
     @Transaction
     @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE actualRaceId =:raceId AND distanceId =:distanceId")
-    fun getRunnerWithResultsFlow(raceId: String, distanceId: String): Flow<List<RunnerWithResult>>
+    fun getRunnersWithResultsFlow(raceId: String, distanceId: String): Flow<List<RunnerWithResult>>
 
 
     @Transaction
     @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE actualRaceId =:raceId AND distanceId =:distanceId;")
-    fun getRunnerWithResults(raceId: String, distanceId: String): List<RunnerWithResult>
+    fun getRunnersWithResults(raceId: String, distanceId: String): List<RunnerWithResult>
+
+    @Transaction
+    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber INNER JOIN teams ON runners.runnerNumber == teams.runnerId WHERE runners.actualRaceId =:raceId AND runners.actualDistanceId =:distanceId AND teams.name IS NOT NULL;")
+    fun getTeamRunnersWithResults(raceId: String, distanceId: String): List<RunnerWithResult>
 
     @Transaction
     @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber INNER JOIN teams ON runners.runnerNumber == teams.runnerId WHERE teams.name =:teamName;")
-    fun getTeamRunnersWithResults(teamName: String): List<RunnerWithResult>
+    fun getTeamRunnersWithResultsByName(teamName: String): List<RunnerWithResult>
 
 
     @Transaction

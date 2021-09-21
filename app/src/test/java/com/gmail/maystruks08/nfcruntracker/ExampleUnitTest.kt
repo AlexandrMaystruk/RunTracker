@@ -17,11 +17,11 @@ class ExampleUnitTest {
             .apply {
                 chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorPrimary, 10))
                 chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorGreen, 10))
-                chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorRed, 10))
+                chartItems.add(ChartItem("Text", R.color.colorText, R.color.colorRed, 1))
             }
 
         println(chart.chartItems.toTypedArray().contentToString())
-        val result = chart.getRecalculatedChartItems()
+        val result = chart.getRecalculatedChartItems(100f)
         println(result.toTypedArray().contentToString())
     }
 }

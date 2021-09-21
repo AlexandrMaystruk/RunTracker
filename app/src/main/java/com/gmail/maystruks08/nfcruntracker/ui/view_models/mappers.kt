@@ -76,15 +76,15 @@ fun IRunner.toRunnerDetailView(): RunnerDetailScreenItem {
 
 
 private fun Runner.toRunnerDetailView(): RunnerDetailView {
-    val isOffTrack = offTrackDistances.any { it == actualDistanceId }
+    val isOffTrack = actualDistanceId == offTrackDistance
     return RunnerDetailView(
         id = this.number,
         fullName = this.fullName,
         city = this.city,
-        result = this.totalResults[actualDistanceId]?.toUITimeFormat(),
+        result = currentResult?.toUITimeFormat(),
         dateOfBirthday = this.dateOfBirthday?.toDateFormat().orEmpty(),
         actualDistanceId = this.actualDistanceId,
-        progress = this.checkpoints[actualDistanceId]?.toCheckpointViews(isOffTrack = isOffTrack).orEmpty(),
+        progress = currentCheckpoints.toCheckpointViews(isOffTrack = isOffTrack),
         cardId = this.cardId,
         isOffTrack = isOffTrack
     )
@@ -95,14 +95,14 @@ private fun Team.toTeamDetailView(): TeamDetailView {
 }
 
 private fun Runner.toRunnerView(): RunnerView {
-    val isOffTrack = offTrackDistances.any { it == actualDistanceId }
+    val isOffTrack = actualDistanceId == offTrackDistance
     return RunnerView(
         id = this.number,
         shortName = this.shortName,
-        result = this.totalResults[actualDistanceId]?.toUITimeFormat(),
+        result = currentResult?.toUITimeFormat(),
         actualDistanceId = this.actualDistanceId,
-        progress = this.checkpoints[actualDistanceId]?.toCheckpointViews(isOffTrack = isOffTrack).orEmpty(),
-        isOffTrack = isOffTrack,
+        progress = currentCheckpoints.toCheckpointViews(isOffTrack = isOffTrack),
+        isOffTrack = actualDistanceId == offTrackDistance,
         placeholder = false
     )
 }
@@ -112,7 +112,7 @@ private fun Runner.toRunnerResultView(position: Int): RunnerResultView {
     return RunnerResultView(
         runnerNumber = this.number,
         runnerFullName = this.fullName,
-        runnerResultTime = this.totalResults[actualDistanceId]!!.time.timeInMillisToTimeFormat(),
+        runnerResultTime = currentResult!!.time.timeInMillisToTimeFormat(),
         position = position
     )
 }
@@ -139,9 +139,9 @@ private fun Team.toTeamResultView(position: Int): TeamResultView {
 }
 
 fun List<Checkpoint>.toCheckpointViews(isOffTrack: Boolean): List<CheckpointView> {
+    sortedBy { it.getPosition() }
     val current = this.findLast { it.getResult() != null }
     val titlePaintFlag = if (isOffTrack) Paint.STRIKE_THRU_TEXT_FLAG else Paint.LINEAR_TEXT_FLAG
-
     return mapIndexed { index, it ->
         val title: String
         val position =

@@ -14,25 +14,25 @@ data class Race(
     val distanceList: MutableList<Distance>
 ) {
 
-    fun findDistance(distanceId: String): Distance? {
-        return distanceList.firstOrNull { it.id == distanceId }
-    }
-
-    fun findRunner(distanceId: String, runnerId: String): Runner? {
-        return findDistance(distanceId)?.findRunnerById(runnerId)
-    }
-
-    fun findRunnerByCardId(distanceId: String, cardId: String): Runner? {
-        return findDistance(distanceId)?.findRunnerByCardId(cardId)
-    }
-
-    fun findRunnerTeamMembers(
-        distanceId: String,
-        currentRunnerNumber: String,
-        teamName: String
-    ): List<Runner>? {
-        return findDistance(distanceId)?.findRunnerTeamMembers(currentRunnerNumber, teamName)
-    }
+//    fun findDistance(distanceId: String): Distance? {
+//        return distanceList.firstOrNull { it.id == distanceId }
+//    }
+//
+//    fun findRunner(distanceId: String, runnerId: String): Runner? {
+//        return findDistance(distanceId)?.findRunnerById(runnerId)
+//    }
+//
+//    fun findRunnerByCardId(distanceId: String, cardId: String): Runner? {
+//        return findDistance(distanceId)?.findRunnerByCardId(cardId)
+//    }
+//
+//    fun findRunnerTeamMembers(
+//        distanceId: String,
+//        currentRunnerNumber: String,
+//        teamName: String
+//    ): List<Runner>? {
+//        return findDistance(distanceId)?.findRunnerTeamMembers(currentRunnerNumber, teamName)
+//    }
 
     fun createNewDistance(
         id: String,
@@ -52,11 +52,12 @@ data class Race(
             dateOfStart = dateOrStart,
             checkpoints = checkpoints ?: mutableListOf(),
             statistic = Statistic(distanceId = id),
-            runners = sortedSetOf(
-                compareBy<Runner> { it.totalResults[id] }
-                    .thenBy { runner -> runner.offTrackDistances.any { it == runner.actualDistanceId } }
-                    .thenBy { runner -> runner.checkpoints[id]?.count { it.getResult() != null } }
-            ))
+//            runners = sortedSetOf(
+//                compareBy<Runner> { it.totalResults[id] }
+//                    .thenBy { runner -> runner.offTrackDistances.any { it == runner.actualDistanceId } }
+//                    .thenBy { runner -> runner.checkpoints[id]?.count { it.getResult() != null } }
+//            )
+        )
         distanceList.add(newDistance)
     }
 

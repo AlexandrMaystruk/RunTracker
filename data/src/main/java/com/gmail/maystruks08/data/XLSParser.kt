@@ -24,7 +24,8 @@ class XLSParser @Inject constructor(private val context: Context) {
     fun readExcelFileFromAssets(
         raceId: String,
         distanceId: String,
-        fileName: String
+        fileName: String,
+        isTeam: Boolean = false
     ): List<Runner> {
         val result = mutableListOf<Runner>()
         try {
@@ -48,41 +49,42 @@ class XLSParser @Inject constructor(private val context: Context) {
                 val city = ""
                 var number: String? = null
                 val dateOfBirthday: Date? = null
-                val raceIds: MutableList<String> = mutableListOf(raceId)
-                val distanceIds: MutableList<String> = mutableListOf(distanceId)
-                val checkpointMap: MutableMap<String, MutableList<Checkpoint>> = mutableMapOf()
-                val offTrackDistances: MutableList<String> = mutableListOf()
-                val teamNames: MutableMap<String, String?> = mutableMapOf()
-                val totalResults: MutableMap<String, Date?> = mutableMapOf()
+                var teamName: String? = null
 
                 while (cellIterator.hasNext()) {
                     val myCell = cellIterator.next() as HSSFCell
-                    when (columnNumber) {
-                        0 -> number = myCell.toString().replace(".0", "")
-                        1 -> fullName = myCell.toString()
-                        2 -> shortName = myCell.toString()
-                        3 -> teamNames[distanceId] = if (myCell.toString().isEmpty()) null else myCell.toString()
+                    if(isTeam){
+                        when (columnNumber) {
+                            0 -> number = myCell.toString().replace(".0", "").trim()
+                            1 -> teamName = if (myCell.toString().isEmpty()) null else myCell.toString().trim()
+                            2 -> fullName = myCell.toString().trim()
+                            3 -> shortName = myCell.toString().trim()
+                        }
+                    }else {
+                        when (columnNumber) {
+                            0 -> number = myCell.toString().replace(".0", "").trim()
+                            1 -> fullName = myCell.toString().trim()
+                            2 -> shortName = myCell.toString().trim()
+                        }
                     }
                     columnNumber++
                 }
                 if (!number.isNullOrEmpty()) {
                     val newRunner = Runner(
                         cardId = "",
-                        fullName = fullName,
-                        shortName = shortName,
-                        phone = phone,
-                        number = number,
+                        fullName = fullName.trim(),
+                        shortName = shortName.trim(),
+                        phone = phone.trim(),
+                        number = number.trim(),
                         sex = runnerSex,
-                        city = city,
+                        city = city.trim(),
                         dateOfBirthday = dateOfBirthday,
                         actualDistanceId = distanceId,
                         actualRaceId = raceId,
-                        distanceIds = distanceIds,
-                        offTrackDistances = offTrackDistances,
-                        raceIds = raceIds,
-                        teamNames = teamNames,
-                        totalResults = totalResults,
-                        checkpoints = checkpointMap
+                        currentCheckpoints = mutableListOf(),
+                        offTrackDistance = null,
+                        currentTeamName = teamName,
+                        currentResult = null
                     )
                     result.add(newRunner)
                     Timber.e(newRunner.toString())
@@ -94,44 +96,4 @@ class XLSParser @Inject constructor(private val context: Context) {
         }
         return result
     }
-
-
-    enum class AppCustomDateFormat {
-        SERVER_DATETIME_FORMAT, SERVER_DATE_FORMAT;
-
-        companion object {
-            fun getFormatString(name: AppCustomDateFormat): String {
-                return when (name) {
-                    SERVER_DATETIME_FORMAT -> "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-                    SERVER_DATE_FORMAT -> "dd.MM.yyyy"
-                }
-            }
-        }
-    }
-
-    fun BigDecimal.hasFraction(): Boolean {
-        val fractionalPart = this.remainder(BigDecimal.ONE)
-        return fractionalPart > BigDecimal.ZERO
-    }
-
-    fun BigDecimal.roundToInteger(): BigDecimal {
-        val fractionalPart = this.remainder(BigDecimal.ONE)
-        return if (fractionalPart > BigDecimal.ZERO) {
-            this - fractionalPart + BigDecimal.ONE
-        } else this
-    }
-
-    private fun parseDateString(date: String, format: AppCustomDateFormat): Date = try {
-        val dateFormat = AppCustomDateFormat.getFormatString(format)
-        val df = SimpleDateFormat(dateFormat, Locale.getDefault())
-        df.parse(date)
-    } catch (e: ParseException) {
-        Timber.d("Error parse date in - $date, format - ${format.name}")
-        if (format == AppCustomDateFormat.SERVER_DATETIME_FORMAT) {
-            parseDateString(date, AppCustomDateFormat.SERVER_DATETIME_FORMAT)
-        } else {
-            Date()
-        }
-    }
-
 }

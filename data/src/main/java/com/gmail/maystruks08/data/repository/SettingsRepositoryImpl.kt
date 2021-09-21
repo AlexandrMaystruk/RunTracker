@@ -45,20 +45,11 @@ class SettingsRepositoryImpl @Inject constructor(
         val raceId = getUUID(raceName)
         val uniqueId = raceId
         val runners = xlsParser.readExcelFileFromAssets(raceId, "runners_$uniqueId", "100_24_run.xls")
-        val iron = xlsParser.readExcelFileFromAssets(raceId, "iron_$uniqueId", "100_24_iron_run.xls")
-        val relayRace = xlsParser.readExcelFileFromAssets(raceId, "relay_race_$uniqueId", "100_24_estaf.xls")
-        val teams = xlsParser.readExcelFileFromAssets(raceId, "teams_$uniqueId", "100_24_run_group.xls")
+        val iron = xlsParser.readExcelFileFromAssets(raceId, "iron_$uniqueId", "100_24_iron.xls")
+        val relayRace = xlsParser.readExcelFileFromAssets(raceId, "relay_race_$uniqueId", "100_24_run_replay.xls", true)
+        val teams = xlsParser.readExcelFileFromAssets(raceId, "teams_$uniqueId", "100_24_run_team.xls", true)
 
         val distances = listOf(
-            DistancePojo(
-                id = "runners_$uniqueId",
-                raceId = raceId,
-                name = "Бегуны",
-                type = DistanceType.MARATHON.name,
-                authorId = authorId,
-                dateOfStart = null,
-                runnerIds = runners.map { it.number }
-            ),
             DistancePojo(
                 id = "iron_$uniqueId",
                 raceId = raceId,
@@ -67,6 +58,15 @@ class SettingsRepositoryImpl @Inject constructor(
                 authorId = authorId,
                 dateOfStart = null,
                 runnerIds = iron.map { it.number }
+            ),
+            DistancePojo(
+                id = "runners_$uniqueId",
+                raceId = raceId,
+                name = "Бегуны",
+                type = DistanceType.MARATHON.name,
+                authorId = authorId,
+                dateOfStart = null,
+                runnerIds = runners.map { it.number }
             ),
             DistancePojo(
                 id = "relay_race_$uniqueId",
@@ -113,8 +113,8 @@ class SettingsRepositoryImpl @Inject constructor(
 
     private fun getCheckpoints(distanceName: String, distanceId: String): List<DistanceCheckpointPojo> {
         return when (distanceName) {
-            "Бегуны" -> getNormalCheckpoints(distanceId)
             "Железные" -> getIronCheckpoints(distanceId)
+            "Бегуны" -> getNormalCheckpoints(distanceId)
             "Эстафета" -> getEstafCheckpoints(distanceId)
             "Команды" -> getTeamCheckpoints(distanceId)
             else -> throw RuntimeException()

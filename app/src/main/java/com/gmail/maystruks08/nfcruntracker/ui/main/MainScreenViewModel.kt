@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.CurrentRaceDistance
 import com.gmail.maystruks08.domain.DEF_STRING_VALUE
 import com.gmail.maystruks08.domain.entities.*
+import com.gmail.maystruks08.domain.entities.account.AssesLevel
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.runner.IRunner
 import com.gmail.maystruks08.domain.exception.CheckpointNotFoundException
@@ -57,6 +58,8 @@ class MainScreenViewModel @ViewModelInject constructor(
 
     private val calculateDistanceStatisticUseCase: CalculateDistanceStatisticUseCase,
 
+    private val getAccountAccessLevelUseCase: GetAccountAccessLevelUseCase,
+
     private val router: Router,
     private val startRunTrackerBus: StartRunTrackerBus
 ) : BaseViewModel() {
@@ -73,6 +76,8 @@ class MainScreenViewModel @ViewModelInject constructor(
     private val _showAlertDialogChannel = Channel<AlertType>(Channel.BUFFERED)
     private val _showTimeChannel = Channel<String>(Channel.BUFFERED)
     private val _selectCheckpointDialogChannel = Channel<CurrentRaceDistance>(Channel.BUFFERED)
+    private val _messageChannel = Channel<String>(Channel.BUFFERED)
+
 
     val distance: StateFlow<List<DistanceView>> get() = _distanceFlow
     val runners: StateFlow<List<RunnerScreenItem>> get() = _runnersFlow
@@ -85,6 +90,7 @@ class MainScreenViewModel @ViewModelInject constructor(
     val showConfirmationDialog get() = _showAlertDialogChannel.receiveAsFlow()
     val showSelectCheckpointDialog get() = _selectCheckpointDialogChannel.receiveAsFlow()
     val showTime get() = _showTimeChannel.receiveAsFlow()
+    val message get() = _messageChannel.receiveAsFlow()
 
 
     private var jobShowRunner: Job? = null
@@ -118,40 +124,38 @@ class MainScreenViewModel @ViewModelInject constructor(
                 .invoke()
                 .onStart { _showProgressFlow.value = true }
                 .collect { distances ->
-                    val distanceViews = distances.mapDistanceList(mode.distanceId)
-                    _distanceFlow.value = distanceViews
-                    Timber.d("Distance rendered count: ${distanceViews.count()}")
-                    val selectedDistanceView = distanceViews.firstOrNull { it.isSelected } ?: distanceViews.firstOrNull() ?: return@collect
-                    _mainScreenModeFlow.value.distanceId = selectedDistanceView.id
-                    renderRunners(mode, selectedDistanceView)
-                    showCurrentCheckpoint(selectedDistanceView.id)
+                    val result = distances.mapDistanceList(mode.distanceId)
+                    _distanceFlow.value = result.second
+                    Timber.d("Distance rendered count: ${result.second.count()}")
+                    val selectedDistance = result.first?: return@collect
+                    _mainScreenModeFlow.value.distanceId = selectedDistance.id
+                    renderRunners(mode, selectedDistance)
+                    showCurrentCheckpoint(selectedDistance.id)
                 }
         }
     }
 
-    private fun renderRunners(mode: MainScreenMode, selectedDistanceView: DistanceView) {
+    private fun renderRunners(mode: MainScreenMode, currentDistance: Distance) {
+        Timber.d("Render runners: cancel jobShowRunner start}")
         jobShowRunner?.cancel()
+        Timber.d("Render runners: cancel jobShowRunner launch}")
         jobShowRunner = viewModelScope.launch(Dispatchers.IO) {
             when (mode) {
                 is MainScreenMode.RenderList -> {
                     _enableSelectCheckpointButtonFlow.value = true
+                    Timber.d("Render runners: provideRunnersUseCase invoke")
                     provideRunnersUseCase
-                        .invoke(
-                            selectedDistanceView.id,
-                            DistanceType.valueOf(selectedDistanceView.type),
-                            mode.query
-                        )
+                        .invoke(currentDistance, mode.query)
+                        .onEach { Timber.d("Render runners: provideRunnersUseCase received list}") }
                         .map { toRunnerViews(it) }
                         .catch { error -> handleError(error) }
                 }
                 is MainScreenMode.RenderResult -> {
                     _enableSelectCheckpointButtonFlow.value = false
+                    Timber.d("Render runners: provideFinishersUseCase invoke")
                     provideFinishersUseCase
-                        .invoke(
-                            selectedDistanceView.id,
-                            DistanceType.valueOf(selectedDistanceView.type),
-                            mode.query
-                        )
+                        .invoke(currentDistance, mode.query)
+                        .onEach { Timber.d("Render runners: provideRunnersUseCase received list}") }
                         .map { toFinisherViews(it) }
                         .catch { error -> handleError(error) }
                 }
@@ -307,7 +311,14 @@ class MainScreenViewModel @ViewModelInject constructor(
     }
 
     fun onEditCurrentRaceClicked() {
-        router.navigateTo(Screens.RaceEditorScreen())
+        viewModelScope.launch {
+            val accessLevel = getAccountAccessLevelUseCase.invoke()
+            if (accessLevel == AssesLevel.Admin) {
+                router.navigateTo(Screens.RaceEditorScreen())
+                return@launch
+            }
+            _messageChannel.send("У Вас нет прав")
+        }
     }
 
     private fun showCurrentCheckpoint(distanceId: String) {
@@ -402,11 +413,13 @@ class MainScreenViewModel @ViewModelInject constructor(
         recalculateDistanceStatistic()
     }
 
-    private fun List<Distance>.mapDistanceList(selectedDistanceId: String?): MutableList<DistanceView> {
-        return if (selectedDistanceId == null) {
+    private fun List<Distance>.mapDistanceList(selectedDistanceId: String?): Pair<Distance?, MutableList<DistanceView>> {
+        var selectedDistance: Distance? = null
+        val result = if (selectedDistanceId == null) {
             mapIndexed { index, distance ->
                 val isSelected = index == 0
                 if (isSelected) {
+                    selectedDistance = distance
                     distance.dateOfStart?.let { showDistanceTime(it) }
                 }
                 distance.toView(isSelected)
@@ -415,11 +428,15 @@ class MainScreenViewModel @ViewModelInject constructor(
             map {
                 val isSelected = selectedDistanceId == it.id
                 if (isSelected) {
+                    selectedDistance = it
                     it.dateOfStart?.let { it1 -> showDistanceTime(it1) }
                 }
                 it.toView(isSelected)
             }
         }.toMutableList()
+
+
+        return selectedDistance to result
     }
 
     private fun handleError(e: Throwable) {

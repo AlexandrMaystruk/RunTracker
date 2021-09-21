@@ -25,7 +25,7 @@ class QrCodeGenerator @Inject constructor() {
         source.forEach {
             val rqCodeBitmap = getQRCodeWithOverlay(it, 250)
             val directory = preparePathToDirectory(IMAGES)
-            val logFile = File(directory, "${it.replace("/", "_")}.png")
+            val logFile = File(directory, "${it.replace("/", "_")}.jpg")
             try {
                 fos = FileOutputStream(logFile)
                 rqCodeBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)

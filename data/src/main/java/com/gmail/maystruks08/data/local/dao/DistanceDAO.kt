@@ -74,13 +74,13 @@ interface DistanceDAO : BaseDao<DistanceTable> {
         distanceId: String
     ): Int
 
-    @Query("SELECT COUNT(*) FROM runners  WHERE actualRaceId =:raceId AND actualDistanceId =:distanceId AND isOffTrackMapJson LIKE '%' || :distanceId || '%';")
+    @Query("SELECT COUNT(*) FROM runners  WHERE actualRaceId =:raceId AND actualDistanceId =:distanceId AND isOffTrackDistance NOT LIKE :distanceId;")
     fun getRunnerCountOffTrack(
         raceId: String,
         distanceId: String
     ): Int
 
-    @Query("SELECT COUNT(*) FROM runners WHERE actualRaceId =:raceId AND actualDistanceId =:distanceId AND isOffTrackMapJson NOT LIKE '%' || :distanceId || '%' AND (SELECT COUNT(*) FROM checkpoints WHERE checkpoints.distanceId =:distanceId) = (SELECT COUNT(*) FROM result WHERE runners.runnerNumber = result.runnerNumber )")
+    @Query("SELECT COUNT(*) FROM runners WHERE actualRaceId =:raceId AND actualDistanceId =:distanceId AND isOffTrackDistance NOT LIKE :distanceId AND (SELECT COUNT(*) FROM checkpoints WHERE checkpoints.distanceId =:distanceId) = (SELECT COUNT(*) FROM result WHERE runners.runnerNumber = result.runnerNumber )")
     fun getFinisherCount(
         raceId: String,
         distanceId: String

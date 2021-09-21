@@ -12,34 +12,5 @@ data class Distance(
     val authorId: String,
     val dateOfStart: Date?,
     val checkpoints: MutableList<Checkpoint>,
-    val statistic: Statistic,
-    val runners: MutableSet<Runner> = sortedSetOf(
-        compareBy<Runner> { it.totalResults[id] }
-            .thenBy { runner -> runner.offTrackDistances.any { it == id } }
-            .thenBy { runner -> runner.checkpoints[id]?.count { it.getResult() != null } }
-    )
-) {
-
-    fun addRunner(newRunner: Runner) {
-        runners.add(newRunner)
-    }
-
-    fun removeRunner(newRunner: Runner) {
-        runners.removeAll { newRunner.number == it.number }
-    }
-
-    fun findRunnerById(runnerId: String): Runner? {
-        return runners.find { it.number == runnerId }
-    }
-
-    fun findRunnerByCardId(cardId: String): Runner? {
-        return runners.find { it.cardId == cardId }
-    }
-
-    fun findRunnerTeamMembers(currentRunnerNumber: String, teamName: String): List<Runner>? {
-        return runners.filter { runner ->
-            if (runner.offTrackDistances.any { it == id }) return null
-            runner.teamNames[id] == teamName && runner.number != currentRunnerNumber
-        }
-    }
-}
+    val statistic: Statistic
+)

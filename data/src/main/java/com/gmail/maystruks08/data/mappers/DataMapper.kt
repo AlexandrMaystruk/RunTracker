@@ -26,7 +26,7 @@ import java.util.*
  * Convert database table to entity
  */
 fun RaceWithDistances.toRaceEntity(gson: Gson): Race {
-    val distances = distancesWithRunners.map { it.toDistanceEntity(gson) }.toMutableList()
+    val distances = distancesWithRunners.map { it.toDistanceEntity() }.toMutableList()
     return Race(
         id = raceTable.id,
         name = raceTable.name,
@@ -38,12 +38,8 @@ fun RaceWithDistances.toRaceEntity(gson: Gson): Race {
     )
 }
 
-fun DistanceWithRunners.toDistanceEntity(gson: Gson): Distance {
+fun DistanceWithRunners.toDistanceEntity(): Distance {
     val checkpointList = checkpoints.map { it.toCheckpoint() }.toMutableList()
-    val runners = runners?.map { it.toRunner(gson) }
-        ?.toSortedSet(compareBy<Runner> { it.totalResults[it.actualDistanceId] }
-            .thenBy {runner -> runner.offTrackDistances.any { it == runner.actualDistanceId } }
-            .thenBy {runner -> runner.checkpoints[runner.actualDistanceId]?.count { it.getResult() != null } })
     val statistic = Statistic(distance.distanceId, distance.runnerCountInProgress, distance.runnerCountOffTrack, distance.finisherCount)
     return Distance(
         id = distance.distanceId,
@@ -54,7 +50,6 @@ fun DistanceWithRunners.toDistanceEntity(gson: Gson): Distance {
         dateOfStart = distance.dateOfStart?.let { Date(it) },
         checkpoints = checkpointList,
         statistic = statistic,
-        runners = runners ?: mutableSetOf()
     )
 }
 
@@ -72,39 +67,11 @@ fun DistanceTable.toDistanceEntity(checkpoints: MutableList<Checkpoint>): Distan
             runnerCountInProgress,
             runnerCountOffTrack,
             finisherCount
-        ),
-        runners = mutableSetOf()
+        )
     )
 }
 
-fun RunnerTable.toRunner(gson: Gson): Runner {
-    return Runner(
-        cardId = cardId,
-        number = runnerNumber,
-        fullName = fullName,
-        shortName = shortName,
-        phone = phone,
-        city = city,
-        sex = RunnerSex.fromOrdinal(sex),
-        dateOfBirthday = dateOfBirthday,
-        teamNames = mutableMapOf(),
-        totalResults = mutableMapOf(),
-        checkpoints = mutableMapOf(),
-        offTrackDistances = gson.fromJsonOrNull(isOffTrackMapJson)?: mutableListOf(),
-        distanceIds = mutableListOf(),
-        raceIds = mutableListOf(),
-        actualDistanceId = actualDistanceId,
-        actualRaceId = actualRaceId
-    )
-}
-
-fun RunnerTable.toRunner(
-    raceIds: MutableList<String>,
-    distanceIds: MutableList<String>,
-    checkpoints: MutableMap<String, MutableList<Checkpoint>>,
-    offTrackDistances: MutableList<String>,
-    teamNames: MutableMap<String, String?>
-): Runner {
+fun RunnerTable.toRunner(checkpoints: MutableList<Checkpoint>): Runner {
     return Runner(
         cardId = cardId,
         number = runnerNumber,
@@ -116,12 +83,10 @@ fun RunnerTable.toRunner(
         dateOfBirthday = dateOfBirthday,
         actualDistanceId = actualDistanceId,
         actualRaceId = actualRaceId,
-        raceIds = raceIds,
-        distanceIds = distanceIds,
-        checkpoints = checkpoints,
-        offTrackDistances = offTrackDistances,
-        teamNames = teamNames,
-        totalResults = mutableMapOf()
+        currentCheckpoints = checkpoints,
+        offTrackDistance = isOffTrackDistance,
+        currentTeamName = currentTeamName,
+        currentResult = null
     ).also { it.calculateTotalResults() }
 }
 
@@ -153,7 +118,7 @@ fun Race.toRaceTable(gson: Gson): RaceTable {
 }
 
 
-fun Runner.toRunnerTable(gson: Gson, needToSync: Boolean = true): RunnerTable {
+fun Runner.toRunnerTable(needToSync: Boolean = true): RunnerTable {
     return RunnerTable(
         cardId = this.cardId,
         runnerNumber = this.number,
@@ -165,8 +130,9 @@ fun Runner.toRunnerTable(gson: Gson, needToSync: Boolean = true): RunnerTable {
         dateOfBirthday = this.dateOfBirthday,
         actualDistanceId = this.actualDistanceId,
         actualRaceId =  this.actualRaceId,
-        isOffTrackMapJson = gson.toJson(this.offTrackDistances),
-        needToSync = needToSync
+        isOffTrackDistance = offTrackDistance,
+        currentTeamName = currentTeamName,
+        needToSync = needToSync,
     )
 }
 
@@ -209,31 +175,19 @@ fun Race.toFirestoreRace(gson: Gson): RacePojo {
 }
 
 
-fun Distance.toFirestoreDistance(raceId: String): DistancePojo {
+fun Distance.toFirestoreDistance(runnerIds: List<String>): DistancePojo {
     return DistancePojo(
         id = id,
         raceId = raceId,
         name = name,
         authorId = authorId,
         dateOfStart = dateOfStart,
-        runnerIds = runners.map { it.number }
+        runnerIds = runnerIds
     )
 }
 
 
 fun Runner.toFirestoreRunner(): RunnerPojo {
-    val checkpointsResult = mutableMapOf<String, List<CheckpointPojo>>().apply {
-        checkpoints.forEach { (distanceId, checkpoints) ->
-            this[distanceId] = checkpoints.mapNotNull {
-                if (it is CheckpointResultIml) CheckpointPojo(
-                    it.getId(),
-                    it.getDistanceId(),
-                    it.getName(),
-                    it.getResult().toServerFormat()
-                ) else null
-            }
-        }
-    }
     return RunnerPojo(
         number = number,
         cardId = cardId,
@@ -245,11 +199,16 @@ fun Runner.toFirestoreRunner(): RunnerPojo {
         dateOfBirthday = dateOfBirthday?.toServerFormat(),
         actualRaceId = actualRaceId,
         actualDistanceId = actualDistanceId,
-        raceIds = raceIds,
-        distanceIds = distanceIds,
-        checkpoints = checkpointsResult,
-        offTrackDistances = offTrackDistances,
-        teamNames = teamNames
+        currentCheckpoints = currentCheckpoints.mapNotNull {
+            if (it is CheckpointResultIml) CheckpointPojo(
+                it.getId(),
+                it.getDistanceId(),
+                it.getName(),
+                it.getResult().toServerFormat()
+            ) else null
+        },
+        offTrackDistance = offTrackDistance,
+        currentTeamName = currentTeamName,
     )
 }
 

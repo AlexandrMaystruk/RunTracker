@@ -9,7 +9,8 @@ import com.gmail.maystruks08.nfcruntracker.databinding.LayoutTeamRunnerBinding
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerView
 import kotlin.properties.Delegates
 
-internal class SimpleTeamAdapter : RecyclerView.Adapter<SimpleTeamAdapter.ViewHolder>() {
+internal class SimpleTeamAdapter(private val onItemClicked: (() -> Unit)? = null) :
+    RecyclerView.Adapter<SimpleTeamAdapter.ViewHolder>() {
 
     var team: List<RunnerView> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
 
@@ -19,7 +20,8 @@ internal class SimpleTeamAdapter : RecyclerView.Adapter<SimpleTeamAdapter.ViewHo
                 LayoutInflater
                     .from(parent.context)
                     .inflate(R.layout.layout_team_runner, parent, false)
-            )
+            ),
+            onItemClicked
         )
 
     override fun getItemCount() = team.size
@@ -27,7 +29,10 @@ internal class SimpleTeamAdapter : RecyclerView.Adapter<SimpleTeamAdapter.ViewHo
         holder.bindHolder(team[position])
     }
 
-    class ViewHolder(private val layoutTeamRunnerBinding: LayoutTeamRunnerBinding) : RecyclerView.ViewHolder(layoutTeamRunnerBinding.root) {
+    class ViewHolder(
+        private val layoutTeamRunnerBinding: LayoutTeamRunnerBinding,
+        private val onItemClicked: (() -> Unit)? = null
+    ) : RecyclerView.ViewHolder(layoutTeamRunnerBinding.root) {
 
         var isSwipeEnable = true
 
@@ -40,6 +45,9 @@ internal class SimpleTeamAdapter : RecyclerView.Adapter<SimpleTeamAdapter.ViewHo
             when {
                 item.isOffTrack -> root.setBackgroundColor(root.context.color(R.color.colorCardOffTrack))
                 else -> root.setBackgroundColor(root.context.color(R.color.colorWhite))
+            }
+            onItemClicked?.let {
+                root.setOnClickListener { onItemClicked.invoke() }
             }
         }
     }

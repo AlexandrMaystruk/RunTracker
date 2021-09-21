@@ -47,7 +47,6 @@ class TeamViewHolderManager(
         fun onRunnerSwipedLeft(position: Int, swipedRunner: RunnerView)
         fun onRunnerSwipedRight(position: Int, swipedRunner: RunnerView)
     }
-
 }
 
 
@@ -56,7 +55,7 @@ class TeamViewHolder(
     private val interaction: TeamViewHolderManager.Interaction
 ) : BaseViewHolder<ItemTeamBinding, TeamView>(binding) {
 
-    private val teamAdapter = SimpleTeamAdapter()
+    private val teamAdapter = SimpleTeamAdapter { interaction.onItemSelected(item) }
 
     override fun onBind(item: TeamView) = with(binding) {
         super.onBind(item)
@@ -65,7 +64,7 @@ class TeamViewHolder(
         rvTeam.adapter = teamAdapter
         setUpItemTouchHelper()
         teamAdapter.team = item.runners
-        itemView.setOnClickListener {
+        root.setOnClickListener {
             interaction.onItemSelected(item)
         }
     }

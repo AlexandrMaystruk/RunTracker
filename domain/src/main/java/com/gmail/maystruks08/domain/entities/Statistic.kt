@@ -8,7 +8,7 @@ data class Statistic(val distanceId: String, var runnerCountInProgress: Int = 0,
         runnerCountInProgress = distanceRunners.size
         distanceRunners.forEach { runner ->
             when {
-                runner.offTrackDistances.any { it == runner.actualDistanceId} -> {
+                runner.offTrackDistance == runner.actualDistanceId -> {
                     runnerCountInProgress --
                     runnerCountOffTrack++
                 }

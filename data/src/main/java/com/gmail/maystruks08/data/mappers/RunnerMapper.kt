@@ -14,32 +14,26 @@ import java.util.*
 
 
 fun RunnerPojo.fromFirestoreRunner(): Runner {
-    val checkpointsResult = mutableMapOf<String, MutableList<Checkpoint>>()
-    checkpoints.forEach { (t, u) ->
-        checkpointsResult[t] = u.mapIndexed { index, checkpointPojo ->
-            CheckpointResultIml(
-                CheckpointImpl(checkpointPojo.id, checkpointPojo.distanceId, checkpointPojo.name, index),
-                checkpointPojo.runnerTime.parseServerTime()
-            )
-        }.toMutableList()
-    }
     return Runner(
-        number,
-        cardId,
-        fullName,
-        shortName,
-        phone,
-        RunnerSex.fromOrdinal(sex),
-        city,
-        dateOfBirthday?.parseServerTime(),
-        actualRaceId,
-        actualDistanceId,
-        raceIds,
-        distanceIds,
-        checkpointsResult,
-        offTrackDistances,
-        teamNames,
-        mutableMapOf()
+       number =  number,
+        cardId=  cardId,
+        fullName =fullName,
+        shortName = shortName,
+        phone =  phone,
+        sex = RunnerSex.fromOrdinal(sex),
+        city =city,
+        dateOfBirthday = dateOfBirthday?.parseServerTime(),
+        actualRaceId = actualRaceId,
+        actualDistanceId = actualDistanceId,
+        currentCheckpoints = mutableListOf<Checkpoint>().apply {
+            currentCheckpoints.forEachIndexed { index, checkpointPojo ->
+                add(CheckpointResultIml(
+                    CheckpointImpl(checkpointPojo.id, checkpointPojo.distanceId, checkpointPojo.name, index), checkpointPojo.runnerTime.parseServerTime()
+                ))
+            }
+        },
+        offTrackDistance = offTrackDistance,
+        currentTeamName = currentTeamName
     ).also {
         it.calculateTotalResults()
     }

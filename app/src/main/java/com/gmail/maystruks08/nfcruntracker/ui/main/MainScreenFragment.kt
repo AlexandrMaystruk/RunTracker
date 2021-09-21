@@ -6,6 +6,7 @@ import android.text.InputType
 import android.transition.TransitionManager
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -178,6 +179,13 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
             lifecycleScope.launchWhenStarted {
                 showTime.collect {
                     binding.tvTime.text = getString(R.string.competition_time, it)
+                }
+            }
+
+
+            lifecycleScope.launchWhenStarted {
+                message.collect {
+                    Toast.makeText(this@MainScreenFragment.context, it, Toast.LENGTH_SHORT).show()
                 }
             }
         }

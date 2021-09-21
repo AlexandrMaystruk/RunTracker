@@ -25,14 +25,12 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(
                     sex = it.runnerSex,
                     city = it.city,
                     dateOfBirthday = it.dateOfBirthday,
-                    teamNames = mutableMapOf(),
-                    totalResults = mutableMapOf(),
-                    checkpoints = mutableMapOf(),
-                    offTrackDistances = mutableListOf(),
-                    distanceIds = mutableListOf(distanceId),
-                    raceIds = mutableListOf(raceId),
                     actualDistanceId = distanceId,
                     actualRaceId = raceId,
+                    currentCheckpoints = mutableListOf(),
+                    offTrackDistance = null,
+                    currentTeamName = it.teamName,
+                    currentResult = null
                 )
             }
             runnersRepository.saveNewRunners(raceId, distanceId, runners)

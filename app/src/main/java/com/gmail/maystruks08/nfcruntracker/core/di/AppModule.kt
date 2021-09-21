@@ -8,8 +8,15 @@ import com.gmail.maystruks08.data.local.dao.*
 import com.gmail.maystruks08.data.remote.Api
 import com.gmail.maystruks08.data.remote.ApiImpl
 import com.gmail.maystruks08.data.repository.SyncRunnersDataScheduler
+import com.gmail.maystruks08.domain.DATA_TIME_FORMAT
 import com.gmail.maystruks08.domain.LogHelper
 import com.gmail.maystruks08.domain.NetworkUtil
+import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
+import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
+import com.gmail.maystruks08.domain.entities.runner.IRunner
+import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.utils.NetworkUtilImpl
 import com.gmail.maystruks08.nfcruntracker.workers.SyncRunnersDataSchedulerImpl
@@ -19,6 +26,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -102,11 +110,26 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideUserSettingsDao(appDatabase: AppDatabase): UserSettingsDAO = appDatabase.userSettingsDAO()
+    fun provideUserSettingsDao(appDatabase: AppDatabase): UserSettingsDAO =
+        appDatabase.userSettingsDAO()
 
     @Provides
     @Singleton
-    fun gson(): Gson = Gson()
+    fun gson(): Gson = GsonBuilder()
+        .registerTypeAdapterFactory(
+            RuntimeTypeAdapterFactory.of(IRunner::class.java)
+                .registerSubtype(Runner::class.java)
+                .registerSubtype(Team::class.java)
+        )
+
+        .registerTypeAdapterFactory(
+            RuntimeTypeAdapterFactory.of(Checkpoint::class.java)
+                .registerSubtype(CheckpointImpl::class.java)
+                .registerSubtype(CheckpointResultIml::class.java)
+        )
+        .setDateFormat(DATA_TIME_FORMAT)
+        .create()
+
 }
 
 @ExperimentalCoroutinesApi

@@ -7,6 +7,7 @@ import com.gmail.maystruks08.domain.interactors.use_cases.ExportFromXlsToRemoteU
 import com.gmail.maystruks08.domain.interactors.use_cases.GetAccountAccessLevelUseCase
 import com.gmail.maystruks08.domain.interactors.use_cases.LogOutUseCase
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
+import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -44,18 +45,18 @@ class SettingsViewModel @ViewModelInject constructor(
     }
 
     fun onSignOutClicked() {
-//        viewModelScope.launch {
-//            val isSuccess = logOutUseCase.logout()
-//            if (isSuccess) {
-//                router.newRootScreen(Screens.LoginScreen())
-//            } else {
-//                toastLiveData.postValue("Logout error")
-//            }
-//        }
-
         viewModelScope.launch {
-            exportFromXlsToRemoteUseCase.invoke()
+            val isSuccess = logOutUseCase.logout()
+            if (isSuccess) {
+                router.newRootScreen(Screens.LoginScreen())
+            } else {
+                toastLiveData.postValue("Logout error")
+            }
         }
+//
+//        viewModelScope.launch {
+//            exportFromXlsToRemoteUseCase.invoke()
+//        }
     }
 
     fun onBackClicked() {

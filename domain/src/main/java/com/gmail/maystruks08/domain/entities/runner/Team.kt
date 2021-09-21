@@ -20,9 +20,9 @@ data class Team(
         get() {
             return when (distanceType) {
                 DistanceType.REPLAY -> {
-                    if(runners.any { it.offTrackDistances.contains(it.actualDistanceId) }) return null
+                    if (runners.any { it.offTrackDistance == it.actualDistanceId }) return null
                     val hasUncompletedCheckpoints = runners.any { runner ->
-                        runner.currentCheckpoints?.any { it is CheckpointImpl } == true
+                        runner.currentCheckpoints.any { it is CheckpointImpl }
                     }
                     if (hasUncompletedCheckpoints) return null
                     if (runners.any { it.currentResult == null }) return null
@@ -33,7 +33,7 @@ data class Team(
                     Date(totalTime)
                 }
                 DistanceType.TEAM -> {
-                    if(runners.any { it.offTrackDistances.contains(it.actualDistanceId) }) return null
+                    if (runners.any { it.offTrackDistance == it.actualDistanceId }) return null
                     if (runners.any { it.currentResult == null }) return null
                     runners.minByOrNull { it.currentResult?.time ?: Long.MAX_VALUE }?.currentResult
                 }
