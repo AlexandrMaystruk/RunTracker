@@ -2,7 +2,6 @@ package com.gmail.maystruks08.nfcruntracker.ui.main.adapter.managers
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -11,7 +10,6 @@ import com.gmail.maystruks08.nfcruntracker.databinding.ItemTeamBinding
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.BaseViewHolder
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.Item
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.ViewHolderManager
-import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.RunnerSwipeActionHelper
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.TeamRunnerSwipeActionHelper
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerView
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.TeamView
