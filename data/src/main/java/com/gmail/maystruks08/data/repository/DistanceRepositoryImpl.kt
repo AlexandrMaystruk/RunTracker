@@ -12,9 +12,11 @@ import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.repository.CheckpointsRepository
 import com.gmail.maystruks08.domain.repository.DistanceRepository
+import com.gmail.maystruks08.domain.toServerFormat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.util.*
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -69,6 +71,10 @@ class DistanceRepositoryImpl @Inject constructor(
 
     override suspend fun updateDistanceName(distanceId: String, newName: String) {
         firestoreApi.updateDistanceName(distanceId, newName)
+    }
+
+    override suspend fun updateDistanceStartDate(distanceId: String, startDate: Date?) {
+        firestoreApi.updateDistanceStartDate(distanceId, startDate?.toServerFormat())
     }
 
 

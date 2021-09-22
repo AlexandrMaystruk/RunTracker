@@ -10,14 +10,15 @@ import com.gmail.maystruks08.data.remote.pojo.DistancePojo
 import com.gmail.maystruks08.data.remote.pojo.RacePojo
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.domain.entities.Distance
-import com.gmail.maystruks08.domain.entities.Statistic
 import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.Race
+import com.gmail.maystruks08.domain.entities.Statistic
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.RunnerSex
+import com.gmail.maystruks08.domain.parseServerTime
 import com.gmail.maystruks08.domain.toServerFormat
 import com.google.gson.Gson
 import java.util.*
@@ -181,7 +182,7 @@ fun Distance.toFirestoreDistance(runnerIds: List<String>): DistancePojo {
         raceId = raceId,
         name = name,
         authorId = authorId,
-        dateOfStart = dateOfStart,
+        dateOfStart = dateOfStart?.toServerFormat(),
         runnerIds = runnerIds
     )
 }
@@ -201,10 +202,11 @@ fun Runner.toFirestoreRunner(): RunnerPojo {
         actualDistanceId = actualDistanceId,
         currentCheckpoints = currentCheckpoints.mapNotNull {
             if (it is CheckpointResultIml) CheckpointPojo(
-                it.getId(),
-                it.getDistanceId(),
-                it.getName(),
-                it.getResult().toServerFormat()
+                id = it.getId(),
+                distanceId = it.getDistanceId(),
+                name = it.getName(),
+                runnerTime = it.getResult().toServerFormat(),
+                position = it.getPosition()
             ) else null
         },
         offTrackDistance = offTrackDistance,
@@ -235,7 +237,7 @@ fun DistancePojo.toTable(): Pair<DistanceTable, List<DistanceRunnerCrossRef>> {
         name = name,
         type = type,
         authorId = authorId,
-        dateOfStart = dateOfStart?.time
+        dateOfStart = dateOfStart?.parseServerTime()?.time,
     ) to runnerIds.map { DistanceRunnerCrossRef(id, it) }
 }
 

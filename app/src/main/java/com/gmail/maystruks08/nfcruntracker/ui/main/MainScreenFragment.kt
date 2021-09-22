@@ -1,10 +1,12 @@
 package com.gmail.maystruks08.nfcruntracker.ui.main
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
 import android.transition.TransitionManager
 import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -178,10 +180,22 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
 
             lifecycleScope.launchWhenStarted {
                 showTime.collect {
-                    binding.tvTime.text = getString(R.string.competition_time, it)
+                    when(it){
+                        TimerState.ShowTimer -> {
+                            binding.tvTime.setTextColor(Color.BLACK)
+                            circleMenuLayoutManager?.isRaceStarted = true
+                        }
+                        is TimerState.UpdateTimer ->  {
+                            binding.tvTime.setTextColor(Color.BLACK)
+                            binding.tvTime.text = getString(R.string.competition_time, it.time)
+                        }
+                        TimerState.HideTimer -> {
+                            binding.tvTime.setTextColor(Color.TRANSPARENT)
+                            circleMenuLayoutManager?.isRaceStarted = false
+                        }
+                    }
                 }
             }
-
 
             lifecycleScope.launchWhenStarted {
                 message.collect {
@@ -203,10 +217,11 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
             }
 
             tvCurrentCheckpoint.setOnClickListener { viewModel.onCurrentCheckpointTextClicked() }
-            circleMenuLayoutManager = CircleMenuManager(binding.circleMenu) {
+            circleMenuLayoutManager = CircleMenuManager(binding.circleMenu, false) {
                 when (it) {
                     CircleMenuEvent.CLICKED_REGISTER_NEW_RUNNER -> viewModel.onRegisterNewRunnerClicked()
                     CircleMenuEvent.CLICKED_SCAN_QR_CODE -> viewModel.onScanQRCodeClicked()
+                    CircleMenuEvent.CLICKED_START_RACE -> viewModel.onStartRaceClicked()
                 }
             }
         }

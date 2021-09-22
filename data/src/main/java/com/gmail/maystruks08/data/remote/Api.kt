@@ -32,6 +32,8 @@ interface Api{
 
     suspend fun updateDistanceName(distanceId: String, newName: String)
 
+    suspend fun updateDistanceStartDate(distanceId: String, startDate: String?)
+
 
 
     //RUNNER

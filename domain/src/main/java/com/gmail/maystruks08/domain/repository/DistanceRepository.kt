@@ -2,6 +2,7 @@ package com.gmail.maystruks08.domain.repository
 
 import com.gmail.maystruks08.domain.entities.Distance
 import kotlinx.coroutines.flow.Flow
+import java.util.*
 
 interface DistanceRepository {
 
@@ -15,5 +16,7 @@ interface DistanceRepository {
     suspend fun getLastSelectedRace(): Pair<String, String>
 
     suspend fun updateDistanceName(distanceId: String, newName: String)
+
+    suspend fun updateDistanceStartDate(distanceId: String, startDate: Date?)
 
 }

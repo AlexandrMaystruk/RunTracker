@@ -39,7 +39,12 @@ fun RunnerPojo.fromFirestoreRunner(): Runner {
     }
 }
 
-fun Checkpoint.toFirestoreCheckpoint() = CheckpointPojo(id = getId(), distanceId = getDistanceId(), name = getName(), runnerTime = getResult()?.toServerFormat().orEmpty(), position = getPosition())
+fun Checkpoint.toFirestoreCheckpoint() = CheckpointPojo(
+    id = getId(),
+    distanceId = getDistanceId(),
+    name = getName(),
+    runnerTime = getResult()?.toServerFormat().orEmpty(),
+    position = getPosition())
 
 fun Checkpoint.toFirestoreDistanceCheckpoint() = DistanceCheckpointPojo(getId(), getDistanceId(), getName(), getPosition())
 

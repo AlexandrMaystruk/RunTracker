@@ -18,9 +18,6 @@ import com.gmail.maystruks08.domain.interactors.use_cases.runner.OffTrackRunnerU
 import com.gmail.maystruks08.domain.interactors.use_cases.runner.SubscribeToRunnersUpdateUseCase
 import com.gmail.maystruks08.domain.timeInMillisToTimeFormat
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
-import com.gmail.maystruks08.nfcruntracker.core.bus.StartRunTrackerBus
-import com.gmail.maystruks08.nfcruntracker.core.ext.name
-import com.gmail.maystruks08.nfcruntracker.core.ext.startCoroutineTimer
 import com.gmail.maystruks08.nfcruntracker.core.ext.updateElement
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.RunnerScreenItem
@@ -60,8 +57,7 @@ class MainScreenViewModel @ViewModelInject constructor(
 
     private val getAccountAccessLevelUseCase: GetAccountAccessLevelUseCase,
 
-    private val router: Router,
-    private val startRunTrackerBus: StartRunTrackerBus
+    private val router: Router
 ) : BaseViewModel() {
 
     private val _mainScreenModeFlow = MutableStateFlow<MainScreenMode>(MainScreenMode.RenderList(null))
@@ -72,9 +68,11 @@ class MainScreenViewModel @ViewModelInject constructor(
     private val _enableSelectCheckpointButtonFlow = MutableStateFlow(true)
     private val _showProgressFlow = MutableStateFlow(true)
 
+    private val _selectedDistanceFlow = MutableStateFlow<Distance?>(null)
+
     private val _showSuccessDialogChannel = Channel<Pair<Checkpoint?, String>>(Channel.BUFFERED)
     private val _showAlertDialogChannel = Channel<AlertType>(Channel.BUFFERED)
-    private val _showTimeChannel = Channel<String>(Channel.BUFFERED)
+    private val _showTimeChannel = Channel<TimerState>(Channel.BUFFERED)
     private val _selectCheckpointDialogChannel = Channel<CurrentRaceDistance>(Channel.BUFFERED)
     private val _messageChannel = Channel<String>(Channel.BUFFERED)
 
@@ -103,7 +101,6 @@ class MainScreenViewModel @ViewModelInject constructor(
     init {
         observeDistanceChanges()
         observeRunnerChanges()
-
         try {
             viewModelScope.launch(Dispatchers.IO) {
                 _mainScreenModeFlow
@@ -112,8 +109,6 @@ class MainScreenViewModel @ViewModelInject constructor(
         } catch (e: Exception) {
             Timber.i("Error render $e")
         }
-
-        startRunTrackerBus.subscribeStartCommandEvent(this.name(), ::onRunningStart)
     }
 
     private fun renderDistances(mode: MainScreenMode) {
@@ -128,6 +123,7 @@ class MainScreenViewModel @ViewModelInject constructor(
                     _distanceFlow.value = result.second
                     Timber.d("Distance rendered count: ${result.second.count()}")
                     val selectedDistance = result.first?: return@collect
+                    _selectedDistanceFlow.value = selectedDistance
                     _mainScreenModeFlow.value.distanceId = selectedDistance.id
                     renderRunners(mode, selectedDistance)
                     showCurrentCheckpoint(selectedDistance.id)
@@ -298,6 +294,27 @@ class MainScreenViewModel @ViewModelInject constructor(
         })
     }
 
+    fun onStartRaceClicked() {
+        viewModelScope.launch {
+            val accessLevel = getAccountAccessLevelUseCase.invoke()
+            if (accessLevel == AssesLevel.Admin) {
+                val currentDistance = _selectedDistanceFlow.value ?: kotlin.run {
+                    _messageChannel.send("Дистанция не выбрана")
+                    return@launch
+                }
+                viewModelScope.launch(Dispatchers.IO) {
+                    try {
+                        manageCheckpoints.addStartCheckpoint(currentDistance)
+                    } catch (e: Exception) {
+                        handleError(e)
+                    }
+                }
+                return@launch
+            }
+            _messageChannel.send("У Вас нет прав для старта дистанции")
+        }
+    }
+
     fun onClickedAtRunner(runnerNumber: String) {
         router.navigateTo(Screens.RunnerScreen(runnerNumber))
     }
@@ -390,16 +407,6 @@ class MainScreenViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun onRunningStart(date: Date) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                manageCheckpoints.addStartCheckpoint(date)
-            } catch (e: Exception) {
-                handleError(e)
-            }
-        }
-    }
-
     private fun recalculateDistanceStatistic() {
         viewModelScope.launch(Dispatchers.Default) {
             calculateDistanceStatisticUseCase.invoke(_mainScreenModeFlow.value.distanceId)
@@ -420,7 +427,7 @@ class MainScreenViewModel @ViewModelInject constructor(
                 val isSelected = index == 0
                 if (isSelected) {
                     selectedDistance = distance
-                    distance.dateOfStart?.let { showDistanceTime(it) }
+                    resolveDistanceStartTime(distance.dateOfStart)
                 }
                 distance.toView(isSelected)
             }
@@ -429,14 +436,28 @@ class MainScreenViewModel @ViewModelInject constructor(
                 val isSelected = selectedDistanceId == it.id
                 if (isSelected) {
                     selectedDistance = it
-                    it.dateOfStart?.let { it1 -> showDistanceTime(it1) }
+                    resolveDistanceStartTime(it.dateOfStart)
                 }
                 it.toView(isSelected)
             }
         }.toMutableList()
-
-
         return selectedDistance to result
+    }
+
+    private fun resolveDistanceStartTime(dateOfStart: Date?) {
+        jobShowDistanceTimer?.cancel()
+        if (dateOfStart == null) {
+            viewModelScope.launch { _showTimeChannel.send(TimerState.HideTimer) }
+            return
+        }
+        jobShowDistanceTimer = viewModelScope.launch(Dispatchers.IO) {
+            _showTimeChannel.send(TimerState.ShowTimer)
+            while (true) {
+                val time = (System.currentTimeMillis() - dateOfStart.time).timeInMillisToTimeFormat()
+                _showTimeChannel.send(TimerState.UpdateTimer(time))
+                delay(1000)
+            }
+        }
     }
 
     private fun handleError(e: Throwable) {
@@ -459,26 +480,16 @@ class MainScreenViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun showDistanceTime(distanceStartTime: Date) {
-        jobShowDistanceTimer?.cancel()
-        jobShowDistanceTimer =
-            viewModelScope.startCoroutineTimer(delayMillis = 0, repeatMillis = 1000) {
-                val time =
-                    (System.currentTimeMillis() - distanceStartTime.time).timeInMillisToTimeFormat()
-                viewModelScope.launch {
-                    _showTimeChannel.send(time)
-                }
-            }
-    }
-
     private fun isRunnerOfftrack() = lastSelectedRunner?.isOffTrack == true
 
     private fun isRunnerHasResult() = !lastSelectedRunner?.result.isNullOrEmpty()
 
-    override fun onCleared() {
-        startRunTrackerBus.unsubscribe(this.name())
-        super.onCleared()
-    }
+}
+
+sealed class TimerState {
+    object ShowTimer : TimerState()
+    data class UpdateTimer(val time: String) : TimerState()
+    object HideTimer : TimerState()
 }
 
 sealed class MainScreenMode(var distanceId: String?) {

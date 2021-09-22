@@ -10,7 +10,7 @@ data class Distance(
     val name: String,
     val type: DistanceType,
     val authorId: String,
-    val dateOfStart: Date?,
+    var dateOfStart: Date?,
     val checkpoints: MutableList<Checkpoint>,
     val statistic: Statistic
 )

@@ -3,7 +3,6 @@ package com.gmail.maystruks08.nfcruntracker.ui.settings
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.account.AssesLevel
-import com.gmail.maystruks08.domain.interactors.use_cases.ExportFromXlsToRemoteUseCase
 import com.gmail.maystruks08.domain.interactors.use_cases.GetAccountAccessLevelUseCase
 import com.gmail.maystruks08.domain.interactors.use_cases.LogOutUseCase
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
@@ -21,11 +20,10 @@ import ru.terrakok.cicerone.Router
 class SettingsViewModel @ViewModelInject constructor(
     private val router: Router,
     private val getAccountAccessLevelUseCase: GetAccountAccessLevelUseCase,
-    private val logOutUseCase: LogOutUseCase,
-    private val exportFromXlsToRemoteUseCase: ExportFromXlsToRemoteUseCase
+    private val logOutUseCase: LogOutUseCase
 ) : BaseViewModel() {
 
-    private var changeStartButtonVisibilityLiveData =  MutableStateFlow<AssesLevel>(AssesLevel.User)
+    private var changeStartButtonVisibilityLiveData = MutableStateFlow<AssesLevel>(AssesLevel.User)
     val uiState
         get(): Flow<ViewState> = changeStartButtonVisibilityLiveData.map {
             when (it) {
@@ -53,10 +51,6 @@ class SettingsViewModel @ViewModelInject constructor(
                 toastLiveData.postValue("Logout error")
             }
         }
-//
-//        viewModelScope.launch {
-//            exportFromXlsToRemoteUseCase.invoke()
-//        }
     }
 
     fun onBackClicked() {

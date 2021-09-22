@@ -147,14 +147,20 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
     }
 
     override suspend fun updateDistanceName(distanceId: String, newName: String) {
-        val distanceDocument =
-            db.collection(DISTANCES_COLLECTION).document(distanceId.replaceSpecialSymbols())
+        val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distanceId.replaceSpecialSymbols())
         awaitTaskCompletable(
             distanceDocument.update(
                 mapOf(
                     "name" to newName,
                 )
             )
+        )
+    }
+
+    override suspend fun updateDistanceStartDate(distanceId: String, startDate: String?) {
+        val distanceDocument = db.collection(DISTANCES_COLLECTION).document(distanceId.replaceSpecialSymbols())
+        awaitTaskCompletable(
+            distanceDocument.update(mapOf("dateOfStart" to startDate,))
         )
     }
 

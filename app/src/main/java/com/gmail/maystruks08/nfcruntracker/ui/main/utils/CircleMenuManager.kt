@@ -1,31 +1,42 @@
 package com.gmail.maystruks08.nfcruntracker.ui.main.utils
 
 import android.view.View
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.transition.Fade
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import com.gmail.maystruks08.nfcruntracker.R
 import com.gmail.maystruks08.nfcruntracker.databinding.CircleMenuLayoutBinding
+import kotlin.properties.Delegates
 
 class CircleMenuManager(
     private val circleMenuLayoutBinding: CircleMenuLayoutBinding,
+    isRaceAlreadyStarted: Boolean,
     private val callback: (CircleMenuEvent) -> Unit
 ) {
-
-    private var isChildVisible = false
-
     private var qdCOdeButtonPosition: Pair<Float, Float>
     private var btnRegisterNewRunnerPosition: Pair<Float, Float>
+    private var isChildVisible = false
+
+    var isRaceStarted: Boolean by Delegates.observable(false) { _, _, newValue ->
+        with(circleMenuLayoutBinding) {
+            if (!newValue) {
+                btnMenu.setOnClickListener { callback.invoke(CircleMenuEvent.CLICKED_START_RACE) }
+                hideChild(R.drawable.ic_play_arrow)
+                return@with
+            }
+            btnMenu.setOnClickListener(null)
+            btnMenu.setOnClickListener { if (isChildVisible) hideChild() else showChild() }
+            hideChild(R.drawable.ic_menu)
+        }
+    }
 
     init {
+        isRaceStarted = isRaceAlreadyStarted
         with(circleMenuLayoutBinding) {
             qdCOdeButtonPosition = btnScanQrCode.x to btnScanQrCode.y
             btnRegisterNewRunnerPosition = btnRegisterNewRunner.x to btnRegisterNewRunner.y
-            btnMenu.setOnClickListener {
-                if (isChildVisible) hideChild() else showChild()
-            }
-            hideChild()
         }
     }
 
@@ -51,11 +62,11 @@ class CircleMenuManager(
         }
     }
 
-    private fun hideChild() {
+    private fun hideChild(@DrawableRes imageId: Int = R.drawable.ic_menu) {
         with(circleMenuLayoutBinding) {
             outAnimationTransition()
             btnMenu.rotation = 0f
-            btnMenu.setImageDrawable(ContextCompat.getDrawable(root.context, R.drawable.ic_menu))
+            btnMenu.setImageDrawable(ContextCompat.getDrawable(root.context, imageId))
             with(btnScanQrCode) {
                 qdCOdeButtonPosition = x to y
                 x = btnMenu.x
@@ -93,6 +104,7 @@ class CircleMenuManager(
 enum class CircleMenuEvent {
 
     CLICKED_REGISTER_NEW_RUNNER,
-    CLICKED_SCAN_QR_CODE
+    CLICKED_SCAN_QR_CODE,
+    CLICKED_START_RACE
 
 }

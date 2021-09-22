@@ -9,6 +9,6 @@ data class DistancePojo(
     val name: String = "",
     val type: String = DistanceType.MARATHON.name,
     val authorId: String = "",
-    val dateOfStart: Date? = null,
+    val dateOfStart: String? = null,
     val runnerIds: List<String> = emptyList()
 )
