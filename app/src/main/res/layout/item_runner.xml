@@ -60,7 +60,6 @@
             android:layout_marginTop="@dimen/margin_xs"
             android:layout_marginEnd="@dimen/margin_m"
             android:layout_marginBottom="@dimen/margin_xs"
-            android:textStyle="italic"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/runnerProgress" />

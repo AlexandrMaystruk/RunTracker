@@ -50,7 +50,6 @@
         android:layout_marginEnd="@dimen/margin_m"
         android:layout_marginBottom="@dimen/margin_xs"
         android:text="6:10:12"
-        android:textStyle="italic"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progress" />
