@@ -76,10 +76,10 @@ class TeamViewHolder(
                 val swipedRunner = teamAdapter.team[position] as? RunnerView
                 swipedRunner ?: return
                 if (direction == ItemTouchHelper.LEFT) {
-                    interaction.onRunnerSwipedLeft(position, swipedRunner)
+                    interaction.onRunnerSwipedLeft(adapterPosition, swipedRunner)
                 }
                 if (direction == ItemTouchHelper.RIGHT) {
-                    interaction.onRunnerSwipedRight(position, swipedRunner)
+                    interaction.onRunnerSwipedRight(adapterPosition, swipedRunner)
                 }
             }
         }
