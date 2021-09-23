@@ -43,7 +43,7 @@ class TeamResultViewHolder(
         val teamPositionText = "#${item.position}"
         tvTeamPosition.text = teamPositionText
         tvTeamName.text = item.teamName
-
+        tvTeamResult.text = item.teamResult.orEmpty()
         rvTeam.adapter = teamAdapter
         teamAdapter.team = item.runners
     }

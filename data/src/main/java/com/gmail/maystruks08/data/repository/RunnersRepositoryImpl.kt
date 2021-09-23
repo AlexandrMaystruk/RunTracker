@@ -89,46 +89,21 @@ class RunnersRepositoryImpl @Inject constructor(
     ): Flow<List<Runner>> {
         Timber.i("Get actual distance ${distance.name}")
         val actualRaceId = getRaceId()
-        if (query.isNullOrEmpty()) {
-            return flow {
-                Timber.i("Start flow")
-                val runnersWithResults = runnerDao.getRunnersWithResults(actualRaceId, distance.id)
-                Timber.i("getRunnerWithResults ${runnersWithResults.count()}")
-                val runners = runnersWithResults.mapNotNull {
-                    val checkpoints = it.getCheckpoints(
-                        onlyFinishers = onlyFinishers,
-                        distanceCheckpoints = distance.checkpoints
-                    )
-                    when {
-                        !onlyFinishers -> {
-                            it.runnerTable.toRunner(checkpoints)
-                        }
-                        onlyFinishers -> {
-                            if (checkpoints.isEmpty()) return@mapNotNull null
-                            it.runnerTable.toRunner(checkpoints)
-                        }
-                        else -> return@mapNotNull null
-                    }
-                }
-                Timber.i("emit(runners)")
-                emit(runners)
-            }
-        }
-
         return flow {
-            val runners = runnerDao
-                .getRunnerWithResultsQuery(actualRaceId, distance.id, query)
-                .mapNotNull {
-                    val startTime = System.currentTimeMillis()
-                    val checkpoints = it.getCheckpoints(
-                        onlyFinishers = onlyFinishers,
-                        distanceCheckpoints = distance.checkpoints
-                    )
-                    when {
-                        !onlyFinishers -> {
-                            val runner = it.runnerTable.toRunner(checkpoints)
-                            Timber.d("MAPPING toRunner() time == ${System.currentTimeMillis() - startTime}")
-                            runner
+            val runnersWithResults = if (query.isNullOrEmpty()) runnerDao.getRunnersWithResults(actualRaceId, distance.id)
+            else runnerDao.getRunnerWithResultsQuery(actualRaceId, distance.id, query)
+
+            val runners = runnersWithResults.mapNotNull {
+                val startTime = System.currentTimeMillis()
+                val checkpoints = it.getCheckpoints(
+                    onlyFinishers = onlyFinishers,
+                    distanceCheckpoints = distance.checkpoints
+                )
+                when {
+                    !onlyFinishers -> {
+                        val runner = it.runnerTable.toRunner(checkpoints)
+                        Timber.d("MAPPING toRunner() time == ${System.currentTimeMillis() - startTime}")
+                        runner
                         }
                         onlyFinishers -> {
                             if (checkpoints.isEmpty()) return@mapNotNull null
@@ -143,7 +118,8 @@ class RunnersRepositoryImpl @Inject constructor(
 
     override suspend fun getTeamRunnersFlow(
         distance: Distance,
-        onlyFinishers: Boolean
+        onlyFinishers: Boolean,
+        query: String?
     ): Flow<List<Team>> {
         val actualRaceId = getRaceId()
         return flow {
@@ -154,13 +130,15 @@ class RunnersRepositoryImpl @Inject constructor(
                     val teamName = entry.key ?: return@mapNotNull null
 
                     if (distance.type != DistanceType.REPLAY) {
+                        val runners = entry.value.map {
+                            val checkpoints = it.getCheckpoints(distance.checkpoints, onlyFinishers)
+                            if (onlyFinishers && checkpoints.isEmpty()) return@mapNotNull null
+                            it.runnerTable.toRunner(checkpoints)
+                        }
                         return@mapNotNull Team(
                             teamName = teamName,
                             distanceType = distance.type,
-                            runners = entry.value.map {
-                                val checkpoints = it.getCheckpoints(distance.checkpoints)
-                                it.runnerTable.toRunner(checkpoints)
-                            },
+                            runners = runners
                         )
                     }
 
@@ -170,17 +148,26 @@ class RunnersRepositoryImpl @Inject constructor(
                                 val checkpoints = getCheckpoints(distance.checkpoints)
                                 val replayCheckpointIndex = checkpoints.size / 2
                                 if (index % 2 == 0) {
-                                    return@runnerMapNotNull runnerTable.toRunner(
+                                    val runnerCheckpoints =
                                         checkpoints.subList(0, replayCheckpointIndex)
-                                    )
+                                    val runner = runnerTable.toRunner(runnerCheckpoints)
+                                    if (onlyFinishers && runner.result == null) return@mapNotNull null
+                                    return@runnerMapNotNull runner
                                 }
-                                return@runnerMapNotNull runnerTable.toRunner(
+                                val runnerCheckpoints =
                                     checkpoints.subList(replayCheckpointIndex - 1, checkpoints.size)
-                                )
+                                val runner = runnerTable.toRunner(runnerCheckpoints)
+                                if (onlyFinishers && runner.result == null) return@mapNotNull null
+                                return@runnerMapNotNull runner
                             }
                         }
                     return@mapNotNull Team(teamName, runners, distance.type)
                 }
+
+            if (!query.isNullOrEmpty()) {
+                emit(teams.filter { it.runners.any { it.number.contains(query.toRegex()) } })
+                return@flow
+            }
             emit(teams)
         }
     }
@@ -237,17 +224,6 @@ class RunnersRepositoryImpl @Inject constructor(
             }
         return Team(teamName, runners, distanceType)
     }
-
-//    private fun RunnerWithResult.toRunner(): Runner {
-//        val startTime = System.currentTimeMillis()
-//        return runnerTable
-//            .toRunner(
-//                getCheckpoints()
-//            )
-//            .also {
-//                Timber.d("MAPPING toRunner() time == ${System.currentTimeMillis() - startTime}")
-//            }
-//    }
 
     private fun RunnerWithResult.getCheckpoints(
         distanceCheckpoints: List<Checkpoint>,

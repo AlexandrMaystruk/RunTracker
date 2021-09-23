@@ -7,7 +7,6 @@ import com.gmail.maystruks08.data.local.entity.relation.RunnerWithResult
 import com.gmail.maystruks08.data.local.entity.tables.ResultTable
 import com.gmail.maystruks08.data.local.entity.tables.RunnerTable
 import com.gmail.maystruks08.data.local.entity.tables.TeamNameTable
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
@@ -50,13 +49,17 @@ interface RunnerDao : BaseDao<RunnerTable> {
     /** GET */
 
     @Transaction
-    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE actualRaceId =:raceId AND distanceId =:distanceId")
-    fun getRunnersWithResultsFlow(raceId: String, distanceId: String): Flow<List<RunnerWithResult>>
-
-
-    @Transaction
     @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE actualRaceId =:raceId AND distanceId =:distanceId;")
     fun getRunnersWithResults(raceId: String, distanceId: String): List<RunnerWithResult>
+
+    @Transaction
+    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE actualRaceId =:raceId AND distanceId =:distanceId AND runners.runnerNumber LIKE '%'||:query||'%';")
+    fun getRunnerWithResultsQuery(
+        raceId: String,
+        distanceId: String,
+        query: String
+    ): List<RunnerWithResult>
+
 
     @Transaction
     @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber INNER JOIN teams ON runners.runnerNumber == teams.runnerId WHERE runners.actualRaceId =:raceId AND runners.actualDistanceId =:distanceId AND teams.name IS NOT NULL;")
@@ -66,10 +69,6 @@ interface RunnerDao : BaseDao<RunnerTable> {
     @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber INNER JOIN teams ON runners.runnerNumber == teams.runnerId WHERE teams.name =:teamName;")
     fun getTeamRunnersWithResultsByName(teamName: String): List<RunnerWithResult>
 
-
-    @Transaction
-    @Query("SELECT * FROM runners INNER JOIN distance_runner_cross_ref ON runners.runnerNumber == distance_runner_cross_ref.runnerNumber WHERE actualRaceId =:raceId AND distanceId =:distanceId AND runners.runnerNumber LIKE '%' || :query || '%';")
-    fun getRunnerWithResultsQuery(raceId: String, distanceId: String, query: String): List<RunnerWithResult>
 
     @Transaction
     @Query("SELECT * FROM runners WHERE runners.runnerNumber =:runnerNumber")

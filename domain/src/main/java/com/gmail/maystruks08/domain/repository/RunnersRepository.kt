@@ -20,7 +20,8 @@ interface RunnersRepository {
 
     suspend fun getTeamRunnersFlow(
         distance: Distance,
-        onlyFinishers: Boolean = false
+        onlyFinishers: Boolean = false,
+        query: String? = null
     ): Flow<List<Team>>
 
     suspend fun getRunnerByCardId(cardId: String): Runner?
