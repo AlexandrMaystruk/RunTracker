@@ -4,6 +4,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.domain.exception.EmptyRegistrationRunnerDataException
@@ -18,7 +19,10 @@ import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.core.view_binding_extentions.viewBinding
 import com.gmail.maystruks08.nfcruntracker.databinding.FragmentRegisterNewRunnerBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_runner) {
 
@@ -72,6 +76,12 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
                 is EmptyRegistrationRunnerDataException -> context?.toast(getString(R.string.fill_in_required_fields))
             }
         })
+
+        lifecycleScope.launchWhenResumed {
+            viewModel.showProgress.collect {
+                binding.progress.visibility = if(it) View.VISIBLE else View.GONE
+            }
+        }
     }
 
     override fun initViews() {
