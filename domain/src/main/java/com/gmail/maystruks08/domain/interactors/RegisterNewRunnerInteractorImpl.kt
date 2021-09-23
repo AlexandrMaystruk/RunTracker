@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.domain.interactors
 
+import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.repository.RegisterNewRunnersRepository
@@ -12,12 +13,13 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(
     override suspend fun invoke(
         raceId: String,
         distanceId: String,
+        distanceType: DistanceType,
         registerInputData: List<RegisterNewRunnerUseCase.RegisterInputData>
     ): TaskResult<Exception, Unit> {
         return TaskResult.build {
             val runners = registerInputData.map {
                 Runner(
-                    cardId = it.runnerCardId,
+                    cardId = null,
                     fullName = it.fullName,
                     shortName = it.shortName,
                     phone = it.phone,

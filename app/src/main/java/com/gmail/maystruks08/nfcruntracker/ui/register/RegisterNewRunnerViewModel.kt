@@ -3,6 +3,7 @@ package com.gmail.maystruks08.nfcruntracker.ui.register
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.TaskResult
 import com.gmail.maystruks08.domain.exception.EmptyRegistrationRunnerDataException
 import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
@@ -23,23 +24,23 @@ class RegisterNewRunnerViewModel @ViewModelInject constructor(
 ) : BaseViewModel() {
 
 
-    val scannedCard get() : LiveData<String> = _cardIdLiveData
     val addNewTeamMemberItem get() : LiveData<InputDataView> = _addNewTeamMemberItem
     val error get() : LiveData<Throwable> = _errorLiveData
 
-    private val _cardIdLiveData = SingleLiveEvent<String>()
     private val _addNewTeamMemberItem = SingleLiveEvent<InputDataView>()
     private val _errorLiveData = SingleLiveEvent<Throwable>()
-
-    fun onNfcCardScanned(cardId: String) {
-        _cardIdLiveData.postValue(cardId)
-    }
 
     fun onBackClicked() {
         router.exit()
     }
 
-    fun onRegisterNewRunnerClicked(runnerRegisterData: List<InputDataView>, raceId: String, distanceId: String, teamName: String?) {
+    fun onRegisterNewRunnerClicked(
+        runnerRegisterData: List<InputDataView>,
+        raceId: String,
+        distanceId: String,
+        distanceTypeName: String,
+        teamName: String?,
+    ) {
         val isEmptyInputField = runnerRegisterData.any { it.isEmpty() }
         if (isEmptyInputField || (runnerRegisterData.size > 1 && teamName.isNullOrEmpty())) {
             _errorLiveData.postValue(EmptyRegistrationRunnerDataException())
@@ -59,11 +60,10 @@ class RegisterNewRunnerViewModel @ViewModelInject constructor(
                         dateOfBirthday = it.dateOfBirthday!!,
                         city = it.city!!,
                         runnerNumber = it.runnerNumber!!,
-                        runnerCardId = it.runnerCardId,
                         teamName = teamName,
                     )
                 }
-                when (val result = interactor.invoke(raceId, distanceId, inputData)) {
+                when (val result = interactor.invoke(raceId, distanceId, DistanceType.valueOf(distanceTypeName), inputData)) {
                     is TaskResult.Value -> withContext(Dispatchers.Main) { onBackClicked() }
                     is TaskResult.Error -> handleError(result.error)
                 }

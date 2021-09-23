@@ -1,14 +1,10 @@
 package com.gmail.maystruks08.nfcruntracker.ui.register
 
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.domain.exception.EmptyRegistrationRunnerDataException
 import com.gmail.maystruks08.domain.exception.RunnerWithIdAlreadyExistException
@@ -31,6 +27,7 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
 
     private var raceId: String by argument()
     private var distanceId: String by argument()
+    private var distanceTypeName: String by argument()
 
     private lateinit var adapter: RegisterRunnerAdapter
 
@@ -49,6 +46,7 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
                     adapter.runnerRegisterData,
                     raceId,
                     distanceId,
+                    distanceTypeName,
                     teamName
                 )
                 true
@@ -57,10 +55,6 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
         .build()
 
     override fun bindViewModel() {
-        viewModel.scannedCard.observe(viewLifecycleOwner, {
-            adapter.setRunnerCardId(it)
-        })
-
         viewModel.addNewTeamMemberItem.observe(viewLifecycleOwner, {
             adapter.addInputData(it)
             resolveTeamNameVisibility()
@@ -95,10 +89,6 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
         resolveTeamNameVisibility()
     }
 
-    fun onNfcCardScanned(cardId: String){
-        viewModel.onNfcCardScanned(cardId)
-    }
-
     private fun initStaticCardSwipe() {
         val swipeHelper = object : SwipeActionHelper(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -127,9 +117,10 @@ class RegisterNewRunnerFragment : BaseFragment(R.layout.fragment_register_new_ru
 
     companion object {
 
-        fun getInstance(raceId: String, distanceId: String) = RegisterNewRunnerFragment().apply {
+        fun getInstance(raceId: String, distanceId: String, distanceTypeName: String) = RegisterNewRunnerFragment().apply {
             this.raceId = raceId
             this.distanceId = distanceId
+            this.distanceTypeName = distanceTypeName
         }
     }
 

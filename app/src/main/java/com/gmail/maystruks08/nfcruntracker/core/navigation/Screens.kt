@@ -79,9 +79,13 @@ object Screens {
         }
     }
 
-    class RegisterNewRunnerScreen(private val raceId: String, private val distanceId: String) :
+    class RegisterNewRunnerScreen(
+        private val raceId: String,
+        private val distanceId: String,
+        private val distanceTypeName: String
+    ) :
         AppScreen() {
-        override fun getFragment() = RegisterNewRunnerFragment.getInstance(raceId, distanceId)
+        override fun getFragment() = RegisterNewRunnerFragment.getInstance(raceId, distanceId, distanceTypeName)
 
         companion object {
             fun tag() = RegisterNewRunnerFragment.name()

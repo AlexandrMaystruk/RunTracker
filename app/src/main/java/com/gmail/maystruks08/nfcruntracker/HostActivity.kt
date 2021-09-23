@@ -30,6 +30,7 @@ import com.gmail.maystruks08.nfcruntracker.utils.NfcAdapter
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
@@ -40,6 +41,7 @@ import javax.inject.Inject
 
 const val PRESS_TWICE_INTERVAL = 2000
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
 @AndroidEntryPoint
@@ -166,8 +168,6 @@ class HostActivity : AppCompatActivity() {
             Timber.log(Log.INFO, "Card scanned: $cardId at ${Date().toDateTimeFormat()}")
             getFragment<MainScreenFragment>(Screens.MainScreen.tag())?.onNfcCardScanned(cardId)
             getFragment<RunnerFragment>(Screens.RunnerScreen.tag())?.onNfcCardScanned(cardId)
-            getFragment<RegisterNewRunnerFragment>(Screens.RegisterNewRunnerScreen.tag())?.onNfcCardScanned(cardId)
-
         }
     }
 

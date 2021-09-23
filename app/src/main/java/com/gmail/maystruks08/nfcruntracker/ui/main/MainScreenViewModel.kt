@@ -307,9 +307,9 @@ class MainScreenViewModel @ViewModelInject constructor(
 
     fun onRegisterNewRunnerClicked() {
         viewModelScope.launch {
-            val raceId = provideCurrentRaceIdUseCase.invoke()
-            val distanceId = _mainScreenModeFlow.value.distanceId.orEmpty()
-            router.navigateTo(Screens.RegisterNewRunnerScreen(raceId, distanceId))
+            _selectedDistanceFlow.value?.let {
+                router.navigateTo(Screens.RegisterNewRunnerScreen(it.raceId, it.id, it.type.name))
+            }
         }
     }
 

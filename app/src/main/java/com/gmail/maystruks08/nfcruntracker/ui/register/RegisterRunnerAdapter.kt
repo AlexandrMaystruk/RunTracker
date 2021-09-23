@@ -22,8 +22,7 @@ data class InputDataView(
     var runnerSex: RunnerSex? = null,
     var dateOfBirthday: Date? = Date(),
     var city: String? = null,
-    var runnerNumber: String? = null,
-    var runnerCardId: String? = null
+    var runnerNumber: String? = null
 ) {
     fun isEmpty(): Boolean = fullName.isNullOrEmpty() ||
             phone.isNullOrEmpty() ||
@@ -40,11 +39,6 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
     fun addInputData(inputDataView: InputDataView) {
         runnerRegisterData.add(inputDataView)
         notifyItemInserted(runnerRegisterData.lastIndex)
-    }
-
-    fun setRunnerCardId(cardId: String) {
-        runnerRegisterData[selectedPosition].runnerCardId = cardId
-        notifyItemChanged(selectedPosition)
     }
 
     fun removeInputField(position: Int) {
@@ -112,10 +106,6 @@ class RegisterRunnerAdapter : RecyclerView.Adapter<RegisterRunnerAdapter.ViewHol
                 etRunnerNumber.setText(item.runnerNumber?.toString().orEmpty())
                 etRunnerPhoneNumber.setText(item.phone.orEmpty())
                 tvDateOfBirthday.text = item.dateOfBirthday?.toDateFormat()
-                tvScanCard.text = tvScanCard.context.resources.getString(
-                    R.string.card,
-                    item.runnerCardId.orEmpty()
-                )
                 etRunnerCity.setText(item.city.orEmpty())
                 when (item.runnerSex) {
                     RunnerSex.MALE -> radioGroupSex.check(R.id.rbMale)
