@@ -12,13 +12,13 @@
         android:layout_height="wrap_content"
         android:contentDescription="@string/cd_distance_image"
         android:elevation="@dimen/margin_m"
+        android:enabled="false"
         android:src="@drawable/ic_person_add"
         app:layout_constraintCircle="@id/btnMenu"
         app:layout_constraintCircleAngle="275"
-        app:layout_constraintCircleRadius="75dp"
+        app:layout_constraintCircleRadius="0dp"
         app:layout_constraintEnd_toStartOf="@+id/btnMenu"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="668dp" />
+        tools:ignore="MissingConstraints" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnScanQrCode"
@@ -26,13 +26,13 @@
         android:layout_height="wrap_content"
         android:contentDescription="@string/cd_distance_image"
         android:elevation="@dimen/margin_m"
+        android:enabled="false"
         android:src="@drawable/ic_qr_code_scanner"
         app:layout_constraintBottom_toTopOf="@+id/btnMenu"
         app:layout_constraintCircle="@id/btnMenu"
         app:layout_constraintCircleAngle="340"
-        app:layout_constraintCircleRadius="75dp"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="330dp" />
+        app:layout_constraintCircleRadius="0dp"
+        tools:ignore="MissingConstraints" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnMenu"

@@ -1,7 +1,6 @@
 package com.gmail.maystruks08.nfcruntracker.ui.runner
 
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
@@ -20,7 +19,9 @@ import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.TeamDetai
 import com.gmail.maystruks08.nfcruntracker.ui.main.dialogs.SuccessDialogFragment
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class RunnerFragment : BaseFragment(R.layout.fragment_runner),
     RunnerCheckpointsViewHolderManager.Interaction {
@@ -37,17 +38,6 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner),
     override fun initToolbar() = FragmentToolbar.Builder()
         .withId(R.id.toolbar)
         .withNavigationIcon(R.drawable.ic_arrow_back) { viewModel.onBackClicked() }
-        .withMenu(R.menu.menu_off_track)
-        .withMenuItems(
-            listOf(R.id.action_runner_off_track, R.id.action_runner_link_card),
-            listOf(MenuItem.OnMenuItemClickListener {
-                viewModel.onRunnerOffTrackClicked()
-                true
-            }, MenuItem.OnMenuItemClickListener {
-                viewModel.onLinkCardToRunnerClicked()
-                true
-            })
-        )
         .withTitle(R.string.screen_runner)
         .build()
 
@@ -57,85 +47,33 @@ class RunnerFragment : BaseFragment(R.layout.fragment_runner),
     }
 
     override fun bindViewModel() {
-        viewModel.onShowRunnerClicked(runnerNumber)
-        viewModel.runner.observe(viewLifecycleOwner, { runner ->
-            when (runner) {
-                is RunnerDetailView -> {
-                    binding.llTeamHeader.visibility = View.GONE
-                    detailItemAdapter.submitList(listOf(runner))
+        with(viewModel) {
+            onShowRunnerClicked(runnerNumber)
+            runner.observe(viewLifecycleOwner, { runner ->
+                when (runner) {
+                    is RunnerDetailView -> {
+                        binding.llTeamHeader.visibility = View.GONE
+                        detailItemAdapter.submitList(listOf(runner))
+                    }
+                    is TeamDetailView -> {
+                        binding.llTeamHeader.visibility = View.VISIBLE
+                        binding.tvTeamName.text = runner.id
+                        binding.tvTeamResult.text = runner.teamResult
+                        detailItemAdapter.submitList(runner.runners)
+                    }
                 }
-                is TeamDetailView -> {
-                    binding.llTeamHeader.visibility = View.VISIBLE
-                    binding.tvTeamName.text = runner.id
-                    binding.tvTeamResult.text = runner.teamResult
-                    detailItemAdapter.submitList(runner.runners)
-                }
-            }
-        })
-
-        viewModel.linkCardModeEnable.observe(viewLifecycleOwner, {
-            with(binding) {
-//                if (it) {
-//                    rvRunnersDetail.visibility = View.GONE
-//                    tvPleaseScanCard.visibility = View.VISIBLE
-//                    btnMarkCheckpointAsPassedInManual.isEnabled = true
-//                    btnMarkCheckpointAsPassedInManual.text =
-//                        getString(R.string.disable_link_card_mode)
-//                } else {
-//                    tvPleaseScanCard.visibility = View.GONE
-//                    runnerCheckpointsRecyclerView.visibility = View.VISIBLE
-//                    btnMarkCheckpointAsPassedInManual.text =
-//                        getString(R.string.mark_at_current_checkpoint)
-//                }
-            }
-        })
-
-        viewModel.showDialog.observe(viewLifecycleOwner, {
-            alertDialog?.dismiss()
-            when(it){
-                is AlertTypeConfirmOfftrack -> {
-                    val builder = AlertDialog.Builder(requireContext())
-                        .setTitle(getString(R.string.attention))
-                        .setMessage(getString(R.string.alert_confirm_offtrack_runner))
-                        .setPositiveButton(android.R.string.yes) { _, _ ->
-                            viewModel.onRunnerOffTrack()
-                            alertDialog?.dismiss()
-                        }
-                        .setNegativeButton(android.R.string.no) { _, _ ->
-                            alertDialog?.dismiss()
-                        }
-                    alertDialog = builder.show()
-                }
-                is AlertTypeMarkRunnerAtCheckpoint -> {
-                    val builder = AlertDialog.Builder(requireContext())
-                        .setTitle(getString(R.string.attention))
-                        .setMessage(getString(R.string.mark_runner_without_card))
-                        .setPositiveButton(android.R.string.yes) { _, _ ->
-                            viewModel.markCheckpointAsPassed(runnerNumber)
-                            alertDialog?.dismiss()
-                        }
-                        .setNegativeButton(android.R.string.no) { _, _ ->
-                            alertDialog?.dismiss()
-                        }
-                    alertDialog = builder.show()
-                }
-                else -> Unit
-            }
-        })
-
-        viewModel.showSuccessDialog.observe(viewLifecycleOwner, {
-            val checkpointName = it.first?.getName() ?: ""
-            val message = getString(R.string.success_message, checkpointName, "#${it.second}")
-            SuccessDialogFragment.getInstance(message).show(childFragmentManager, SuccessDialogFragment.name())
-        })
-
+            })
+            showSuccessDialog.observe(viewLifecycleOwner, {
+                val checkpointName = it.first?.getName() ?: ""
+                val message = getString(R.string.success_message, checkpointName, "#${it.second}")
+                SuccessDialogFragment.getInstance(message)
+                    .show(childFragmentManager, SuccessDialogFragment.name())
+            })
+        }
     }
 
     override fun initViews() {
         with(binding) {
-//            btnMarkCheckpointAsPassedInManual.setOnClickListener {
-//                viewModel.btnMarkCheckpointAsPassedInManualClicked()
-//            }
             rvRunnersDetail.adapter = detailItemAdapter
             rvRunnersDetail.addItemDecoration(
                 DividerVerticalItemDecoration(

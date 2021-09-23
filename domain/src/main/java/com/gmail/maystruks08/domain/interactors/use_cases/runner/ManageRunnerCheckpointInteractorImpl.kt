@@ -67,11 +67,17 @@ class ManageRunnerCheckpointInteractorImpl @Inject constructor(
     override suspend fun removeCheckpoint(
         runnerNumber: String,
         checkpointId: String
-    ): Change<Runner> {
+    ): Change<IRunner> {
         val runner = runnersRepository.getRunnerByNumber(runnerNumber) ?: throw RunnerNotFoundException()
         logHelper.log(INFO, "Remove checkpoint: $checkpointId for runner ${runner.number}  actualDistanceId:${runner.actualDistanceId}  ${runner.fullName}")
         runner.removeCheckpoint(checkpointId)
-        return Change(runnersRepository.updateRunnerData(runner), ModifierType.UPDATE)
+        runnersRepository.updateRunnerData(runner)
+        val teamName = runner.currentTeamName
+        if(!teamName.isNullOrEmpty()){
+            val team = runnersRepository.getTeam(teamName) ?: return Change(runner, ModifierType.UPDATE)
+            return Change(team, ModifierType.UPDATE)
+        }
+        return Change(runner, ModifierType.UPDATE)
     }
 
 

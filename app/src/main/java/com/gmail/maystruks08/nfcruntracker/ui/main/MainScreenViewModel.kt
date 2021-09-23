@@ -17,6 +17,7 @@ import com.gmail.maystruks08.domain.interactors.use_cases.runner.ManageRunnerChe
 import com.gmail.maystruks08.domain.interactors.use_cases.runner.OffTrackRunnerUseCase
 import com.gmail.maystruks08.domain.interactors.use_cases.runner.SubscribeToRunnersUpdateUseCase
 import com.gmail.maystruks08.domain.timeInMillisToTimeFormat
+import com.gmail.maystruks08.nfcruntracker.core.EventBus
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.ext.updateElement
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
@@ -111,6 +112,13 @@ class MainScreenViewModel @ViewModelInject constructor(
         }
     }
 
+    fun onReceiveReloadEvent(reloadEvent: EventBus.ReloadEvent?) {
+        when(reloadEvent){
+            EventBus.ReloadEvent.DistanceWithRunners -> renderDistances(_mainScreenModeFlow.value)
+            EventBus.ReloadEvent.UpdateCircleMenuState -> resolveDistanceStartTime(_selectedDistanceFlow.value?.dateOfStart)
+        }
+    }
+
     private fun renderDistances(mode: MainScreenMode) {
         jobShowAllDistances?.cancel()
         jobShowRunner?.cancel()
@@ -118,14 +126,16 @@ class MainScreenViewModel @ViewModelInject constructor(
             provideDistanceListUseCase
                 .invoke()
                 .onStart { _showProgressFlow.value = true }
-                .collect { distances ->
-                    val result = distances.mapDistanceList(mode.distanceId)
+                .distinctUntilChanged()
+                .map { it.mapDistanceList(mode.distanceId) }
+                .collect { result ->
                     _distanceFlow.value = result.second
                     Timber.d("Distance rendered count: ${result.second.count()}")
-                    val selectedDistance = result.first?: return@collect
+                    val selectedDistance = result.first ?: return@collect
                     _selectedDistanceFlow.value = selectedDistance
                     _mainScreenModeFlow.value.distanceId = selectedDistance.id
                     renderRunners(mode, selectedDistance)
+                    resolveDistanceStartTime(selectedDistance.dateOfStart)
                     showCurrentCheckpoint(selectedDistance.id)
                 }
         }
@@ -230,7 +240,8 @@ class MainScreenViewModel @ViewModelInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (isRunnerOfftrack() || isRunnerHasResult()) return@launch
             try {
-                val runnerNumber = lastSelectedRunner?.id ?: kotlin.run { throw RunnerNotFoundException() }
+                val runnerNumber =
+                    lastSelectedRunner?.id ?: kotlin.run { throw RunnerNotFoundException() }
                 val updatedRunner = manageCheckpoints.addCurrentCheckpointByNumber(runnerNumber)
                 onMarkRunnerOnCheckpointSuccess(updatedRunner)
             } catch (e: Exception) {
@@ -245,23 +256,30 @@ class MainScreenViewModel @ViewModelInject constructor(
             Timber.v("showAllRunners  onSearchQueryChanged")
             _mainScreenModeFlow.value = when (val mode = _mainScreenModeFlow.value) {
                 is MainScreenMode.RenderList -> MainScreenMode.RenderList(mode.distanceId)
-                is MainScreenMode.RenderResult -> MainScreenMode.RenderResult(mode.distanceId ?: DEF_STRING_VALUE)
+                is MainScreenMode.RenderResult -> MainScreenMode.RenderResult(
+                    mode.distanceId ?: DEF_STRING_VALUE
+                )
             }
             return
         }
         Timber.v("onSearchQueryChanged")
         _mainScreenModeFlow.value = when (val mode = _mainScreenModeFlow.value) {
             is MainScreenMode.RenderList -> MainScreenMode.RenderList(mode.distanceId, query)
-            is MainScreenMode.RenderResult -> MainScreenMode.RenderResult(mode.distanceId ?: DEF_STRING_VALUE, query)
+            is MainScreenMode.RenderResult -> MainScreenMode.RenderResult(
+                mode.distanceId ?: DEF_STRING_VALUE, query
+            )
         }
     }
 
     fun onNewCurrentCheckpointSelected(checkpointView: CheckpointView) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                saveCurrentSelectedCheckpointUseCase.invoke(_mainScreenModeFlow.value.distanceId!!,  checkpointView.id)
+                saveCurrentSelectedCheckpointUseCase.invoke(
+                    _mainScreenModeFlow.value.distanceId!!,
+                    checkpointView.id
+                )
                 _closeCheckpointDialogChannel.value = checkpointView.bean.title
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 handleError(e)
             }
         }
@@ -425,19 +443,13 @@ class MainScreenViewModel @ViewModelInject constructor(
         val result = if (selectedDistanceId == null) {
             mapIndexed { index, distance ->
                 val isSelected = index == 0
-                if (isSelected) {
-                    selectedDistance = distance
-                    resolveDistanceStartTime(distance.dateOfStart)
-                }
+                if (isSelected) selectedDistance = distance
                 distance.toView(isSelected)
             }
         } else {
             map {
                 val isSelected = selectedDistanceId == it.id
-                if (isSelected) {
-                    selectedDistance = it
-                    resolveDistanceStartTime(it.dateOfStart)
-                }
+                if (isSelected) selectedDistance = it
                 it.toView(isSelected)
             }
         }.toMutableList()
@@ -518,7 +530,7 @@ sealed class MainScreenMode(var distanceId: String?) {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as RenderList
+            other as RenderResult
 
             if (distanceId != other.distanceId) return false
             if (query != other.query) return false

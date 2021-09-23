@@ -4,20 +4,18 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.runner.IRunner
-import com.gmail.maystruks08.domain.entities.runner.Runner
-import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
 import com.gmail.maystruks08.domain.interactors.use_cases.runner.ManageRunnerCheckpointInteractor
-import com.gmail.maystruks08.domain.interactors.use_cases.runner.OffTrackRunnerUseCase
 import com.gmail.maystruks08.domain.interactors.use_cases.runner.ProvideRunnerUseCase
+import com.gmail.maystruks08.nfcruntracker.core.EventBus
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseViewModel
 import com.gmail.maystruks08.nfcruntracker.core.base.SingleLiveEvent
 import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.RunnerDetailScreenItem
-import com.gmail.maystruks08.nfcruntracker.ui.main.adapter.views.items.RunnerDetailView
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.CheckpointView
 import com.gmail.maystruks08.nfcruntracker.ui.view_models.toRunnerDetailView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
@@ -26,22 +24,19 @@ sealed class AlertType(val position: Int)
 class AlertTypeConfirmOfftrack(position: Int): AlertType(position)
 class AlertTypeMarkRunnerAtCheckpoint(position: Int): AlertType(position)
 
+@ExperimentalCoroutinesApi
 class RunnerViewModel @ViewModelInject constructor(
     private val router: Router,
     private val checkpointManager: ManageRunnerCheckpointInteractor,
     private val provideRunnerUseCase: ProvideRunnerUseCase,
-    private val offTrackRunnerUseCase: OffTrackRunnerUseCase,
+    private val eventBus: EventBus
 ) : BaseViewModel() {
 
     val runner get() = _runnerLiveData
-    val showDialog get() = _showAlertDialogLiveData
     val showSuccessDialog get() = _showSuccessDialogLiveData
-    val linkCardModeEnable get() = _linkCardModeEnableLiveData
 
     private val _runnerLiveData = SingleLiveEvent<RunnerDetailScreenItem>()
-    private val _showAlertDialogLiveData = SingleLiveEvent<AlertType>()
     private val _showSuccessDialogLiveData = SingleLiveEvent<Pair<Checkpoint?, String>>()
-    private val _linkCardModeEnableLiveData = SingleLiveEvent<Boolean>()
 
     fun onShowRunnerClicked(runnerNumber: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -54,57 +49,16 @@ class RunnerViewModel @ViewModelInject constructor(
         }
     }
 
-    fun onRunnerOffTrackClicked() {
-        _showAlertDialogLiveData.value = AlertTypeConfirmOfftrack(0)
-    }
-
-    fun onRunnerOffTrack() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val runnerNumber = runner.value?.id ?: return@launch
-            if (isRunnerOfftrack()) return@launch
-            try {
-                val updatedRunner = offTrackRunnerUseCase.invoke(runnerNumber)
-                handleRunnerData(updatedRunner)
-            } catch (e: Exception) {
-                handleError(e)
-            }
-        }
-    }
-
-    fun markCheckpointAsPassed(runnerNumber: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (isRunnerOfftrack() || isRunnerHasResult()) return@launch
-            try {
-                val updatedRunner = checkpointManager.addCurrentCheckpointByNumber(runnerNumber)
-                onMarkRunnerOnCheckpointSuccess(updatedRunner)
-            } catch (e: Exception) {
-                handleError(e)
-            }
-        }
-    }
-
     fun deleteCheckpointFromRunner(runnerNumber: String, checkpointId: CheckpointView) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val updatedRunner = checkpointManager.removeCheckpoint(runnerNumber, checkpointId.id)
                 handleRunnerData(updatedRunner.entity)
+                eventBus.sendReloadEvent()
             } catch (e: Exception) {
                 handleError(e)
             }
         }
-    }
-
-    fun btnMarkCheckpointAsPassedInManualClicked() {
-        if (linkCardModeEnable.value == true) {
-            linkCardModeEnable.value = false
-            return
-        }
-        if (isRunnerOfftrack() || isRunnerHasResult()) return
-        _showAlertDialogLiveData.value = AlertTypeMarkRunnerAtCheckpoint(0)
-    }
-
-    fun onLinkCardToRunnerClicked() {
-        linkCardModeEnable.value = true
     }
 
     fun onNfcCardScanned(cardId: String) {
@@ -128,15 +82,8 @@ class RunnerViewModel @ViewModelInject constructor(
         router.exit()
     }
 
-    private fun onMarkRunnerOnCheckpointSuccess(updatedRunner: IRunner) {
-        val lastCheckpoint = updatedRunner.lastAddedCheckpoint
-        _showSuccessDialogLiveData.postValue(lastCheckpoint to updatedRunner.id)
-        handleRunnerData(updatedRunner)
-    }
-
     private fun handleRunnerData(runner: IRunner) {
         _runnerLiveData.postValue(runner.toRunnerDetailView())
-        linkCardModeEnable.postValue(false)
     }
 
     private fun handleError(e: Exception) {
@@ -146,8 +93,4 @@ class RunnerViewModel @ViewModelInject constructor(
             is SaveRunnerDataException -> toastLiveData.postValue("Ошибка сохранения данных участника =(")
         }
     }
-
-    private fun isRunnerOfftrack() = runner.value?.isOffTrack() == true
-
-    private fun isRunnerHasResult() = runner.value?.isRunnerHasResult() == true
 }

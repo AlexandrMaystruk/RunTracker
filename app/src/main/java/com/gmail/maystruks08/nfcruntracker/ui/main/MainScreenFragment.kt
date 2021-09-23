@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.text.InputType
 import android.transition.TransitionManager
 import android.view.MenuItem
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -15,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.maystruks08.nfcruntracker.R
+import com.gmail.maystruks08.nfcruntracker.core.EventBus
 import com.gmail.maystruks08.nfcruntracker.core.base.BaseFragment
 import com.gmail.maystruks08.nfcruntracker.core.base.FragmentToolbar
 import com.gmail.maystruks08.nfcruntracker.core.ext.*
@@ -39,6 +39,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import javax.inject.Inject
 
 
 @FlowPreview
@@ -49,6 +50,9 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
     RunnerViewHolderManager.Interaction,
     DistanceViewHolderManager.Interaction,
     TeamViewHolderManager.Interaction {
+
+    @Inject
+    lateinit var eventBus: EventBus
 
     private val viewModel: MainScreenViewModel by viewModels()
 
@@ -202,6 +206,12 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
                     Toast.makeText(this@MainScreenFragment.context, it, Toast.LENGTH_SHORT).show()
                 }
             }
+
+            lifecycleScope.launchWhenResumed {
+                eventBus.needToReload.collect {
+                    viewModel.onReceiveReloadEvent(it)
+                }
+            }
         }
     }
 
@@ -217,7 +227,7 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
             }
 
             tvCurrentCheckpoint.setOnClickListener { viewModel.onCurrentCheckpointTextClicked() }
-            circleMenuLayoutManager = CircleMenuManager(binding.circleMenu, false) {
+            circleMenuLayoutManager = CircleMenuManager(binding.circleMenu) {
                 when (it) {
                     CircleMenuEvent.CLICKED_REGISTER_NEW_RUNNER -> viewModel.onRegisterNewRunnerClicked()
                     CircleMenuEvent.CLICKED_SCAN_QR_CODE -> viewModel.onScanQRCodeClicked()
@@ -277,6 +287,7 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
         val builder = AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.attention))
             .setMessage(getString(R.string.alert_confirm_offtrack_runner))
+            .setCancelable(false)
             .setPositiveButton(android.R.string.yes) { _, _ ->
                 viewModel.onRunnerOffTrack()
                 runnerAdapter.notifyItemChanged(position)
@@ -294,6 +305,7 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
         val builder = AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.attention))
             .setMessage(getString(R.string.mark_runner_without_card))
+            .setCancelable(false)
             .setPositiveButton(android.R.string.yes) { _, _ ->
                 viewModel.markCheckpointAsPassed()
                 runnerAdapter.notifyItemChanged(position)
@@ -313,6 +325,11 @@ class MainScreenFragment : BaseFragment(R.layout.fragment_main),
 
     private val inputManager: InputMethodManager by lazy {
         requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    }
+
+    override fun onDestroyView() {
+        eventBus.sendUpdateOnlyCircleMenuEvent()
+        super.onDestroyView()
     }
 
     override fun onStop() {

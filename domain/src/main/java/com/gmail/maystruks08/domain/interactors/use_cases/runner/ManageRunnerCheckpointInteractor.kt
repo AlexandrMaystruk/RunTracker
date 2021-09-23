@@ -16,6 +16,6 @@ interface ManageRunnerCheckpointInteractor {
 
     suspend fun addStartCheckpoint(currentDistance: Distance)
 
-    suspend fun removeCheckpoint(runnerNumber: String, checkpointId: String): Change<Runner>
+    suspend fun removeCheckpoint(runnerNumber: String, checkpointId: String): Change<IRunner>
 
 }
