@@ -50,6 +50,10 @@ data class Team(
         return runners.any { it.checkIsOffTrack() }
     }
 
+    override fun restart(checkpoint: Checkpoint) {
+        runners.forEach { it.restart(checkpoint) }
+    }
+
     override fun getPassedCheckpointCount(): Int {
         return runners.sumBy { it.currentCheckpoints.count() }
     }

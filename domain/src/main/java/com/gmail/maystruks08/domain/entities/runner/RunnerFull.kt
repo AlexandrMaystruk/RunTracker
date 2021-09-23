@@ -35,6 +35,10 @@ data class RunnerFull(
         return offTrackDistances.contains(actualDistanceId)
     }
 
+    override fun restart(checkpoint: Checkpoint) {
+
+    }
+
     val currentTeamName get() = teamNames[actualDistanceId]
     val currentCheckpoints get() = checkpoints[actualDistanceId]
     val currentResult get() = totalResults[actualDistanceId]

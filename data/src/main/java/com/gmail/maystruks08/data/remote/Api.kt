@@ -8,8 +8,10 @@ import com.gmail.maystruks08.domain.entities.Change
 import com.gmail.maystruks08.domain.entities.Statistic
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.google.firebase.firestore.DocumentSnapshot
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 
+@ExperimentalCoroutinesApi
 interface Api{
 
     suspend fun subscribeToRaceCollectionChange(): Flow<List<Change<RacePojo>>>
@@ -38,6 +40,8 @@ interface Api{
 
     //RUNNER
     suspend fun saveRunner(runnerPojo: RunnerPojo)
+
+    suspend fun updateRunner(runnerPojo: RunnerPojo)
 
 
     //CHECKPOINTS

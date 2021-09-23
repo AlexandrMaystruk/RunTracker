@@ -99,6 +99,8 @@ class MainScreenViewModel @ViewModelInject constructor(
     private var jobShowDistanceTimer: Job? = null
     private var jobShowCurrentCheckpoint: Job? = null
 
+    private var jobObserveRunnerChanges: Job? = null
+
     private var lastSelectedRunner: RunnerView? = null
 
     init {
@@ -330,8 +332,14 @@ class MainScreenViewModel @ViewModelInject constructor(
                 }
                 viewModelScope.launch(Dispatchers.IO) {
                     try {
+                        _showProgressFlow.value = true
+                        stopObserveRunnerChanges()
                         manageCheckpoints.addStartCheckpoint(currentDistance)
+                        observeRunnerChanges()
+                        _showProgressFlow.value = false
+                        eventBus.sendRunnerReloadEvent()
                     } catch (e: Exception) {
+                        observeRunnerChanges()
                         handleError(e)
                     }
                 }
@@ -392,7 +400,8 @@ class MainScreenViewModel @ViewModelInject constructor(
     }
 
     private fun observeRunnerChanges() {
-        viewModelScope.launch {
+        jobObserveRunnerChanges?.cancel()
+        jobObserveRunnerChanges = viewModelScope.launch {
             try {
                 subscribeToRunnersUpdateUseCase
                     .invoke()
@@ -403,6 +412,11 @@ class MainScreenViewModel @ViewModelInject constructor(
                 Timber.e(e)
             }
         }
+    }
+
+    private fun stopObserveRunnerChanges(){
+        jobObserveRunnerChanges?.cancel()
+        jobObserveRunnerChanges = null
     }
 
     private fun handleScannedQrCode(code: String) {

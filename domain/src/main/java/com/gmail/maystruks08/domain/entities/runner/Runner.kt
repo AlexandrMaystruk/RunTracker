@@ -47,15 +47,14 @@ data class Runner(
      * If checkpoint with current checkpoint id already exist -> remove old checkpoint and add new
      */
     fun addPassedCheckpoint(
-        checkpoint: Checkpoint,
-        isRestart: Boolean = false
+        checkpoint: Checkpoint
     ) {
        check(checkpoint.getResult() != null)
         val actualCheckpoints = currentCheckpoints
         val indexOfExistingElement = actualCheckpoints.indexOfFirst { it.getId() == checkpoint.getId() && it.getDistanceId() == checkpoint.getDistanceId() }
         if (indexOfExistingElement != -1) {
             actualCheckpoints.removeAt(indexOfExistingElement)
-            if (!isRestart) addCheckpoint(checkpoint, indexOfExistingElement, actualCheckpoints.size) else addStartCheckpoint(checkpoint)
+            addCheckpoint(checkpoint, indexOfExistingElement, actualCheckpoints.size)
             for (index in 1 until actualCheckpoints.lastIndex) {
                 val current = actualCheckpoints[index]
                 if (!hasNotPassedPreviously(current)) {
@@ -82,7 +81,7 @@ data class Runner(
         }
     }
 
-    private fun addStartCheckpoint(checkpoint: Checkpoint) {
+    override fun restart(checkpoint: Checkpoint) {
         val mappedCheckpoints = currentCheckpoints.mapNotNull {
             if (checkpoint.getId() == it.getId() && checkpoint.getDistanceId() == it.getDistanceId()) return@mapNotNull null
             CheckpointImpl(
@@ -93,9 +92,11 @@ data class Runner(
             )
         }
         result = null
+        offTrackDistance = null
         currentCheckpoints.clear()
         currentCheckpoints.add(checkpoint)
         currentCheckpoints.addAll(mappedCheckpoints)
+        currentCheckpoints.sortBy { it.getPosition() }
         lastAddedCheckpoint = checkpoint
     }
 

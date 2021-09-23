@@ -40,7 +40,11 @@ class ProvideRunnersUseCaseImpl @Inject constructor(
             }
             DistanceType.REPLAY, DistanceType.TEAM -> {
                 runnersRepository
-                    .getTeamRunnersFlow(distance = distance, query = query, onlyFinishers = false)
+                    .getTeamRunnersFlow(
+                        distance = distance,
+                        query = query,
+                        onlyFinishers = false
+                    )
                     .map { list ->
                         list.sortedWith(compareBy<IRunner> { it.getTotalResult() }
                             .thenBy { runner -> runner.checkIsOffTrack() }

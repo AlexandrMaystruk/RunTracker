@@ -1,7 +1,6 @@
 package com.gmail.maystruks08.domain.repository
 
 import com.gmail.maystruks08.domain.entities.Distance
-import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.domain.exception.SaveRunnerDataException
@@ -32,6 +31,9 @@ interface RunnersRepository {
 
     @Throws(SaveRunnerDataException::class, SyncWithServerException::class)
     suspend fun updateRunnerData(runner: Runner): Runner
+
+    @Throws(SaveRunnerDataException::class, SyncWithServerException::class)
+    suspend fun updateRunnersData(runners: List<Runner>)
 
     suspend fun getRaceId(): String
 

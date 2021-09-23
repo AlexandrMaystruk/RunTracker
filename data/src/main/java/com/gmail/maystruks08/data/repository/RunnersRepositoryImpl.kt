@@ -66,6 +66,23 @@ class RunnersRepositoryImpl @Inject constructor(
         return runner
     }
 
+    override suspend fun updateRunnersData(runners: List<Runner>) {
+        runnerDao.delete(runners.map { it.number })
+        runners.insertRunners()
+        if (networkUtil.isOnline()) {
+            try {
+                runners.forEach { api.updateRunner(it.toFirestoreRunner()) }
+            } catch (e: FirebaseFirestoreException) {
+                Timber.e(e, "Saving runners data to firestore error")
+                runners.forEach { runnerDao.markAsNeedToSync(it.number, true) }
+                throw SyncWithServerException()
+            }
+            return
+        }
+        runners.forEach { runnerDao.markAsNeedToSync(it.number, true) }
+
+    }
+
     override suspend fun getRaceId(): String {
         return configPreferences.getRaceId()
     }
@@ -94,16 +111,13 @@ class RunnersRepositoryImpl @Inject constructor(
             else runnerDao.getRunnerWithResultsQuery(actualRaceId, distance.id, query)
 
             val runners = runnersWithResults.mapNotNull {
-                val startTime = System.currentTimeMillis()
                 val checkpoints = it.getCheckpoints(
                     onlyFinishers = onlyFinishers,
                     distanceCheckpoints = distance.checkpoints
                 )
                 when {
                     !onlyFinishers -> {
-                        val runner = it.runnerTable.toRunner(checkpoints)
-                        Timber.d("MAPPING toRunner() time == ${System.currentTimeMillis() - startTime}")
-                        runner
+                         it.runnerTable.toRunner(checkpoints)
                         }
                         onlyFinishers -> {
                             if (checkpoints.isEmpty()) return@mapNotNull null
@@ -154,8 +168,7 @@ class RunnersRepositoryImpl @Inject constructor(
                                     if (onlyFinishers && runner.result == null) return@mapNotNull null
                                     return@runnerMapNotNull runner
                                 }
-                                val runnerCheckpoints =
-                                    checkpoints.subList(replayCheckpointIndex - 1, checkpoints.size)
+                                val runnerCheckpoints = checkpoints.subList(replayCheckpointIndex - 1, checkpoints.size)
                                 val runner = runnerTable.toRunner(runnerCheckpoints)
                                 if (onlyFinishers && runner.result == null) return@mapNotNull null
                                 return@runnerMapNotNull runner
@@ -314,6 +327,50 @@ class RunnersRepositoryImpl @Inject constructor(
         )
     }
 
+    private suspend fun List<Runner>.insertRunners() {
+        val runners = mutableListOf<RunnerTable>()
+        val resultTables = mutableListOf<ResultTable>()
+        val runnerResultCrossRefTables = mutableListOf<RunnerResultCrossRef>()
+        val distanceRunnerCrossRefTables = mutableListOf<DistanceRunnerCrossRef>()
+        val teamNameTables = mutableListOf<TeamNameTable>()
+
+        forEach { runner ->
+            val runnerTable = runner.toRunnerTable(false).also { runners.add(it) }
+            runner.currentCheckpoints
+                .filterIsInstance<CheckpointResultIml>()
+                .map { it.toResultTable(runnerTable.runnerNumber) }
+                .also { resultTables.addAll(it) }
+
+            resultTables.forEach {
+                RunnerResultCrossRef(
+                    runner.number,
+                    it.checkpointId
+                ).also { runnerResultCrossRefTables.add(it) }
+            }
+
+            DistanceRunnerCrossRef(
+                runner.actualDistanceId,
+                runner.number
+            ).also { distanceRunnerCrossRefTables.add(it) }
+
+            runner.currentTeamName?.let {
+                TeamNameTable(
+                    distanceId = runner.actualDistanceId,
+                    runnerId = runner.number,
+                    name = it
+                )
+            }?.also { teamNameTables.add(it) }
+        }
+
+        runnerDao.insertOrReplaceRunners(
+            runners,
+            resultTables,
+            teamNameTables,
+            runnerResultCrossRefTables,
+            distanceRunnerCrossRefTables
+        )
+    }
+
     private suspend fun List<RunnerPojo>.updateRunnersTable() {
         deleteRunnersTables()
         insert()
@@ -328,10 +385,8 @@ class RunnersRepositoryImpl @Inject constructor(
         val resultTables = runner.currentCheckpoints
             .filterIsInstance<CheckpointResultIml>()
             .map { it.toResultTable(runnerTable.runnerNumber) }
-        val runnerResultCrossRefTables =
-            resultTables.map { RunnerResultCrossRef(runner.number, it.checkpointId) }
-        val distanceRunnerCrossRefTables =
-            mutableListOf(DistanceRunnerCrossRef(runner.actualDistanceId, runner.number))
+        val runnerResultCrossRefTables = resultTables.map { RunnerResultCrossRef(runner.number, it.checkpointId) }
+        val distanceRunnerCrossRefTables = mutableListOf(DistanceRunnerCrossRef(runner.actualDistanceId, runner.number))
         val teamNameTables = mutableListOf<TeamNameTable>().apply {
             runner.currentTeamName?.let {
                 TeamNameTable(

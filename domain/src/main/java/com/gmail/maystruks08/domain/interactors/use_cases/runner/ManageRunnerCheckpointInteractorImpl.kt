@@ -1,5 +1,6 @@
 package com.gmail.maystruks08.domain.interactors.use_cases.runner
 
+import com.gmail.maystruks08.domain.DEBUG
 import com.gmail.maystruks08.domain.INFO
 import com.gmail.maystruks08.domain.LogHelper
 import com.gmail.maystruks08.domain.entities.Change
@@ -9,8 +10,10 @@ import com.gmail.maystruks08.domain.entities.ModifierType
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.IRunner
 import com.gmail.maystruks08.domain.entities.runner.Runner
+import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.domain.exception.CheckpointNotFoundException
 import com.gmail.maystruks08.domain.exception.RunnerNotFoundException
+import com.gmail.maystruks08.domain.interactors.use_cases.ProvideRunnersUseCase
 import com.gmail.maystruks08.domain.repository.CheckpointsRepository
 import com.gmail.maystruks08.domain.repository.DistanceRepository
 import com.gmail.maystruks08.domain.repository.RunnersRepository
@@ -20,6 +23,7 @@ import java.util.*
 import javax.inject.Inject
 
 class ManageRunnerCheckpointInteractorImpl @Inject constructor(
+    private val provideRunnersUseCase: ProvideRunnersUseCase,
     private val runnersRepository: RunnersRepository,
     private val distanceRepository: DistanceRepository,
     private val checkpointsRepository: CheckpointsRepository,
@@ -50,18 +54,30 @@ class ManageRunnerCheckpointInteractorImpl @Inject constructor(
     override suspend fun addStartCheckpoint(currentDistance: Distance) {
         val startDate = Date()
         logHelper.log(INFO, "Add start for distance ${currentDistance.name} at ${startDate.toDateTimeFormat()}")
-        distanceRepository.updateDistanceStartDate(currentDistance.id, startDate)
-        runnersRepository
-            .getRunnersFlow(currentDistance)
-            .collect {
+        provideRunnersUseCase
+            .invoke(currentDistance, null)
+            .collect { list ->
                 val startCheckpoint = currentDistance.checkpoints.first()
-                it.forEach { runner ->
-                    val startCheckpointResult = CheckpointResultIml(startCheckpoint, startDate, true)
-                    runner.addPassedCheckpoint(startCheckpointResult, true)
-                    runnersRepository.updateRunnerData(runner)
+                val startCheckpointResult = CheckpointResultIml(startCheckpoint, startDate, true)
+                val updatedRunners = mutableListOf<Runner>()
+                list.forEach { runner ->
+                    runner.restart(startCheckpointResult)
+                    runner.addToList(updatedRunners)
                 }
+                updatedRunners.forEach {
+                    logHelper.log(DEBUG, it.number + " " + it.offTrackDistance)
+                }
+                runnersRepository.updateRunnersData(updatedRunners)
+                distanceRepository.updateDistanceStartDate(currentDistance.id, startDate)
                 logHelper.log(INFO, "Add start checkpoint to all runners success")
             }
+    }
+
+    private fun IRunner.addToList(list: MutableList<Runner>) {
+        when (this) {
+            is Runner -> list.add(this)
+            is Team -> list.addAll(this.runners)
+        }
     }
 
     override suspend fun removeCheckpoint(

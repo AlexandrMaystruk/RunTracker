@@ -14,4 +14,5 @@ interface IRunner {
 
     fun getTotalResult(): Date?
     fun checkIsOffTrack(): Boolean
+    fun restart(checkpoint: Checkpoint)
 }

@@ -168,8 +168,7 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
 
 
     override suspend fun saveRunner(runnerPojo: RunnerPojo) {
-        val runnerDocument =
-            db.collection(RUNNER_COLLECTION).document(runnerPojo.number.replaceSpecialSymbols())
+        val runnerDocument = db.collection(RUNNER_COLLECTION).document(runnerPojo.number.replaceSpecialSymbols())
         return try {
             awaitTaskCompletable(runnerDocument.update(runnerPojo.serializeToMap()))
         } catch (e: FirebaseFirestoreException) {
@@ -178,6 +177,11 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
             Timber.e(e)
             throw e
         }
+    }
+
+    override suspend fun updateRunner(runnerPojo: RunnerPojo) {
+        val runnerDocument = db.collection(RUNNER_COLLECTION).document(runnerPojo.number.replaceSpecialSymbols())
+        awaitTaskCompletable(runnerDocument.update(runnerPojo.serializeToMap()))
     }
 
     override suspend fun saveCheckpoints(
