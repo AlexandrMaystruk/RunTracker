@@ -27,6 +27,14 @@ data class RunnerFull(
     override val id get() = number
     override var lastAddedCheckpoint: Checkpoint? = null
 
+    override fun getTotalResult(): Date? {
+        return totalResults[actualDistanceId]
+    }
+
+    override fun checkIsOffTrack(): Boolean {
+        return offTrackDistances.contains(actualDistanceId)
+    }
+
     val currentTeamName get() = teamNames[actualDistanceId]
     val currentCheckpoints get() = checkpoints[actualDistanceId]
     val currentResult get() = totalResults[actualDistanceId]

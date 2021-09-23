@@ -51,12 +51,6 @@ interface Api{
     suspend fun deleteDistanceCheckpoints(distanceId: String)
 
 
-    suspend fun getCheckpointsSelectionState(userId: String): DocumentSnapshot
-
-    /**
-     * Document id is userId, field name is distanceId, value is selectedCheckpointId
-     */
-    suspend fun saveCheckpointsSelectionState(userId: String, distanceId: String, selectedCheckpointId: String)
-
+    suspend fun getAdminUserIds(): List<String>
 
 }

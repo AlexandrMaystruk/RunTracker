@@ -87,7 +87,7 @@ fun RunnerTable.toRunner(checkpoints: MutableList<Checkpoint>): Runner {
         currentCheckpoints = checkpoints,
         offTrackDistance = isOffTrackDistance,
         currentTeamName = currentTeamName,
-        currentResult = null
+        result = null
     ).also { it.calculateTotalResults() }
 }
 

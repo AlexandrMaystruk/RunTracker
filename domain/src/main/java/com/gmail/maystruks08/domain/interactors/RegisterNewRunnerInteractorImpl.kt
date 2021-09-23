@@ -30,7 +30,7 @@ class RegisterNewRunnerInteractorImpl @Inject constructor(
                     currentCheckpoints = mutableListOf(),
                     offTrackDistance = null,
                     currentTeamName = it.teamName,
-                    currentResult = null
+                    result = null
                 )
             }
             runnersRepository.saveNewRunners(raceId, distanceId, runners)

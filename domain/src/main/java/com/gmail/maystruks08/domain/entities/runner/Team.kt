@@ -25,24 +25,32 @@ data class Team(
                         runner.currentCheckpoints.any { it is CheckpointImpl }
                     }
                     if (hasUncompletedCheckpoints) return null
-                    if (runners.any { it.currentResult == null }) return null
+                    if (runners.any { it.result == null }) return null
                     var totalTime = 0L
                     runners.forEach {
-                        totalTime += it.currentResult?.time ?: 0L
+                        totalTime += it.result?.time ?: 0L
                     }
                     Date(totalTime)
                 }
                 DistanceType.TEAM -> {
                     if (runners.any { it.offTrackDistance == it.actualDistanceId }) return null
-                    if (runners.any { it.currentResult == null }) return null
-                    runners.minByOrNull { it.currentResult?.time ?: Long.MAX_VALUE }?.currentResult
+                    if (runners.any { it.result == null }) return null
+                    runners.minByOrNull { it.result?.time ?: Long.MAX_VALUE }?.result
                 }
                 else -> null
             }
         }
 
 
+    override fun getTotalResult(): Date? {
+        return result
+    }
+
+    override fun checkIsOffTrack(): Boolean {
+        return runners.any { it.checkIsOffTrack() }
+    }
+
     override fun getPassedCheckpointCount(): Int {
-        return runners.sumBy { it.currentCheckpoints?.count() ?: 0 }
+        return runners.sumBy { it.currentCheckpoints.count() }
     }
 }

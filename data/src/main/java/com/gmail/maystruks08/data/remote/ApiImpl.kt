@@ -8,9 +8,10 @@ import com.gmail.maystruks08.data.remote.pojo.DistancePojo
 import com.gmail.maystruks08.data.remote.pojo.RacePojo
 import com.gmail.maystruks08.data.remote.pojo.RunnerPojo
 import com.gmail.maystruks08.data.serializeToMap
+import com.gmail.maystruks08.data.toDataClass
 import com.gmail.maystruks08.domain.entities.Change
-import com.gmail.maystruks08.domain.entities.Statistic
 import com.gmail.maystruks08.domain.entities.ModifierType
+import com.gmail.maystruks08.domain.entities.Statistic
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.DocumentSnapshot
@@ -21,6 +22,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 
@@ -202,12 +204,17 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
         awaitTaskCompletable(document.delete())
     }
 
+    override suspend fun getAdminUserIds(): List<String> {
+        val snapshot = awaitTaskResult(db.collection(SETTINGS_COLLECTION).document("adminUsers").get())
+        val admins: HashMap<String, List<String>>? = snapshot.data?.toDataClass()
+        return admins?.values?.first().orEmpty()
+    }
+
     override suspend fun saveDistanceCheckpoints(
         distanceId: String,
         checkpoints: List<DistanceCheckpointPojo>
     ) {
-        val document =
-            db.collection(CHECKPOINTS_COLLECTION).document(distanceId.replaceSpecialSymbols())
+        val document = db.collection(CHECKPOINTS_COLLECTION).document(distanceId.replaceSpecialSymbols())
         val map = hashMapOf<String, Any>().apply { checkpoints.forEach { this[it.id] = it } }
         return try {
             awaitTaskCompletable(document.update(map))
@@ -223,20 +230,6 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
         distanceId: String
     ): DocumentSnapshot {
         return awaitTaskResult(db.collection(CHECKPOINTS_COLLECTION).document(distanceId.replaceSpecialSymbols()).get())
-    }
-
-    override suspend fun getCheckpointsSelectionState(userId: String): DocumentSnapshot {
-        return awaitTaskResult(db.collection(SETTINGS_COLLECTION).document(userId).get())
-    }
-
-
-    override suspend fun saveCheckpointsSelectionState(
-        userId: String,
-        distanceId: String,
-        selectedCheckpointId: String
-    ) {
-        val document = db.collection(SETTINGS_COLLECTION).document(userId)
-        return awaitTaskCompletable(document.update(distanceId, selectedCheckpointId))
     }
 
     private fun DocumentChange.getChangeType(): ModifierType = when (type) {

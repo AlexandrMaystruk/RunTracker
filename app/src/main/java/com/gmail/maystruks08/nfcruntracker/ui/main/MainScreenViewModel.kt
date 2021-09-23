@@ -58,6 +58,8 @@ class MainScreenViewModel @ViewModelInject constructor(
 
     private val getAccountAccessLevelUseCase: GetAccountAccessLevelUseCase,
 
+    private val eventBus: EventBus,
+
     private val router: Router
 ) : BaseViewModel() {
 
@@ -113,9 +115,15 @@ class MainScreenViewModel @ViewModelInject constructor(
     }
 
     fun onReceiveReloadEvent(reloadEvent: EventBus.ReloadEvent?) {
-        when(reloadEvent){
+        when (reloadEvent) {
             EventBus.ReloadEvent.DistanceWithRunners -> renderDistances(_mainScreenModeFlow.value)
             EventBus.ReloadEvent.UpdateCircleMenuState -> resolveDistanceStartTime(_selectedDistanceFlow.value?.dateOfStart)
+            EventBus.ReloadEvent.Runners -> {
+                _selectedDistanceFlow.value?.let { selectedDistance ->
+                    resolveDistanceStartTime(selectedDistance.dateOfStart)
+                    renderRunners(_mainScreenModeFlow.value, selectedDistance)
+                }
+            }
         }
     }
 
@@ -229,6 +237,7 @@ class MainScreenViewModel @ViewModelInject constructor(
             try {
                 val updatedRunner = offTrackRunnerUseCase.invoke(runnerNumber)
                 handleRunnerChanges(Change(updatedRunner, ModifierType.UPDATE))
+                eventBus.sendRunnerReloadEvent()
             } catch (e: Exception) {
                 handleError(e)
             }
@@ -240,8 +249,7 @@ class MainScreenViewModel @ViewModelInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (isRunnerOfftrack() || isRunnerHasResult()) return@launch
             try {
-                val runnerNumber =
-                    lastSelectedRunner?.id ?: kotlin.run { throw RunnerNotFoundException() }
+                val runnerNumber = lastSelectedRunner?.id ?: kotlin.run { throw RunnerNotFoundException() }
                 val updatedRunner = manageCheckpoints.addCurrentCheckpointByNumber(runnerNumber)
                 onMarkRunnerOnCheckpointSuccess(updatedRunner)
             } catch (e: Exception) {

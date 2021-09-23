@@ -30,11 +30,11 @@ class SettingsRepositoryImpl @Inject constructor(
         return firebaseAuth.currentUser?.uid
     }
 
-    override fun getAdminUserIds(): List<String> {
-        return emptyList()
+    override suspend fun getAdminUserIds(): List<String> {
+        return api.getAdminUserIds()
     }
 
-    override fun clearCurrentSelectedRace() {
+    override suspend fun clearCurrentSelectedRace() {
         preferences.clearRaceId()
         preferences.clearRaceName()
     }

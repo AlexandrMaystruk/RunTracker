@@ -1,7 +1,6 @@
 package com.gmail.maystruks08.data
 
 import android.content.Context
-import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.RunnerSex
 import org.apache.poi.hssf.usermodel.HSSFCell
@@ -12,9 +11,6 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import timber.log.Timber
 import java.io.InputStream
-import java.math.BigDecimal
-import java.text.ParseException
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -84,7 +80,7 @@ class XLSParser @Inject constructor(private val context: Context) {
                         currentCheckpoints = mutableListOf(),
                         offTrackDistance = null,
                         currentTeamName = teamName,
-                        currentResult = null
+                        result = null
                     )
                     result.add(newRunner)
                     Timber.e(newRunner.toString())

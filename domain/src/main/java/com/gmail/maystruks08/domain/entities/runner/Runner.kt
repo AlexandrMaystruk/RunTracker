@@ -19,7 +19,7 @@ data class Runner(
     val currentCheckpoints: MutableList<Checkpoint>,
     var offTrackDistance: String?,
     val currentTeamName: String?,
-    var currentResult: Date? = null
+    var result: Date? = null
 ) : IRunner {
 
     override val id get() = number
@@ -31,6 +31,14 @@ data class Runner(
 
     fun updateCardId(newCardId: String) {
         cardId = newCardId
+    }
+
+    override fun getTotalResult(): Date? {
+        return result
+    }
+
+    override fun checkIsOffTrack(): Boolean {
+        return !offTrackDistance.isNullOrEmpty()
     }
 
     /**
@@ -63,7 +71,7 @@ data class Runner(
         val actualCheckpoints = currentCheckpoints
         val index = actualCheckpoints.indexOfFirst { it.getId() == checkpointId }
         if (index != -1) {
-            currentResult = null
+            result = null
             val oldCheckpoint = actualCheckpoints[index]
             actualCheckpoints[index] = CheckpointImpl(
                 oldCheckpoint.getId(),
@@ -84,7 +92,7 @@ data class Runner(
                 it.getPosition()
             )
         }
-        currentResult = null
+        result = null
         currentCheckpoints.clear()
         currentCheckpoints.add(checkpoint)
         currentCheckpoints.addAll(mappedCheckpoints)
@@ -119,7 +127,7 @@ data class Runner(
         val first = currentCheckpoints.firstOrNull()?.getResult()
         val last = currentCheckpoints.lastOrNull()?.getResult()
         if (first != null && last != null) {
-            currentResult = Date(last.time - first.time)
+            result = Date(last.time - first.time)
         }
     }
 

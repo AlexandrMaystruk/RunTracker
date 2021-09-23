@@ -4,7 +4,6 @@ import android.graphics.Paint
 import com.gmail.maystruks08.domain.entities.CheckpointStatistic
 import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.Race
-import com.gmail.maystruks08.domain.entities.Statistic
 import com.gmail.maystruks08.domain.entities.checkpoint.Checkpoint
 import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointImpl
 import com.gmail.maystruks08.domain.entities.runner.IRunner
@@ -81,7 +80,7 @@ private fun Runner.toRunnerDetailView(): RunnerDetailView {
         id = this.number,
         fullName = this.fullName,
         city = this.city,
-        result = currentResult?.toUITimeFormat(),
+        result = result?.toUITimeFormat(),
         dateOfBirthday = this.dateOfBirthday?.toDateFormat().orEmpty(),
         actualDistanceId = this.actualDistanceId,
         progress = currentCheckpoints.toCheckpointViews(isOffTrack = isOffTrack),
@@ -99,7 +98,7 @@ private fun Runner.toRunnerView(): RunnerView {
     return RunnerView(
         id = this.number,
         shortName = this.shortName,
-        result = currentResult?.toUITimeFormat(),
+        result = result?.toUITimeFormat(),
         actualDistanceId = this.actualDistanceId,
         progress = currentCheckpoints.toCheckpointViews(isOffTrack = isOffTrack),
         isOffTrack = actualDistanceId == offTrackDistance,
@@ -112,7 +111,7 @@ private fun Runner.toRunnerResultView(position: Int): RunnerResultView {
     return RunnerResultView(
         runnerNumber = this.number,
         runnerFullName = this.fullName,
-        runnerResultTime = currentResult!!.time.timeInMillisToTimeFormat(),
+        runnerResultTime = result!!.time.timeInMillisToTimeFormat(),
         position = position
     )
 }

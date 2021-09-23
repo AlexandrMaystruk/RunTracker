@@ -4,9 +4,9 @@ interface SettingsRepository {
 
     suspend fun getCurrentUserId(): String?
 
-    fun getAdminUserIds(): List<String>
+    suspend fun getAdminUserIds(): List<String>
 
-    fun clearCurrentSelectedRace()
+    suspend fun clearCurrentSelectedRace()
 
     suspend fun exportRunnerDataFromXlsToRemote()
 

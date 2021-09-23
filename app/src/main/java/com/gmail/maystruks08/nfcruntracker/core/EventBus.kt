@@ -13,8 +13,12 @@ class EventBus @Inject constructor() {
     private val _reloadStateFloat = MutableStateFlow<ReloadEvent?>(null)
     val needToReload: StateFlow<ReloadEvent?> = _reloadStateFloat
 
-    fun sendReloadEvent(){
+    fun sendFullReloadEvent(){
         _reloadStateFloat.value = ReloadEvent.DistanceWithRunners
+    }
+
+    fun sendRunnerReloadEvent(){
+        _reloadStateFloat.value = ReloadEvent.Runners
     }
 
     fun sendUpdateOnlyCircleMenuEvent(){
@@ -23,6 +27,7 @@ class EventBus @Inject constructor() {
 
     sealed class ReloadEvent{
         object DistanceWithRunners: ReloadEvent()
+        object Runners: ReloadEvent()
         object UpdateCircleMenuState: ReloadEvent()
     }
 

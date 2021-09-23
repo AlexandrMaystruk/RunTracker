@@ -10,7 +10,8 @@ class GetAccountAccessLevelUseCaseImpl @Inject constructor(
 
     override suspend fun invoke(): AssesLevel {
         val currentUserId = repository.getCurrentUserId()
-        val isCurrentUserAdmin = repository.getAdminUserIds().contains(currentUserId)
+        val admins =  repository.getAdminUserIds()
+        val isCurrentUserAdmin = admins.contains(currentUserId)
         return if (isCurrentUserAdmin) AssesLevel.Admin else AssesLevel.User
     }
 

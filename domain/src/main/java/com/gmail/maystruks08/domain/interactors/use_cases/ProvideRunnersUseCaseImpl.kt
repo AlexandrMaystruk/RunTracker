@@ -1,19 +1,15 @@
 package com.gmail.maystruks08.domain.interactors.use_cases
 
 import com.gmail.maystruks08.domain.DEBUG
-import com.gmail.maystruks08.domain.INFO
 import com.gmail.maystruks08.domain.LogHelper
 import com.gmail.maystruks08.domain.entities.Distance
 import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.runner.IRunner
-import com.gmail.maystruks08.domain.entities.runner.Team
 import com.gmail.maystruks08.domain.repository.RunnersRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import java.util.logging.Level
 import javax.inject.Inject
 
 class ProvideRunnersUseCaseImpl @Inject constructor(
@@ -25,20 +21,32 @@ class ProvideRunnersUseCaseImpl @Inject constructor(
         distance: Distance,
         query: String?
     ): Flow<List<IRunner>> {
-       return when (distance.type) {
+        return when (distance.type) {
             DistanceType.MARATHON -> {
-                runnersRepository.getRunnersFlow(distance = distance, onlyFinishers = false, query = query)
+                runnersRepository.getRunnersFlow(
+                    distance = distance,
+                    onlyFinishers = false,
+                    query = query
+                )
                     .map { list ->
-                        logHelper.log(DEBUG, "Received runners fro repository" )
-                        val result = list.sortedByDescending { it.getPassedCheckpointCount() }
-                        logHelper.log(DEBUG, "Sorting finished" )
+                        logHelper.log(DEBUG, "Received runners fro repository")
+                        val result = list.sortedWith(compareBy<IRunner> { it.getTotalResult() }
+                            .thenBy { runner -> runner.checkIsOffTrack() }
+                            .thenByDescending { runner -> runner.getPassedCheckpointCount() }
+                        )
+                        logHelper.log(DEBUG, "Sorting finished")
                         result
                     }
             }
             DistanceType.REPLAY, DistanceType.TEAM -> {
                 runnersRepository
                     .getTeamRunnersFlow(distance = distance)
-                    .map { list -> list.sortedByDescending { it.getPassedCheckpointCount() } }
+                    .map { list ->
+                        list.sortedWith(compareBy<IRunner> { it.getTotalResult() }
+                            .thenBy { runner -> runner.checkIsOffTrack() }
+                            .thenByDescending { runner -> runner.getPassedCheckpointCount() }
+                        )
+                    }
             }
         }.flowOn(Dispatchers.IO)
     }

@@ -54,7 +54,7 @@ class RunnerViewModel @ViewModelInject constructor(
             try {
                 val updatedRunner = checkpointManager.removeCheckpoint(runnerNumber, checkpointId.id)
                 handleRunnerData(updatedRunner.entity)
-                eventBus.sendReloadEvent()
+                eventBus.sendRunnerReloadEvent()
             } catch (e: Exception) {
                 handleError(e)
             }
