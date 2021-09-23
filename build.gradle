@@ -116,12 +116,12 @@ ext {
     //Global config
     androidApplicationId = 'com.gmail.maystruks08.nfcruntracker'
     testApplicationId = 'com.gmail.maystruks08.nfcruntracker'
-    androidVersionCode = 1
-    androidVersionName = "1.0"
+    androidVersionCode = versionCode
+    androidVersionName = "${versionMajor}.${versionMinor}.${versionPatch}"
     testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
 
     //Android
-    androidBuildToolsVersion = "29.0.0"
+    androidBuildToolsVersion = "30.0.2"
     annotationVersion = '1.1.0'
     androidXToolsVersion = '1.3.2'
     androidXRecyclerViewVersion = '1.1.0'
@@ -131,8 +131,8 @@ ext {
 
     androidXAppCompatToolsVersion = "1.1.0"
     androidMinSdkVersion = 21
-    androidTargetSdkVersion = 29
-    androidCompileSdkVersion = 29
+    androidTargetSdkVersion = 30
+    androidCompileSdkVersion = 30
     androidCoreKTXVersion = '1.3.2'
 
     //{ Libraries }

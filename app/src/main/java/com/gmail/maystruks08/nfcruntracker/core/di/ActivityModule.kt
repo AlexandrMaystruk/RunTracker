@@ -152,6 +152,10 @@ interface RunnerUseCaseModule {
     @ActivityScoped
     fun bindCalculateCheckpointStatisticUseCase(impl: CalculateCheckpointStatisticUseCaseImpl): CalculateCheckpointStatisticUseCase
 
+    @Binds
+    @ActivityScoped
+    fun bindCheckIsValidAppVersionUseCaseImpl(impl: CheckIsValidAppVersionUseCaseImpl): CheckIsValidAppVersionUseCase
+
 }
 
 

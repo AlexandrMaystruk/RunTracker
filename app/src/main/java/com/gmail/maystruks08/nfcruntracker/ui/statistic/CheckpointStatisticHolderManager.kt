@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import com.gmail.maystruks08.nfcruntracker.R
+import com.gmail.maystruks08.nfcruntracker.core.ext.color
 import com.gmail.maystruks08.nfcruntracker.databinding.ItemCheckpointStatisticBinding
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.BaseViewHolder
 import com.gmail.maystruks08.nfcruntracker.ui.adapter.base.Item
@@ -38,7 +39,13 @@ class CheckpointStatisticViewHolder(
     override fun onBind(item: CheckpointStatisticView) = with(binding) {
         super.onBind(item)
         tvCheckpointName.text = item.title
-        tvInProgressLabel.text = item.runnerCountInProgress
-        tvFinishersLabel.text = item.runnerCountWhoVisitCheckpoint
+        tvInProgressLabel.text = item.runnerCountInProgress.toString()
+        tvFinishersLabel.text = item.runnerCountWhoVisitCheckpoint.toString()
+        root.setBackgroundColor(
+            root.context.color(
+                if (item.runnerCountInProgress > 0) R.color.colorWhite
+                else R.color.colorCardFinisher
+            )
+        )
     }
 }

@@ -14,7 +14,6 @@
 
     <string name="menu_item_edit_race">Edit current race</string>
 
-
     <string name="tab_runner_result">Runners</string>
     <string name="tab_iron_runner_result">Iron</string>
 
@@ -82,8 +81,6 @@
     <string name="current_checkpoint">Current checkpoint:</string>
     <string name="finishers">Finishers</string>
 
-
-
-
+    <string name="invalid_version">Version invalid. Please install actual or contact with the developer</string>
 
 </resources>

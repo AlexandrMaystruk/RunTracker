@@ -211,7 +211,13 @@ class ApiImpl @Inject constructor(private val db: FirebaseFirestore) : Api {
     override suspend fun getAdminUserIds(): List<String> {
         val snapshot = awaitTaskResult(db.collection(SETTINGS_COLLECTION).document("adminUsers").get())
         val admins: HashMap<String, List<String>>? = snapshot.data?.toDataClass()
-        return admins?.values?.first().orEmpty()
+        return admins?.get("UUID").orEmpty()
+    }
+
+    override suspend fun getActualAppVersion(): List<String> {
+        val snapshot = awaitTaskResult(db.collection(SETTINGS_COLLECTION).document( "actualVersions").get())
+        val actualVersions: HashMap<String, List<String>>? = snapshot.data?.toDataClass()
+        return actualVersions?.get("versions").orEmpty()
     }
 
     override suspend fun saveDistanceCheckpoints(

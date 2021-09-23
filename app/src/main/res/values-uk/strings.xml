@@ -12,6 +12,8 @@
     <string name="screen_race_list">Забіги</string>
     <string name="screen_distance_statistic">Статистика по дистанціх</string>
 
+    <string name="menu_item_edit_race">Редагувати забіг</string>
+
     <string name="tab_runner_result">Бігуни</string>
     <string name="tab_iron_runner_result">Залізні</string>
 
@@ -72,5 +74,6 @@
     <string name="current_checkpoint">Поточне кп:</string>
     <string name="finishers">Фінішники</string>
 
+    <string name="invalid_version">Версія додатка застаріла. Встановіть актуальну або зв\'яжіться з розробником</string>
 
 </resources>

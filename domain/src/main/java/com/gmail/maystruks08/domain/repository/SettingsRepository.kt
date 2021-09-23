@@ -6,10 +6,13 @@ interface SettingsRepository {
 
     suspend fun getAdminUserIds(): List<String>
 
+    suspend fun getActualAppVersion(): List<String>
+
     suspend fun clearCurrentSelectedRace()
 
     suspend fun exportRunnerDataFromXlsToRemote()
 
     suspend fun generateQrCodes()
+
 
 }

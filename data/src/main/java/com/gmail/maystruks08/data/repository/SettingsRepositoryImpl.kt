@@ -12,11 +12,13 @@ import com.gmail.maystruks08.domain.entities.DistanceType
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.repository.SettingsRepository
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
 
+@ExperimentalCoroutinesApi
 class SettingsRepositoryImpl @Inject constructor(
     private val preferences: ConfigPreferences,
     private val firebaseAuth: FirebaseAuth,
@@ -708,5 +710,9 @@ class SettingsRepositoryImpl @Inject constructor(
             "860"
         )
         qrCodeGenerator.generateQRCodes(list)
+    }
+
+    override suspend fun getActualAppVersion(): List<String> {
+        return api.getActualAppVersion()
     }
 }

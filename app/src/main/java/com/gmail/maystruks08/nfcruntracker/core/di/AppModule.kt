@@ -17,7 +17,9 @@ import com.gmail.maystruks08.domain.entities.checkpoint.CheckpointResultIml
 import com.gmail.maystruks08.domain.entities.runner.IRunner
 import com.gmail.maystruks08.domain.entities.runner.Runner
 import com.gmail.maystruks08.domain.entities.runner.Team
+import com.gmail.maystruks08.domain.repository.EnvironmentUtil
 import com.gmail.maystruks08.nfcruntracker.R
+import com.gmail.maystruks08.nfcruntracker.utils.EnvironmentUtilImpl
 import com.gmail.maystruks08.nfcruntracker.utils.NetworkUtilImpl
 import com.gmail.maystruks08.nfcruntracker.workers.SyncRunnersDataSchedulerImpl
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -47,6 +49,12 @@ abstract class AppModule {
     @Binds
     @Singleton
     abstract fun log(logHelper: LogHelperImpl): LogHelper
+
+
+    @Binds
+    @Singleton
+    abstract fun bindEnvironmentUtil(logHelper: EnvironmentUtilImpl): EnvironmentUtil
+
 
     @Binds
     @Singleton

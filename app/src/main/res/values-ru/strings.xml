@@ -12,6 +12,8 @@
     <string name="screen_race_list">Забеги</string>
     <string name="screen_distance_statistic">Статистика по дистанции</string>
 
+    <string name="menu_item_edit_race">Редактировать забег</string>
+
     <string name="tab_runner_result">Бегуны</string>
     <string name="tab_iron_runner_result">Железные</string>
 
@@ -71,5 +73,7 @@
     <string name="def_new_checkpoint_name">Введите название</string>
     <string name="current_checkpoint">Текущее кп:</string>
     <string name="finishers">Финишеры</string>
+
+    <string name="invalid_version">Версия приложения устарела. Установите актуальную либо свяжитесь с разработчиком</string>
 
 </resources>

@@ -206,8 +206,8 @@ fun Checkpoint.toCheckpointView(
 fun CheckpointStatistic.toCheckpointStatisticViewView(): CheckpointStatisticView {
     return CheckpointStatisticView(
         title = checkpointName,
-        runnerCountInProgress = runnerCountInProgress.toString(),
-        runnerCountWhoVisitCheckpoint = runnerCountWhoVisitCheckpoint.toString()
+        runnerCountInProgress = runnerCountInProgress,
+        runnerCountWhoVisitCheckpoint = runnerCountWhoVisitCheckpoint
     )
 }
 

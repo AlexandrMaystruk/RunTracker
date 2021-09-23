@@ -30,7 +30,8 @@ class CalculateCheckpointStatisticUseCaseImpl @Inject constructor(
                     )
                 }
                 val finisherCount = finisherCountDeferred.await()
-                val runnerCountInProgress = runnerCount - finisherCount - offTrackCount
+                var runnerCountInProgress = runnerCount - finisherCount - offTrackCount
+                if (runnerCountInProgress < 0) runnerCountInProgress = 0
                 CheckpointStatistic(it.getId(), it.getName(), runnerCountInProgress, finisherCount)
             }
         }

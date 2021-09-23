@@ -28,8 +28,8 @@ data class CheckpointView(
 
 data class CheckpointStatisticView(
     val title: String,
-    var runnerCountWhoVisitCheckpoint: String,
-    var runnerCountInProgress: String
+    var runnerCountWhoVisitCheckpoint: Int,
+    var runnerCountInProgress: Int
 ) : Item
 
 sealed class CheckpointPosition {

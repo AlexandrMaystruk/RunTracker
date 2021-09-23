@@ -57,4 +57,6 @@ interface Api{
 
     suspend fun getAdminUserIds(): List<String>
 
+    suspend fun getActualAppVersion(): List<String>
+
 }

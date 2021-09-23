@@ -15,23 +15,26 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.lifecycleScope
 import com.gmail.maystruks08.domain.NetworkUtil
 import com.gmail.maystruks08.domain.toDateTimeFormat
+import com.gmail.maystruks08.nfcruntracker.core.ext.drawable
 import com.gmail.maystruks08.nfcruntracker.core.ext.getFragment
+import com.gmail.maystruks08.nfcruntracker.core.ext.string
 import com.gmail.maystruks08.nfcruntracker.core.ext.toast
 import com.gmail.maystruks08.nfcruntracker.core.navigation.AppNavigator
 import com.gmail.maystruks08.nfcruntracker.core.navigation.Screens
 import com.gmail.maystruks08.nfcruntracker.databinding.ActivityHostBinding
 import com.gmail.maystruks08.nfcruntracker.ui.login.LoginFragment
-import com.gmail.maystruks08.nfcruntracker.ui.register.RegisterNewRunnerFragment
-import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
 import com.gmail.maystruks08.nfcruntracker.ui.main.MainScreenFragment
+import com.gmail.maystruks08.nfcruntracker.ui.runner.RunnerFragment
 import com.gmail.maystruks08.nfcruntracker.utils.NfcAdapter
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.flow.collect
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.commands.Command
@@ -59,7 +62,7 @@ class HostActivity : AppCompatActivity() {
 
     private var lastBackPressTime = 0L
 
-    private val nfcAdapter = NfcAdapter()
+//    private val nfcAdapter = NfcAdapter()
 
     private var alertDialog: AlertDialog? = null
 
@@ -67,13 +70,8 @@ class HostActivity : AppCompatActivity() {
 
     private var toast: Toast? = null
 
-    private var isFirstLaunch = true
-
-    private var isCorrectFragment = false
-
     private val navigator: Navigator = object : AppNavigator(this, supportFragmentManager, R.id.nav_host_container) {
         override fun setupFragmentTransaction(command: Command?, currentFragment: Fragment?, nextFragment: Fragment?, fragmentTransaction: FragmentTransaction) {
-            isCorrectFragment = nextFragment !is LoginFragment
             fragmentTransaction.setReorderingAllowed(true)
         }
     }
@@ -86,6 +84,22 @@ class HostActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         viewModel.toast.observe(this, { toast(it) })
+
+        lifecycleScope.launchWhenResumed {
+            viewModel.applicationVersionInvalid.collect { isInvalid ->
+                if (isInvalid == true) {
+                    val alert = AlertDialog.Builder(this@HostActivity)
+                        .setIcon(drawable(R.drawable.ic_launcher_foreground))
+                        .setMessage(string(R.string.invalid_version))
+                        .show()
+                    alert.show()
+                    binding.root.postDelayed({
+                        alert.dismiss()
+                        this@HostActivity.finish()
+                    }, 4000)
+                }
+            }
+        }
 
         networkUtil.subscribeToConnectionChange(this) { isConnected ->
             if (!isConnected) {
@@ -142,7 +156,7 @@ class HostActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         navigatorHolder.setNavigator(navigator)
-        nfcAdapter.startListening(this)
+/*        nfcAdapter.startListening(this)
         if (!nfcAdapter.isEnabled() && isFirstLaunch && isCorrectFragment) {
             val builder = AlertDialog.Builder(this)
                 .setTitle(getString(R.string.nfc_disabled))
@@ -158,23 +172,23 @@ class HostActivity : AppCompatActivity() {
                 }
             alertDialog = builder.show()
         } else alertDialog?.dismiss()
-        isFirstLaunch = false
+        isFirstLaunch = false*/
     }
 
     @ObsoleteCoroutinesApi
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        nfcAdapter.processReadCard(intent)?.let { cardId ->
-            Timber.log(Log.INFO, "Card scanned: $cardId at ${Date().toDateTimeFormat()}")
-            getFragment<MainScreenFragment>(Screens.MainScreen.tag())?.onNfcCardScanned(cardId)
-            getFragment<RunnerFragment>(Screens.RunnerScreen.tag())?.onNfcCardScanned(cardId)
-        }
+//        nfcAdapter.processReadCard(intent)?.let { cardId ->
+//            Timber.log(Log.INFO, "Card scanned: $cardId at ${Date().toDateTimeFormat()}")
+//            getFragment<MainScreenFragment>(Screens.MainScreen.tag())?.onNfcCardScanned(cardId)
+//            getFragment<RunnerFragment>(Screens.RunnerScreen.tag())?.onNfcCardScanned(cardId)
+//        }
     }
 
     override fun onPause() {
         super.onPause()
         navigatorHolder.removeNavigator()
-        nfcAdapter.stopListening(this)
+//        nfcAdapter.stopListening(this)
         alertDialog?.dismiss()
         this.hideSoftKeyboard()
     }
